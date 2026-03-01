@@ -49,9 +49,15 @@ Each team context: `docs/teams/<team>-team.md`
 - Tests: `.toEqual()` for exact matching, not `.toContain()`
 - Constants: `src/core/constants.ts`
 
+## Dev Server Ports
+- **5173** - Human development port (manual testing, debugging)
+- **5174** - AI automation port (browser testing via Playwright MCP)
+
+When running browser automation tests, use port 5174 to avoid conflicts with human activity.
+
 ## Commands
 ```bash
-pnpm dev              # Start dev server
+pnpm dev              # Start dev server (defaults to 5173, auto-increments if in use)
 pnpm build            # Production build
 pnpm lint             # ESLint with auto-fix
 pnpm type-check       # TypeScript type checking
