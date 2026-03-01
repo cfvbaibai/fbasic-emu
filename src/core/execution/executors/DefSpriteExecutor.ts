@@ -116,9 +116,15 @@ export class DefSpriteExecutor {
       }
 
       // Convert character set to tiles
+      // CGEN mode determines which character table to use:
+      // - CGEN 0, 2: Table A for sprites
+      // - CGEN 1, 3: Table B for sprites
+      const cgenMode = this.context.deviceAdapter?.getCharacterGeneratorMode() ?? 2
+      const useTableB = cgenMode === 1 || cgenMode === 3
+
       let tiles
       try {
-        tiles = convertCharacterSetToTiles(characterSet, size as 0 | 1)
+        tiles = convertCharacterSetToTiles(characterSet, size as 0 | 1, useTableB)
       } catch (error) {
         this.context.addError({
           line: lineNumber ?? 0,
@@ -151,6 +157,9 @@ export class DefSpriteExecutor {
             `priority=${priority}, color=${colorCombination})`
         )
       }
+
+      // Notify main thread of sprite state change
+      this.notifySpriteStatesChanged()
     } catch (error) {
       this.context.addError({
         line: lineNumber ?? 0,
@@ -274,5 +283,17 @@ export class DefSpriteExecutor {
       }
     }
     return []
+  }
+
+  /**
+   * Notify main thread that sprite states have changed
+   */
+  private notifySpriteStatesChanged(): void {
+    if (this.context.spriteStateManager && this.context.deviceAdapter?.sendSpriteStates) {
+      this.context.deviceAdapter.sendSpriteStates(
+        this.context.spriteStateManager.getAllSpriteStates(),
+        this.context.spriteStateManager.isSpriteEnabled()
+      )
+    }
   }
 }

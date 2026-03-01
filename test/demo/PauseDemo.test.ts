@@ -44,6 +44,7 @@ describe.skipIf(!shouldRunPauseDemoTests)('Pause Demo Program', () => {
       setColorPalette: () => {},
       setBackdropColor: () => {},
       setCharacterGeneratorMode: () => {},
+      getCharacterGeneratorMode: () => 2,
     }
 
     interpreter = new BasicInterpreter({

@@ -287,6 +287,10 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
     logDevice.debug('Set character generator mode:', mode)
   }
 
+  getCharacterGeneratorMode(): number {
+    return this.currentCgenMode ?? 2 // Default is 2 per F-BASIC spec
+  }
+
   // === TEST HELPER METHODS ===
 
   /**

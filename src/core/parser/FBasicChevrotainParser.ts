@@ -978,16 +978,20 @@ class FBasicChevrotainParser extends CstParser {
       this.SUBRULE7(this.expression, { LABEL: 'characterSet' })
     })
 
-    // SPRITE n, X, Y
+    // SPRITE n [, X, Y]
     // n: sprite number (0-7)
     // X, Y: position in pixels (X: 0-255, Y: 0-255, per F-BASIC manual)
+    // If X, Y are omitted, sprite n is hidden (removed from display)
     this.spriteStatement = this.RULE('spriteStatement', () => {
       this.CONSUME(Sprite)
       this.SUBRULE(this.expression, { LABEL: 'spriteNumber' }) // n
-      this.CONSUME(Comma)
-      this.SUBRULE2(this.expression, { LABEL: 'x' }) // X
-      this.CONSUME2(Comma)
-      this.SUBRULE3(this.expression, { LABEL: 'y' }) // Y
+      // X, Y coordinates are optional - if omitted, sprite is hidden
+      this.OPTION(() => {
+        this.CONSUME(Comma)
+        this.SUBRULE2(this.expression, { LABEL: 'x' }) // X
+        this.CONSUME2(Comma)
+        this.SUBRULE3(this.expression, { LABEL: 'y' }) // Y
+      })
     })
 
     // SPRITE ON | SPRITE OFF

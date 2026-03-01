@@ -1,12 +1,66 @@
 /**
  * Sprite Lookup Utilities
- * Lookup sprites from Character Table A (CHARACTER_SPRITES)
+ * Lookup sprites from Character Table A (CHARACTER_SPRITES) or Table B (BG items)
  * Used for DEF SPRITE character set conversion
+ *
+ * CGEN mode determines which table to use:
+ * - CGEN 0, 2: Table A for sprites
+ * - CGEN 1, 3: Table B for sprites
  */
 
+import { KANA_BG_ITEMS, LETTER_BG_ITEMS, NUMBER_BG_ITEMS, PICTURE_BG_ITEMS, SYMBOL_BG_ITEMS } from '@/shared/data/bg'
 import { CHARACTER_SPRITES } from '@/shared/data/sprites'
-import type { SpriteDefinition, Tile } from '@/shared/data/types'
+import type { BackgroundItem, SpriteDefinition, Tile } from '@/shared/data/types'
 import { isEightTileSprite, isFourTileSprite, isOneTileSprite, isSixTileSprite } from '@/shared/data/types'
+
+// Combine all BG items into a single array for Table B lookup
+const ALL_BG_ITEMS: BackgroundItem[] = [
+  ...KANA_BG_ITEMS,
+  ...LETTER_BG_ITEMS,
+  ...NUMBER_BG_ITEMS,
+  ...PICTURE_BG_ITEMS,
+  ...SYMBOL_BG_ITEMS,
+]
+
+// Create a Map for O(1) lookup by character code
+const bgItemByCode = new Map<number, BackgroundItem>()
+for (const item of ALL_BG_ITEMS) {
+  bgItemByCode.set(item.code, item)
+}
+
+/**
+ * Find background tile by character code from Table B
+ * Used when CGEN mode is 1 or 3 (B on sprite)
+ *
+ * @param code - Character code (0-255)
+ * @returns Tile data or null if not found
+ */
+export function getBgTileByCode(code: number): Tile | null {
+  const item = bgItemByCode.get(code)
+  return item?.tile ?? null
+}
+
+/**
+ * Find background tiles for a sequence of character codes from Table B
+ *
+ * @param codes - Array of character codes
+ * @returns Array of tiles in order
+ */
+export function getBgTilesByCodes(codes: number[]): Tile[] {
+  const tiles: Tile[] = []
+  for (let i = 0; i < codes.length; i++) {
+    const code = codes[i]
+    if (code === undefined) {
+      throw new Error(`Undefined character code at index ${i}`)
+    }
+    const tile = getBgTileByCode(code)
+    if (!tile) {
+      throw new Error(`No background tile found for character code ${code} in Table B`)
+    }
+    tiles.push(tile)
+  }
+  return tiles
+}
 
 /**
  * Find sprite tile by character code from Table A

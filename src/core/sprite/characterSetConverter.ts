@@ -1,14 +1,17 @@
 /**
  * Character Set Converter
  * Converts DEF SPRITE character sets to tile data
- * Uses Character Table A (sprite table) instead of Table B (background table)
+ *
+ * Uses Table A (sprite table) or Table B (background table) based on CGEN mode:
+ * - CGEN 0, 2: Table A for sprites
+ * - CGEN 1, 3: Table B for sprites
  */
 
 import type { Tile } from '@/shared/data/types'
-import { getSpriteTilesByCodes } from '@/shared/utils/spriteLookup'
+import { getBgTilesByCodes, getSpriteTilesByCodes } from '@/shared/utils/spriteLookup'
 
 /**
- * Convert character set to tiles from Table A (sprite table)
+ * Convert character set to tiles
  * Character set can be:
  * - String: "@ABC" (use character lookup)
  * - Number array: [0, 1, 2, 3] (use code lookup)
@@ -18,9 +21,10 @@ import { getSpriteTilesByCodes } from '@/shared/utils/spriteLookup'
  *
  * @param characterSet - Character codes or string
  * @param size - Sprite size (0=8×8, 1=16×16)
- * @returns Array of tiles from Table A
+ * @param useTableB - If true, use Table B (background), otherwise Table A (sprite)
+ * @returns Array of tiles
  */
-export function convertCharacterSetToTiles(characterSet: number[] | string, size: 0 | 1): Tile[] {
+export function convertCharacterSetToTiles(characterSet: number[] | string, size: 0 | 1, useTableB = false): Tile[] {
   const expectedCount = size === 1 ? 4 : 1
 
   // Convert to character codes
@@ -39,12 +43,17 @@ export function convertCharacterSetToTiles(characterSet: number[] | string, size
     )
   }
 
-  // Look up tiles from Table A (sprite table)
+  // Look up tiles from the appropriate table
+  const tableName = useTableB ? 'Table B' : 'Table A'
   try {
-    return getSpriteTilesByCodes(charCodes)
+    if (useTableB) {
+      return getBgTilesByCodes(charCodes)
+    } else {
+      return getSpriteTilesByCodes(charCodes)
+    }
   } catch (error) {
     throw new Error(
-      `DEF SPRITE: Failed to find sprite tiles in Table A: ${error instanceof Error ? error.message : String(error)}`
+      `DEF SPRITE: Failed to find sprite tiles in ${tableName}: ${error instanceof Error ? error.message : String(error)}`
     )
   }
 }

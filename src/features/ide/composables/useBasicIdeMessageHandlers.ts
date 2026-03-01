@@ -17,6 +17,7 @@ import type {
   ScreenCell,
 } from '@/core/interfaces'
 import type { Note, Rest } from '@/core/sound/types'
+import type { SpriteState } from '@/core/sprite/types'
 import { ExecutionError } from '@/features/ide/errors/ExecutionError'
 import { logComposable, logIdeMessages } from '@/shared/logger'
 
@@ -153,6 +154,10 @@ export interface MessageHandlerContext {
   backdropColor?: Ref<number>
   spritePalette?: Ref<number>
   cgenMode?: Ref<number>
+  /** Sprite states from DEF SPRITE and SPRITE commands (updated via SPRITE_STATES message) */
+  spriteStates?: Ref<SpriteState[]>
+  /** Whether sprite display is enabled (SPRITE ON/OFF) */
+  spriteEnabled?: Ref<boolean>
   // movementStates removed - read from shared buffer instead
   frontSpriteNodes?: Ref<Map<number, unknown>>
   backSpriteNodes?: Ref<Map<number, unknown>>
@@ -203,6 +208,34 @@ export function handleScreenChangedMessage(
   context: MessageHandlerContext
 ): void {
   const schedule = context.scheduleRenderForScreenChanged ?? context.scheduleRender
+  if (schedule) {
+    schedule()
+  }
+}
+
+/**
+ * Handle SPRITE_STATES message from web worker.
+ * Updates sprite states and triggers a render to display static sprites (DEF SPRITE, SPRITE commands).
+ */
+export function handleSpriteStatesMessage(
+  message: AnyServiceWorkerMessage,
+  context: MessageHandlerContext
+): void {
+  if (message.type !== 'SPRITE_STATES') return
+
+  const { spriteStates, spriteEnabled } = message.data
+  logIdeMessages.debug('📤 Handling SPRITE_STATES:', { statesCount: spriteStates?.length, enabled: spriteEnabled })
+
+  // Update sprite states in context (these are passed to Screen.vue via useScreenContext)
+  if (context.spriteStates && spriteStates) {
+    context.spriteStates.value = spriteStates
+  }
+  if (context.spriteEnabled !== undefined && spriteEnabled !== undefined) {
+    context.spriteEnabled.value = spriteEnabled
+  }
+
+  // Schedule a full render to display the sprites
+  const schedule = context.scheduleRender
   if (schedule) {
     schedule()
   }
@@ -603,6 +636,10 @@ function processMessage(message: AnyServiceWorkerMessage, context: MessageHandle
       if (reqInputData?.executionId && context.webWorkerManager) {
         extendExecutionTimeout(context.webWorkerManager, reqInputData.executionId)
       }
+      break
+    }
+    case 'SPRITE_STATES': {
+      handleSpriteStatesMessage(message, context)
       break
     }
     default:

@@ -144,6 +144,8 @@ export class ExecutionEngine {
         variables: this.context.variables,
         arrays: this.context.arrays,
         executionTime: Date.now() - startTime,
+        spriteStates: this.context.spriteStateManager?.getAllSpriteStates(),
+        spriteEnabled: this.context.spriteStateManager?.isSpriteEnabled(),
       }
     } catch (error) {
       this.context.isRunning = false
@@ -159,6 +161,8 @@ export class ExecutionEngine {
         variables: this.context.variables,
         arrays: this.context.arrays,
         executionTime: Date.now() - startTime,
+        spriteStates: this.context.spriteStateManager?.getAllSpriteStates(),
+        spriteEnabled: this.context.spriteStateManager?.isSpriteEnabled(),
       }
     }
   }

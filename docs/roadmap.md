@@ -1,6 +1,6 @@
 # Roadmap
 
-**Last Updated**: 2026-02-25
+**Last Updated**: 2026-03-01
 
 ---
 
@@ -30,7 +30,7 @@ Track future work via [GitHub Issues](https://github.com/cfvbaibai/fbasic-ide/is
 
 **Statements**: BEEP, CGEN, CGSET, CLEAR, CLS, COLOR, CUT, DATA, DEF MOVE, DEF SPRITE, DIM, END, ERA, FOR/NEXT, GOTO, GOSUB, IF/THEN, INPUT, LET, LINPUT, LOCATE, MOVE, ON, PALET/PALETB/PALETS, PAUSE, PLAY, POSITION, PRINT, READ, REM, RESTORE, RETURN, SPRITE/SPRITE ON/OFF, SWAP, VIEW
 
-**Functions**: ABS, ASC, CHR$, CSRLIN, HEX$, LEFT$, LEN, MID$, MOVE(n), POS, RIGHT$, RND, SCR$, SGN, STICK, STR$, STRIG, VAL, XPOS, YPOS
+**Functions**: ABS, ASC, CHR$, CSRLIN, HEX$, INKEY$, LEFT$, LEN, MID$, MOVE(n), POS, RIGHT$, RND, SCR$, SGN, STICK, STR$, STRIG, VAL, XPOS, YPOS
 
 ### REPL-Only (Parsed with IDE Error Message)
 
@@ -51,12 +51,19 @@ These commands are recognized by the parser but produce "Not applicable for IDE 
 | POKE | Write memory | "POKE: Not applicable for IDE version" |
 | PEEK | Read memory | "PEEK: Not applicable for IDE version" |
 | FRE | Free memory | "FRE: Not applicable for IDE version" |
-| INKEY$ | Immediate keypress | "INKEY$: Not applicable for IDE version" |
 | STOP | Pause execution | "STOP: Not applicable for IDE version" |
 
 ---
 
 ## Completed
+
+### INKEY$ Full Implementation (2026-03-01)
+
+**What was implemented**:
+- INKEY$ function with non-blocking (default) and blocking (`n=0`) modes
+- SharedArrayBuffer-based keyboard input via Web Worker
+- IDE keyboard capture composable with Joystick/Keyboard mode toggle (F9)
+- Comprehensive test coverage (~30 test cases)
 
 ### Command Coverage Complete (2026-02-25)
 

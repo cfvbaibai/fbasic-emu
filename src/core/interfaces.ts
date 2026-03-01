@@ -106,6 +106,15 @@ export interface BasicDeviceAdapter {
   /** Clear stored position for sprite (e.g. after START_MOVEMENT so next MOVE uses buffer/default). */
   clearSpritePosition?(actionNumber: number): void
 
+  // === SPRITE STATE NOTIFICATION ===
+  /**
+   * Send sprite states to main thread for rendering.
+   * Called by executors when sprite states change (DEF SPRITE, SPRITE, SPRITE ON/OFF).
+   * @param spriteStates - Array of all sprite states
+   * @param spriteEnabled - Whether sprite display is enabled
+   */
+  sendSpriteStates?(spriteStates: SpriteState[], spriteEnabled: boolean): void
+
   // === TEXT OUTPUT ===
   printOutput(output: string): void
   debugOutput(output: string): void
@@ -118,6 +127,7 @@ export interface BasicDeviceAdapter {
   setColorPalette(bgPalette: number, spritePalette: number): void
   setBackdropColor(colorCode: number): void
   setCharacterGeneratorMode(mode: number): void
+  getCharacterGeneratorMode(): number
 
   // === KEYBOARD INPUT (INPUT / LINPUT) ===
   /**
@@ -280,6 +290,7 @@ export type ServiceWorkerMessageType =
   | 'OUTPUT'
   | 'SCREEN_UPDATE'
   | 'SCREEN_CHANGED'
+  | 'SPRITE_STATES'
   | 'STOP'
   | 'INIT'
   | 'READY'
@@ -384,6 +395,15 @@ export interface ScreenChangedMessage extends ServiceWorkerMessage {
   data?: {
     id?: string
     timestamp?: number
+  }
+}
+
+// Sprite states message - sent from worker to UI when sprite states change (DEF SPRITE, SPRITE, SPRITE ON/OFF)
+export interface SpriteStatesMessage extends ServiceWorkerMessage {
+  type: 'SPRITE_STATES'
+  data: {
+    spriteStates: SpriteState[]
+    spriteEnabled: boolean
   }
 }
 
@@ -539,6 +559,7 @@ export type AnyServiceWorkerMessage =
   | OutputMessage
   | ScreenUpdateMessage
   | ScreenChangedMessage
+  | SpriteStatesMessage
   | StopMessage
   | StrigEventMessage
   | StickEventMessage

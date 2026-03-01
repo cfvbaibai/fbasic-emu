@@ -56,6 +56,8 @@ export function useBasicIdeWorkerIntegration(
     backdropColor: state.backdropColor,
     spritePalette: state.spritePalette,
     cgenMode: state.cgenMode,
+    spriteStates: state.spriteStates,
+    spriteEnabled: state.spriteEnabled,
     // movementStates removed - read from shared buffer instead
     frontSpriteNodes: state.frontSpriteNodes,
     backSpriteNodes: state.backSpriteNodes,

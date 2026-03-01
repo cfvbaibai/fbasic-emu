@@ -17,6 +17,7 @@ import type {
   OutputMessage,
 } from '@/core/interfaces'
 import type { CompiledAudio } from '@/core/sound/types'
+import type { SpriteState } from '@/core/sprite/types'
 import type { BgGridData } from '@/features/bg-editor/types'
 import { logWorker } from '@/shared/logger'
 
@@ -281,6 +282,24 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
     this.lastPositionBySprite.clear()
   }
 
+  // === SPRITE STATE NOTIFICATION ===
+
+  /**
+   * Send sprite states to main thread for rendering.
+   * Called by executors when sprite states change (DEF SPRITE, SPRITE, SPRITE ON/OFF).
+   */
+  sendSpriteStates(spriteStates: SpriteState[], spriteEnabled: boolean): void {
+    self.postMessage({
+      type: 'SPRITE_STATES',
+      id: `sprite-states-${Date.now()}`,
+      timestamp: Date.now(),
+      data: {
+        spriteStates,
+        spriteEnabled,
+      },
+    })
+  }
+
   // === BG GRAPHIC METHODS (VIEW command) ===
 
   /** Set BG grid data for VIEW command (called from WebWorkerInterpreter when receiving SET_BG_DATA) */
@@ -495,6 +514,10 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
     this.screenStateManager.setCharacterGeneratorMode(mode)
     this.syncScreenStateToShared()
     this.postScreenChanged()
+  }
+
+  getCharacterGeneratorMode(): number {
+    return this.screenStateManager.getCgenMode()
   }
 
   /**

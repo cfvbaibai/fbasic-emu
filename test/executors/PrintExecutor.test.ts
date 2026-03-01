@@ -43,6 +43,7 @@ describe('PrintExecutor', () => {
       setColorPalette: vi.fn(),
       setBackdropColor: vi.fn(),
       setCharacterGeneratorMode: vi.fn(),
+      getCharacterGeneratorMode: vi.fn(() => 2),
     }
 
     context = new ExecutionContext({

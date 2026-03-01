@@ -43,12 +43,27 @@ export class SpriteOnOffExecutor {
       if (this.context.config.enableDebugMode) {
         this.context.addDebugOutput(`SPRITE: Display ${isOn ? 'enabled' : 'disabled'}`)
       }
+
+      // Notify main thread of sprite state change
+      this.notifySpriteStatesChanged()
     } catch (error) {
       this.context.addError({
         line: lineNumber ?? 0,
         message: `SPRITE ON/OFF: ${error instanceof Error ? error.message : String(error)}`,
         type: ERROR_TYPES.RUNTIME,
       })
+    }
+  }
+
+  /**
+   * Notify main thread that sprite states have changed
+   */
+  private notifySpriteStatesChanged(): void {
+    if (this.context.spriteStateManager && this.context.deviceAdapter?.sendSpriteStates) {
+      this.context.deviceAdapter.sendSpriteStates(
+        this.context.spriteStateManager.getAllSpriteStates(),
+        this.context.spriteStateManager.isSpriteEnabled()
+      )
     }
   }
 }

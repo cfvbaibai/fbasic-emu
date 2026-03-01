@@ -40,6 +40,7 @@ describe('CSRLIN, POS, SCR$, BEEP Functions', () => {
       setColorPalette: vi.fn(),
       setBackdropColor: vi.fn(),
       setCharacterGeneratorMode: vi.fn(),
+      getCharacterGeneratorMode: vi.fn(() => 2),
       beep: beepMock,
     }
 

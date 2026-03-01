@@ -37,6 +37,7 @@ describe('Family Basic IDE Demo Program', () => {
       setColorPalette: vi.fn(),
       setBackdropColor: vi.fn(),
       setCharacterGeneratorMode: vi.fn(),
+      getCharacterGeneratorMode: vi.fn(() => 2),
     }
 
     interpreter = new BasicInterpreter({
