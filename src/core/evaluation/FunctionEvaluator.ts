@@ -521,20 +521,20 @@ export class FunctionEvaluator {
    * @returns Single character string or empty string
    */
   private evaluateInkey(args: Array<number | string>): string {
-    // Check if blocking mode is requested (n=0)
-    if (args.length === 1) {
-      const mode = Math.floor(toNumber(args[0] ?? 1))
-      if (mode === 0) {
-        // Blocking mode - use waitForInkeyBlocking() if available
-        if (this.deviceAdapter?.waitForInkeyBlocking) {
-          return this.deviceAdapter.waitForInkeyBlocking()
-        }
-        // Fallback: return current key state (non-blocking behavior)
-        if (!this.deviceAdapter) {
-          return ''
-        }
-        return this.deviceAdapter.getInkeyState()
+    // Check if blocking mode is requested (any argument present triggers blocking)
+    // Per F-BASIC Manual page 87 and real hardware testing:
+    // - INKEY$ (no arg): Non-blocking, returns pressed key or ""
+    // - INKEY$(n) (any n): Blocking, waits for key press
+    if (args.length >= 1) {
+      // Blocking mode - use waitForInkeyBlocking() if available
+      if (this.deviceAdapter?.waitForInkeyBlocking) {
+        return this.deviceAdapter.waitForInkeyBlocking()
       }
+      // Fallback: return current key state (non-blocking behavior)
+      if (!this.deviceAdapter) {
+        return ''
+      }
+      return this.deviceAdapter.getInkeyState()
     }
 
     // Non-blocking mode: return currently pressed key
