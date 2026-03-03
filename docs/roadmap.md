@@ -60,10 +60,14 @@ These commands are recognized by the parser but produce "Not applicable for IDE 
 ### INKEY$ Full Implementation (2026-03-01)
 
 **What was implemented**:
-- INKEY$ function with non-blocking (default) and blocking (`n=0`) modes
+- INKEY$ function with non-blocking (default) and blocking (any argument) modes
 - SharedArrayBuffer-based keyboard input via Web Worker
 - IDE keyboard capture composable with Joystick/Keyboard mode toggle (F9)
 - Comprehensive test coverage (~30 test cases)
+
+**Blocking mode behavior** (verified on real F-BASIC hardware):
+- `INKEY$` (no arg): Non-blocking, returns pressed key or ""
+- `INKEY$(n)` (any n): Blocking, waits for key press
 
 ### Command Coverage Complete (2026-02-25)
 
