@@ -25,7 +25,7 @@
 160 C=C(PL(I))
 170 PALETB 8, 13, 13, 13, 13
 180 GOSUB 440
-190 PLAY "T204"+MID$(PP$, PL(I)+1, 1)+"3"
+190 PLAY "T2O4"+MID$(PP$, PL(I)+1, 1)+"3"
 200 GOSUB 500
 210 PALETB 8, 13, &H16, &H27, 2
 220 PAUSE 10
@@ -33,8 +33,8 @@
 240 LOCATE 9, 10:PRINT "YOU"
 250 A$=INKEY$:IF A$="" THEN 250
 260 IF A$=CHR$(PL(I)+65) THEN 280
-270 PLAY "T101CICIC1":GOTO 240
-280 PLAY "T205C2R2F2R2E2"
+270 PLAY "T1O1CICIC1":GOTO 240
+280 PLAY "T2O5C2R2F2R2E2"
 290 PALETB 8, 13, &H16, &H27, 2
 300 X=PX(PL(I)):Y=PY(PL(I))
 310 C=C(PL(I))
@@ -147,4 +147,25 @@ Enter the character codes in BG GRAPHIC mode to create the background screen for
 ---
 
 *Page 95*
+
+### Manual Errata
+
+The original F-BASIC manual contains several bugs in this sample program:
+
+1. **PLAY Tempo/Octave Typos (Lines 190, 270, 280):**
+   - `T204` should be `T2O4` (tempo 2, octave 4)
+   - `T101` should be `T1O1` (tempo 1, octave 1)
+   - `T205` should be `T2O5` (tempo 2, octave 5)
+
+2. **Variable Initialization Bug (Line 13):**
+   - Original: `I=Z-Y:C=0` - Uses undefined Y variable and wrong initialization
+   - Correct: `Z=0:I=0:C=0` - Properly initialize Z, I, C to 0
+
+3. **Variable Type Conflict (Line 16):**
+   - Original: `Z=CHR$(254):Z$=Z$+Z$+Z$+Z$+Z$` - Z used as both numeric and string
+   - Correct: `ZC$=CHR$(254):Z$=ZC$+ZC$+ZC$+ZC$+ZC$` - Use separate string variable
+
+4. **Invalid PALETB Palette Number (Lines 170, 210, 290, 340):**
+   - Original: `PALETB 8, ...` - Palette number 8 is out of range (valid: 0-3)
+   - Correct: `PALETB 3, ...` - Use valid palette number 3
 
