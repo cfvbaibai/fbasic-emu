@@ -623,6 +623,29 @@ function createScrSampleGrid(): BgGridData {
 // ============================================================================
 
 /**
+ * Layer visualization box frame - simple border to show BG GRAPHIC boundaries
+ * Used with printableArea sample to visualize all 3 screen layers
+ */
+function createLayerBoxGrid(): BgGridData {
+  const grid = createEmptyGrid()
+
+  // Draw a simple box frame using CHR$(254) - different from CHR$(255) used in printable area
+  // Top and bottom borders
+  for (let x = 0; x < BG_GRID.COLS; x++) {
+    setCell(grid, x, 0, 254, 1) // Top border
+    setCell(grid, x, BG_GRID.ROWS - 1, 254, 1) // Bottom border
+  }
+
+  // Left and right borders
+  for (let y = 0; y < BG_GRID.ROWS; y++) {
+    setCell(grid, 0, y, 254, 1) // Left border
+    setCell(grid, BG_GRID.COLS - 1, y, 254, 1) // Right border
+  }
+
+  return grid
+}
+
+/**
  * Map of sample keys to their pre-designed BG data
  * Only samples that use VIEW need BG data
  * Keys must match the bgKey property in sampleCodes.ts
@@ -639,6 +662,9 @@ export const SAMPLE_BG_DATA: Record<string, BgGridData> = {
 
   // Test pattern for debugging
   testPattern: createTestPatternGrid(),
+
+  // Layer visualization - box frame for printableArea sample
+  layerBox: createLayerBoxGrid(),
 
   // ============================================================================
   // F-BASIC Reference Manual Sample Games (pages 94-101)

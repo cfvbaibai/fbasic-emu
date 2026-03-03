@@ -308,7 +308,13 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
     logWorker.debug('[WebWorkerDeviceAdapter] BG grid data set, rows:', data.length)
   }
 
-  /** Copy BG GRAPHIC to Background Screen (per F-BASIC Manual page 36). Grid rows 0-20 map to screen rows 3-23. */
+  /** Copy BG GRAPHIC to Background Screen (per F-BASIC Manual page 36).
+   *
+   * BG GRAPHIC (28×21) and Background Screen (28×24) share the same origin on the sprite screen.
+   * Per the sprite coordinate formula y = (Y × 8) + 24, BG GRAPHIC Y=0 appears at sprite y=24.
+   * The canvas renderer already applies this +24 pixel offset (BG_OFFSET_Y), so BG rows map
+   * directly to screen buffer rows without additional offset.
+   */
   copyBgGraphicToBackground(): void {
     if (!this.bgGridData) {
       logWorker.warn('[WebWorkerDeviceAdapter] VIEW: No BG grid data available')
@@ -321,14 +327,15 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
     const screenBuffer = this.screenStateManager.getScreenBuffer()
 
     // Copy BG data to screen buffer
-    // BG grid has 21 rows (rows 0-20 in grid), which map to screen rows 3-23
+    // BG grid has 21 rows (Y: 0-20), which map directly to screen rows 0-20
+    // The +24 pixel offset in the renderer positions both at sprite y=24
     // BG grid has 28 columns, same as screen width
     for (let gridRow = 0; gridRow < this.bgGridData.length; gridRow++) {
       const bgRow = this.bgGridData[gridRow]
       if (!bgRow) continue
 
-      // Screen rows start at 3 (top 3 rows are system area)
-      const screenRow = gridRow + 3
+      // Direct mapping: BG row N → screen row N
+      const screenRow = gridRow
       if (screenRow >= 24) break // Don't exceed screen height
 
       for (let col = 0; col < bgRow.length && col < 28; col++) {

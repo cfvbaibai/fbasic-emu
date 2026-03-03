@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import { provideScreenDebug } from '@/features/ide/composables/useScreenDebug'
 import { provideScreenZoom } from '@/features/ide/composables/useScreenZoom'
 import { GameButton, GameButtonGroup, GameIcon, GameTabPane } from '@/shared/components/ui'
 
@@ -28,6 +29,9 @@ const { t } = useI18n()
 // Provide zoom state for child components (Screen) and use it for controls
 const { zoomLevel, setZoom } = provideScreenZoom()
 
+// Provide debug settings for child components
+const { showGrid, toggleGrid } = provideScreenDebug()
+
 // Zoom level options
 const zoomLevels: Array<{ value: 1 | 2 | 3 | 4; label: string }> = [
   { value: 1, label: '×1' },
@@ -38,6 +42,7 @@ const zoomLevels: Array<{ value: 1 | 2 | 3 | 4; label: string }> = [
 
 // Computed property for template binding (Vue templates auto-unwrap refs, but this helps TypeScript)
 const currentZoomLevel = computed(() => zoomLevel.value)
+const isGridShown = computed(() => showGrid.value)
 </script>
 
 <template>
@@ -61,6 +66,15 @@ const currentZoomLevel = computed(() => zoomLevel.value)
             {{ level.label }}
           </GameButton>
         </GameButtonGroup>
+        <GameButton
+          variant="toggle"
+          size="small"
+          :selected="isGridShown"
+          @click="toggleGrid"
+        >
+          <GameIcon icon="mdi:grid" size="small" />
+          Grid
+        </GameButton>
       </div>
     </template>
 

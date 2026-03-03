@@ -4,22 +4,17 @@ import { computed, onDeactivated, onUnmounted, ref, useTemplateRef, watch } from
 
 import type { ScreenCell } from '@/core/interfaces'
 import { useAnimationWorker } from '@/features/ide/composables/useAnimationWorker'
-import {
-  preInitializeBackgroundTiles,
-  renderBackgroundToCanvas,
-  renderBackgroundToCanvasDirty,
-} from '@/features/ide/composables/useCanvasBackgroundRenderer'
-import {
-  initializeKonvaLayers,
-  type KonvaScreenLayers,
-  renderAllScreenLayers,
-} from '@/features/ide/composables/useKonvaScreenRenderer'
+import { preInitializeBackgroundTiles, renderBackgroundToCanvas, renderBackgroundToCanvasDirty } from '@/features/ide/composables/useCanvasBackgroundRenderer'
+import { initializeKonvaLayers, type KonvaScreenLayers, renderAllScreenLayers } from '@/features/ide/composables/useKonvaScreenRenderer'
 import { useScreenAnimationLoopRenderOnly } from '@/features/ide/composables/useScreenAnimationLoopRenderOnly'
 import { useScreenContext } from '@/features/ide/composables/useScreenContext'
+import { useScreenDebug } from '@/features/ide/composables/useScreenDebug'
 import { useScreenZoom } from '@/features/ide/composables/useScreenZoom'
 import { COLORS } from '@/shared/data/palette'
 import { logScreen } from '@/shared/logger'
 import type { VueKonvaStageInstance } from '@/types/vue-konva'
+
+import DebugGridOverlay from './DebugGridOverlay.vue'
 
 /**
  * Screen - CRT-style display for F-BASIC: backdrop, character grid, sprites.
@@ -51,6 +46,9 @@ const backdropColorHex = computed(() => {
 
 // Use shared zoom state composable
 const { zoomLevel } = useScreenZoom()
+
+// Use debug settings composable
+const { showGrid } = useScreenDebug()
 
 // Base screen dimensions (full backdrop/sprite screen: 256×240)
 const BASE_WIDTH = 256
@@ -464,6 +462,8 @@ onDeactivated(cleanupScreen)
             <!-- Background layer is now Canvas2D for performance (10-50x faster than Konva) -->
           </v-layer>
           </v-stage>
+          <!-- Debug Grid Overlay -->
+          <DebugGridOverlay v-if="showGrid" :zoom="zoomLevel" />
         </div>
         <div class="crt-reflection"></div>
       </div>
