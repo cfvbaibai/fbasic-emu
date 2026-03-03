@@ -7,6 +7,7 @@
  */
 
 import type { CompactBg } from '@/core/interfaces'
+import { logCore } from '@/shared/logger'
 
 import { BG_GRID, DEFAULT_BG_CHAR_CODE } from '../constants'
 import type { BgCell, BgGridData } from '../types'
@@ -255,6 +256,6 @@ export function decompressBg(compact: CompactBg): BgGridData {
   }
 
   // Unknown format - return empty grid
-  console.warn(`Unknown BG compression format: ${(compact).format}`)
+  logCore.warn(`Unknown BG compression format: ${(compact).format}`)
   return createEmptyGrid()
 }

@@ -202,7 +202,7 @@ export class AnimationManager {
     const ackReceived = this.accessor.waitForAck(100)
     console.log('[AnimationManager] AFTER waitForAck, ackReceived=', ackReceived)
     if (!ackReceived) {
-      console.warn('[AnimationManager] No Animation Worker ack for START_MOVEMENT, clearing command')
+      logWorker.warn('[AnimationManager] No Animation Worker ack for START_MOVEMENT, clearing command')
       this.accessor.clearSyncCommand()
     } else {
       this.accessor.writeAck(0)
@@ -227,7 +227,7 @@ export class AnimationManager {
 
       const ackReceived = this.accessor.waitForAck(100)
       if (!ackReceived) {
-        console.warn('[AnimationManager] No Animation Worker ack for STOP_MOVEMENT, clearing command')
+        logWorker.warn('[AnimationManager] No Animation Worker ack for STOP_MOVEMENT, clearing command')
         this.accessor.clearSyncCommand()
       } else {
         this.accessor.writeAck(0)
@@ -253,7 +253,7 @@ export class AnimationManager {
 
       const ackReceived = this.accessor.waitForAck(100)
       if (!ackReceived) {
-        console.warn('[AnimationManager] No Animation Worker ack for ERASE_MOVEMENT, clearing command')
+        logWorker.warn('[AnimationManager] No Animation Worker ack for ERASE_MOVEMENT, clearing command')
         this.accessor.clearSyncCommand()
       } else {
         this.accessor.writeAck(0)
@@ -301,7 +301,7 @@ export class AnimationManager {
 
     const ackReceived = this.accessor.waitForAck(100)
     if (!ackReceived) {
-      console.warn('[AnimationManager] No Animation Worker ack for SET_POSITION, clearing command')
+      logWorker.warn('[AnimationManager] No Animation Worker ack for SET_POSITION, clearing command')
       this.accessor.clearSyncCommand()
     } else {
       this.accessor.writeAck(0)

@@ -5,8 +5,9 @@
  * Only active when input mode is 'keyboard' and program is running.
  */
 
+import { useEventListener } from '@vueuse/core'
 import type { MaybeRefOrGetter } from 'vue'
-import { onActivated, onDeactivated, onMounted, onUnmounted, toValue } from 'vue'
+import { toValue } from 'vue'
 
 import {
   clearInkeyState,
@@ -30,10 +31,11 @@ export interface UseKeyboardInputOptions {
  * Composable for tracking keyboard input and writing to shared buffer for INKEY$.
  *
  * This composable:
- * - Listens for keydown/keyup events
+ * - Listens for keydown/keyup events using VueUse's useEventListener
  * - Writes pressed key character to shared buffer
- * - Only processes keys when input mode is 'keyboard'
+ * - Only processes keys when input mode is 'keyboard' and enabled() returns true
  * - Only printable characters (key.length === 1) are tracked
+ * - Automatically cleans up listeners on component unmount
  */
 export function useKeyboardInput(options: UseKeyboardInputOptions = {}) {
   const { sharedKeyboardView, enabled = () => true, inputMode } = options
@@ -58,10 +60,6 @@ export function useKeyboardInput(options: UseKeyboardInputOptions = {}) {
     const view = sharedKeyboardView ? toValue(sharedKeyboardView) : null
     if (!view) return
 
-    // Prevent default for game control keys to avoid browser shortcuts
-    // But only when in keyboard mode and running
-    // event.preventDefault() // May want to be selective here
-
     // F-BASIC only uses uppercase letters - convert lowercase to uppercase
     const key = event.key.length === 1 && event.key >= 'a' && event.key <= 'z'
       ? event.key.toUpperCase()
@@ -82,33 +80,9 @@ export function useKeyboardInput(options: UseKeyboardInputOptions = {}) {
     logComposable.debug('[useKeyboardInput] Key released, buffer cleared')
   }
 
-  // Set up event listeners
-  onMounted(() => {
-    window.addEventListener('keydown', handleKeyDown)
-    window.addEventListener('keyup', handleKeyUp)
-    logComposable.debug('[useKeyboardInput] Event listeners registered')
-  })
-
-  // Clean up event listeners
-  onUnmounted(() => {
-    window.removeEventListener('keydown', handleKeyDown)
-    window.removeEventListener('keyup', handleKeyUp)
-    logComposable.debug('[useKeyboardInput] Event listeners removed')
-  })
-
-  // Handle keep-alive deactivation
-  onDeactivated(() => {
-    window.removeEventListener('keydown', handleKeyDown)
-    window.removeEventListener('keyup', handleKeyUp)
-    logComposable.debug('[useKeyboardInput] Event listeners removed (deactivated)')
-  })
-
-  // Handle keep-alive activation
-  onActivated(() => {
-    window.addEventListener('keydown', handleKeyDown)
-    window.addEventListener('keyup', handleKeyUp)
-    logComposable.debug('[useKeyboardInput] Event listeners registered (activated)')
-  })
+  // Use VueUse's useEventListener for automatic cleanup on unmount
+  useEventListener(window, 'keydown', handleKeyDown)
+  useEventListener(window, 'keyup', handleKeyUp)
 
   return {
     // No public methods needed - event handlers are automatic

@@ -4,6 +4,8 @@
 
 import { computed, ref, shallowReactive } from 'vue'
 
+import { logComposable } from '@/shared/logger'
+
 import type { TestResult, TestResultRecord } from './soundTestCases'
 import { generateReport, SOUND_TEST_CASES } from './soundTestCases'
 
@@ -83,8 +85,8 @@ export function useSoundTestResults() {
       setTimeout(() => {
         copySuccess.value = false
       }, 2000)
-    } catch {
-      console.error('Failed to copy to clipboard')
+    } catch (error) {
+      logComposable.error('Failed to copy to clipboard:', error)
     }
   }
 

@@ -40,9 +40,26 @@ if (typeof window !== 'undefined') {
       return new EditorWorker()
     },
   }
+
+  // Global handler for unhandled promise rejections
+  window.addEventListener('unhandledrejection', (event) => {
+    logApp.error('Unhandled promise rejection:', event.reason)
+  })
 }
 
 const app = createApp(App)
+
+// Global error handler for Vue errors
+app.config.errorHandler = (err, instance, info) => {
+  logApp.error('Vue error:', err, info)
+  // Error is logged but not re-thrown, allowing the app to continue
+  // ErrorBoundary components can catch and display these errors
+}
+
+// Global warning handler for Vue warnings (development mode)
+app.config.warnHandler = (msg, instance, trace) => {
+  logApp.warn('Vue warning:', msg, trace)
+}
 
 app.use(router)
 app.use(i18n)

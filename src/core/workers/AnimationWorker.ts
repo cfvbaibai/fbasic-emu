@@ -160,7 +160,7 @@ export class AnimationWorker {
       // Write acknowledgment
       this.accessor.notifyAck()
     } catch (error) {
-      console.error('[AnimationWorker] Error processing sync command:', error)
+      logWorker.error('[AnimationWorker] Error processing sync command:', error)
       // Still write ack to prevent Executor Worker from hanging
       this.accessor.notifyAck()
     }

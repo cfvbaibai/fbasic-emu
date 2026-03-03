@@ -13,6 +13,7 @@ import type { ProgramData, ProgramExportFile } from '@/core/interfaces'
 import { createEmptyGrid } from '@/features/bg-editor/composables/useBgGrid'
 import type { BgGridData } from '@/features/bg-editor/types'
 import { compressBg, decompressBg } from '@/features/bg-editor/utils/bgCompression'
+import { logComposable } from '@/shared/logger'
 import { isValidProgramFile, loadJsonFile, saveJsonFile } from '@/shared/utils/fileIO'
 import { generateProgramId, generateSessionId } from '@/shared/utils/id'
 
@@ -158,7 +159,7 @@ async function open(): Promise<boolean> {
     }
 
     if (!isValidProgramFile(data)) {
-      console.error('[useProgramStore] Invalid program file format')
+      logComposable.error('[useProgramStore] Invalid program file format')
       return false
     }
 
@@ -166,7 +167,7 @@ async function open(): Promise<boolean> {
     loadProgram(exportFile.program)
     return true
   } catch (error) {
-    console.error('[useProgramStore] Failed to open program:', error)
+    logComposable.error('[useProgramStore] Failed to open program:', error)
     return false
   }
 }

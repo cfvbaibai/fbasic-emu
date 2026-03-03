@@ -1,7 +1,6 @@
+import { useEventListener, useLocalStorage } from '@vueuse/core'
 import type { Ref } from 'vue'
-import { onActivated, onDeactivated, onMounted, onUnmounted, ref } from 'vue'
-
-import { logComposable } from '@/shared/logger'
+import { ref } from 'vue'
 
 export interface KeyBinding {
   key: string
@@ -50,44 +49,6 @@ export const defaultJoystick1Bindings: JoystickKeyBindings = {
 
 const STORAGE_KEY = 'fbasic-joystick-keybindings'
 
-export function loadKeyBindings(): KeyBindingsConfig {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY)
-    if (stored) {
-      const parsed = JSON.parse(stored) as Partial<KeyBindingsConfig>
-      return {
-        joystick0: { ...defaultJoystick0Bindings, ...parsed.joystick0 },
-        joystick1: { ...defaultJoystick1Bindings, ...parsed.joystick1 },
-      }
-    }
-  } catch {
-    logComposable.warn('Failed to load key bindings from localStorage')
-  }
-
-  return {
-    joystick0: { ...defaultJoystick0Bindings },
-    joystick1: { ...defaultJoystick1Bindings },
-  }
-}
-
-export function saveKeyBindings(config: KeyBindingsConfig): void {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(config))
-    logComposable.debug('Key bindings saved to localStorage')
-  } catch {
-    logComposable.warn('Failed to save key bindings to localStorage')
-  }
-}
-
-export function resetKeyBindings(): KeyBindingsConfig {
-  const config = {
-    joystick0: { ...defaultJoystick0Bindings },
-    joystick1: { ...defaultJoystick1Bindings },
-  }
-  saveKeyBindings(config)
-  return config
-}
-
 interface UseKeyboardJoystickOptions {
   enabled?: Ref<boolean> | boolean
   onDirectionStart?: (joystickId: number, direction: 'up' | 'down' | 'left' | 'right') => void
@@ -97,6 +58,12 @@ interface UseKeyboardJoystickOptions {
   keyBindings?: KeyBindingsConfig
 }
 
+/**
+ * Composable for keyboard-based joystick emulation.
+ *
+ * Uses VueUse's useEventListener for automatic cleanup and reactive enabled state.
+ * Key bindings are persisted to localStorage using useLocalStorage.
+ */
 export function useKeyboardJoystick(options: UseKeyboardJoystickOptions = {}) {
   const {
     enabled: enabledOption = true,
@@ -107,9 +74,17 @@ export function useKeyboardJoystick(options: UseKeyboardJoystickOptions = {}) {
     keyBindings: initialBindings,
   } = options
 
+  // Normalize enabled to a ref
   const enabled = typeof enabledOption === 'boolean' ? ref(enabledOption) : enabledOption
 
-  const keyBindings = ref<KeyBindingsConfig>(initialBindings ?? loadKeyBindings())
+  // Use VueUse's useLocalStorage for automatic persistence and reactivity
+  const storedBindings = useLocalStorage<KeyBindingsConfig>(STORAGE_KEY, {
+    joystick0: { ...defaultJoystick0Bindings },
+    joystick1: { ...defaultJoystick1Bindings },
+  })
+
+  // Use provided bindings or stored bindings
+  const keyBindings = ref<KeyBindingsConfig>(initialBindings ?? storedBindings.value)
 
   const pressedKeys = ref<Set<string>>(new Set())
 
@@ -191,33 +166,20 @@ export function useKeyboardJoystick(options: UseKeyboardJoystickOptions = {}) {
     }
   }
 
-  onMounted(() => {
-    window.addEventListener('keydown', handleKeyDown)
-    window.addEventListener('keyup', handleKeyUp)
-  })
-
-  onUnmounted(() => {
-    window.removeEventListener('keydown', handleKeyDown)
-    window.removeEventListener('keyup', handleKeyUp)
-  })
-
-  onDeactivated(() => {
-    window.removeEventListener('keydown', handleKeyDown)
-    window.removeEventListener('keyup', handleKeyUp)
-  })
-
-  onActivated(() => {
-    window.addEventListener('keydown', handleKeyDown)
-    window.addEventListener('keyup', handleKeyUp)
-  })
+  // Use VueUse's useEventListener for automatic cleanup on unmount
+  useEventListener(window, 'keydown', handleKeyDown)
+  useEventListener(window, 'keyup', handleKeyUp)
 
   const updateKeyBindings = (newBindings: KeyBindingsConfig) => {
     keyBindings.value = newBindings
-    saveKeyBindings(newBindings)
+    storedBindings.value = newBindings
   }
 
   const resetToDefaults = () => {
-    const defaults = resetKeyBindings()
+    const defaults = {
+      joystick0: { ...defaultJoystick0Bindings },
+      joystick1: { ...defaultJoystick1Bindings },
+    }
     updateKeyBindings(defaults)
   }
 

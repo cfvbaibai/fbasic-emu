@@ -121,8 +121,8 @@ const canRun = computed(() => !isRunning.value)
 const canStop = isRunning
 
 // Parser capabilities for display
-const parserInfo = ref<ParserInfo | null>(null)
-const highlighterInfo = ref<HighlighterInfo | null>(null)
+const parserInfo = shallowRef<ParserInfo | null>(null)
+const highlighterInfo = shallowRef<HighlighterInfo | null>(null)
 
 // Initialize parser info
 onMounted(() => {

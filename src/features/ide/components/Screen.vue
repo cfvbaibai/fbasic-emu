@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Konva from 'konva'
-import { computed, onDeactivated, onUnmounted, ref, useTemplateRef, watch } from 'vue'
+import { computed, onDeactivated, onUnmounted, ref, shallowRef, useTemplateRef, watch } from 'vue'
 
 import type { ScreenCell } from '@/core/interfaces'
 import { useAnimationWorker } from '@/features/ide/composables/useAnimationWorker'
@@ -65,7 +65,8 @@ const stageDisplayWidth = computed(() => BASE_WIDTH * zoomLevel.value)
 const stageDisplayHeight = computed(() => BASE_HEIGHT * zoomLevel.value)
 
 // Konva layers (background populated from offscreen Canvas2D for performance)
-const layers = ref<KonvaScreenLayers>({
+// Use shallowRef since the layers object is replaced, not mutated
+const layers = shallowRef<KonvaScreenLayers>({
   backdropLayer: null,
   spriteBackLayer: null,
   backgroundLayer: null, // Populated with Konva.Image from offscreen Canvas2D
@@ -73,15 +74,18 @@ const layers = ref<KonvaScreenLayers>({
 })
 
 // Sprite node maps for animated sprite updates
-const frontSpriteNodes = ref<Map<number, Konva.Image>>(new Map())
-const backSpriteNodes = ref<Map<number, Konva.Image>>(new Map())
+// Use shallowRef since the Map objects are replaced, not mutated
+const frontSpriteNodes = shallowRef<Map<number, Konva.Image>>(new Map())
+const backSpriteNodes = shallowRef<Map<number, Konva.Image>>(new Map())
 
 // Last rendered buffer for dirty diff (Canvas2D rendering)
-const lastBackgroundBufferRef = ref<ScreenCell[][] | null>(null)
+// Use shallowRef since the buffer array is replaced, not mutated
+const lastBackgroundBufferRef = shallowRef<ScreenCell[][] | null>(null)
 
 // Shared buffer path: last sequence and last decoded buffer (so we only decode when sequence changes)
+// Use shallowRef since the buffer array is replaced, not mutated
 const lastSequenceRef = ref(-1)
-const lastDecodedBufferRef = ref<ScreenCell[][] | null>(null)
+const lastDecodedBufferRef = shallowRef<ScreenCell[][] | null>(null)
 
 // Render reason: bufferOnly = only screenBuffer changed (PRINT); full = sprite/palette/backdrop/etc
 type RenderReason = 'full' | 'bufferOnly'

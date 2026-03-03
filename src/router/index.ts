@@ -1,18 +1,7 @@
+import './types.d.ts'
+
 import type { RouteRecordRaw } from 'vue-router'
 import { createRouter, createWebHistory } from 'vue-router'
-
-/**
- * Route metadata for navigation and display
- */
-declare module 'vue-router' {
-  interface RouteMeta {
-    title?: string
-    showInNav?: boolean
-    icon?: string
-    group?: 'main' | 'tools' | 'testing'
-    parent?: string
-  }
-}
 
 const routes: RouteRecordRaw[] = [
   // ============================================
@@ -136,11 +125,26 @@ const routes: RouteRecordRaw[] = [
       group: 'testing',
     },
   },
+
+  // ============================================
+  // Error Routes
+  // ============================================
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    component: () => import('@/features/error/NotFoundPage.vue'),
+    meta: {
+      title: 'Not Found',
+    },
+  },
 ]
 
 const router = createRouter({
   history: createWebHistory(),
   routes,
+  scrollBehavior(_to, _from, savedPosition) {
+    return savedPosition ?? { top: 0 }
+  },
 })
 
 export default router

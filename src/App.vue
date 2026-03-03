@@ -2,12 +2,14 @@
 import { watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import ErrorBoundary from './shared/components/ErrorBoundary.vue'
 import { useSkin } from './shared/composables/useSkin'
 
 /**
  * App component - Root component of the application.
  * Handles locale synchronization with HTML lang attribute.
  * Initializes skin system early.
+ * Wraps entire app in ErrorBoundary for graceful error handling.
  */
 defineOptions({
   name: 'App',
@@ -31,7 +33,9 @@ watch(
 </script>
 
 <template>
-  <router-view />
+  <ErrorBoundary name="AppRoot">
+    <router-view />
+  </ErrorBoundary>
 </template>
 
 <style>
