@@ -8,6 +8,7 @@
 /* eslint-disable max-lines */
 
 import type { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
+import { TIMING } from '@/core/constants'
 import type {
   AnyServiceWorkerMessage,
   BasicDeviceAdapter,
@@ -25,7 +26,7 @@ import { MessageHandler } from './MessageHandler'
 import { ScreenStateManager } from './ScreenStateManager'
 import {
   createViewsFromJoystickBuffer,
-  getStickState,
+  getStickState as getRawStickState,
   type JoystickBufferView,
 } from './sharedJoystickBuffer'
 import {
@@ -53,6 +54,11 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   private isEnabled = true
   /** BG GRAPHIC data for VIEW command. Set via SET_BG_DATA message from main thread. */
   private bgGridData: BgGridData | null = null
+  // === STICK REPEAT CONTROL (typematic-style) ===
+  /** Last non-zero STICK value returned for each joystick (for repeat control). */
+  private lastStickValue: Map<number, number> = new Map()
+  /** Timestamp when last non-zero STICK value was returned (for repeat interval). */
+  private lastStickReadTime: Map<number, number> = new Map()
   // === MANAGERS ===
   private webWorkerManager: WebWorkerManager
   private screenStateManager: ScreenStateManager
@@ -156,14 +162,56 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   getJoystickCount(): number {
     return 2
   }
-  /** Get stick state from shared joystick buffer (zero-copy read). Throws if buffer not set. */
+  /**
+   * Get stick state from shared joystick buffer with typematic-style repeat control.
+   *
+   * This prevents programs from registering continuous direction input when the
+   * joystick is held in one direction. Instead:
+   * - New directions are returned immediately
+   * - Release (returning 0) is immediate
+   * - Same direction held is only returned after repeat interval elapses
+   *
+   * @param joystickId - Joystick ID (0 or 1)
+   * @returns Stick state (0-15), or 0 if same direction and interval not elapsed
+   */
   getStickState(joystickId: number): number {
     if (!this.sharedJoystickView) {
       throw new Error(
         'Shared joystick buffer not set. Worker must receive SET_SHARED_JOYSTICK_BUFFER message before reading joystick state.'
       )
     }
-    return getStickState(this.sharedJoystickView, joystickId)
+
+    // Read current raw state from shared buffer
+    const currentDirection = getRawStickState(this.sharedJoystickView, joystickId)
+    const now = performance.now()
+
+    // If current is 0 (no direction/released): return immediately, reset tracking
+    if (currentDirection === 0) {
+      this.lastStickValue.delete(joystickId)
+      this.lastStickReadTime.delete(joystickId)
+      return 0
+    }
+
+    const lastValue = this.lastStickValue.get(joystickId) ?? 0
+    const lastTime = this.lastStickReadTime.get(joystickId) ?? 0
+
+    // If current != last: new direction, return immediately, update tracking
+    if (currentDirection !== lastValue) {
+      this.lastStickValue.set(joystickId, currentDirection)
+      this.lastStickReadTime.set(joystickId, now)
+      return currentDirection
+    }
+
+    // Same direction held: check if enough time has elapsed since last return
+    const elapsed = now - lastTime
+    if (elapsed >= TIMING.STICK_REPEAT_INTERVAL_MS) {
+      // Enough time elapsed: return value, update timestamp
+      this.lastStickReadTime.set(joystickId, now)
+      return currentDirection
+    }
+
+    // Not enough time elapsed: suppress repeat (return 0)
+    return 0
   }
   /** Set stick state (deprecated - main thread now writes directly to shared buffer) */
   setStickState(_joystickId: number, _state: number): void {

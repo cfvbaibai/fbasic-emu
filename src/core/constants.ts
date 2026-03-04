@@ -135,6 +135,10 @@ export const TIMING = {
 
   // Screen rendering intervals (for performance optimization)
   SCREEN_RENDER_INTERVAL_MS: 50, // Min interval between screen renders during rapid updates (20 FPS)
+
+  // STICK repeat interval (typematic-style control for joystick direction reads)
+  // This prevents programs from registering continuous direction when held
+  STICK_REPEAT_INTERVAL_MS: 120, // ~8 reads per second when direction held
 } as const
 
 // Screen dimensions and coordinate limits
