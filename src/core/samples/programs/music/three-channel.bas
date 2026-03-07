@@ -1,0 +1,15 @@
+10 CLS
+20 PRINT "Three-Channel Harmony Demo"
+30 PRINT "=========================="
+40 PRINT "Playing C major chord..."
+50 PLAY "T4"
+60 PLAY "O3C9:O3E9:O3G9"
+70 PRINT "Playing F major chord..."
+80 PLAY "O3F9:O3A9:O4C9"
+90 PRINT "Playing G major chord..."
+100 PLAY "O3G9:O3B9:O4D9"
+110 PRINT "Playing C major chord..."
+120 PLAY "O3C9:O3E9:O3G9"
+130 PRINT ""
+140 PRINT "Complete!"
+150 END

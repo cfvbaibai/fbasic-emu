@@ -1,0 +1,6 @@
+10 CLS
+20 VIEW
+30 REM Add your title text here
+40 LOCATE 10,8:PRINT "MY GAME"
+50 LOCATE 8,12:PRINT "Press START"
+60 END

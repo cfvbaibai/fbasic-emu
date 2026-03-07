@@ -1,0 +1,4 @@
+10 CLS
+20 VIEW
+30 LOCATE 12,11:PRINT "BG content displayed"
+40 END

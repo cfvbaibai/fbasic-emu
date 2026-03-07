@@ -1,0 +1,9 @@
+10 LET A = 10
+20 LET B = 25
+30 PRINT "A="; A; " B="; B
+40 PRINT "A+B="; A+B
+50 PRINT "ABS(-5)="; ABS(-5)
+60 PRINT "SGN(3)="; SGN(3)
+70 LET S$ = "Hello"
+80 PRINT "LEN="; LEN(S$)
+90 END

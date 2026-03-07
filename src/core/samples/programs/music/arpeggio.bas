@@ -1,0 +1,11 @@
+10 CLS
+20 PRINT "C Major Arpeggio"
+30 PRINT "================"
+40 PLAY "T3"
+50 PRINT "Ascending..."
+60 PLAY "O2C5E5G5O3C5E5G5O4C5"
+70 PRINT "Descending..."
+80 PLAY "O4C5G5E5O3C5G5E5O2C5"
+90 PRINT ""
+100 PRINT "Complete!"
+110 END

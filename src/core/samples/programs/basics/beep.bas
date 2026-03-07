@@ -1,0 +1,5 @@
+10 PRINT "BEEP Demo"
+20 PRINT "Beeping..."
+30 BEEP
+40 PRINT "Done!"
+50 END

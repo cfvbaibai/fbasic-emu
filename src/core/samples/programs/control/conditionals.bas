@@ -1,0 +1,4 @@
+10 FOR I = 1 TO 5
+20 IF I=3 THEN PRINT "Three"
+30 NEXT
+40 END

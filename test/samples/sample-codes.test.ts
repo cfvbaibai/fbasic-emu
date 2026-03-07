@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { FBasicParser } from '@/core/parser/FBasicParser'
-import { getAllSampleCodes } from '@/core/samples/sampleCodes'
+import { getAllSampleCodes } from '@/core/samples'
 
 describe('Sample Code Parser Tests', () => {
   const parser = new FBasicParser()

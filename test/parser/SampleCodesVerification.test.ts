@@ -1,12 +1,12 @@
 /**
- * Verification test for all sample codes in sampleCodes.ts
+ * Verification test for all sample codes
  * Ensures all sample programs parse correctly with the F-BASIC parser
  */
 
 import { describe, expect,test } from 'vitest'
 
 import { FBasicParser } from '@/core/parser/FBasicParser'
-import { getAllSampleCodes, getSampleCode, getSampleCodeKeys,SAMPLE_CODES } from '@/core/samples/sampleCodes'
+import { getAllSampleCodes, getSampleCode, getSampleCodeKeys, SAMPLE_CODES } from '@/core/samples'
 
 describe('Sample Codes Syntax Verification', () => {
   const parser = new FBasicParser()

@@ -1,0 +1,6 @@
+10 CLS
+20 VIEW
+30 REM Player would move on this level
+40 LOCATE 3,4:PRINT "LEVEL 1"
+50 LOCATE 20,4:PRINT "x3"
+60 END

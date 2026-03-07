@@ -10,7 +10,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import type { BasicDeviceAdapter } from '@/core/interfaces'
 import { FBasicParser } from '@/core/parser/FBasicParser'
-import { getSampleCode } from '@/core/samples/sampleCodes'
+import { getSampleCode } from '@/core/samples'
 
 // Skip by default - this test takes a long time due to PAUSE delays
 // To run manually:

@@ -1,0 +1,12 @@
+10 CLS
+20 PRINT "C Major Scale"
+30 PRINT "============="
+40 PRINT "Ascending..."
+50 PLAY "O2C5D5E5F5G5A5B5"
+60 PLAY "O3C5"
+70 PRINT "Descending..."
+80 PLAY "O3C5"
+90 PLAY "O2B5A5G5F5E5D5C5"
+100 PRINT ""
+110 PRINT "Complete!"
+120 END

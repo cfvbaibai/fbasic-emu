@@ -648,7 +648,7 @@ function createLayerBoxGrid(): BgGridData {
 /**
  * Map of sample keys to their pre-designed BG data
  * Only samples that use VIEW need BG data
- * Keys must match the bgKey property in sampleCodes.ts
+ * Keys must match the bgKey property in sample codes (index.ts)
  */
 export const SAMPLE_BG_DATA: Record<string, BgGridData> = {
   // Main VIEW demo - border with center decoration

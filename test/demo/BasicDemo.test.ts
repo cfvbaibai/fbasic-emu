@@ -9,7 +9,7 @@ import { beforeEach, describe, expect, it, type MockedFunction, vi } from 'vites
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import type { BasicDeviceAdapter } from '@/core/interfaces'
 import { FBasicParser } from '@/core/parser/FBasicParser'
-import { getSampleCode } from '@/core/samples/sampleCodes'
+import { getSampleCode } from '@/core/samples'
 
 describe('Family Basic IDE Demo Program', () => {
   let interpreter: BasicInterpreter

@@ -2,7 +2,7 @@
  * Check for GOTO/GOSUB/THEN targeting issues in sample codes
  */
 
-import { SAMPLE_CODES } from '../../src/core/samples/sampleCodes.js'
+import { SAMPLE_CODES } from '../../src/core/samples/index.js'
 
 interface Issue {
   sample: string

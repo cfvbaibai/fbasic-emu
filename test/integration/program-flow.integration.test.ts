@@ -100,7 +100,7 @@ describe('BG Data Flow Integration', () => {
 
   describe('Sample Loading with BG', () => {
     it('should load sample with BG data', async () => {
-      const { getSampleCode } = await import('@/core/samples/sampleCodes')
+      const { getSampleCode } = await import('@/core/samples')
       const { getSampleBgData, hasSampleBgData } = await import('@/core/samples/sampleBgData')
 
       // Check bgView sample
@@ -121,7 +121,7 @@ describe('BG Data Flow Integration', () => {
     })
 
     it('should handle sample without BG data', async () => {
-      const { getSampleCode } = await import('@/core/samples/sampleCodes')
+      const { getSampleCode } = await import('@/core/samples')
       const { hasSampleBgData, getSampleBgData } = await import('@/core/samples/sampleBgData')
 
       // Check basic sample (no BG)

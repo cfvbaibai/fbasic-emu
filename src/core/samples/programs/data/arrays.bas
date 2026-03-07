@@ -1,0 +1,6 @@
+10 DIM A(3)
+20 FOR I = 1 TO 3
+30 A(I) = I*10
+40 NEXT
+50 PRINT A(1); A(2); A(3)
+60 END

@@ -1,0 +1,4 @@
+10 PRINT "Basic Music Demo"
+20 PLAY "CDEFGAB"
+30 PRINT "Done!"
+40 END

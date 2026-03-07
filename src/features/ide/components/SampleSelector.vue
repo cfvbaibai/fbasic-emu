@@ -2,8 +2,8 @@
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import { getSampleCodeKeys, SAMPLE_CODES } from '@/core/samples'
 import { hasSampleBgData } from '@/core/samples/sampleBgData'
-import { getSampleCodeKeys, SAMPLE_CODES } from '@/core/samples/sampleCodes'
 import { GameButton } from '@/shared/components/ui'
 
 /**
@@ -61,6 +61,7 @@ const categoryNames: Record<string, string> = {
   sprites: 'Sprites',
   interactive: 'Interactive',
   comprehensive: 'Full Demo',
+  music: 'Music',
 }
 
 // Category colors for visual distinction
@@ -72,6 +73,7 @@ const categoryColors: Record<string, string> = {
   sprites: 'var(--game-color-warning)',
   interactive: 'var(--game-color-danger)',
   comprehensive: 'var(--game-color-info)',
+  music: 'var(--game-color-primary)',
 }
 </script>
 

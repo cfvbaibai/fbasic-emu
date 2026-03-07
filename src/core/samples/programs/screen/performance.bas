@@ -1,0 +1,6 @@
+10 CLS
+20 FOR I = 1 TO 50
+30 PRINT "Line "; I
+40 NEXT
+50 PRINT "Done"
+60 END
