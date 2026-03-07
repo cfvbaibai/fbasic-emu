@@ -67,6 +67,8 @@ $RECYCLE.BIN/
 *.tmp
 *.temp
 .cache
+nul
+test_output.txt
 
 # Generated parser files
 src/core/parser/fbasic-parser.js

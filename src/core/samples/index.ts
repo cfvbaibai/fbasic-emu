@@ -51,14 +51,14 @@ import joystick from './programs/interactive/joystick.bas?raw'
 // Interactive
 import spriteInteractive from './programs/interactive/sprite-interactive.bas?raw'
 import musicArpeggio from './programs/music/arpeggio.bas?raw'
-// Music
-import musicBasic from './programs/music/basic.bas?raw'
 import musicFurElise2Ch from './programs/music/fur-elise.bas?raw'
 import musicHappyBirthday from './programs/music/happy-birthday.bas?raw'
 import musicJingleBells from './programs/music/jingle-bells.bas?raw'
 import musicLoopDemo from './programs/music/loop-demo.bas?raw'
 import musicMaryHadALittleLamb from './programs/music/mary-lamb.bas?raw'
 import musicOdeToJoy from './programs/music/ode-to-joy.bas?raw'
+// Music
+import musicPlayDemo from './programs/music/play-demo.bas?raw'
 import musicPlayer from './programs/music/player.bas?raw'
 import musicRocknRouge from './programs/music/rockn-rouge.bas?raw'
 import musicScale from './programs/music/scale.bas?raw'
@@ -70,12 +70,11 @@ import bgPlatform from './programs/screen/bg-platform.bas?raw'
 import bgTitle from './programs/screen/bg-title.bas?raw'
 import bgView from './programs/screen/bg-view.bas?raw'
 import cursorPosition from './programs/screen/cursor-position.bas?raw'
-import performance from './programs/screen/performance.bas?raw'
 import printableArea from './programs/screen/printable-area.bas?raw'
 // Screen
 import screen from './programs/screen/screen.bas?raw'
+import screenFill from './programs/screen/screen-fill.bas?raw'
 import screenRead from './programs/screen/screen-read.bas?raw'
-import screenReadColor from './programs/screen/screen-read-color.bas?raw'
 import spriteAnimation from './programs/sprites/sprite-animation.bas?raw'
 // Sprites
 import spriteBasic from './programs/sprites/sprite-basic.bas?raw'
@@ -166,11 +165,11 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
     category: 'screen',
     code: screen,
   },
-  screenCoalesce: {
-    name: 'Performance Test',
-    description: 'Screen update test',
+  screenFill: {
+    name: 'Screen Fill Test',
+    description: 'Fill screen with 50 lines - basic screen output test',
     category: 'screen',
-    code: performance,
+    code: screenFill,
   },
   allChars: {
     name: 'All Characters',
@@ -213,15 +212,9 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
   },
   screenRead: {
     name: 'Screen Read (SCR$)',
-    description: 'SCR$ function - read characters from screen',
+    description: 'SCR$ function - read characters and colors from screen',
     category: 'screen',
     code: screenRead,
-  },
-  screenReadColor: {
-    name: 'Screen Read with Color (SCR$)',
-    description: 'SCR$ with color switch - read character and color from screen',
-    category: 'screen',
-    code: screenReadColor,
   },
   printableArea: {
     name: 'PRINTable & Sprite Area Demo',
@@ -354,11 +347,11 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
   },
 
   // === MUSIC ===
-  musicBasic: {
-    name: 'Basic Music Demo',
+  musicPlayDemo: {
+    name: 'PLAY Command Demo',
     description: 'Simple PLAY demonstration with single notes',
     category: 'music',
-    code: musicBasic,
+    code: musicPlayDemo,
   },
   musicTwinkle: {
     name: 'Twinkle Twinkle Little Star (Full)',

@@ -38,7 +38,7 @@ describe('Sample Codes Syntax Verification', () => {
 })
 
 describe('New screen function sample codes', () => {
-  const newSampleKeys = ['cursorPosition', 'screenRead', 'screenReadColor', 'beep', 'beepInteractive']
+  const newSampleKeys = ['cursorPosition', 'screenRead', 'beep', 'beepInteractive']
 
   test('all new sample code keys exist', () => {
     const allKeys = getSampleCodeKeys()
