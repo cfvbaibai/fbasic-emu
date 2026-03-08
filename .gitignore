@@ -67,6 +67,11 @@ $RECYCLE.BIN/
 *.tmp
 *.temp
 .cache
+nul
+test_output.txt
+
+# Codex-generated skills folder (separate from .claude/skills/)
+skills/
 
 # Generated parser files
 src/core/parser/fbasic-parser.js
