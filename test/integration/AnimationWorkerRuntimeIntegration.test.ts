@@ -132,7 +132,7 @@ describe('AnimationWorker Runtime Integration', () => {
       expect(accessor.readSpriteCharacterType(i)).toBe(-1)
       expect(accessor.readSpritePosition(i)).toEqual({ x: 0, y: 0 })
     }
-    expect(worker.getAllMovementStates()).toHaveLength(0)
+    expect(worker.getAllMovementStates()).toEqual([])
   })
 
   it('completes movement and wraps at screen boundaries', () => {

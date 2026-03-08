@@ -60,7 +60,7 @@ describe('Sample Display Snapshot Integration', () => {
 
       const result = await interpreter.execute(code)
       expect(result.success).toBe(true)
-      expect(result.errors).toHaveLength(0)
+      expect(result.errors).toEqual([])
 
       await waitForSequenceStable(accessor, { stablePolls: 2, intervalMs: 10, timeoutMs: 600 })
       const snapshot = captureDisplaySnapshotV1(accessor, {
@@ -92,7 +92,7 @@ describe('Sample Display Snapshot Integration', () => {
     const result = await loopInterpreter.execute(code)
 
     expect(result.success).toBe(true)
-    expect(result.errors).toHaveLength(0)
+    expect(result.errors).toEqual([])
     await waitForSequenceStable(accessor, { stablePolls: 2, intervalMs: 20, timeoutMs: 1000 })
     const snapshot = captureDisplaySnapshotV1(accessor, {
       sampleKey: 'joystick',
