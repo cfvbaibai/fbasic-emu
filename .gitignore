@@ -69,6 +69,7 @@ $RECYCLE.BIN/
 .cache
 nul
 test_output.txt
+output/
 
 # Codex-generated skills folder (separate from .claude/skills/)
 skills/
