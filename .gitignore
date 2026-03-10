@@ -84,3 +84,9 @@ public/basic-interpreter-worker.js
 build-number.json
 .vite/
 .playwright-mcp/
+
+# Generated automation run artifacts (reports, latest snapshots, run logs)
+docs/automation/**
+!docs/automation/
+!docs/automation/.gitkeep
+!docs/automation/README.md
