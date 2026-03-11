@@ -20,7 +20,7 @@ import { ExecutionContext, ExecutionEngine } from './execution'
 import { SoundService } from './execution/sound/SoundService'
 import { expandStatements } from './execution/statement-expander'
 import type { BasicVariable, ExecutionResult, InterpreterConfig } from './interfaces'
-import { getSourceTextFromCst } from './parser/cst-helpers'
+import { getCstNodes, getFirstCstNode, getSourceTextFromCst } from './parser/cst-helpers'
 import { FBasicParser } from './parser/FBasicParser'
 import { SpriteStateManager } from './sprite/SpriteStateManager'
 
@@ -85,6 +85,29 @@ export class BasicInterpreter {
           variables: new Map(),
           executionTime: 0,
         }
+      }
+
+      if (parseResult.cst && this.isContinueOnlyCommand(parseResult.cst)) {
+        if (!this.context || !this.executionEngine || !this.context.isStopPaused) {
+          return {
+            success: false,
+            errors: [
+              {
+                line: 0,
+                message: 'CONT: no paused program to continue',
+                type: ERROR_TYPES.RUNTIME,
+              },
+            ],
+            variables: this.context?.variables ?? new Map(),
+            arrays: this.context?.arrays ?? new Map(),
+            executionTime: 0,
+            spriteStates: this.context?.spriteStateManager?.getAllSpriteStates(),
+            spriteEnabled: this.context?.spriteStateManager?.isSpriteEnabled(),
+          }
+        }
+
+        this.context.isStopPaused = false
+        return await this.executionEngine.continueExecution()
       }
 
       // Create execution context (or reuse existing one if it has device adapter)
@@ -163,6 +186,24 @@ export class BasicInterpreter {
         executionTime: 0,
       }
     }
+  }
+
+  private isContinueOnlyCommand(programCst: CstNode): boolean {
+    const statements = getCstNodes(programCst.children.statement)
+    if (statements.length !== 1) return false
+
+    const statement = statements[0]
+    if (!statement) return false
+
+    const commandList = getFirstCstNode(statement.children.commandList)
+    if (!commandList) return false
+
+    const commands = getCstNodes(commandList.children.command)
+    if (commands.length !== 1) return false
+
+    const command = commands[0]
+    const singleCommand = getFirstCstNode(command?.children.singleCommand)
+    return !!singleCommand?.children.contStatement
   }
 
   /**

@@ -1473,10 +1473,8 @@ const REPL_ONLY_COMMANDS: Record<string, string> = {
   loadStatement: 'LOAD: Not applicable for IDE version - use Import instead',
   keyStatement: 'KEY: Not applicable for IDE version',
   keylistStatement: 'KEYLIST: Not applicable for IDE version',
-  contStatement: 'CONT: Not applicable for IDE version',
   systemStatement: 'SYSTEM: Not applicable for IDE version',
   pokeStatement: 'POKE: Not applicable for IDE version',
-  stopStatement: 'STOP: Not applicable for IDE version',
 }
 
 /**

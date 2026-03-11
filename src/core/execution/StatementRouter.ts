@@ -17,6 +17,7 @@ import { CgsetExecutor } from './executors/CgsetExecutor'
 import { ClearExecutor } from './executors/ClearExecutor'
 import { ClsExecutor } from './executors/ClsExecutor'
 import { ColorExecutor } from './executors/ColorExecutor'
+import { ContExecutor } from './executors/ContExecutor'
 import { CutExecutor } from './executors/CutExecutor'
 import { DataExecutor } from './executors/DataExecutor'
 import { DefMoveExecutor } from './executors/DefMoveExecutor'
@@ -45,6 +46,7 @@ import { RestoreExecutor } from './executors/RestoreExecutor'
 import { ReturnExecutor } from './executors/ReturnExecutor'
 import { SpriteExecutor } from './executors/SpriteExecutor'
 import { SpriteOnOffExecutor } from './executors/SpriteOnOffExecutor'
+import { StopExecutor } from './executors/StopExecutor'
 import { SwapExecutor } from './executors/SwapExecutor'
 import { ViewExecutor } from './executors/ViewExecutor'
 import type { ExpandedStatement } from './statement-expander'
@@ -72,12 +74,14 @@ export class StatementRouter {
   private clearExecutor: ClearExecutor
   private locateExecutor: LocateExecutor
   private colorExecutor: ColorExecutor
+  private contExecutor: ContExecutor
   private cgsetExecutor: CgsetExecutor
   private cgenExecutor: CgenExecutor
   private paletExecutor: PaletExecutor
   private defSpriteExecutor: DefSpriteExecutor
   private spriteExecutor: SpriteExecutor
   private spriteOnOffExecutor: SpriteOnOffExecutor
+  private stopExecutor: StopExecutor
   private defMoveExecutor: DefMoveExecutor
   private moveExecutor: MoveExecutor
   private cutExecutor: CutExecutor
@@ -115,12 +119,14 @@ export class StatementRouter {
     this.clearExecutor = new ClearExecutor(variableService)
     this.locateExecutor = new LocateExecutor(context, evaluator)
     this.colorExecutor = new ColorExecutor(context, evaluator)
+    this.contExecutor = new ContExecutor(context)
     this.cgsetExecutor = new CgsetExecutor(context, evaluator)
     this.cgenExecutor = new CgenExecutor(context, evaluator)
     this.paletExecutor = new PaletExecutor(context, evaluator)
     this.defSpriteExecutor = new DefSpriteExecutor(context, evaluator)
     this.spriteExecutor = new SpriteExecutor(context, evaluator)
     this.spriteOnOffExecutor = new SpriteOnOffExecutor(context)
+    this.stopExecutor = new StopExecutor(context)
     this.defMoveExecutor = new DefMoveExecutor(context, evaluator)
     this.moveExecutor = new MoveExecutor(context, evaluator)
     this.cutExecutor = new CutExecutor(context, evaluator)
@@ -266,6 +272,11 @@ export class StatementRouter {
         this.returnExecutor.execute(returnStmtCst, expandedStatement.lineNumber)
         return
       }
+    } else if (singleCommandCst.children.contStatement) {
+      const contStmtCst = getFirstCstNode(singleCommandCst.children.contStatement)
+      if (contStmtCst) {
+        this.contExecutor.execute(contStmtCst, expandedStatement.lineNumber)
+      }
     } else if (singleCommandCst.children.printStatement) {
       const printStmtCst = getFirstCstNode(singleCommandCst.children.printStatement)
       if (printStmtCst) {
@@ -311,6 +322,12 @@ export class StatementRouter {
         // END stops execution immediately
         this.endExecutor.execute(endStmtCst)
         return // Don't continue executing
+      }
+    } else if (singleCommandCst.children.stopStatement) {
+      const stopStmtCst = getFirstCstNode(singleCommandCst.children.stopStatement)
+      if (stopStmtCst) {
+        this.stopExecutor.execute(stopStmtCst)
+        return // STOP pauses immediately
       }
     } else if (singleCommandCst.children.pauseStatement) {
       const pauseStmtCst = getFirstCstNode(singleCommandCst.children.pauseStatement)

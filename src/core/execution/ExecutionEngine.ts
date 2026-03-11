@@ -60,14 +60,27 @@ export class ExecutionEngine {
    * Execute the BASIC program
    */
   async execute(): Promise<ExecutionResult> {
+    return this.runExecutionLoop(true)
+  }
+
+  /**
+   * Continue execution after STOP pause without resetting statements/data.
+   */
+  async continueExecution(): Promise<ExecutionResult> {
+    return this.runExecutionLoop(false)
+  }
+
+  private async runExecutionLoop(preprocess: boolean): Promise<ExecutionResult> {
     const startTime = Date.now()
 
     try {
-      // Preprocess DATA statements
-      this.dataService.preprocessDataStatements()
+      if (preprocess) {
+        // Preprocess DATA statements
+        this.dataService.preprocessDataStatements()
 
-      // Preprocess statements
-      this.preprocessStatements()
+        // Preprocess statements
+        this.preprocessStatements()
+      }
 
       // Start execution
       this.context.isRunning = true
@@ -122,6 +135,19 @@ export class ExecutionEngine {
 
       // Execution completed
       this.context.isRunning = false
+
+      // STOP pauses execution and preserves state for CONT.
+      if (this.context.isStopPaused) {
+        return {
+          success: this.context.getErrors().length === 0,
+          errors: this.context.getErrors(),
+          variables: this.context.variables,
+          arrays: this.context.arrays,
+          executionTime: Date.now() - startTime,
+          spriteStates: this.context.spriteStateManager?.getAllSpriteStates(),
+          spriteEnabled: this.context.spriteStateManager?.isSpriteEnabled(),
+        }
+      }
 
       // Check for unclosed FOR loops
       if (this.context.loopStack.length > 0) {

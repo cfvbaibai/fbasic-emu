@@ -13,7 +13,6 @@ describe('REPL-only Commands Parser', () => {
     { command: 'LOAD?', error: 'LOAD: Not applicable for IDE version - use Import instead' },
     { command: 'KEY', error: 'KEY: Not applicable for IDE version' },
     { command: 'KEYLIST', error: 'KEYLIST: Not applicable for IDE version' },
-    { command: 'CONT', error: 'CONT: Not applicable for IDE version' },
     { command: 'SYSTEM', error: 'SYSTEM: Not applicable for IDE version' },
   ]
 
@@ -22,7 +21,6 @@ describe('REPL-only Commands Parser', () => {
     { command: 'POKE &H7000, 255', error: 'POKE: Not applicable for IDE version' },
     { command: 'A = PEEK(&H7000)', error: 'PEEK: Not applicable for IDE version' },
     { command: 'A = FRE(0)', error: 'FRE: Not applicable for IDE version' },
-    { command: 'STOP', error: 'STOP: Not applicable for IDE version' },
   ]
 
   describe.each(replOnlyCommands)('$command', ({ command, error }) => {
@@ -84,6 +82,22 @@ describe('REPL-only Commands Parser', () => {
 
   test('valid commands still parse successfully', () => {
     const result = parseWithChevrotain('10 PRINT "HELLO"')
+
+    expect(result.success).toBe(true)
+    expect(result.cst).toBeDefined()
+    expect(result.errors).toBeUndefined()
+  })
+
+  test('CONT should parse successfully as executable command', () => {
+    const result = parseWithChevrotain('10 CONT')
+
+    expect(result.success).toBe(true)
+    expect(result.cst).toBeDefined()
+    expect(result.errors).toBeUndefined()
+  })
+
+  test('STOP should parse successfully as executable command', () => {
+    const result = parseWithChevrotain('10 STOP')
 
     expect(result.success).toBe(true)
     expect(result.cst).toBeDefined()
