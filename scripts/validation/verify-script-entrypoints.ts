@@ -1,53 +1,28 @@
-import { access, readFile } from 'node:fs/promises'
-import path from 'node:path'
+import { resolve } from 'node:path'
+import {
+  collectScriptEntrypoints,
+  findMissingScriptEntrypoints,
+  readPackageScripts,
+} from './script-entrypoint-integrity'
 
-interface PackageJson {
-  scripts?: Record<string, string>
+const repoRoot = process.cwd()
+const packageJsonPath = resolve(repoRoot, 'package.json')
+const scripts = readPackageScripts(packageJsonPath)
+const referencedEntrypoints = collectScriptEntrypoints(scripts)
+const missingEntrypoints = findMissingScriptEntrypoints(scripts, repoRoot)
+
+console.log(`Found ${referencedEntrypoints.length} script entrypoint reference(s).`)
+
+if (missingEntrypoints.length === 0) {
+  console.log('All referenced script entrypoints exist.')
+  process.exit(0)
 }
 
-const scriptsToValidate = [
-  'build-web-worker',
-  'build-service-worker',
-  'test-service-worker',
-  'check-syntax',
-  'visualize-cst',
-] as const
-
-function resolveTsxEntrypoint(command: string): string | null {
-  const match = command.match(/(?:^|\s)tsx\s+([^\s]+)/)
-  return match?.[1] ?? null
+console.error(`Missing ${missingEntrypoints.length} script entrypoint(s):`)
+for (const missing of missingEntrypoints) {
+  console.error(`- ${missing.scriptName}: ${missing.entrypoint}`)
+  console.error(`  command: ${missing.command}`)
+  console.error(`  resolved: ${missing.resolvedPath}`)
 }
 
-async function main(): Promise<void> {
-  const packageJsonPath = path.resolve(process.cwd(), 'package.json')
-  const packageJson = JSON.parse(await readFile(packageJsonPath, 'utf8')) as PackageJson
-  const scripts = packageJson.scripts ?? {}
-
-  for (const scriptName of scriptsToValidate) {
-    const scriptCommand = scripts[scriptName]
-    if (!scriptCommand) {
-      console.error(`[verify-script-entrypoints] Missing script: ${scriptName}`)
-      process.exit(1)
-    }
-
-    const entrypoint = resolveTsxEntrypoint(scriptCommand)
-    if (!entrypoint) {
-      continue
-    }
-
-    const resolvedEntrypoint = path.resolve(process.cwd(), entrypoint)
-    try {
-      await access(resolvedEntrypoint)
-    } catch {
-      console.error(`[verify-script-entrypoints] Entrypoint not found for "${scriptName}": ${entrypoint}`)
-      process.exit(1)
-    }
-  }
-
-  console.log('[verify-script-entrypoints] Script entrypoints verified.')
-}
-
-main().catch((error) => {
-  console.error('[verify-script-entrypoints] Unexpected error:', error)
-  process.exit(1)
-})
+process.exit(1)
