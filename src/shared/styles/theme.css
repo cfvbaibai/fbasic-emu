@@ -164,13 +164,14 @@
 
 /* Multi-language Font Support */
 
-/* FZRuiZhengHei (方正锐正黑) Font Face Declaration */
-
-/* Note: Font files should be placed in public/fonts/ directory */
-
+/*
+  Prefer local-only FZRuiZhengHei sources.
+  This avoids unresolved /fonts/* build warnings when proprietary font files
+  are not bundled in the repository.
+*/
 @font-face {
     font-family: 'FZRuiZhengHei';
-    src: url('/fonts/FZRuiZhengHei.woff2') format('woff2'), url('/fonts/FZRuiZhengHei.woff') format('woff'), url('/fonts/FZRuiZhengHei.ttf') format('truetype');
+    src: local('FZRuiZhengHei'), local('FZ Rui Zheng Hei');
     font-weight: normal;
     font-style: normal;
     font-display: swap;
@@ -178,12 +179,11 @@
 
 @font-face {
     font-family: 'FZRuiZhengHei';
-    src: url('/fonts/FZRuiZhengHei-Bold.woff2') format('woff2'), url('/fonts/FZRuiZhengHei-Bold.woff') format('woff'), url('/fonts/FZRuiZhengHei-Bold.ttf') format('truetype');
+    src: local('FZRuiZhengHei Bold'), local('FZ Rui Zheng Hei Bold');
     font-weight: bold;
     font-style: normal;
     font-display: swap;
 }
-
 
 /* Japanese */
 
@@ -193,7 +193,7 @@
 }
 
 
-/* Simplified Chinese - Using FZRuiZhengHei (方正锐正黑) */
+/* Simplified Chinese - prefer local FZRuiZhengHei, then Noto Sans SC */
 
 :lang(zh-CN) {
     --game-font-family: 'FZRuiZhengHei', 'Noto Sans SC', 'Rajdhani', 'Orbitron', system-ui, sans-serif;
@@ -201,7 +201,7 @@
 }
 
 
-/* Traditional Chinese - Using FZRuiZhengHei (方正锐正黑) */
+/* Traditional Chinese - prefer local FZRuiZhengHei, then Noto Sans TC */
 
 :lang(zh-TW) {
     --game-font-family: 'FZRuiZhengHei', 'Noto Sans TC', 'Rajdhani', 'Orbitron', system-ui, sans-serif;

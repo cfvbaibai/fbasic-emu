@@ -27,7 +27,8 @@
         "test-service-worker": "tsx scripts/dev/test-service-worker.ts",
         "visualize-cst": "tsx scripts/dev/visualize-cst.ts",
         "check-syntax": "tsx scripts/validation/check-syntax.ts",
-        "verify:script-entrypoints": "tsx scripts/validation/verify-script-entrypoints.ts"
+        "verify:script-entrypoints": "tsx scripts/validation/verify-script-entrypoints.ts",
+        "verify:build-no-unresolved-assets": "tsx scripts/validation/check-unresolved-assets.ts"
     },
     "dependencies": {
         "@fontsource/exo-2": "^5.1.0",
