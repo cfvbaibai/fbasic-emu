@@ -370,6 +370,50 @@ describe('OnExecutor', () => {
   })
 
   describe('Error Handling', () => {
+    it('should return a clear runtime error for non-numeric string expression', async () => {
+      const source = `
+10 LET X$ = "ABC"
+20 ON X$ GOTO 100, 200
+30 PRINT "This should not print"
+40 END
+100 PRINT "First"
+110 END
+200 PRINT "Second"
+210 END
+`
+      const result = await interpreter.execute(source)
+
+      expect(result.success).toBe(false)
+      expect(result.errors.length).toBeGreaterThan(0)
+      const errorMessages = result.errors.map(e => e.message).join(' ')
+      expect(errorMessages).toEqual('ON: expression must evaluate to a number')
+
+      const outputs = deviceAdapter.getAllOutputs()
+      expect(outputs).toEqual('RUNTIME: ON: expression must evaluate to a number')
+    })
+
+    it('should return a clear runtime error for Infinity expression values', async () => {
+      const source = `
+10 LET X$ = "Infinity"
+20 ON X$ GOTO 100, 200
+30 PRINT "This should not print"
+40 END
+100 PRINT "First"
+110 END
+200 PRINT "Second"
+210 END
+`
+      const result = await interpreter.execute(source)
+
+      expect(result.success).toBe(false)
+      expect(result.errors.length).toBeGreaterThan(0)
+      const errorMessages = result.errors.map(e => e.message).join(' ')
+      expect(errorMessages).toEqual('ON: expression must evaluate to a number')
+
+      const outputs = deviceAdapter.getAllOutputs()
+      expect(outputs).toEqual('RUNTIME: ON: expression must evaluate to a number')
+    })
+
     it('should error on ON to non-existent line number', async () => {
       const source = `
 10 LET X = 1
