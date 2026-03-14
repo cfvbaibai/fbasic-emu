@@ -2,21 +2,7 @@
  * Pause Statement Executor
  *
  * Handles execution of PAUSE statements to delay program execution.
- *
- * ## Why our PAUSE was ~2× real F-BASIC (analysis)
- *
- * 1. **Two time bases**: We use TIMING.FRAME_RATE = 30 (33.33ms per frame). DEF MOVE
- *    uses 60/C dots per second (manual), so movement is tied to a 60Hz-like base.
- *
- * 2. **Original formula**: We used (frames × FRAME_DURATION_MS) / 2 ≈ 16.67ms per
- *    PAUSE unit (60Hz). That assumed real PAUSE used the same 60Hz tick.
- *
- * 3. **Empirical result**: Our pause was ~2× longer than real hardware, so real
- *    PAUSE uses a shorter unit: ~8.33ms (120Hz-equivalent). Real F-BASIC likely
- *    drives PAUSE from a ~120Hz time base (e.g. CPU/scanline-derived), not 60Hz.
- *
- * 4. **Fix**: Use divisor 4 so 1 PAUSE unit ≈ 8.33ms (quarter of our 30 FPS frame),
- *    matching observed real F-BASIC timing.
+ * Uses TIMING.PAUSE_TIMING_DIVISOR for calibrated web feel - see constants.ts.
  */
 
 import type { CstNode } from 'chevrotain'
@@ -33,9 +19,8 @@ export class PauseExecutor {
   ) {}
 
   /**
-   * Execute a PAUSE statement from CST
-   * Pauses execution for the specified number of frames.
-   * Real F-BASIC PAUSE is ~quarter of our nominal frame duration (~8.33ms per frame).
+   * Execute a PAUSE statement from CST.
+   * Pauses execution for the specified number of PAUSE units (~12.12ms per unit on web).
    */
   async execute(pauseStmtCst: CstNode): Promise<void> {
     const expressionCst = getFirstCstNode(pauseStmtCst.children.expression)
@@ -49,16 +34,16 @@ export class PauseExecutor {
       return
     }
 
-    // Evaluate the pause duration (in frames)
+    // Evaluate the pause duration (in PAUSE units)
     const durationValue = this.evaluator.evaluateExpression(expressionCst)
     // Convert to number (handles both numeric and string values)
-    const frames =
+    const pauseUnits =
       typeof durationValue === 'number'
         ? Math.max(0, Math.floor(durationValue))
         : Math.max(0, Math.floor(parseFloat(String(durationValue)) || 0))
 
-    // Convert frames to milliseconds; 1 PAUSE frame = 1 nominal frame (33.33ms at 30 FPS)
-    const durationMs = frames * TIMING.FRAME_DURATION_MS
+    // Convert to milliseconds using calibrated divisor (see TIMING.PAUSE_TIMING_DIVISOR)
+    const durationMs = (pauseUnits * TIMING.FRAME_DURATION_MS) / TIMING.PAUSE_TIMING_DIVISOR
 
     if (durationMs > 0) {
       await new Promise(resolve => setTimeout(resolve, durationMs))
@@ -66,7 +51,7 @@ export class PauseExecutor {
 
     // Add debug output
     if (this.context.config.enableDebugMode) {
-      this.context.addDebugOutput(`PAUSE: ${frames} frames (${Math.round(durationMs)}ms)`)
+      this.context.addDebugOutput(`PAUSE: ${pauseUnits} units (${Math.round(durationMs)}ms)`)
     }
   }
 }

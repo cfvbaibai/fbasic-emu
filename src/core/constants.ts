@@ -133,6 +133,22 @@ export const TIMING = {
   FRAME_RATE: 30, // Family BASIC frame rate (frames per second)
   FRAME_DURATION_MS: 1000 / 30, // Duration of one frame in milliseconds (~33.33ms)
 
+  /**
+   * PAUSE timing divisor - DO NOT MODIFY
+   *
+   * Real F-BASIC hardware uses ~8.33ms per PAUSE unit (divisor 4).
+   * However, web timing feels different from hardware, so we use divisor 2.75
+   * (~12.12ms per unit) to match the real F-BASIC experience on web.
+   *
+   * This value was empirically determined and should NOT be changed.
+   * See: https://github.com/cfvbaibai/fbasic-ide/issues/25
+   *
+   * History:
+   * - divisor 4 (8.33ms): accurate to hardware, but feels too fast on web
+   * - divisor 2.75 (12.12ms): calibrated for web feel - DO NOT CHANGE
+   */
+  PAUSE_TIMING_DIVISOR: 2.75,
+
   // Screen rendering intervals (for performance optimization)
   SCREEN_RENDER_INTERVAL_MS: 50, // Min interval between screen renders during rapid updates (20 FPS)
 
