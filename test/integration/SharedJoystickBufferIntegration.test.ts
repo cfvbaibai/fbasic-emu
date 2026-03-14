@@ -148,20 +148,31 @@ describe('Shared Joystick Buffer Integration', () => {
 
   describe('Zero-Copy Performance Characteristics', () => {
     it('should support rapid writes without message overhead', () => {
-      const startTime = performance.now()
+      const iterations = 20_000
 
-      // Simulate rapid writes (like holding dpad with 100ms repeat)
-      for (let i = 0; i < 1000; i++) {
-        setStickState(view, 0, 1) // RIGHT
-        setStickState(view, 0, 2) // LEFT
-        setStickState(view, 0, 0) // Release
+      const measureDuration = (writer: (state: number) => void): number => {
+        const startTime = performance.now()
+        for (let i = 0; i < iterations; i++) {
+          writer(1) // RIGHT
+          writer(2) // LEFT
+          writer(0) // Release
+        }
+        return performance.now() - startTime
       }
 
-      const endTime = performance.now()
-      const duration = endTime - startTime
+      // Control path: raw buffer assignment under the same loop shape.
+      const baselineDuration = measureDuration((state) => {
+        view.stickState[0] = state
+      })
 
-      // Should complete very quickly (< 10ms for 3000 writes)
-      expect(duration).toBeLessThan(10)
+      const setStickStateDuration = measureDuration((state) => {
+        setStickState(view, 0, state)
+      })
+
+      // Relative threshold avoids flaky absolute wall-clock assumptions while still
+      // detecting major overhead regressions (e.g., accidental messaging/sync work).
+      const baselineFloorMs = Math.max(baselineDuration, 0.5)
+      expect(setStickStateDuration).toBeLessThanOrEqual(baselineFloorMs * 8)
     })
 
     it('should support concurrent read/write (same joystick)', () => {
