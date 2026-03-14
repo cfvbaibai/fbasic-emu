@@ -310,9 +310,17 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
     // Sync from shared buffer if available (main thread writes live animation positions)
     if (this.sharedDisplayAccessor) {
       const livePos = this.sharedDisplayAccessor.readSpritePosition(actionNumber)
-      if (livePos !== null && (livePos.x !== 0 || livePos.y !== 0)) {
-        this.lastPositionBySprite.set(actionNumber, livePos)
-        return livePos
+      if (livePos !== null) {
+        const isOrigin = livePos.x === 0 && livePos.y === 0
+        const hasLiveSpriteState =
+          this.sharedDisplayAccessor.readSpriteIsActive(actionNumber) ||
+          this.sharedDisplayAccessor.readSpriteIsVisible(actionNumber)
+
+        // Origin is a valid coordinate; only treat (0,0) as uninitialized when slot is inactive/invisible.
+        if (!isOrigin || hasLiveSpriteState) {
+          this.lastPositionBySprite.set(actionNumber, livePos)
+          return livePos
+        }
       }
     }
     return this.lastPositionBySprite.get(actionNumber) ?? null

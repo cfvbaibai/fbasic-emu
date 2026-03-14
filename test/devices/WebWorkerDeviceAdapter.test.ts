@@ -456,15 +456,25 @@ describe('WebWorkerDeviceAdapter - Sprite Position Sync', () => {
       expect(adapter.getSpritePosition(0)).toEqual({ x: 999, y: 888 })
     })
 
-    it('should fall back to cached POSITION when shared buffer is (0,0)', () => {
+    it('should fall back to cached POSITION when shared buffer is (0,0) and sprite is inactive', () => {
       // Set cached POSITION
       adapter.setSpritePosition(0, 100, 50)
 
       // Shared buffer at (0,0) means uninitialized/invalid - should use cache
-      accessor.writeSpriteState(0, 0, 0, true, true, 0, 0, 0, 0, 0, 0, -1, 0)
+      accessor.writeSpriteState(0, 0, 0, false, false, 0, 0, 0, 0, 0, 0, -1, 0)
 
       // Should return cached POSITION since buffer (0,0) is treated as uninitialized
       expect(adapter.getSpritePosition(0)).toEqual({ x: 100, y: 50 })
+    })
+
+    it('should return live origin when shared buffer reports active sprite at (0,0)', () => {
+      // Cached POSITION should not override a valid live origin
+      adapter.setSpritePosition(0, 100, 50)
+
+      // Active+visible sprite at origin is a valid state
+      accessor.writeSpriteState(0, 0, 0, true, true, 0, 0, 0, 0, 0, 0, 2, 0)
+
+      expect(adapter.getSpritePosition(0)).toEqual({ x: 0, y: 0 })
     })
 
     it('should sync position continuously as sprite animates', () => {
