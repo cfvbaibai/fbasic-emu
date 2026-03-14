@@ -195,9 +195,10 @@ export function usePerformanceDiagnosticsMetrics({
   watch(
     () => output.value.length,
     (newLength, oldLength) => {
-      if (measurementActive && newLength > oldLength) {
+      const increment = Math.max(0, newLength - (oldLength ?? 0))
+      if (measurementActive && increment > 0) {
         performance.mark(`message-start-${messageSequence}`)
-        messageCount++
+        messageCount += increment
         setTimeout(() => {
           performance.mark(`message-end-${messageSequence}`)
           try {
@@ -225,11 +226,6 @@ export function usePerformanceDiagnosticsMetrics({
         totalTime.value = Math.round(performance.now() - startTime)
       }
     }, 100)
-    const originalPush = output.value.push.bind(output.value)
-    output.value.push = function (...items: string[]) {
-      messageCount += items.length
-      return originalPush(...items)
-    }
   })
 
   onBeforeUnmount(() => {
