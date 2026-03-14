@@ -133,6 +133,16 @@ describe('AnimationManager', () => {
       expect(state?.actionNumber).toBe(0)
       // Position is now tracked by Animation Worker, not in MovementState
     })
+
+    it('should use frame-budget timeout when ACK is missing', () => {
+      manager.defineMovement(validDefinition)
+      const accessor = (manager as unknown as { accessor: { waitForAck: (timeoutMs: number) => boolean } }).accessor
+      const waitSpy = vi.spyOn(accessor, 'waitForAck')
+
+      manager.startMovement(0, 100, 80)
+
+      expect(waitSpy).toHaveBeenCalledWith(16)
+    })
   })
 
   describe('getMovementStatus', () => {
@@ -243,6 +253,14 @@ describe('AnimationManager', () => {
     it('should throw for invalid Y coordinate', () => {
       expect(() => manager.setPosition(0, 0, -1)).toThrow('Invalid Y coordinate: -1 (must be 0-255)')
       expect(() => manager.setPosition(0, 0, 256)).toThrow('Invalid Y coordinate: 256 (must be 0-255)')
+    })
+
+    it('should avoid long blocking waits when ACK is missing', () => {
+      const startedAt = performance.now()
+      manager.setPosition(0, 50, 60)
+      const elapsedMs = performance.now() - startedAt
+
+      expect(elapsedMs).toBeLessThan(80)
     })
   })
 

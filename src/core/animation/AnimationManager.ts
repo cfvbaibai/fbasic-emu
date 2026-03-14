@@ -11,6 +11,8 @@ import type { BasicDeviceAdapter } from '@/core/interfaces'
 import type { MoveDefinition, MovementState } from '@/core/sprite/types'
 import { logWorker } from '@/shared/logger'
 
+const SYNC_ACK_WAIT_TIMEOUT_MS = 16
+
 /**
  * AnimationManager - Manages 8 action slots (0-7) for animated sprite movement
  * Handles move definitions and movement states with direct synchronization to Animation Worker.
@@ -59,6 +61,36 @@ export class AnimationManager {
     if (sharedAnimationBuffer) {
       this.setSharedAnimationBuffer(sharedAnimationBuffer)
     }
+  }
+
+  private dispatchSyncCommand(commandType: SyncCommandType, actionNumber: number, params: {
+    startX?: number
+    startY?: number
+    direction?: number
+    speed?: number
+    distance?: number
+    priority?: number
+  }): void {
+    if (!this.accessor) {
+      throw new Error('[AnimationManager] Shared buffer not available - cannot sync animation command')
+    }
+
+    this.accessor.writeSyncCommand(commandType, actionNumber, params)
+    this.accessor.notify()
+
+    const ackReceived = this.accessor.waitForAck(SYNC_ACK_WAIT_TIMEOUT_MS)
+    if (!ackReceived) {
+      logWorker.debug('[AnimationManager] Animation Worker ack timeout; clearing sync command', {
+        commandType,
+        actionNumber,
+        timeoutMs: SYNC_ACK_WAIT_TIMEOUT_MS,
+      })
+      this.accessor.clearSyncCommand()
+      return
+    }
+
+    this.accessor.writeAck(0)
+    this.accessor.clearSyncCommand()
   }
 
   /**
@@ -186,7 +218,7 @@ export class AnimationManager {
     }
 
     console.log('[AnimationManager] Writing START_MOVEMENT command to buffer...')
-    this.accessor.writeSyncCommand(SyncCommandType.START_MOVEMENT, actionNumber, {
+    this.dispatchSyncCommand(SyncCommandType.START_MOVEMENT, actionNumber, {
       startX: initialX,
       startY: initialY,
       direction: definition.direction,
@@ -194,20 +226,6 @@ export class AnimationManager {
       distance: definition.distance,
       priority: definition.priority,
     })
-
-    // Notify Animation Worker and wait for acknowledgment
-    this.accessor.notify()
-
-    console.log('[AnimationManager] BEFORE waitForAck')
-    const ackReceived = this.accessor.waitForAck(100)
-    console.log('[AnimationManager] AFTER waitForAck, ackReceived=', ackReceived)
-    if (!ackReceived) {
-      logWorker.warn('[AnimationManager] No Animation Worker ack for START_MOVEMENT, clearing command')
-      this.accessor.clearSyncCommand()
-    } else {
-      this.accessor.writeAck(0)
-      this.accessor.clearSyncCommand()
-    }
   }
 
   /**
@@ -221,18 +239,7 @@ export class AnimationManager {
     }
 
     for (const actionNumber of actionNumbers) {
-      this.accessor.writeSyncCommand(SyncCommandType.STOP_MOVEMENT, actionNumber, {})
-
-      this.accessor.notify()
-
-      const ackReceived = this.accessor.waitForAck(100)
-      if (!ackReceived) {
-        logWorker.warn('[AnimationManager] No Animation Worker ack for STOP_MOVEMENT, clearing command')
-        this.accessor.clearSyncCommand()
-      } else {
-        this.accessor.writeAck(0)
-        this.accessor.clearSyncCommand()
-      }
+      this.dispatchSyncCommand(SyncCommandType.STOP_MOVEMENT, actionNumber, {})
     }
   }
 
@@ -247,18 +254,7 @@ export class AnimationManager {
     }
 
     for (const actionNumber of actionNumbers) {
-      this.accessor.writeSyncCommand(SyncCommandType.ERASE_MOVEMENT, actionNumber, {})
-
-      this.accessor.notify()
-
-      const ackReceived = this.accessor.waitForAck(100)
-      if (!ackReceived) {
-        logWorker.warn('[AnimationManager] No Animation Worker ack for ERASE_MOVEMENT, clearing command')
-        this.accessor.clearSyncCommand()
-      } else {
-        this.accessor.writeAck(0)
-        this.accessor.clearSyncCommand()
-      }
+      this.dispatchSyncCommand(SyncCommandType.ERASE_MOVEMENT, actionNumber, {})
 
       // Clear the move definition
       this.moveDefinitions.delete(actionNumber)
@@ -292,21 +288,10 @@ export class AnimationManager {
     this.deviceAdapter?.setSpritePosition?.(actionNumber, x, y)
 
     // Write SET_POSITION command to shared buffer
-    this.accessor.writeSyncCommand(SyncCommandType.SET_POSITION, actionNumber, {
+    this.dispatchSyncCommand(SyncCommandType.SET_POSITION, actionNumber, {
       startX: x,
       startY: y,
     })
-
-    this.accessor.notify()
-
-    const ackReceived = this.accessor.waitForAck(100)
-    if (!ackReceived) {
-      logWorker.warn('[AnimationManager] No Animation Worker ack for SET_POSITION, clearing command')
-      this.accessor.clearSyncCommand()
-    } else {
-      this.accessor.writeAck(0)
-      this.accessor.clearSyncCommand()
-    }
   }
 
   /**
