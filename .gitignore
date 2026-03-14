@@ -39,6 +39,10 @@ __pycache__/
 *.pyw
 *.pyz
 
+# uv package manager
+.uv-cache/
+.uv-python/
+
 # Environment variables
 .env
 .env.local
@@ -86,7 +90,7 @@ build-number.json
 .playwright-mcp/
 
 # Generated automation run artifacts (reports, latest snapshots, run logs)
-docs/automation/**
-!docs/automation/
-!docs/automation/.gitkeep
-!docs/automation/README.md
+.automation/**
+!.automation/
+!.automation/.gitkeep
+!.automation/README.md
