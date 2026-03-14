@@ -56,6 +56,16 @@ export class OnExecutor {
     // Convert to integer (Family BASIC uses integer values)
     // If it's a string, try to convert it
     const numericValue = typeof expressionValue === 'string' ? parseFloat(expressionValue) : Number(expressionValue)
+
+    if (!Number.isFinite(numericValue)) {
+      this.context.addError({
+        line: lineNumber,
+        message: 'ON: expression must evaluate to a number',
+        type: ERROR_TYPES.RUNTIME,
+      })
+      return
+    }
+
     const index = Math.floor(numericValue)
 
     // If index is 0 or negative, or exceeds the number of line numbers, proceed to next line
