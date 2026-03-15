@@ -1,6 +1,10 @@
 # Claude Code local settings
 .claude/settings.local.json
 
+# Claude auto-memory (session context, should not be committed)
+.claude/projects/
+memory/
+
 # Git worktrees (isolated working directories for parallel development)
 .wt/
 
@@ -90,6 +94,7 @@ build-number.json
 .playwright-mcp/
 
 # Generated automation run artifacts (reports, latest snapshots, run logs)
+.automation/
 .automation/**
 !.automation/
 !.automation/.gitkeep
