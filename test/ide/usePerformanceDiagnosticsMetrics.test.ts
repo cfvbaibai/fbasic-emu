@@ -46,12 +46,14 @@ describe('usePerformanceDiagnosticsMetrics', () => {
     if (!api) {
       throw new Error('failed to initialize diagnostics metrics harness')
     }
+    const metricsApi = api as ReturnType<typeof usePerformanceDiagnosticsMetrics>
 
     return {
       wrapper,
-      api,
+      api: metricsApi,
       isRunning,
       output,
+      screenBuffer,
     }
   }
 
@@ -84,6 +86,51 @@ describe('usePerformanceDiagnosticsMetrics', () => {
     vi.advanceTimersByTime(100)
 
     expect(api.messagesPerSecond.value).toBe(2)
+    wrapper.unmount()
+  })
+
+  it('does not count renders when rendering is disabled', async () => {
+    const { wrapper, api, isRunning, screenBuffer } = mountHarness()
+
+    isRunning.value = true
+    await nextTick()
+    api.renderingEnabled.value = false
+
+    screenBuffer.value = { frame: 1 }
+    await nextTick()
+
+    now = 1000
+    vi.advanceTimersByTime(100)
+
+    expect(api.rendersPerSecond.value).toBe(0)
+    wrapper.unmount()
+  })
+
+  it('throttles render metrics to renderFpsTarget', async () => {
+    const { wrapper, api, isRunning, screenBuffer } = mountHarness()
+
+    isRunning.value = true
+    await nextTick()
+    api.renderingEnabled.value = true
+    api.renderFpsTarget.value = 10
+
+    now = 0
+    screenBuffer.value = { frame: 1 }
+    await nextTick()
+    now = 20
+    screenBuffer.value = { frame: 2 }
+    await nextTick()
+    now = 50
+    screenBuffer.value = { frame: 3 }
+    await nextTick()
+    now = 100
+    screenBuffer.value = { frame: 4 }
+    await nextTick()
+
+    now = 1000
+    vi.advanceTimersByTime(100)
+
+    expect(api.rendersPerSecond.value).toBe(2)
     wrapper.unmount()
   })
 })
