@@ -4,7 +4,7 @@
  * Tests for the PAUSE statement in Family Basic.
  */
 
-import { beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { FBasicParser } from '@/core/parser/FBasicParser'
@@ -19,6 +19,10 @@ describe('PAUSE Statement', () => {
       enableDebugMode: false,
       strictMode: false,
     })
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
   })
 
   describe('Parser Tests', () => {
@@ -49,131 +53,80 @@ describe('PAUSE Statement', () => {
   })
 
   describe('Execution Tests', () => {
-    it('should pause for specified duration', async () => {
-      const startTime = Date.now()
-      const code = '10 PAUSE 3' // 3 frames = ~100ms
+    async function executeWithCapturedTimeouts(code: string): Promise<number[]> {
+      const durations: number[] = []
+
+      vi.spyOn(globalThis, 'setTimeout').mockImplementation((callback: TimerHandler, delay?: number) => {
+        durations.push(typeof delay === 'number' ? delay : 0)
+        if (typeof callback === 'function') {
+          callback()
+        }
+        return {} as ReturnType<typeof setTimeout>
+      })
+
       const result = await interpreter.execute(code)
-      const endTime = Date.now()
 
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
-      // Should have paused for approximately 3 frames = ~100ms (allow some tolerance)
-      expect(endTime - startTime).toBeGreaterThanOrEqual(90)
-      expect(endTime - startTime).toBeLessThan(200)
+      return durations.filter((duration) => duration > 1)
+    }
+
+    it('should pause for specified duration', async () => {
+      const durations = await executeWithCapturedTimeouts('10 PAUSE 3')
+      expect(durations).toContainEqual(expect.closeTo(36.36, 1))
     })
 
     it('should pause with numeric literal', async () => {
-      const startTime = Date.now()
-      const code = '10 PAUSE 2' // 2 frames = ~67ms
-      const result = await interpreter.execute(code)
-      const endTime = Date.now()
-
-      expect(result.success).toBe(true)
-      expect(result.errors).toHaveLength(0)
-      // 2 frames = ~67ms, allow some tolerance
-      expect(endTime - startTime).toBeGreaterThanOrEqual(50)
+      const durations = await executeWithCapturedTimeouts('10 PAUSE 2')
+      expect(durations).toContainEqual(expect.closeTo(24.24, 1))
     })
 
     it('should pause with expression', async () => {
-      const startTime = Date.now()
-      const code = '10 PAUSE 1 + 1' // 2 frames = ~67ms
-      const result = await interpreter.execute(code)
-      const endTime = Date.now()
-
-      expect(result.success).toBe(true)
-      expect(result.errors).toHaveLength(0)
-      // 2 frames = ~67ms, allow some tolerance
-      expect(endTime - startTime).toBeGreaterThanOrEqual(50)
+      const durations = await executeWithCapturedTimeouts('10 PAUSE 1 + 1')
+      expect(durations).toContainEqual(expect.closeTo(24.24, 1))
     })
 
     it('should pause with variable', async () => {
-      const startTime = Date.now()
-      const code = `10 LET DURATION = 3
-20 PAUSE DURATION` // 3 frames = ~100ms
-      const result = await interpreter.execute(code)
-      const endTime = Date.now()
-
-      expect(result.success).toBe(true)
-      expect(result.errors).toHaveLength(0)
-      // 3 frames = ~100ms, allow some tolerance
-      expect(endTime - startTime).toBeGreaterThanOrEqual(90)
+      const durations = await executeWithCapturedTimeouts(`10 LET DURATION = 3
+20 PAUSE DURATION`)
+      expect(durations).toContainEqual(expect.closeTo(36.36, 1))
     })
 
     it('should handle PAUSE 0 (no delay)', async () => {
-      const startTime = Date.now()
-      const code = '10 PAUSE 0'
-      const result = await interpreter.execute(code)
-      const endTime = Date.now()
-
-      expect(result.success).toBe(true)
-      expect(result.errors).toHaveLength(0)
-      // Should complete almost immediately
-      expect(endTime - startTime).toBeLessThan(50)
+      const durations = await executeWithCapturedTimeouts('10 PAUSE 0')
+      expect(durations).toHaveLength(0)
     })
 
     it('should handle negative duration (no delay)', async () => {
-      const startTime = Date.now()
-      const code = '10 PAUSE -100'
-      const result = await interpreter.execute(code)
-      const endTime = Date.now()
-
-      expect(result.success).toBe(true)
-      expect(result.errors).toHaveLength(0)
-      // Negative duration should be clamped to 0
-      expect(endTime - startTime).toBeLessThan(50)
+      const durations = await executeWithCapturedTimeouts('10 PAUSE -100')
+      expect(durations).toHaveLength(0)
     })
 
     it('should handle multiple PAUSE statements', async () => {
-      const startTime = Date.now()
-      const code = `10 PAUSE 1
+      const durations = await executeWithCapturedTimeouts(`10 PAUSE 1
 20 PAUSE 1
-30 PAUSE 1` // 3 frames total = ~100ms
-      const result = await interpreter.execute(code)
-      const endTime = Date.now()
-
-      expect(result.success).toBe(true)
-      expect(result.errors).toHaveLength(0)
-      // Should pause for approximately 3 frames = ~100ms total
-      expect(endTime - startTime).toBeGreaterThanOrEqual(90)
+30 PAUSE 1`)
+      expect(durations).toHaveLength(3)
+      expect(durations.every((duration) => Math.abs(duration - 12.12) < 0.5)).toBe(true)
     })
 
     it('should work with PAUSE in loops', async () => {
-      const startTime = Date.now()
-      const code = `10 FOR I = 1 TO 3
+      const durations = await executeWithCapturedTimeouts(`10 FOR I = 1 TO 3
 20   PAUSE 1
-30 NEXT` // 3 iterations * 1 frame = 3 frames = ~100ms
-      const result = await interpreter.execute(code)
-      const endTime = Date.now()
-
-      expect(result.success).toBe(true)
-      expect(result.errors).toHaveLength(0)
-      // Should pause 3 times for 1 frame each = 3 frames = ~100ms
-      expect(endTime - startTime).toBeGreaterThanOrEqual(90)
+30 NEXT`)
+      expect(durations).toHaveLength(3)
+      expect(durations.every((duration) => Math.abs(duration - 12.12) < 0.5)).toBe(true)
     })
 
     it('should work with PAUSE on same line as other statements', async () => {
-      const startTime = Date.now()
-      const code = `10 PRINT "Before": PAUSE 2: PRINT "After"` // 2 frames = ~67ms
-      const result = await interpreter.execute(code)
-      const endTime = Date.now()
-
-      expect(result.success).toBe(true)
-      expect(result.errors).toHaveLength(0)
-      // 2 frames = ~67ms, allow some tolerance
-      expect(endTime - startTime).toBeGreaterThanOrEqual(50)
+      const durations = await executeWithCapturedTimeouts(`10 PRINT "Before": PAUSE 2: PRINT "After"`)
+      expect(durations).toContainEqual(expect.closeTo(24.24, 1))
     })
 
     it('should handle PAUSE with string expression (converts to number)', async () => {
-      const startTime = Date.now()
-      const code = `10 LET DURATION$ = "3"
-20 PAUSE DURATION$` // 3 frames = ~100ms
-      const result = await interpreter.execute(code)
-      const endTime = Date.now()
-
-      expect(result.success).toBe(true)
-      expect(result.errors).toHaveLength(0)
-      // String "3" should be converted to number 3 frames = ~100ms
-      expect(endTime - startTime).toBeGreaterThanOrEqual(90)
+      const durations = await executeWithCapturedTimeouts(`10 LET DURATION$ = "3"
+20 PAUSE DURATION$`)
+      expect(durations).toContainEqual(expect.closeTo(36.36, 1))
     })
 
     it('should reject floating point literals', async () => {

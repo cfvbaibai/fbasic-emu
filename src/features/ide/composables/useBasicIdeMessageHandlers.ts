@@ -3,8 +3,6 @@
  *
  * Use loglevel: log.getLogger('ide-messages').setLevel('debug') in console for verbose logs.
  */
- 
-
 import type { Ref } from 'vue'
 
 import type { SharedDisplayViews } from '@/core/animation/sharedDisplayBuffer'
@@ -18,13 +16,14 @@ import type {
 } from '@/core/interfaces'
 import type { Note, Rest } from '@/core/sound/types'
 import type { SpriteState } from '@/core/sprite/types'
-import { ExecutionError } from '@/features/ide/errors/ExecutionError'
 import { clearBackgroundTileCache } from '@/features/ide/composables/useCanvasBackgroundRenderer'
 import { clearSpriteImageCache } from '@/features/ide/composables/useKonvaSpriteRenderer'
+import { ExecutionError } from '@/features/ide/errors/ExecutionError'
 import { setRuntimePaletteCombination } from '@/shared/data/palette'
 import { logComposable, logIdeMessages } from '@/shared/logger'
 
-import { extendExecutionTimeout, type WebWorkerManager } from './useBasicIdeWebWorkerUtils'
+import type { WebWorkerManager } from './useBasicIdeWebWorkerUtils'
+import { extendExecutionTimeout } from './useBasicIdeWebWorkerUtils'
 import { useWebAudioPlayer } from './useWebAudioPlayer'
 
 export { ExecutionError }

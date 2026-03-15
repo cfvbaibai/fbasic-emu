@@ -1,10 +1,12 @@
 import { mount } from '@vue/test-utils'
-import { defineComponent, nextTick, ref } from 'vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { defineComponent, nextTick, ref } from 'vue'
 
 import { usePerformanceDiagnosticsMetrics } from '@/features/ide/composables/usePerformanceDiagnosticsMetrics'
 
 describe('usePerformanceDiagnosticsMetrics', () => {
+  type DiagnosticsApi = ReturnType<typeof usePerformanceDiagnosticsMetrics>
+
   let now = 0
 
   beforeEach(() => {
@@ -20,16 +22,21 @@ describe('usePerformanceDiagnosticsMetrics', () => {
     vi.unstubAllGlobals()
   })
 
-  function mountHarness() {
+  function mountHarness(): {
+    wrapper: ReturnType<typeof mount>
+    api: DiagnosticsApi
+    isRunning: { value: boolean }
+    output: { value: string[] }
+  } {
     const code = ref('')
     const isRunning = ref(false)
     const output = ref<string[]>([])
     const screenBuffer = ref({})
     const runCode = vi.fn(async () => {})
 
-    let api: ReturnType<typeof usePerformanceDiagnosticsMetrics> | null = null
+    let api: DiagnosticsApi | null = null
 
-    const Harness = defineComponent({
+    const harnessComponent = defineComponent({
       setup() {
         api = usePerformanceDiagnosticsMetrics({
           code,
@@ -42,7 +49,7 @@ describe('usePerformanceDiagnosticsMetrics', () => {
       },
     })
 
-    const wrapper = mount(Harness)
+    const wrapper = mount(harnessComponent)
     if (!api) {
       throw new Error('failed to initialize diagnostics metrics harness')
     }

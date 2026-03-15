@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { SyncCommandType, createSharedDisplayBuffer } from '@/core/animation/sharedDisplayBuffer'
+import { createSharedDisplayBuffer,SyncCommandType } from '@/core/animation/sharedDisplayBuffer'
 import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
 import { AnimationWorker } from '@/core/workers/AnimationWorker'
 

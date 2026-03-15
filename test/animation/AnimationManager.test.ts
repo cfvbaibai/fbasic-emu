@@ -136,7 +136,9 @@ describe('AnimationManager', () => {
 
     it('should use frame-budget timeout when ACK is missing', () => {
       manager.defineMovement(validDefinition)
-      const accessor = (manager as unknown as { accessor: { waitForAck: (timeoutMs: number) => boolean } }).accessor
+      const accessor = Reflect.get(manager as object, 'accessor') as {
+        waitForAck: (timeoutMs: number) => boolean
+      }
       const waitSpy = vi.spyOn(accessor, 'waitForAck')
 
       manager.startMovement(0, 100, 80)

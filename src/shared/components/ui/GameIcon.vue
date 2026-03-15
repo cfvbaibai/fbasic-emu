@@ -71,7 +71,7 @@ const rotateValue = computed((): number | undefined => {
 
 const iconColorValue = computed(() => props.color)
 const iconFontSize = computed(() => `${iconSize.value}px`)
-const resolvedIcon = ref<string | undefined>(props.icon)
+const resolvedIcon = ref<string | undefined>()
 
 watch(
   () => props.icon,
@@ -90,7 +90,14 @@ watch(
 
 <template>
   <span v-if="resolvedIcon" :class="iconClasses">
-    <Icon :icon="resolvedIcon" :width="iconSize" :height="iconSize" :color="color" :inline="inline" :rotate="rotateValue" />
+    <Icon
+      :icon="resolvedIcon"
+      :width="iconSize"
+      :height="iconSize"
+      :color="color"
+      :inline="inline"
+      :rotate="rotateValue"
+    />
   </span>
   <span v-else class="game-icon-placeholder">
     <slot />

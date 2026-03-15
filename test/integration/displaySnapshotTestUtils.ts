@@ -1,10 +1,12 @@
-import { COLS, MAX_SPRITES, ROWS } from '@/core/animation/sharedDisplayBuffer'
-import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
-import { getCodeByChar } from '@/shared/utils/backgroundLookup'
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+
 import { expect } from 'vitest'
+
+import { COLS, MAX_SPRITES, ROWS } from '@/core/animation/sharedDisplayBuffer'
+import type { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
+import { getCodeByChar } from '@/shared/utils/backgroundLookup'
 
 export interface DisplaySnapshotMeta {
   sampleKey: string

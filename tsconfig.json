@@ -6,7 +6,8 @@
     "src/**/*.vue",
     "src/**/*.ts",
     "src/**/*.d.ts",
-    "test/**/*.ts"
+    "test/**/*.ts",
+    "scripts/validation/script-entrypoint-integrity.ts"
   ],
   "exclude": [
     "src/**/__tests__/*",
