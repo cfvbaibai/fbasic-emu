@@ -5,6 +5,7 @@
  */
 
 import type { ScreenCell, ScreenUpdateMessage } from '@/core/interfaces'
+import { BACKGROUND_PALETTES, SPRITE_PALETTES } from '@/shared/data/palette'
 import { logDevice } from '@/shared/logger'
 
 export class ScreenStateManager {
@@ -13,6 +14,16 @@ export class ScreenStateManager {
   private cursorY = 0
   private bgPalette = 1 // Default background palette (0-1)
   private spritePalette = 1 // Default sprite palette (0-2)
+  private readonly backgroundPalettes = BACKGROUND_PALETTES.map(palette =>
+    palette.map(combination => [...combination] as [number, number, number, number])
+  ) as [[number, number, number, number][], [number, number, number, number][]]
+  private readonly spritePalettes = SPRITE_PALETTES.map(palette =>
+    palette.map(combination => [...combination] as [number, number, number, number])
+  ) as [
+    [number, number, number, number][],
+    [number, number, number, number][],
+    [number, number, number, number][],
+  ]
   private backdropColor = 0 // Default backdrop color code (0-60, 0 = black)
   private cgenMode = 2 // Default character generator mode (0-3): B on BG, A on sprite
   private currentExecutionId: string | null = null
@@ -263,6 +274,39 @@ export class ScreenStateManager {
    */
   getPalette(): { bgPalette: number; spritePalette: number } {
     return { bgPalette: this.bgPalette, spritePalette: this.spritePalette }
+  }
+
+  /**
+   * Set a PALET color combination for the currently selected CGSET palette.
+   */
+  setPaletteCombination(
+    target: 'B' | 'S',
+    combination: number,
+    colors: [number, number, number, number]
+  ): { paletteIndex: number; colors: [number, number, number, number] } {
+    const clampedCombination = Math.max(0, Math.min(3, combination))
+    const clampedColors: [number, number, number, number] = [
+      Math.max(0, Math.min(60, colors[0] ?? 0)),
+      Math.max(0, Math.min(60, colors[1] ?? 0)),
+      Math.max(0, Math.min(60, colors[2] ?? 0)),
+      Math.max(0, Math.min(60, colors[3] ?? 0)),
+    ]
+
+    if (target === 'B') {
+      const paletteIndex = Math.max(0, Math.min(1, this.bgPalette))
+      const palette = this.backgroundPalettes[paletteIndex]
+      if (palette) {
+        palette[clampedCombination] = clampedColors
+      }
+      return { paletteIndex, colors: clampedColors }
+    }
+
+    const paletteIndex = Math.max(0, Math.min(2, this.spritePalette))
+    const palette = this.spritePalettes[paletteIndex]
+    if (palette) {
+      palette[clampedCombination] = clampedColors
+    }
+    return { paletteIndex, colors: clampedColors }
   }
 
   /**

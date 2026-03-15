@@ -71,7 +71,8 @@ export const COLORS = [
 
 type Palette = [ColorCombination, ColorCombination, ColorCombination, ColorCombination]
 
-type ColorCombination = [number, number, number, number]
+export type ColorCombination = [number, number, number, number]
+export type PaletteTarget = 'B' | 'S'
 
 export const SPRITE_PALETTES: [Palette, Palette, Palette] = [
   [
@@ -108,3 +109,33 @@ export const BACKGROUND_PALETTES: [Palette, Palette] = [
     [0x00, 0x29, 0x36, 0x17],
   ],
 ]
+
+export function setRuntimePaletteCombination(
+  target: PaletteTarget,
+  paletteIndex: number,
+  combination: number,
+  colors: ColorCombination
+): void {
+  const clampedCombination = Math.max(0, Math.min(3, combination))
+  const clampedColors: ColorCombination = [
+    Math.max(0, Math.min(60, colors[0] ?? 0)),
+    Math.max(0, Math.min(60, colors[1] ?? 0)),
+    Math.max(0, Math.min(60, colors[2] ?? 0)),
+    Math.max(0, Math.min(60, colors[3] ?? 0)),
+  ]
+
+  if (target === 'B') {
+    const idx = Math.max(0, Math.min(1, paletteIndex))
+    const palette = BACKGROUND_PALETTES[idx]
+    if (palette) {
+      palette[clampedCombination] = clampedColors
+    }
+    return
+  }
+
+  const idx = Math.max(0, Math.min(2, paletteIndex))
+  const palette = SPRITE_PALETTES[idx]
+  if (palette) {
+    palette[clampedCombination] = clampedColors
+  }
+}

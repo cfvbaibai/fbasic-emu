@@ -19,6 +19,9 @@ import type {
 import type { Note, Rest } from '@/core/sound/types'
 import type { SpriteState } from '@/core/sprite/types'
 import { ExecutionError } from '@/features/ide/errors/ExecutionError'
+import { clearBackgroundTileCache } from '@/features/ide/composables/useCanvasBackgroundRenderer'
+import { clearSpriteImageCache } from '@/features/ide/composables/useKonvaSpriteRenderer'
+import { setRuntimePaletteCombination } from '@/shared/data/palette'
 import { logComposable, logIdeMessages } from '@/shared/logger'
 
 import { extendExecutionTimeout, type WebWorkerManager } from './useBasicIdeWebWorkerUtils'
@@ -376,6 +379,30 @@ export function handleScreenUpdateMessage(message: AnyServiceWorkerMessage, cont
           context.cgenMode.value = update.cgenMode
         }
         logComposable.debug('Updated character generator mode:', update.cgenMode)
+      }
+      break
+    case 'palette-combination':
+      if (
+        update.paletteTarget &&
+        update.paletteIndex !== undefined &&
+        update.paletteCombination !== undefined &&
+        update.paletteColors
+      ) {
+        setRuntimePaletteCombination(
+          update.paletteTarget,
+          update.paletteIndex,
+          update.paletteCombination,
+          update.paletteColors
+        )
+        clearBackgroundTileCache()
+        clearSpriteImageCache()
+        context.scheduleRender?.()
+        logComposable.debug('Updated runtime palette combination:', {
+          target: update.paletteTarget,
+          paletteIndex: update.paletteIndex,
+          combination: update.paletteCombination,
+          colors: update.paletteColors,
+        })
       }
       break
   }

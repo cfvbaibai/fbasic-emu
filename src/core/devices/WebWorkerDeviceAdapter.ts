@@ -565,6 +565,25 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
     this.postScreenChanged()
   }
 
+  setPaletteCombination(target: 'B' | 'S', combination: number, c1: number, c2: number, c3: number, c4: number): void {
+    const { paletteIndex, colors } = this.screenStateManager.setPaletteCombination(target, combination, [c1, c2, c3, c4])
+
+    self.postMessage({
+      type: 'SCREEN_UPDATE',
+      id: `screen-palette-combination-${Date.now()}`,
+      timestamp: Date.now(),
+      data: {
+        executionId: this.screenStateManager.getCurrentExecutionId() ?? 'unknown',
+        updateType: 'palette-combination',
+        paletteTarget: target,
+        paletteIndex,
+        paletteCombination: combination,
+        paletteColors: colors,
+        timestamp: Date.now(),
+      },
+    })
+  }
+
   setBackdropColor(colorCode: number): void {
     logWorker.debug('Set backdrop color:', colorCode)
     this.screenStateManager.setBackdropColor(colorCode)

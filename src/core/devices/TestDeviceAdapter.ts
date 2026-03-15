@@ -26,10 +26,50 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
     bgPalette: number
     spritePalette: number
   }> = []
+  public paletteCombinationCalls: Array<{
+    target: 'B' | 'S'
+    paletteIndex: number
+    combination: number
+    colors: [number, number, number, number]
+  }> = []
   public currentColorPalette: { bgPalette: number; spritePalette: number } = {
     bgPalette: 1,
     spritePalette: 1,
   }
+  public runtimeBackgroundPalettes = [
+    [
+      [0x00, 0x2c, 0x15, 0x07] as [number, number, number, number],
+      [0x00, 0x27, 0x21, 0x12] as [number, number, number, number],
+      [0x00, 0x29, 0x36, 0x17] as [number, number, number, number],
+      [0x00, 0x30, 0x26, 0x07] as [number, number, number, number],
+    ],
+    [
+      [0x00, 0x30, 0x21, 0x02] as [number, number, number, number],
+      [0x00, 0x30, 0x27, 0x18] as [number, number, number, number],
+      [0x00, 0x30, 0x27, 0x16] as [number, number, number, number],
+      [0x00, 0x29, 0x36, 0x17] as [number, number, number, number],
+    ],
+  ]
+  public runtimeSpritePalettes = [
+    [
+      [0x00, 0x36, 0x16, 0x02] as [number, number, number, number],
+      [0x00, 0x27, 0x30, 0x19] as [number, number, number, number],
+      [0x00, 0x35, 0x25, 0x17] as [number, number, number, number],
+      [0x00, 0x30, 0x27, 0x16] as [number, number, number, number],
+    ],
+    [
+      [0x00, 0x30, 0x16, 0x01] as [number, number, number, number],
+      [0x00, 0x10, 0x00, 0x01] as [number, number, number, number],
+      [0x00, 0x30, 0x29, 0x09] as [number, number, number, number],
+      [0x00, 0x30, 0x16, 0x07] as [number, number, number, number],
+    ],
+    [
+      [0x00, 0x30, 0x26, 0x12] as [number, number, number, number],
+      [0x00, 0x30, 0x15, 0x12] as [number, number, number, number],
+      [0x00, 0x30, 0x12, 0x16] as [number, number, number, number],
+      [0x00, 0x30, 0x26, 0x19] as [number, number, number, number],
+    ],
+  ]
   public backdropColorCalls: number[] = []
   public currentBackdropColor: number = 0 // Default backdrop color (0 = black)
   public cgenModeCalls: number[] = []
@@ -265,6 +305,20 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
       bgPalette,
       spritePalette,
     })
+  }
+
+  setPaletteCombination(target: 'B' | 'S', combination: number, c1: number, c2: number, c3: number, c4: number): void {
+    const colors: [number, number, number, number] = [c1, c2, c3, c4]
+    if (target === 'B') {
+      const paletteIndex = Math.max(0, Math.min(1, this.currentColorPalette.bgPalette))
+      this.runtimeBackgroundPalettes[paletteIndex]![combination] = colors
+      this.paletteCombinationCalls.push({ target, paletteIndex, combination, colors })
+      return
+    }
+
+    const paletteIndex = Math.max(0, Math.min(2, this.currentColorPalette.spritePalette))
+    this.runtimeSpritePalettes[paletteIndex]![combination] = colors
+    this.paletteCombinationCalls.push({ target, paletteIndex, combination, colors })
   }
 
   setBackdropColor(colorCode: number): void {

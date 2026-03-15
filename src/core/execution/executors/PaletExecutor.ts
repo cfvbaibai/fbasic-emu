@@ -179,25 +179,18 @@ export class PaletExecutor {
       return
     }
 
-    // Handle PALET B with n=0: set backdrop color
-    if (target === 'B' && n === 0) {
-      // C1 is the backdrop color when n=0
-      if (this.context.deviceAdapter) {
-        this.context.deviceAdapter.setBackdropColor(c1)
-      }
+    // Persist PALET color combination for active CGSET palette selection.
+    this.context.deviceAdapter?.setPaletteCombination?.(target, n, c1, c2, c3, c4)
 
-      if (this.context.config.enableDebugMode) {
-        this.context.addDebugOutput(`PALET B: Set backdrop color to ${c1} (color combination 0)`)
-      }
-    } else {
-      // For other cases (PALET S, or PALET B with n != 0), we would store palette colors
-      // This is a placeholder for future implementation
-      // For now, we'll just log it in debug mode
-      if (this.context.config.enableDebugMode) {
-        this.context.addDebugOutput(
-          `PALET ${target}: Set color combination ${n} to C1=${c1}, C2=${c2}, C3=${c3}, C4=${c4} (not yet fully implemented)`
-        )
-      }
+    // PALET B with n=0 also sets backdrop color to C1.
+    if (target === 'B' && n === 0) {
+      this.context.deviceAdapter?.setBackdropColor(c1)
+    }
+
+    if (this.context.config.enableDebugMode) {
+      this.context.addDebugOutput(
+        `PALET ${target}: Set color combination ${n} to C1=${c1}, C2=${c2}, C3=${c3}, C4=${c4}${target === 'B' && n === 0 ? ' (backdrop updated)' : ''}`
+      )
     }
   }
 }
