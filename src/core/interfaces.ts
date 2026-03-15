@@ -125,6 +125,14 @@ export interface BasicDeviceAdapter {
   getScreenCell(x: number, y: number, colorSwitch?: number): string | number
   setColorPattern(x: number, y: number, pattern: number): void
   setColorPalette(bgPalette: number, spritePalette: number): void
+  setPaletteCombination?(
+    target: 'B' | 'S',
+    combination: number,
+    c1: number,
+    c2: number,
+    c3: number,
+    c4: number
+  ): void
   setBackdropColor(colorCode: number): void
   setCharacterGeneratorMode(mode: number): void
   getCharacterGeneratorMode(): number
@@ -365,7 +373,16 @@ export interface ScreenUpdateMessage extends ServiceWorkerMessage {
   type: 'SCREEN_UPDATE'
   data: {
     executionId: string
-    updateType: 'character' | 'cursor' | 'clear' | 'full' | 'color' | 'palette' | 'cgen' | 'backdrop'
+    updateType:
+      | 'character'
+      | 'cursor'
+      | 'clear'
+      | 'full'
+      | 'color'
+      | 'palette'
+      | 'cgen'
+      | 'backdrop'
+      | 'palette-combination'
     x?: number
     y?: number
     character?: string
@@ -375,6 +392,10 @@ export interface ScreenUpdateMessage extends ServiceWorkerMessage {
     colorUpdates?: Array<{ x: number; y: number; pattern: number }>
     bgPalette?: number
     spritePalette?: number
+    paletteTarget?: 'B' | 'S'
+    paletteIndex?: number
+    paletteCombination?: number
+    paletteColors?: [number, number, number, number]
     backdropColor?: number
     cgenMode?: number
     timestamp: number

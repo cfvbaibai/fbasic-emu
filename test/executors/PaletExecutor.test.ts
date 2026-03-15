@@ -104,6 +104,13 @@ describe('PaletExecutor', () => {
       expect(result.errors).toHaveLength(0)
       // When n != 0, backdrop color should not be set (only palette colors would be set)
       expect(deviceAdapter.backdropColorCalls).toHaveLength(0)
+      expect(deviceAdapter.paletteCombinationCalls).toHaveLength(1)
+      expect(deviceAdapter.paletteCombinationCalls[0]).toMatchObject({
+        target: 'B',
+        paletteIndex: 1,
+        combination: 1,
+        colors: [15, 0, 0, 0],
+      })
     })
 
     it('should handle multiple PALET B commands', async () => {
@@ -137,6 +144,13 @@ describe('PaletExecutor', () => {
       expect(result.errors).toHaveLength(0)
       // PALET S doesn't set backdrop color, so no backdrop color calls
       expect(deviceAdapter.backdropColorCalls).toHaveLength(0)
+      expect(deviceAdapter.paletteCombinationCalls).toHaveLength(1)
+      expect(deviceAdapter.paletteCombinationCalls[0]).toMatchObject({
+        target: 'S',
+        paletteIndex: 1,
+        combination: 0,
+        colors: [15, 20, 25, 30],
+      })
     })
 
     it('should parse PALETS statement (no space) without errors', async () => {
@@ -245,6 +259,26 @@ describe('PaletExecutor', () => {
       expect(result.errors).toHaveLength(0)
       expect(deviceAdapter.backdropColorCalls).toHaveLength(1)
       expect(deviceAdapter.backdropColorCalls[0]).toBe(20)
+    })
+
+    it('should apply palette combination to currently selected sprite palette from CGSET', async () => {
+      const source = `
+10 CGSET 1, 2
+20 PALET S 2, 9, 10, 11, 12
+30 END
+`
+      const result = await interpreter.execute(source)
+
+      expect(result.success).toBe(true)
+      expect(result.errors).toHaveLength(0)
+      expect(deviceAdapter.paletteCombinationCalls).toHaveLength(1)
+      expect(deviceAdapter.paletteCombinationCalls[0]).toMatchObject({
+        target: 'S',
+        paletteIndex: 2,
+        combination: 2,
+        colors: [9, 10, 11, 12],
+      })
+      expect(deviceAdapter.runtimeSpritePalettes[2]?.[2]).toEqual([9, 10, 11, 12])
     })
   })
 })
