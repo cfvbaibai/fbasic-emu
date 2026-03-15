@@ -5,20 +5,14 @@
  * PAUSE command usage with countdown and timing delays.
  */
 
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import type { BasicDeviceAdapter } from '@/core/interfaces'
 import { FBasicParser } from '@/core/parser/FBasicParser'
 import { getSampleCode } from '@/core/samples'
 
-// Skip by default - this test takes a long time due to PAUSE delays
-// To run manually:
-//   - Remove .skip() temporarily, OR
-//   - Set RUN_PAUSE_DEMO_TESTS=true pnpm test:run -- test/parser/PauseDemo.test.ts
-const shouldRunPauseDemoTests = process.env.RUN_PAUSE_DEMO_TESTS === 'true'
-
-describe.skipIf(!shouldRunPauseDemoTests)('Pause Demo Program', () => {
+describe('Pause Demo Program', () => {
   let interpreter: BasicInterpreter
   let mockDeviceAdapter: BasicDeviceAdapter
   let printOutputMock: ReturnType<typeof vi.fn<(output: string) => void>>
@@ -55,6 +49,40 @@ describe.skipIf(!shouldRunPauseDemoTests)('Pause Demo Program', () => {
       deviceAdapter: mockDeviceAdapter,
     })
   })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
+  async function executeWithCapturedTimeouts(code: string): Promise<{
+    durations: number[]
+    result: Awaited<ReturnType<BasicInterpreter['execute']>>
+  }> {
+    const durations: number[] = []
+
+    vi.spyOn(globalThis, 'setTimeout').mockImplementation((callback: TimerHandler, delay?: number) => {
+      durations.push(typeof delay === 'number' ? delay : 0)
+      if (typeof callback === 'function') {
+        callback()
+      }
+      return {} as ReturnType<typeof setTimeout>
+    })
+
+    const result = await interpreter.execute(code)
+    expect(result.success).toBe(true)
+    expect(result.errors).toHaveLength(0)
+
+    return {
+      result,
+      durations: durations.filter((duration) => duration > 1),
+    }
+  }
+
+  function getPrintedLines(): string[] {
+    return printOutputMock.mock.calls
+      .map(call => call[0].trim().replace(/\s+/g, ' '))
+      .filter(call => call.length > 0)
+  }
 
   const pauseDemoCode = getSampleCode('pause')?.code
   if (!pauseDemoCode) {
@@ -94,28 +122,16 @@ describe.skipIf(!shouldRunPauseDemoTests)('Pause Demo Program', () => {
 
   describe('Execution Tests', () => {
     it('should execute the complete pause demo program', async () => {
-      const result = await interpreter.execute(pauseDemoCode)
+      const { durations } = await executeWithCapturedTimeouts(pauseDemoCode)
 
-      // Check for errors first
-      if (!result.success || result.errors.length > 0) {
-        console.log('Execution errors:', result.errors)
-        console.log('Print calls:', printOutputMock.mock.calls.length)
-        console.log(
-          'Print outputs:',
-          printOutputMock.mock.calls.map(c => c[0])
-        )
-      }
-
-      // Program should execute successfully
-      expect(result.success).toBe(true)
-      expect(result.errors).toHaveLength(0)
+      // The sample has five PAUSE 3 calls + one PAUSE 10 call.
+      expect(durations).toHaveLength(6)
+      expect(durations.filter((duration) => Math.abs(duration - 36.36) < 0.5)).toHaveLength(5)
+      expect(durations.some((duration) => Math.abs(duration - 121.21) < 0.5)).toBe(true)
     })
 
     it('should produce correct output sequence', async () => {
-      const result = await interpreter.execute(pauseDemoCode)
-
-      expect(result.success).toBe(true)
-      expect(result.errors).toHaveLength(0)
+      await executeWithCapturedTimeouts(pauseDemoCode)
 
       // Verify all PRINT statements executed
       // Line 10: "PAUSE Command Demo"
@@ -124,10 +140,7 @@ describe.skipIf(!shouldRunPauseDemoTests)('Pause Demo Program', () => {
       // Line 70: "Blast off!"
       // Line 90: "Mission complete!"
       // Total: 2 + 5 + 1 + 1 = 9 PRINT calls
-      expect(printOutputMock).toHaveBeenCalledTimes(9)
-
-      // Verify the output order and content
-      const calls = printOutputMock.mock.calls.map(call => call[0])
+      const calls = getPrintedLines()
 
       // First two PRINT statements
       expect(calls[0]).toBe('PAUSE Command Demo')
@@ -144,13 +157,11 @@ describe.skipIf(!shouldRunPauseDemoTests)('Pause Demo Program', () => {
       // Final outputs
       expect(calls[7]).toBe('Blast off!')
       expect(calls[8]).toBe('Mission complete!')
+      expect(calls[9]).toBe('OK')
     })
 
     it('should execute FOR loop with negative STEP correctly', async () => {
-      const result = await interpreter.execute(pauseDemoCode)
-
-      expect(result.success).toBe(true)
-      expect(result.errors).toHaveLength(0)
+      const { result } = await executeWithCapturedTimeouts(pauseDemoCode)
 
       // After loop completion, I should be 0 (1 - 1 = 0, but loop exits when I < 1)
       // Actually, in Family Basic, after NEXT when I becomes 0, the loop exits
@@ -168,23 +179,18 @@ describe.skipIf(!shouldRunPauseDemoTests)('Pause Demo Program', () => {
 50 PRINT "End"
 60 END`
 
-      const startTime = Date.now()
-      const result = await interpreter.execute(codeWithShortDelays)
-      const endTime = Date.now()
-
-      expect(result.success).toBe(true)
-      expect(result.errors).toHaveLength(0)
-
-      // Verify execution took at least the pause duration
-      // (10ms + 20ms = 30ms minimum, but allow some margin)
-      expect(endTime - startTime).toBeGreaterThanOrEqual(25)
+      const { durations } = await executeWithCapturedTimeouts(codeWithShortDelays)
+      expect(durations).toEqual([
+        expect.closeTo(121.21, 1),
+        expect.closeTo(242.42, 1),
+      ])
 
       // Verify outputs
-      expect(printOutputMock).toHaveBeenCalledTimes(3)
-      const calls = printOutputMock.mock.calls.map(call => call[0])
+      const calls = getPrintedLines()
       expect(calls[0]).toBe('Start')
       expect(calls[1]).toBe('Middle')
       expect(calls[2]).toBe('End')
+      expect(calls[3]).toBe('OK')
     })
 
     it('should handle PAUSE with expressions', async () => {
@@ -194,21 +200,14 @@ describe.skipIf(!shouldRunPauseDemoTests)('Pause Demo Program', () => {
 40 PRINT "Done"
 50 END`
 
-      const startTime = Date.now()
-      const result = await interpreter.execute(code)
-      const endTime = Date.now()
-
-      expect(result.success).toBe(true)
-      expect(result.errors).toHaveLength(0)
-
-      // Verify execution took at least the pause duration
-      expect(endTime - startTime).toBeGreaterThanOrEqual(45)
+      const { durations } = await executeWithCapturedTimeouts(code)
+      expect(durations).toEqual([expect.closeTo(606.06, 1)])
 
       // Verify outputs
-      expect(printOutputMock).toHaveBeenCalledTimes(2)
-      const calls = printOutputMock.mock.calls.map(call => call[0])
+      const calls = getPrintedLines()
       expect(calls[0]).toBe('Pausing...')
       expect(calls[1]).toBe('Done')
+      expect(calls[2]).toBe('OK')
     })
 
     it('should handle multiple PAUSE statements in sequence', async () => {
@@ -221,18 +220,14 @@ describe.skipIf(!shouldRunPauseDemoTests)('Pause Demo Program', () => {
 70 PRINT "Done"
 80 END`
 
-      const startTime = Date.now()
-      const result = await interpreter.execute(code)
-      const endTime = Date.now()
-
-      expect(result.success).toBe(true)
-      expect(result.errors).toHaveLength(0)
-
-      // Verify execution took at least the total pause duration
-      expect(endTime - startTime).toBeGreaterThanOrEqual(25)
+      const { durations } = await executeWithCapturedTimeouts(code)
+      expect(durations).toHaveLength(3)
+      expect(durations.every((duration) => Math.abs(duration - 121.21) < 1)).toBe(true)
 
       // Verify all outputs
-      expect(printOutputMock).toHaveBeenCalledTimes(4)
+      const calls = getPrintedLines()
+      expect(calls).toHaveLength(5)
+      expect(calls[4]).toBe('OK')
     })
 
     it('should handle PAUSE in FOR loop correctly', async () => {
@@ -240,36 +235,27 @@ describe.skipIf(!shouldRunPauseDemoTests)('Pause Demo Program', () => {
       const code = `10 FOR J = 1 TO 3
 20   PRINT "Loop "; J
 30   PAUSE 10
-40 NEXT J
+40 NEXT
 50 PRINT "Loop complete"
 60 END`
 
-      const startTime = Date.now()
-      const result = await interpreter.execute(code)
-      const endTime = Date.now()
+      const { durations } = await executeWithCapturedTimeouts(code)
+      expect(durations).toHaveLength(3)
+      expect(durations.every((duration) => Math.abs(duration - 121.21) < 1)).toBe(true)
 
-      expect(result.success).toBe(true)
-      expect(result.errors).toHaveLength(0)
-
-      // Verify execution took at least the total pause duration (3 * 10ms = 30ms)
-      expect(endTime - startTime).toBeGreaterThanOrEqual(25)
-
-      // Verify outputs: 3 loop prints + 1 final print = 4 total
-      expect(printOutputMock).toHaveBeenCalledTimes(4)
-
-      const calls = printOutputMock.mock.calls.map(call => call[0])
+      // Verify outputs: 3 loop prints + 1 final print + final OK.
+      const calls = getPrintedLines()
+      expect(calls).toHaveLength(5)
       // PRINT "Loop"; I outputs "Loop 1" etc. (semicolon concatenates, number gets leading space)
       expect(calls[0]).toEqual('Loop 1')
       expect(calls[1]).toEqual('Loop 2')
       expect(calls[2]).toEqual('Loop 3')
       expect(calls[3]).toBe('Loop complete')
+      expect(calls[4]).toBe('OK')
     })
 
     it('should handle END statement correctly', async () => {
-      const result = await interpreter.execute(pauseDemoCode)
-
-      expect(result.success).toBe(true)
-      expect(result.errors).toHaveLength(0)
+      await executeWithCapturedTimeouts(pauseDemoCode)
 
       // Program should complete without errors
       // END statement should stop execution
@@ -283,17 +269,12 @@ describe.skipIf(!shouldRunPauseDemoTests)('Pause Demo Program', () => {
 30 PRINT "After"
 40 END`
 
-      const startTime = Date.now()
-      const result = await interpreter.execute(code)
-      const endTime = Date.now()
+      const { durations } = await executeWithCapturedTimeouts(code)
+      expect(durations).toHaveLength(0)
 
-      expect(result.success).toBe(true)
-      expect(result.errors).toHaveLength(0)
-
-      // PAUSE 0 should not cause significant delay
-      expect(endTime - startTime).toBeLessThan(50)
-
-      expect(printOutputMock).toHaveBeenCalledTimes(2)
+      const calls = getPrintedLines()
+      expect(calls).toHaveLength(3)
+      expect(calls[2]).toBe('OK')
     })
 
     it('should handle PAUSE with negative value (no delay)', async () => {
@@ -302,17 +283,12 @@ describe.skipIf(!shouldRunPauseDemoTests)('Pause Demo Program', () => {
 30 PRINT "After"
 40 END`
 
-      const startTime = Date.now()
-      const result = await interpreter.execute(code)
-      const endTime = Date.now()
+      const { durations } = await executeWithCapturedTimeouts(code)
+      expect(durations).toHaveLength(0)
 
-      expect(result.success).toBe(true)
-      expect(result.errors).toHaveLength(0)
-
-      // Negative PAUSE should not cause delay
-      expect(endTime - startTime).toBeLessThan(50)
-
-      expect(printOutputMock).toHaveBeenCalledTimes(2)
+      const calls = getPrintedLines()
+      expect(calls).toHaveLength(3)
+      expect(calls[2]).toBe('OK')
     })
   })
 })
