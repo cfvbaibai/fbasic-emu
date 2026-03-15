@@ -37,6 +37,7 @@ Vue 3 + TypeScript + Vite + Chevrotain parser
 | `pnpm test:run` | Run tests |
 | `pnpm lint` | Lint and format |
 | `pnpm type-check` | TypeScript check |
+| `pnpm verify:build-size-budgets` | Enforce initial app-shell JS chunk budget (<= 1.5 MB raw) |
 
 ## Contributing
 

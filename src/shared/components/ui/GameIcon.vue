@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
+
+import { ensureLocalIcon } from '@/shared/icons'
 
 /**
  * GameIcon component - An icon component using Iconify with size, color, and animation options.
@@ -69,11 +71,26 @@ const rotateValue = computed((): number | undefined => {
 
 const iconColorValue = computed(() => props.color)
 const iconFontSize = computed(() => `${iconSize.value}px`)
+const resolvedIcon = ref<string | undefined>(props.icon)
+
+watch(
+  () => props.icon,
+  async (newIcon) => {
+    if (!newIcon) {
+      resolvedIcon.value = undefined
+      return
+    }
+
+    await ensureLocalIcon(newIcon)
+    resolvedIcon.value = newIcon
+  },
+  { immediate: true }
+)
 </script>
 
 <template>
-  <span v-if="icon" :class="iconClasses">
-    <Icon :icon="icon" :width="iconSize" :height="iconSize" :color="color" :inline="inline" :rotate="rotateValue" />
+  <span v-if="resolvedIcon" :class="iconClasses">
+    <Icon :icon="resolvedIcon" :width="iconSize" :height="iconSize" :color="color" :inline="inline" :rotate="rotateValue" />
   </span>
   <span v-else class="game-icon-placeholder">
     <slot />
