@@ -42,6 +42,10 @@ Vue 3 + TypeScript + Vite + Chevrotain parser
 | `pnpm test:run` | Run tests |
 | `pnpm lint` | Lint and auto-fix |
 | `pnpm type-check` | TypeScript check |
+| `pnpm build-web-worker` | Validate Web Worker entrypoint and wiring assumptions |
+| `pnpm test-web-worker` | Assert worker import wiring in `WebWorkerManager` |
+| `pnpm build-service-worker` | Deprecated alias for `pnpm build-web-worker` |
+| `pnpm test-service-worker` | Deprecated alias for `pnpm test-web-worker` |
 | `pnpm verify:build-size-budgets` | Enforce initial app-shell JS chunk budget (<= 1.5 MB raw) |
 
 ## CI
