@@ -52,28 +52,6 @@ const {
   registerScheduleRender,
 } = useBasicIdeEnhanced()
 
-provideScreenContext({
-  screenBuffer,
-  cursorX,
-  cursorY,
-  bgPalette,
-  backdropColor,
-  spritePalette,
-  cgenMode,
-  spriteStates,
-  spriteEnabled,
-  // movementStates removed - read from shared buffer instead
-  movementPositionsFromBuffer,
-  externalFrontSpriteNodes: frontSpriteNodes,
-  externalBackSpriteNodes: backSpriteNodes,
-  sharedDisplayViews: ref(sharedDisplayViews),
-  sharedDisplayBufferAccessor,
-  sharedAnimationBuffer: ref(sharedAnimationBuffer),
-  sharedJoystickBuffer: ref(sharedJoystickBuffer),
-  setDecodedScreenState,
-  registerScheduleRender,
-})
-
 const {
   fps,
   messagesPerSecond,
@@ -97,6 +75,30 @@ const {
   isRunning,
   output,
   screenBuffer,
+})
+
+provideScreenContext({
+  screenBuffer,
+  cursorX,
+  cursorY,
+  bgPalette,
+  backdropColor,
+  spritePalette,
+  cgenMode,
+  spriteStates,
+  spriteEnabled,
+  // movementStates removed - read from shared buffer instead
+  movementPositionsFromBuffer,
+  externalFrontSpriteNodes: frontSpriteNodes,
+  externalBackSpriteNodes: backSpriteNodes,
+  sharedDisplayViews: ref(sharedDisplayViews),
+  sharedDisplayBufferAccessor,
+  sharedAnimationBuffer: ref(sharedAnimationBuffer),
+  sharedJoystickBuffer: ref(sharedJoystickBuffer),
+  setDecodedScreenState,
+  registerScheduleRender,
+  renderingEnabled,
+  renderFpsTarget,
 })
 </script>
 
@@ -161,6 +163,10 @@ const {
             />
           </div>
         </div>
+        <p class="settings-note">
+          Screen Rendering now disables the Screen render loop entirely. Render FPS Target caps
+          maximum redraw frequency while rendering remains enabled.
+        </p>
       </GameBlock>
 
       <!-- Real-time Metrics -->
@@ -225,15 +231,20 @@ const {
       </GameBlock>
 
       <!-- Screen Output -->
-      <GameBlock v-if="renderingEnabled" title="Screen Output" title-icon="mdi:monitor" class="screen-output-block">
-        <RuntimeOutput
-          :output="outputForDisplay"
-          :is-running="isRunning"
-          :errors="errors"
-          :variables="variables"
-          :debug-output="debugOutput"
-          :debug-mode="debugMode"
-        />
+      <GameBlock title="Screen Output" title-icon="mdi:monitor" class="screen-output-block">
+        <template v-if="renderingEnabled">
+          <RuntimeOutput
+            :output="outputForDisplay"
+            :is-running="isRunning"
+            :errors="errors"
+            :variables="variables"
+            :debug-output="debugOutput"
+            :debug-mode="debugMode"
+          />
+        </template>
+        <p v-else class="rendering-disabled-note">
+          Rendering is disabled. Screen decode/render work is paused until re-enabled.
+        </p>
       </GameBlock>
     </div>
   </GameLayout>
@@ -288,6 +299,12 @@ const {
 
 .fps-select {
   min-width: 120px;
+}
+
+.settings-note {
+  margin: 0.75rem 0 0;
+  font-size: var(--game-font-size-sm);
+  color: var(--game-text-secondary);
 }
 
 /* Metrics Grid */
@@ -406,5 +423,11 @@ const {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+}
+
+.rendering-disabled-note {
+  margin: 0;
+  color: var(--game-text-secondary);
+  font-size: var(--game-font-size-base);
 }
 </style>

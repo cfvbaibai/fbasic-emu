@@ -41,6 +41,10 @@ export interface ScreenContextValue {
   sharedJoystickBuffer: Ref<SharedArrayBuffer | undefined>
   setDecodedScreenState: (decoded: DecodedScreenState) => void
   registerScheduleRender: (fn: () => void) => void
+  /** Optional diagnostics control: disable all screen rendering work when false. */
+  renderingEnabled?: Ref<boolean>
+  /** Optional diagnostics control: target max screen render FPS. */
+  renderFpsTarget?: Ref<number>
   /** Callback to update inspector MOVE tab data (called by animation loop every frame). */
   updateInspectorMoveSlots?: () => void
 }

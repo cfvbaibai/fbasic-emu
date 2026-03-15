@@ -63,6 +63,12 @@ backgroundCanvas.height = BASE_HEIGHT
 // Computed stage display dimensions based on zoom (for CSS scaling)
 const stageDisplayWidth = computed(() => BASE_WIDTH * zoomLevel.value)
 const stageDisplayHeight = computed(() => BASE_HEIGHT * zoomLevel.value)
+const renderingEnabled = computed(() => ctx.renderingEnabled?.value ?? true)
+const renderFrameIntervalMs = computed(() => {
+  const target = Number(ctx.renderFpsTarget?.value ?? 60)
+  const safeTarget = Number.isFinite(target) && target > 0 ? target : 60
+  return 1000 / safeTarget
+})
 
 // Konva layers (background populated from offscreen Canvas2D for performance)
 // Use shallowRef since the layers object is replaced, not mutated
@@ -96,6 +102,46 @@ const pendingStaticRenderRef = ref(false)
 
 // Track if a render is in progress to prevent overlapping renders
 let renderInProgress = false
+let lastRenderAt = 0
+let throttledRenderTimer: number | null = null
+
+async function runRenderNow(): Promise<void> {
+  await render()
+  lastRenderAt = performance.now()
+}
+
+function cancelThrottledRenderTimer(): void {
+  if (throttledRenderTimer !== null) {
+    window.clearTimeout(throttledRenderTimer)
+    throttledRenderTimer = null
+  }
+}
+
+function scheduleThrottledRender(): void {
+  if (!renderingEnabled.value) {
+    cancelThrottledRenderTimer()
+    return
+  }
+
+  const now = performance.now()
+  const elapsed = now - lastRenderAt
+  const remaining = renderFrameIntervalMs.value - elapsed
+
+  if (remaining <= 0 || lastRenderAt === 0) {
+    cancelThrottledRenderTimer()
+    void runRenderNow()
+    return
+  }
+
+  if (throttledRenderTimer === null) {
+    throttledRenderTimer = window.setTimeout(() => {
+      throttledRenderTimer = null
+      if (renderingEnabled.value) {
+        void runRenderNow()
+      }
+    }, Math.ceil(remaining))
+  }
+}
 
 /**
  * Initialize Konva Stage and layers
@@ -305,6 +351,11 @@ watch(
 
 // Render queue: when animation is active, sets pending static render so animation loop runs render at end of frame
 function scheduleRender() {
+  if (!renderingEnabled.value) {
+    pendingStaticRenderRef.value = false
+    return
+  }
+
   // Check if there are active movements - Pure Buffer Read
   const hasActiveMovements = (() => {
     if (!ctx.sharedDisplayBufferAccessor) return false
@@ -321,7 +372,7 @@ function scheduleRender() {
     pendingStaticRenderRef.value = true
   } else {
     // No active animation, render immediately
-    render()
+    scheduleThrottledRender()
   }
 }
 
@@ -407,23 +458,48 @@ const stopAnimationLoop = useScreenAnimationLoopRenderOnly({
   updateInspectorMoveSlots: ctx.updateInspectorMoveSlots,
   getPendingStaticRender: () => pendingStaticRenderRef.value,
   onRunPendingStaticRender: async () => {
-    await render()
+    if (renderingEnabled.value) {
+      await runRenderNow()
+    }
     pendingStaticRenderRef.value = false
   },
   onRenderNeeded: () => {
     pendingRenderReasonRef.value = 'full'
     scheduleRender()
   },
+  isRenderingEnabled: () => renderingEnabled.value,
 })
 
 // Stop animation loop and cancel pending renders (unmount and keep-alive deactivation)
 function cleanupScreen() {
   stopAnimationLoop()
   cleanupRenderQueue()
+  cancelThrottledRenderTimer()
   terminateAnimationWorker()
 }
 onUnmounted(cleanupScreen)
 onDeactivated(cleanupScreen)
+
+watch(
+  renderingEnabled,
+  enabled => {
+    if (!enabled) {
+      pendingStaticRenderRef.value = false
+      cancelThrottledRenderTimer()
+      return
+    }
+    pendingRenderReasonRef.value = 'full'
+    scheduleRender()
+  },
+  { immediate: true }
+)
+
+watch(renderFrameIntervalMs, () => {
+  if (!renderingEnabled.value) return
+  cancelThrottledRenderTimer()
+  pendingRenderReasonRef.value = 'full'
+  scheduleRender()
+})
 </script>
 
 <template>
