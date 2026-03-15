@@ -7,6 +7,7 @@ import { buildNumberPlugin } from './vite-plugin-build-number'
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: process.env.VITE_BASE_PATH ?? '/',
   plugins: [vue(), buildNumberPlugin()],
   server: {
     host: '127.0.0.1',
