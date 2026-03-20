@@ -152,7 +152,7 @@ describe('PlayExecutor', () => {
 
     expect(result.success).toBe(false)
     expect(result.errors.length).toBeGreaterThan(0)
-    expect(result.errors[0]?.message).toContain('Expected string')
+    expect(result.errors[0]?.message).toMatch(/Expected string/)
   })
 
   it('should handle PLAY with string concatenation', async () => {

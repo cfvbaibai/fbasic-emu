@@ -176,7 +176,7 @@ describe('PaletExecutor', () => {
 
       expect(result.success).toBe(false)
       expect(result.errors.length).toBeGreaterThan(0)
-      expect(result.errors[0]?.message).toContain('PALET')
+      expect(result.errors[0]?.message).toMatch(/PALET/)
     })
 
     it('should report error for missing arguments', async () => {
@@ -201,7 +201,7 @@ describe('PaletExecutor', () => {
 
       expect(result.success).toBe(false)
       expect(result.errors.length).toBeGreaterThan(0)
-      expect(result.errors[0]?.message).toContain('Color combination number out of range')
+      expect(result.errors[0]?.message).toMatch(/Color combination number out of range/)
     })
 
     it('should report error for color code out of range', async () => {
@@ -213,7 +213,7 @@ describe('PaletExecutor', () => {
 
       expect(result.success).toBe(false)
       expect(result.errors.length).toBeGreaterThan(0)
-      expect(result.errors[0]?.message).toContain('Color code out of range')
+      expect(result.errors[0]?.message).toMatch(/Color code out of range/)
     })
 
     it('should report error for negative color code', async () => {
@@ -225,7 +225,7 @@ describe('PaletExecutor', () => {
 
       expect(result.success).toBe(false)
       expect(result.errors.length).toBeGreaterThan(0)
-      expect(result.errors[0]?.message).toContain('Color code out of range')
+      expect(result.errors[0]?.message).toMatch(/Color code out of range/)
     })
   })
 

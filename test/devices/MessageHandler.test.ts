@@ -66,7 +66,7 @@ describe('MessageHandler', () => {
     expect(resolve).not.toHaveBeenCalled()
     expect(reject).toHaveBeenCalledTimes(1)
     expect(reject.mock.calls[0]?.[0]).toBeInstanceOf(Error)
-    expect((reject.mock.calls[0]?.[0] as Error).message).toContain('falling back to main thread')
+    expect((reject.mock.calls[0]?.[0] as Error).message).toMatch(/falling back to main thread/)
     expect(pendingMessages.has(messageId)).toBe(false)
   })
 

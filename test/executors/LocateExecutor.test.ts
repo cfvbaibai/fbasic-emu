@@ -108,7 +108,7 @@ describe('LocateExecutor', () => {
 
     expect(result.success).toBe(false)
     expect(result.errors.length).toBeGreaterThan(0)
-    expect(result.errors[0]?.message).toContain('X coordinate out of range')
+    expect(result.errors[0]?.message).toMatch(/X coordinate out of range/)
   })
 
   it('should error when X coordinate is out of range (too large)', async () => {
@@ -120,7 +120,7 @@ describe('LocateExecutor', () => {
 
     expect(result.success).toBe(false)
     expect(result.errors.length).toBeGreaterThan(0)
-    expect(result.errors[0]?.message).toContain('X coordinate out of range')
+    expect(result.errors[0]?.message).toMatch(/X coordinate out of range/)
   })
 
   it('should error when Y coordinate is out of range (negative)', async () => {
@@ -132,7 +132,7 @@ describe('LocateExecutor', () => {
 
     expect(result.success).toBe(false)
     expect(result.errors.length).toBeGreaterThan(0)
-    expect(result.errors[0]?.message).toContain('Y coordinate out of range')
+    expect(result.errors[0]?.message).toMatch(/Y coordinate out of range/)
   })
 
   it('should error when Y coordinate is out of range (too large)', async () => {
@@ -144,7 +144,7 @@ describe('LocateExecutor', () => {
 
     expect(result.success).toBe(false)
     expect(result.errors.length).toBeGreaterThan(0)
-    expect(result.errors[0]?.message).toContain('Y coordinate out of range')
+    expect(result.errors[0]?.message).toMatch(/Y coordinate out of range/)
   })
 
   it('should handle LOCATE on same line as other commands', async () => {

@@ -162,7 +162,7 @@ describe('CgsetExecutor', () => {
 
     expect(result.success).toBe(false)
     expect(result.errors.length).toBeGreaterThan(0)
-    expect(result.errors[0]?.message).toContain('Background palette code out of range (0-1)')
+    expect(result.errors[0]?.message).toMatch(/Background palette code out of range \(0-1\)/)
   })
 
   it('should report error when background palette is out of range (too large)', async () => {
@@ -174,7 +174,7 @@ describe('CgsetExecutor', () => {
 
     expect(result.success).toBe(false)
     expect(result.errors.length).toBeGreaterThan(0)
-    expect(result.errors[0]?.message).toContain('Background palette code out of range (0-1)')
+    expect(result.errors[0]?.message).toMatch(/Background palette code out of range \(0-1\)/)
   })
 
   it('should report error when sprite palette is out of range (negative)', async () => {
@@ -186,7 +186,7 @@ describe('CgsetExecutor', () => {
 
     expect(result.success).toBe(false)
     expect(result.errors.length).toBeGreaterThan(0)
-    expect(result.errors[0]?.message).toContain('Sprite palette code out of range (0-2)')
+    expect(result.errors[0]?.message).toMatch(/Sprite palette code out of range \(0-2\)/)
   })
 
   it('should report error when sprite palette is out of range (too large)', async () => {
@@ -198,7 +198,7 @@ describe('CgsetExecutor', () => {
 
     expect(result.success).toBe(false)
     expect(result.errors.length).toBeGreaterThan(0)
-    expect(result.errors[0]?.message).toContain('Sprite palette code out of range (0-2)')
+    expect(result.errors[0]?.message).toMatch(/Sprite palette code out of range \(0-2\)/)
   })
 
   it('should handle CGSET with all valid background palette values', async () => {

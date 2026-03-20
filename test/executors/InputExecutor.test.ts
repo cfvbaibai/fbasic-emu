@@ -116,6 +116,6 @@ describe('InputExecutor', () => {
     const result = await interp.execute(source)
     expect(result.success).toBe(false)
     expect(result.errors.length).toBeGreaterThan(0)
-    expect(result.errors[0]?.message).toContain('not supported')
+    expect(result.errors[0]?.message).toMatch(/not supported/)
   })
 })

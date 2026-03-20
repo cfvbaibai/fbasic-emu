@@ -134,7 +134,7 @@ describe('ColorExecutor', () => {
 
     expect(result.success).toBe(false)
     expect(result.errors.length).toBeGreaterThan(0)
-    expect(result.errors[0]?.message).toContain('X coordinate out of range (0-27)')
+    expect(result.errors[0]?.message).toMatch(/X coordinate out of range \(0-27\)/)
   })
 
   it('should report error when X coordinate is out of range (too large)', async () => {
@@ -146,7 +146,7 @@ describe('ColorExecutor', () => {
 
     expect(result.success).toBe(false)
     expect(result.errors.length).toBeGreaterThan(0)
-    expect(result.errors[0]?.message).toContain('X coordinate out of range (0-27)')
+    expect(result.errors[0]?.message).toMatch(/X coordinate out of range \(0-27\)/)
   })
 
   it('should report error when Y coordinate is out of range (negative)', async () => {
@@ -158,7 +158,7 @@ describe('ColorExecutor', () => {
 
     expect(result.success).toBe(false)
     expect(result.errors.length).toBeGreaterThan(0)
-    expect(result.errors[0]?.message).toContain('Y coordinate out of range (0-23)')
+    expect(result.errors[0]?.message).toMatch(/Y coordinate out of range \(0-23\)/)
   })
 
   it('should report error when Y coordinate is out of range (too large)', async () => {
@@ -170,7 +170,7 @@ describe('ColorExecutor', () => {
 
     expect(result.success).toBe(false)
     expect(result.errors.length).toBeGreaterThan(0)
-    expect(result.errors[0]?.message).toContain('Y coordinate out of range (0-23)')
+    expect(result.errors[0]?.message).toMatch(/Y coordinate out of range \(0-23\)/)
   })
 
   it('should report error when color pattern is out of range (negative)', async () => {
@@ -182,7 +182,7 @@ describe('ColorExecutor', () => {
 
     expect(result.success).toBe(false)
     expect(result.errors.length).toBeGreaterThan(0)
-    expect(result.errors[0]?.message).toContain('Color pattern number out of range (0-3)')
+    expect(result.errors[0]?.message).toMatch(/Color pattern number out of range \(0-3\)/)
   })
 
   it('should report error when color pattern is out of range (too large)', async () => {
@@ -194,7 +194,7 @@ describe('ColorExecutor', () => {
 
     expect(result.success).toBe(false)
     expect(result.errors.length).toBeGreaterThan(0)
-    expect(result.errors[0]?.message).toContain('Color pattern number out of range (0-3)')
+    expect(result.errors[0]?.message).toMatch(/Color pattern number out of range \(0-3\)/)
   })
 
   it('should handle COLOR with expressions that evaluate to non-integers (floor conversion)', async () => {

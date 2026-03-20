@@ -61,8 +61,8 @@ describe('ViewExecutor', () => {
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.copyBgGraphicToBackgroundCalls).toBe(1)
     const outputs = deviceAdapter.getAllOutputs()
-    expect(outputs).toContain('Before')
-    expect(outputs).toContain('After')
+    expect(outputs).toMatch(/Before/)
+    expect(outputs).toMatch(/After/)
   })
 
   it('should handle VIEW in a loop', async () => {
@@ -92,7 +92,7 @@ describe('ViewExecutor', () => {
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.copyBgGraphicToBackgroundCalls).toBe(1)
     const outputs = deviceAdapter.getAllOutputs()
-    expect(outputs).toContain('Done')
+    expect(outputs).toMatch(/Done/)
   })
 
   it('should handle VIEW after CLS', async () => {
