@@ -52,5 +52,21 @@ describe('Parser Error Handling', () => {
       expect(result.success).toBe(false)
       expect(result.errors).toBeDefined()
     })
+
+    it('should normalize parser diagnostics when token column is not finite', async () => {
+      const result = await parser.parse('10 PALET B 0, 15, 0, 0')
+      expect(result.success).toBe(false)
+
+      const firstError = result.errors?.[0]
+      expect(firstError).toBeDefined()
+      expect(firstError?.message).not.toContain('NaN')
+
+      const start = firstError?.location?.start
+      const end = firstError?.location?.end
+      expect(Number.isFinite(start?.line)).toBe(true)
+      expect(Number.isFinite(start?.column)).toBe(true)
+      expect(Number.isFinite(end?.line)).toBe(true)
+      expect(Number.isFinite(end?.column)).toBe(true)
+    })
   })
 })
