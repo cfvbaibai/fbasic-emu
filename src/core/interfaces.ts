@@ -23,6 +23,8 @@ export interface BasicError {
   line: number
   message: string
   type: (typeof ERROR_TYPES)[keyof typeof ERROR_TYPES]
+  /** Machine-readable error code for behavior-specific handling (e.g. worker fallback). */
+  code?: 'UNSUPPORTED_FEATURE'
   /** Stack trace for runtime errors (worker or interpreter catch). */
   stack?: string
   /** Source line text at the failing statement. */
