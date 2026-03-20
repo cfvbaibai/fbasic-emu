@@ -116,6 +116,7 @@ export function useScreenAnimationLoopRenderOnly(
 
     // Check for visible movements that need sprite nodes
     const visibleMovements: number[] = []
+    let hasMissingSpriteNode = false
     for (let actionNumber = 0; actionNumber < MAX_SPRITES; actionNumber++) {
       const characterType = sharedDisplayBufferAccessor.readSpriteCharacterType(actionNumber)
       if (characterType < 0) continue // No DEF MOVE
@@ -129,6 +130,7 @@ export function useScreenAnimationLoopRenderOnly(
       const priority = sharedDisplayBufferAccessor.readSpritePriority(actionNumber)
       const nodeMap = priority === 0 ? frontNodes : backNodes
       if (!nodeMap.has(actionNumber)) {
+        hasMissingSpriteNode = true
         // Sprite node missing - trigger render to create it
         if (onRenderNeeded) {
           if (DEBUG_ANIMATION_LOOP) {
@@ -138,6 +140,13 @@ export function useScreenAnimationLoopRenderOnly(
           break // Only trigger once per frame
         }
       }
+    }
+
+    const hasPendingStaticRender = getPendingStaticRender?.() ?? false
+    const isIdleFrame = visibleMovements.length === 0 && !hasPendingStaticRender && !hasMissingSpriteNode
+    if (isIdleFrame) {
+      animationFrameId = requestAnimationFrame(animationLoop)
+      return
     }
 
     // Read all sprite positions from shared buffer and update Konva nodes
@@ -188,10 +197,7 @@ export function useScreenAnimationLoopRenderOnly(
     }
 
     // Run pending static render at end of frame (animation first, then render)
-    if (
-      getPendingStaticRender?.() &&
-      onRunPendingStaticRender
-    ) {
+    if (hasPendingStaticRender && onRunPendingStaticRender) {
       await onRunPendingStaticRender()
     }
 
