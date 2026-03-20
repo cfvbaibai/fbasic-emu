@@ -27,11 +27,55 @@ export default defineConfig({
     include: ['monaco-editor'],
   },
   build: {
-    chunkSizeWarningLimit: 4000,
     rollupOptions: {
       output: {
-        // Ensure Monaco workers are handled correctly
-        manualChunks: undefined,
+        manualChunks(id: string) {
+          const monacoPrefix = '/node_modules/monaco-editor/esm/vs/'
+          const monacoIndex = id.indexOf(monacoPrefix)
+          if (monacoIndex >= 0) {
+            const monacoPath = id.slice(monacoIndex + monacoPrefix.length)
+            const [section, group, subgroup] = monacoPath.split('/')
+            if (!section) return undefined
+
+            if (
+              monacoPath.startsWith('editor/common/model') ||
+              monacoPath.startsWith('editor/common/services') ||
+              monacoPath.startsWith('editor/common/languageFeatureRegistry')
+            ) {
+              return 'monaco-editor-common-model-services'
+            }
+            if (
+              monacoPath.startsWith('editor/browser/editorExtensions') ||
+              monacoPath.startsWith('editor/browser/services')
+            ) {
+              return 'monaco-editor-browser-extensions-services'
+            }
+            if (
+              monacoPath.startsWith('base/browser/ui') ||
+              monacoPath.startsWith('base/browser/markdownRenderer')
+            ) {
+              return 'monaco-base-browser-ui-markdown'
+            }
+            if (
+              monacoPath.startsWith('platform/actions/browser') ||
+              monacoPath.startsWith('platform/contextview/browser')
+            ) {
+              return 'monaco-platform-actions-contextview-browser'
+            }
+
+            if (section === 'editor' || section === 'base' || section === 'platform') {
+              if (group && subgroup && !subgroup.endsWith('.js')) {
+                return `monaco-${section}-${group}-${subgroup}`
+              }
+              if (group) {
+                return `monaco-${section}-${group}`
+              }
+            }
+
+            return `monaco-${section}`
+          }
+          return undefined
+        },
       },
     },
   },
