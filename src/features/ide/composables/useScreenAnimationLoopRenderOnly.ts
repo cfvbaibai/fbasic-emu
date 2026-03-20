@@ -18,8 +18,8 @@ import { logScreen } from '@/shared/logger'
 import type { KonvaScreenLayers } from './useKonvaScreenRenderer'
 import { updateAnimatedSprites } from './useKonvaScreenRenderer'
 
-/** Enable detailed animation loop tracing */
-const DEBUG_ANIMATION_LOOP = true
+/** Dev-only render-loop trace toggle (set VITE_DEBUG_ANIMATION_LOOP=true in local env). */
+const DEBUG_ANIMATION_LOOP = import.meta.env.DEV && import.meta.env.VITE_DEBUG_ANIMATION_LOOP === 'true'
 
 export interface UseScreenAnimationLoopRenderOnlyOptions {
   layers: Ref<KonvaScreenLayers | Record<string, unknown>>
@@ -208,7 +208,7 @@ export function useScreenAnimationLoopRenderOnly(
   // Start the loop immediately
   animationFrameId = requestAnimationFrame(animationLoop)
   if (DEBUG_ANIMATION_LOOP) {
-    logScreen.error('[RENDER-ONLY LOOP] Started continuous animation loop at 60fps')
+    logScreen.debug('[RENDER-ONLY LOOP] Started continuous animation loop at 60fps')
   }
 
   // Return cleanup function

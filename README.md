@@ -65,6 +65,11 @@ GitHub Pages deployment is automated via `.github/workflows/deploy-pages.yml`:
 - Publish directory: `dist`
 - SPA fallback: `dist/404.html` mirrors `dist/index.html` for refresh-safe routing
 
+## Dev Debug Toggles
+
+- Render-only animation loop tracing is disabled by default.
+- To enable it in local development, set `VITE_DEBUG_ANIMATION_LOOP=true` before running `pnpm dev`.
+
 ## Contributing
 
 1. Fork, branch, code
