@@ -11,6 +11,14 @@ import type { ParserInfo } from '@/core/interfaces'
 
 import { parseWithChevrotain } from './FBasicChevrotainParser'
 
+function normalizeLocationValue(value: number | undefined, fallback = 1): number {
+  if (typeof value !== 'number' || !Number.isFinite(value)) {
+    return fallback
+  }
+  const normalized = Math.floor(value)
+  return normalized >= 1 ? normalized : fallback
+}
+
 /**
  * Parser error interface
  */
@@ -59,21 +67,27 @@ export class FBasicParser {
         const errorMessages = parseResult.errors?.map(e => e.message).join('; ') ?? 'Unknown parse error'
         return {
           success: false,
-          errors: parseResult.errors?.map(err => ({
-            message: `${err.message} (line ${err.line}, col ${err.column})`,
-            location: {
-              start: {
-                offset: 0,
-                line: err.line ?? 1,
-                column: err.column ?? 1,
+          errors: parseResult.errors?.map(err => {
+            const line = normalizeLocationValue(err.line)
+            const column = normalizeLocationValue(err.column)
+            const length = normalizeLocationValue(err.length)
+
+            return {
+              message: `${err.message} (line ${line}, col ${column})`,
+              location: {
+                start: {
+                  offset: 0,
+                  line,
+                  column,
+                },
+                end: {
+                  offset: 0,
+                  line,
+                  column: column + length,
+                },
               },
-              end: {
-                offset: 0,
-                line: err.line ?? 1,
-                column: (err.column ?? 1) + (err.length ?? 1),
-              },
-            },
-          })) ?? [
+            }
+          }) ?? [
             {
               message: errorMessages,
               location: {
