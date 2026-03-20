@@ -99,7 +99,7 @@ describe('Sample Display Snapshot Integration', () => {
       checkpoint: 'stopped',
     })
 
-    expect(rowTextFromSnapshot(snapshot, 0)).toContain('JOYSTICK TEST')
+    expect(rowTextFromSnapshot(snapshot, 0)).toMatch(/JOYSTICK TEST/)
     expect(snapshot.sequence).toBeGreaterThan(0)
   })
 })

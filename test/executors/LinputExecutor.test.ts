@@ -69,7 +69,7 @@ describe('LinputExecutor', () => {
     const result = await interpreter.execute(source)
     expect(result.success).toBe(false)
     expect(result.errors.length).toBeGreaterThan(0)
-    expect(result.errors[0]?.message).toContain('string variable')
+    expect(result.errors[0]?.message).toMatch(/string variable/)
   })
 
   it('should add error when device has no requestInput', async () => {
@@ -89,6 +89,6 @@ describe('LinputExecutor', () => {
 `
     const result = await interp.execute(source)
     expect(result.success).toBe(false)
-    expect(result.errors[0]?.message).toContain('not supported')
+    expect(result.errors[0]?.message).toMatch(/not supported/)
   })
 })

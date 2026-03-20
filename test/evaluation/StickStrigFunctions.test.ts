@@ -192,8 +192,8 @@ describe('STICK and STRIG Functions', () => {
 
       const outputs = deviceAdapter.getAllOutputs()
       // Should see both outputs: first 1 (RIGHT), then 8 (UP)
-      expect(outputs).toContain(' 1\n')
-      expect(outputs).toContain(' 8\n')
+      expect(outputs).toMatch(/ 1\n/)
+      expect(outputs).toMatch(/ 8\n/)
     })
 
     it('should return 0 after release', async () => {

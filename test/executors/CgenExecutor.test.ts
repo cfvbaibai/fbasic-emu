@@ -151,7 +151,7 @@ describe('CgenExecutor', () => {
 
     expect(result.success).toBe(false)
     expect(result.errors).toHaveLength(1)
-    expect(result.errors[0]?.message).toContain('CGEN: Mode out of range (0-3)')
+    expect(result.errors[0]?.message).toMatch(/CGEN: Mode out of range \(0-3\)/)
     expect(deviceAdapter.cgenModeCalls).toHaveLength(0)
   })
 
@@ -164,7 +164,7 @@ describe('CgenExecutor', () => {
 
     expect(result.success).toBe(false)
     expect(result.errors).toHaveLength(1)
-    expect(result.errors[0]?.message).toContain('CGEN: Mode out of range (0-3)')
+    expect(result.errors[0]?.message).toMatch(/CGEN: Mode out of range \(0-3\)/)
     expect(deviceAdapter.cgenModeCalls).toHaveLength(0)
   })
 
@@ -177,7 +177,7 @@ describe('CgenExecutor', () => {
 
     expect(result.success).toBe(false)
     expect(result.errors).toHaveLength(1)
-    expect(result.errors[0]?.message).toContain('CGEN: Mode out of range (0-3)')
+    expect(result.errors[0]?.message).toMatch(/CGEN: Mode out of range \(0-3\)/)
     expect(deviceAdapter.cgenModeCalls).toHaveLength(0)
   })
 
@@ -206,6 +206,6 @@ describe('CgenExecutor', () => {
     expect(result.errors).toHaveLength(0)
     expect(deviceAdapter.cgenModeCalls).toHaveLength(1)
     expect(deviceAdapter.cgenModeCalls[0]).toBe(0)
-    expect(deviceAdapter.printOutputs).toContain('HELLO\n')
+    expect(deviceAdapter.printOutputs).toEqual(expect.arrayContaining(['HELLO\n']))
   })
 })

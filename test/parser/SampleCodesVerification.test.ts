@@ -43,7 +43,7 @@ describe('New screen function sample codes', () => {
   test('all new sample code keys exist', () => {
     const allKeys = getSampleCodeKeys()
     for (const key of newSampleKeys) {
-      expect(allKeys).toContain(key)
+      expect(allKeys).toEqual(expect.arrayContaining([key]))
     }
   })
 

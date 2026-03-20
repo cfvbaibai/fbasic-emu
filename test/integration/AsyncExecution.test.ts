@@ -42,8 +42,8 @@ describe('Async Execution - Production Mode', () => {
 
     // Verify all iterations executed
     const outputs = deviceAdapter.getAllOutputs()
-    expect(outputs).toContain('Loop  1')
-    expect(outputs).toContain('Loop  500')
+    expect(outputs).toMatch(/Loop {2}1/)
+    expect(outputs).toMatch(/Loop {2}500/)
   }, 10000) // 10 second timeout
 
   it('should yield during GOTO loop with many iterations', async () => {
@@ -107,7 +107,7 @@ describe('Async Execution - Production Mode', () => {
     expect(result.success).toBe(true)
     const outputs = deviceAdapter.getAllOutputs()
     // Should not print "Done" since we stopped execution
-    expect(outputs).not.toContain('Done')
+    expect(outputs).not.toMatch(/Done/)
   }, 10000)
 })
 

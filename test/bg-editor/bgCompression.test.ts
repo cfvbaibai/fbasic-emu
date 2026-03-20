@@ -45,9 +45,9 @@ describe('bgCompression', () => {
       const compressed = compressBg(grid)
 
       expect(compressed.format).toBe('sparse1')
-      expect(compressed.data).toContain('0,0,65,1')
-      expect(compressed.data).toContain('5,10,66,2')
-      expect(compressed.data).toContain('27,20,67,3')
+      expect(compressed.data).toMatch(/0,0,65,1/)
+      expect(compressed.data).toMatch(/5,10,66,2/)
+      expect(compressed.data).toMatch(/27,20,67,3/)
     })
 
     it('should compress dense grid using RLE format', () => {

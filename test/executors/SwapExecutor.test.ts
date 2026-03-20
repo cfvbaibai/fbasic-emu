@@ -116,7 +116,7 @@ describe('SwapExecutor', () => {
 
     expect(result.success).toBe(false)
     expect(result.errors.length).toBeGreaterThan(0)
-    expect(result.errors[0]?.message ?? '').toContain('type mismatch')
+    expect(result.errors[0]?.message ?? '').toMatch(/type mismatch/)
   })
 
   it('should handle SWAP on same line as other commands', async () => {
