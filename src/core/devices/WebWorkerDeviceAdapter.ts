@@ -112,6 +112,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   /** Stop execution in the web worker */
   stopExecution(): void {
     this.webWorkerManager.stopExecution()
+    this.resetStickTypematicState()
   }
   /** Send a STRIG event to the web worker */
   sendStrigEvent(joystickId: number, state: number): void {
@@ -149,12 +150,16 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   terminate(): void {
     this.webWorkerManager.terminate()
     this.messageHandler.rejectAllPending('Web worker terminated')
+    this.resetStickTypematicState()
   }
 
   // === DEVICE ADAPTER METHODS ===
   /** Enable or disable the device adapter */
   setEnabled(enabled: boolean): void {
     this.isEnabled = enabled
+    if (!enabled) {
+      this.resetStickTypematicState()
+    }
     logWorker.debug('Device adapter enabled:', enabled)
   }
 
@@ -225,7 +230,13 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
    */
   setSharedJoystickBuffer(buffer: SharedArrayBuffer): void {
     this.sharedJoystickView = createViewsFromJoystickBuffer(buffer)
+    this.resetStickTypematicState()
     logWorker.debug('[WebWorkerDeviceAdapter] Shared joystick buffer set')
+  }
+
+  private resetStickTypematicState(): void {
+    this.lastStickValue.clear()
+    this.lastStickReadTime.clear()
   }
 
   // === KEYBOARD INPUT (INKEY$) ===
@@ -685,6 +696,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
    */
   setCurrentExecutionId(executionId: string | null): void {
     this.screenStateManager.setCurrentExecutionId(executionId)
+    this.resetStickTypematicState()
     if (executionId) {
       // Sound state reset is now handled by SoundService in ExecutionContext.reset()
       this.screenStateManager.initializeScreen()
