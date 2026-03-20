@@ -67,8 +67,8 @@ export class MessageHandler {
         clearTimeout(pending.timeout)
         this.pendingMessages.delete(message.id)
 
-        // Check if web worker indicates fallback is needed
-        if (resultMessage.data.errors?.some(error => error.message.includes('not yet fully implemented'))) {
+        // Use machine-readable unsupported-feature signal from worker errors for fallback.
+        if (resultMessage.data.errors?.some(error => error.code === 'UNSUPPORTED_FEATURE')) {
           logIdeMessages.warn('Web worker indicates fallback needed, rejecting to trigger fallback')
           // Web worker can't handle the execution, reject to trigger fallback
           pending.reject(new Error('Web worker execution not implemented, falling back to main thread'))

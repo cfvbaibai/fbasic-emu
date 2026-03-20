@@ -457,6 +457,7 @@ export class StatementRouter {
         line: expandedStatement.lineNumber,
         message: 'Unsupported statement type',
         type: ERROR_TYPES.RUNTIME,
+        code: 'UNSUPPORTED_FEATURE',
       })
     }
   }
