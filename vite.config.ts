@@ -27,6 +27,7 @@ export default defineConfig({
     include: ['monaco-editor'],
   },
   build: {
+    chunkSizeWarningLimit: 4000,
     rollupOptions: {
       output: {
         // Ensure Monaco workers are handled correctly
