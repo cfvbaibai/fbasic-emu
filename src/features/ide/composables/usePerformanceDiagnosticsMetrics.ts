@@ -71,7 +71,6 @@ export function usePerformanceDiagnosticsMetrics({
   let metricsInterval: number | null = null
   let fpsRafId: number | null = null
   let workerStartTime = 0
-  let lastRenderSampleAt: number | null = null
 
   const workerTimePercent = computed(() =>
     totalTime.value === 0 ? 0 : Math.round((workerTime.value / totalTime.value) * 100)
@@ -122,7 +121,6 @@ export function usePerformanceDiagnosticsMetrics({
     lastMetricsUpdate = startTime
     code.value = PERFORMANCE_TEST_SCENARIOS[scenario]
     workerStartTime = performance.now()
-    lastRenderSampleAt = null
     await runCode()
   }
 
@@ -137,7 +135,6 @@ export function usePerformanceDiagnosticsMetrics({
     rendersPerSecond.value = 0
     fps.value = 0
     output.value = []
-    lastRenderSampleAt = null
   }
 
   let measurementActive = false
@@ -152,7 +149,6 @@ export function usePerformanceDiagnosticsMetrics({
         performance.clearMeasures()
         measurementActive = true
         workerStartTime = performance.now()
-        lastRenderSampleAt = null
       } else if (!running && wasRunning) {
         measurementActive = false
         if (workerStartTime > 0) {
@@ -175,16 +171,7 @@ export function usePerformanceDiagnosticsMetrics({
   watch(
     () => screenBuffer.value,
     () => {
-      if (measurementActive && renderingEnabled.value) {
-        const now = performance.now()
-        const targetFps = Number.isFinite(renderFpsTarget.value) && renderFpsTarget.value > 0
-          ? renderFpsTarget.value
-          : 60
-        const minIntervalMs = 1000 / targetFps
-        if (lastRenderSampleAt !== null && now - lastRenderSampleAt < minIntervalMs) {
-          return
-        }
-        lastRenderSampleAt = now
+      if (measurementActive) {
         performance.mark(`render-start-${renderSequence}`)
         renderCount++
         requestAnimationFrame(() => {

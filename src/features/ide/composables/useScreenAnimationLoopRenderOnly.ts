@@ -37,8 +37,6 @@ export interface UseScreenAnimationLoopRenderOnlyOptions {
   onRunPendingStaticRender?: () => Promise<void>
   /** When sprite nodes are missing for visible movements, call to trigger render */
   onRenderNeeded?: () => void
-  /** Optional gate to pause all render-loop work. */
-  isRenderingEnabled?: () => boolean
 }
 
 /**
@@ -66,7 +64,6 @@ export function useScreenAnimationLoopRenderOnly(
     getPendingStaticRender,
     onRunPendingStaticRender,
     onRenderNeeded,
-    isRenderingEnabled,
   } = options
 
   let animationFrameId: number | null = null
@@ -83,11 +80,6 @@ export function useScreenAnimationLoopRenderOnly(
    * Uses dirty tracking to only redraw when positions actually change
    */
   async function animationLoop(): Promise<void> {
-    if (isRenderingEnabled && !isRenderingEnabled()) {
-      animationFrameId = requestAnimationFrame(animationLoop)
-      return
-    }
-
     if (!sharedDisplayBufferAccessor) {
       animationFrameId = requestAnimationFrame(animationLoop)
       return

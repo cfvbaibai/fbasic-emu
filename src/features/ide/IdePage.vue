@@ -5,11 +5,17 @@ import type { HighlighterInfo, ParserInfo } from '@/core/interfaces'
 import { GameLayout } from '@/shared/components/ui'
 import { useContainerWidth } from '@/shared/composables/useContainerWidth'
 
+import CommandPalette from './components/CommandPalette.vue'
 import IdeBottomArea from './components/IdeBottomArea.vue'
 import IdeEditorPanel from './components/IdeEditorPanel.vue'
 import IdeOutputPanel from './components/IdeOutputPanel.vue'
 import InputModal from './components/InputModal.vue'
 import SampleSelector from './components/SampleSelector.vue'
+import {
+  type CommandPaletteCommand,
+  isEditableTarget,
+  matchesAnyShortcut,
+} from './composables/commandPalette'
 import { useBasicIde as useBasicIdeEnhanced } from './composables/useBasicIdeEnhanced'
 import { provideScreenContext } from './composables/useScreenContext'
 
@@ -63,6 +69,7 @@ const {
 
 // UI state
 const sampleSelectorOpen = shallowRef(false)
+const commandPaletteOpen = shallowRef(false)
 const editorView = shallowRef<'code' | 'bg'>('code')
 const logLevelPanelOpen = shallowRef(false)
 
@@ -116,6 +123,115 @@ function handleLoadSample(sampleType: string) {
   }
 }
 
+function openCommandPalette() {
+  commandPaletteOpen.value = true
+}
+
+function closeCommandPalette() {
+  commandPaletteOpen.value = false
+}
+
+async function restartCode() {
+  stopCode()
+  await runCode()
+}
+
+const commandPaletteCommands = computed<CommandPaletteCommand[]>(() => [
+  {
+    id: 'run.start',
+    title: 'Run Program',
+    description: 'Execute the current BASIC program.',
+    shortcut: 'F5',
+    keywords: ['execute', 'start', 'run'],
+    enabled: !isRunning.value,
+    execute: () => {
+      void runCode()
+    },
+  },
+  {
+    id: 'run.stop',
+    title: 'Stop Program',
+    description: 'Stop the currently running program.',
+    shortcut: 'Shift+F5',
+    keywords: ['halt', 'stop'],
+    enabled: isRunning.value,
+    execute: stopCode,
+  },
+  {
+    id: 'run.restart',
+    title: 'Restart Program',
+    description: 'Stop and execute the current program again.',
+    shortcut: 'Ctrl+Shift+F5 / Cmd+Shift+F5',
+    keywords: ['restart', 'rerun'],
+    execute: () => {
+      void restartCode()
+    },
+  },
+  {
+    id: 'run.clearOutput',
+    title: 'Clear Output',
+    description: 'Clear output, errors, variables, and screen state.',
+    keywords: ['clear', 'output', 'screen'],
+    execute: clearOutput,
+  },
+  {
+    id: 'view.openSampleSelector',
+    title: 'Load Sample Program',
+    description: 'Open the sample selector.',
+    keywords: ['sample', 'demo'],
+    execute: () => {
+      sampleSelectorOpen.value = true
+    },
+  },
+  {
+    id: 'view.openLogFilters',
+    title: 'Open Output Log Filters',
+    description: 'Open runtime output log-level controls.',
+    keywords: ['output', 'logs', 'filters'],
+    execute: () => {
+      logLevelPanelOpen.value = true
+    },
+  },
+  {
+    id: 'view.switchToCode',
+    title: 'Switch To Code Editor',
+    description: 'Show the Monaco code editor panel.',
+    keywords: ['code', 'editor'],
+    execute: () => {
+      editorView.value = 'code'
+    },
+  },
+  {
+    id: 'view.switchToBgEditor',
+    title: 'Switch To BG Editor',
+    description: 'Show the BG editor panel.',
+    keywords: ['bg', 'background', 'editor'],
+    execute: () => {
+      editorView.value = 'bg'
+    },
+  },
+  {
+    id: 'input.toggleMode',
+    title: 'Toggle Input Mode',
+    description: 'Switch between joystick and keyboard input mode.',
+    shortcut: 'F9',
+    keywords: ['input', 'keyboard', 'joystick'],
+    execute: toggleInputMode,
+  },
+  {
+    id: 'debug.toggle',
+    title: 'Toggle Debug Mode',
+    description: 'Enable or disable runtime debug output.',
+    keywords: ['debug'],
+    execute: toggleDebugMode,
+  },
+])
+
+async function handleExecuteCommandFromPalette(command: CommandPaletteCommand) {
+  closeCommandPalette()
+  await command.execute()
+}
+
 // Computed properties for backward compatibility
 const canRun = computed(() => !isRunning.value)
 const canStop = isRunning
@@ -137,9 +253,31 @@ onUnmounted(() => {
 
 // Global hotkey handler
 function handleGlobalKeydown(e: KeyboardEvent) {
-  // Only handle if not in an input field
-  const target = e.target as HTMLElement
-  if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return
+  if (matchesAnyShortcut(e, ['Ctrl+Shift+P', 'Meta+Shift+P'])) {
+    e.preventDefault()
+    openCommandPalette()
+    return
+  }
+
+  if (commandPaletteOpen.value || isEditableTarget(e.target)) return
+
+  if (matchesAnyShortcut(e, ['F5'])) {
+    e.preventDefault()
+    void runCode()
+    return
+  }
+
+  if (matchesAnyShortcut(e, ['Shift+F5'])) {
+    e.preventDefault()
+    stopCode()
+    return
+  }
+
+  if (matchesAnyShortcut(e, ['Ctrl+Shift+F5', 'Meta+Shift+F5'])) {
+    e.preventDefault()
+    void restartCode()
+    return
+  }
 
   // F9: Toggle input mode (joystick/keyboard)
   if (e.key === 'F9') {
@@ -224,6 +362,13 @@ function toggleInputMode() {
           v-if="sampleSelectorOpen"
           @select="handleLoadSample"
           @close="sampleSelectorOpen = false"
+        />
+
+        <CommandPalette
+          :open="commandPaletteOpen"
+          :commands="commandPaletteCommands"
+          @close="closeCommandPalette"
+          @execute="handleExecuteCommandFromPalette"
         />
       </Teleport>
     </div>
