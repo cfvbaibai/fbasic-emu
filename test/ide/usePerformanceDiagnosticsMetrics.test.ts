@@ -22,19 +22,14 @@ describe('usePerformanceDiagnosticsMetrics', () => {
     vi.unstubAllGlobals()
   })
 
-  function mountHarness(): {
-    wrapper: ReturnType<typeof mount>
-    api: DiagnosticsApi
-    isRunning: { value: boolean }
-    output: { value: string[] }
-  } {
+  function mountHarness() {
     const code = ref('')
     const isRunning = ref(false)
     const output = ref<string[]>([])
     const screenBuffer = ref({})
     const runCode = vi.fn(async () => {})
 
-    let api: DiagnosticsApi | null = null
+    let api!: DiagnosticsApi
 
     const harnessComponent = defineComponent({
       setup() {
