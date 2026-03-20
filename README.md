@@ -21,6 +21,7 @@ Open http://localhost:5173 and start coding!
 - Monaco code editor with syntax highlighting
 - Sprite and character viewers
 - Multi-language support (EN, JA, zh-CN, zh-TW)
+- SharedArrayBuffer-powered runtime and rendering pipeline
 
 ## Tech Stack
 
@@ -68,6 +69,21 @@ GitHub Pages deployment is automated via `.github/workflows/deploy-pages.yml`:
 - Base path: `VITE_BASE_PATH=/fbasic-ide/`
 - Publish directory: `dist`
 - SPA fallback: `dist/404.html` mirrors `dist/index.html` for refresh-safe routing
+- Cross-origin isolation: `coi-serviceworker.js` is shipped and registered from `index.html` to enable
+  `SharedArrayBuffer` on GitHub Pages (COOP/COEP via service worker response headers)
+
+### SharedArrayBuffer Requirement
+
+`SharedArrayBuffer` is required by this app.
+
+- Development: Vite dev server sets COOP/COEP headers in `vite.config.ts`
+- GitHub Pages: `public/coi-serviceworker.js` applies COOP/COEP to responses and auto-reloads once controlled
+
+If you still see `SharedArrayBuffer is not available (require cross-origin isolation)`:
+
+1. Open the deployed URL over HTTPS (`https://cfvbaibai.github.io/fbasic-ide/`)
+2. Hard refresh once (or clear the site service worker and reload)
+3. Confirm `window.crossOriginIsolated === true` in DevTools
 
 ## Contributing
 

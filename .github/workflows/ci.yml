@@ -160,3 +160,13 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+      - name: Build (GitHub Pages base path)
+        env:
+          VITE_BASE_PATH: /fbasic-ide/
+        run: pnpm vite build
+
+      - name: Verify COI service worker is included
+        run: |
+          test -f dist/coi-serviceworker.js
+          grep -q "coi-serviceworker.js" dist/index.html
