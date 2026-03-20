@@ -11,7 +11,7 @@
  */
 
 import { useDebounceFn } from '@vueuse/core'
-import * as monaco from 'monaco-editor'
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'
 
 import { parseWithChevrotain } from '@/core/parser/FBasicChevrotainParser'
 

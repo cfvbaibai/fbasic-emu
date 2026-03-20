@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import * as monaco from 'monaco-editor'
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'
 import { onBeforeUnmount, onDeactivated, onMounted, useTemplateRef, watch } from 'vue'
 
 import { setupLiveErrorChecking, setupMonacoLanguage } from '@/features/ide/integrations/monaco-integration'
