@@ -8,6 +8,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { createSharedDisplayBuffer } from '@/core/animation/sharedDisplayBuffer'
 import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
+import {
+  createSharedJoystickBuffer,
+  createViewsFromJoystickBuffer,
+  setStickState,
+} from '@/core/devices/sharedJoystickBuffer'
 import { WebWorkerDeviceAdapter } from '@/core/devices/WebWorkerDeviceAdapter'
 import type { AnyServiceWorkerMessage } from '@/core/interfaces'
 
@@ -370,6 +375,46 @@ describe('WebWorkerDeviceAdapter - Cursor Position', () => {
     const screenState = accessor.readScreenState()
 
     expect(screenState.buffer[0]?.[0]?.character).toBe('E')
+  })
+})
+
+describe('WebWorkerDeviceAdapter - STICK typematic lifecycle reset', () => {
+  let adapter: WebWorkerDeviceAdapter
+  let joystickView: ReturnType<typeof createViewsFromJoystickBuffer>
+
+  beforeEach(() => {
+    vi.useFakeTimers()
+    adapter = new WebWorkerDeviceAdapter()
+    const joystickBuffer = createSharedJoystickBuffer()
+    joystickView = createViewsFromJoystickBuffer(joystickBuffer)
+    adapter.setSharedJoystickBuffer(joystickBuffer)
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  it('should return held direction immediately after execution restart', () => {
+    setStickState(joystickView, 0, 8)
+    expect(adapter.getStickState(0)).toBe(8)
+
+    vi.advanceTimersByTime(1)
+    expect(adapter.getStickState(0)).toBe(0)
+
+    adapter.setCurrentExecutionId(null)
+    adapter.setCurrentExecutionId('run-2')
+    expect(adapter.getStickState(0)).toBe(8)
+  })
+
+  it('should reset typematic suppression when execution is stopped', () => {
+    setStickState(joystickView, 0, 4)
+    expect(adapter.getStickState(0)).toBe(4)
+
+    vi.advanceTimersByTime(1)
+    expect(adapter.getStickState(0)).toBe(0)
+
+    adapter.stopExecution()
+    expect(adapter.getStickState(0)).toBe(4)
   })
 })
 
