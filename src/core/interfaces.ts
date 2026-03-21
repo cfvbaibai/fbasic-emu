@@ -246,7 +246,15 @@ export interface ParserInfo {
   version: string
   capabilities: string[]
   features: string[]
+  /**
+   * Interpreter-facing statement surface exposed to IDE capabilities.
+   * Keep aligned with routed/executable command support.
+   */
   supportedStatements: string[]
+  /**
+   * Function call surface exposed to IDE capabilities.
+   * Keep aligned with FunctionEvaluator support.
+   */
   supportedFunctions: string[]
   supportedOperators: string[]
 }
