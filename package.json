@@ -31,6 +31,7 @@
         "check-syntax": "tsx scripts/validation/check-syntax.ts",
         "verify:script-entrypoints": "tsx scripts/validation/verify-script-entrypoints.ts",
         "verify:build-no-unresolved-assets": "tsx scripts/validation/check-unresolved-assets.ts",
+        "verify:gates": "pnpm check-syntax && pnpm verify:script-entrypoints && pnpm verify:build-no-unresolved-assets",
         "verify:build-size-budgets": "node scripts/validation/check-build-size-budgets.mjs"
     },
     "dependencies": {
