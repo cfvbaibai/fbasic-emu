@@ -1,7 +1,15 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, shallowRef, useTemplateRef } from 'vue'
 
-import type { HighlighterInfo, ParserInfo } from '@/core/interfaces'
+import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
+import type {
+  BasicVariable,
+  HighlighterInfo,
+  ParserInfo,
+  RequestInputMessage,
+  ScreenCell,
+} from '@/core/interfaces'
+import type { SpriteState } from '@/core/sprite/types'
 import { GameLayout } from '@/shared/components/ui'
 import { useContainerWidth } from '@/shared/composables/useContainerWidth'
 
@@ -17,6 +25,7 @@ import {
   matchesAnyShortcut,
 } from './composables/commandPalette'
 import { useBasicIde as useBasicIdeEnhanced } from './composables/useBasicIdeEnhanced'
+import type { InputMode } from './composables/useBasicIdeState'
 import { provideScreenContext } from './composables/useScreenContext'
 
 /**
@@ -27,45 +36,89 @@ defineOptions({
   name: 'IdePage',
 })
 
-const {
-  code,
-  isRunning,
-  output,
-  errors,
-  variables,
-  debugOutput,
-  debugMode,
-  screenBuffer,
-  cursorX,
-  cursorY,
-  bgPalette,
-  backdropColor,
-  spritePalette,
-  cgenMode,
-  spriteStates,
-  spriteEnabled,
-  movementPositionsFromBuffer,
-  frontSpriteNodes,
-  backSpriteNodes,
-  inputMode,
-  runCode,
-  stopCode,
-  clearOutput,
-  loadSampleCode,
-  getParserCapabilities,
-  getHighlighterCapabilities,
-  toggleDebugMode,
-  debugBuffer,
-  sendStrigEvent,
-  sharedDisplayBufferAccessor,
-  sharedAnimationBuffer,
-  sharedDisplayViews,
-  sharedJoystickBuffer,
-  setDecodedScreenState,
-  registerScheduleRender,
-  pendingInputRequest,
-  respondToInputRequest,
-} = useBasicIdeEnhanced()
+const isE2ELite =
+  typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('e2e') === 'lite'
+
+const basicIde = isE2ELite ? null : useBasicIdeEnhanced()
+
+const code = basicIde?.code ?? ref('')
+const isRunning = basicIde?.isRunning ?? ref(false)
+const output = basicIde?.output ?? ref<string[]>([])
+const errors =
+  basicIde?.errors ??
+  ref<Array<{ line: number; message: string; type: string; stack?: string; sourceLine?: string }>>([])
+const variables = basicIde?.variables ?? ref<Record<string, BasicVariable>>({})
+const debugOutput = basicIde?.debugOutput ?? ref('')
+const debugMode = basicIde?.debugMode ?? ref(false)
+const screenBuffer = basicIde?.screenBuffer ?? ref<ScreenCell[][]>([])
+const cursorX = basicIde?.cursorX ?? ref(0)
+const cursorY = basicIde?.cursorY ?? ref(0)
+const bgPalette = basicIde?.bgPalette ?? ref(1)
+const backdropColor = basicIde?.backdropColor ?? ref(0)
+const spritePalette = basicIde?.spritePalette ?? ref(1)
+const cgenMode = basicIde?.cgenMode ?? ref(2)
+const spriteStates = basicIde?.spriteStates ?? ref<SpriteState[]>([])
+const spriteEnabled = basicIde?.spriteEnabled ?? ref(true)
+const movementPositionsFromBuffer =
+  basicIde?.movementPositionsFromBuffer ?? ref<Map<number, { x: number; y: number }>>(new Map())
+const frontSpriteNodes = basicIde?.frontSpriteNodes ?? ref<Map<number, unknown>>(new Map())
+const backSpriteNodes = basicIde?.backSpriteNodes ?? ref<Map<number, unknown>>(new Map())
+const inputMode = basicIde?.inputMode ?? ref<InputMode>('joystick')
+
+const runCode =
+  basicIde?.runCode ??
+  (async () => {
+    isRunning.value = true
+  })
+const stopCode =
+  basicIde?.stopCode ??
+  (() => {
+    isRunning.value = false
+  })
+const clearOutput =
+  basicIde?.clearOutput ??
+  (() => {
+    output.value = []
+    errors.value = []
+    variables.value = {}
+    debugOutput.value = ''
+  })
+const loadSampleCode = basicIde?.loadSampleCode ?? (() => false)
+const getParserCapabilities =
+  basicIde?.getParserCapabilities ??
+  (() => ({
+    name: 'E2E Lite Parser',
+    version: '0.0.0',
+    capabilities: [],
+    features: [],
+    supportedStatements: [],
+    supportedFunctions: [],
+    supportedOperators: [],
+  }))
+const getHighlighterCapabilities =
+  basicIde?.getHighlighterCapabilities ??
+  (() => ({
+    name: 'E2E Lite Highlighter',
+    version: '0.0.0',
+    features: [],
+  }))
+const toggleDebugMode =
+  basicIde?.toggleDebugMode ??
+  (() => {
+    debugMode.value = !debugMode.value
+  })
+const debugBuffer = basicIde?.debugBuffer ?? (() => {})
+const sendStrigEvent = basicIde?.sendStrigEvent ?? (() => {})
+const sharedDisplayBufferAccessor =
+  basicIde?.sharedDisplayBufferAccessor ?? ({} as SharedDisplayBufferAccessor)
+const sharedAnimationBuffer = basicIde?.sharedAnimationBuffer ?? ({} as SharedArrayBuffer)
+const sharedDisplayViews = basicIde?.sharedDisplayViews ?? ({ buffer: {} as SharedArrayBuffer } as any)
+const sharedJoystickBuffer = basicIde?.sharedJoystickBuffer ?? ({} as SharedArrayBuffer)
+const setDecodedScreenState = basicIde?.setDecodedScreenState ?? (() => {})
+const registerScheduleRender = basicIde?.registerScheduleRender ?? (() => {})
+const pendingInputRequest = basicIde?.pendingInputRequest ?? ref<RequestInputMessage['data'] | null>(null)
+const respondToInputRequest =
+  basicIde?.respondToInputRequest ?? ((_requestId: string, _values: string[], _cancelled: boolean) => {})
 
 // UI state
 const sampleSelectorOpen = shallowRef(false)
@@ -81,28 +134,30 @@ const isToolbarCompact = useContainerWidth(editorPanelRef, 900)
 const bottomAreaRef = useTemplateRef<{ updateMoveSlotsData: () => void }>('bottomAreaRef')
 
 // Provide screen context so ScreenTab/Screen can inject instead of prop drilling
-provideScreenContext({
-  screenBuffer,
-  cursorX,
-  cursorY,
-  bgPalette,
-  backdropColor,
-  spritePalette,
-  cgenMode,
-  spriteStates,
-  spriteEnabled,
-  movementPositionsFromBuffer,
-  externalFrontSpriteNodes: frontSpriteNodes,
-  externalBackSpriteNodes: backSpriteNodes,
-  sharedDisplayViews: ref(sharedDisplayViews),
-  sharedDisplayBufferAccessor,
-  sharedAnimationBuffer: ref(sharedAnimationBuffer),
-  sharedJoystickBuffer: ref(sharedJoystickBuffer),
-  setDecodedScreenState,
-  registerScheduleRender,
-  // Callback for animation loop to update inspector MOVE tab data
-  updateInspectorMoveSlots: () => bottomAreaRef.value?.updateMoveSlotsData(),
-})
+if (!isE2ELite && sharedDisplayViews && sharedDisplayBufferAccessor && sharedAnimationBuffer && sharedJoystickBuffer) {
+  provideScreenContext({
+    screenBuffer,
+    cursorX,
+    cursorY,
+    bgPalette,
+    backdropColor,
+    spritePalette,
+    cgenMode,
+    spriteStates,
+    spriteEnabled,
+    movementPositionsFromBuffer,
+    externalFrontSpriteNodes: frontSpriteNodes,
+    externalBackSpriteNodes: backSpriteNodes,
+    sharedDisplayViews: ref(sharedDisplayViews),
+    sharedDisplayBufferAccessor,
+    sharedAnimationBuffer: ref(sharedAnimationBuffer),
+    sharedJoystickBuffer: ref(sharedJoystickBuffer),
+    setDecodedScreenState,
+    registerScheduleRender,
+    // Callback for animation loop to update inspector MOVE tab data
+    updateInspectorMoveSlots: () => bottomAreaRef.value?.updateMoveSlotsData(),
+  })
+}
 
 // Input modal response handler
 function handleInputResponse(
@@ -322,6 +377,7 @@ function toggleInputMode() {
 
         <!-- Right Panel - Runtime Output -->
         <IdeOutputPanel
+          v-if="!isE2ELite"
           v-model:log-level-panel-open="logLevelPanelOpen"
           :output="output"
           :is-running="isRunning"
@@ -334,6 +390,7 @@ function toggleInputMode() {
 
       <!-- Bottom area: Joystick (left) + State Inspector (right) -->
       <IdeBottomArea
+        v-if="!isE2ELite"
         ref="bottomAreaRef"
         :send-strig-event="sendStrigEvent"
         :shared-joystick-buffer="sharedJoystickBuffer"
@@ -351,7 +408,7 @@ function toggleInputMode() {
       />
 
       <!-- INPUT/LINPUT modal overlay -->
-      <Teleport to="body">
+      <Teleport v-if="!isE2ELite" to="body">
         <InputModal
           :pending-request="pendingInputRequest"
           @respond="handleInputResponse"
