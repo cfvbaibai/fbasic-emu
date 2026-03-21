@@ -204,7 +204,6 @@ describe('OnExecutor', () => {
 
   describe('ON ... GOSUB', () => {
     it('should jump to first line when expression is 1', async () => {
-      // TODO: Enable when GOSUB/RETURN is fully implemented
       const source = `
 10 LET N = 1
 20 ON N GOSUB 100, 200, 300
@@ -224,6 +223,91 @@ describe('OnExecutor', () => {
       const outputs = deviceAdapter.getAllOutputs()
       // PRINT "After" doesn't end with semicolon, so adds newline
       expect(outputs).toEqual('First\nAfter\nOK\n')
+    })
+
+    it('should proceed to next line when expression is 0', async () => {
+      const source = `
+10 LET N = 0
+20 ON N GOSUB 100, 200, 300
+30 PRINT "Next"
+40 END
+100 PRINT "First"
+110 RETURN
+200 PRINT "Second"
+210 RETURN
+300 PRINT "Third"
+310 RETURN
+`
+      const result = await interpreter.execute(source)
+
+      expect(result.success).toBe(true)
+      expect(result.errors).toHaveLength(0)
+      const outputs = deviceAdapter.getAllOutputs()
+      expect(outputs).toEqual('Next\nOK\n')
+    })
+
+    it('should proceed to next line when expression exceeds number of lines', async () => {
+      const source = `
+10 LET N = 4
+20 ON N GOSUB 100, 200, 300
+30 PRINT "Next"
+40 END
+100 PRINT "First"
+110 RETURN
+200 PRINT "Second"
+210 RETURN
+300 PRINT "Third"
+310 RETURN
+`
+      const result = await interpreter.execute(source)
+
+      expect(result.success).toBe(true)
+      expect(result.errors).toHaveLength(0)
+      const outputs = deviceAdapter.getAllOutputs()
+      expect(outputs).toEqual('Next\nOK\n')
+    })
+
+    it('should return a clear runtime error for Infinity selector value', async () => {
+      const source = `
+10 LET N$ = "Infinity"
+20 ON N$ GOSUB 100, 200
+30 PRINT "This should not print"
+40 END
+100 PRINT "First"
+110 RETURN
+200 PRINT "Second"
+210 RETURN
+`
+      const result = await interpreter.execute(source)
+
+      expect(result.success).toBe(false)
+      expect(result.errors.length).toBeGreaterThan(0)
+      const errorMessages = result.errors.map(e => e.message).join(' ')
+      expect(errorMessages).toEqual('ON: expression must evaluate to a number')
+
+      const outputs = deviceAdapter.getAllOutputs()
+      expect(outputs).toEqual('RUNTIME: ON: expression must evaluate to a number')
+    })
+
+    it('should return to the statement after each ON GOSUB across repeated invocations', async () => {
+      const source = `
+10 LET N = 1
+20 ON N GOSUB 100, 200
+30 LET N = 2
+40 ON N GOSUB 100, 200
+50 PRINT "After"
+60 END
+100 PRINT "First"
+110 RETURN
+200 PRINT "Second"
+210 RETURN
+`
+      const result = await interpreter.execute(source)
+
+      expect(result.success).toBe(true)
+      expect(result.errors).toHaveLength(0)
+      const outputs = deviceAdapter.getAllOutputs()
+      expect(outputs).toEqual('First\nSecond\nAfter\nOK\n')
     })
 
     it('should handle ON-GOSUB matching manual example structure', async () => {
