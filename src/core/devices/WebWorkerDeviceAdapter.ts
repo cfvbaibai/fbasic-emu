@@ -24,6 +24,7 @@ import { logWorker } from '@/shared/logger'
 
 import { MessageHandler } from './MessageHandler'
 import { ScreenStateManager } from './ScreenStateManager'
+import { ScreenUpdateBatcher } from './ScreenUpdateBatcher'
 import {
   createViewsFromJoystickBuffer,
   getStickState as getRawStickState,
@@ -69,17 +70,16 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
     { resolve: (values: string[]) => void; reject: (err: Error) => void }
   > = new Map()
   // === SCREEN UPDATE BATCHING (FPS-based: aligns updates with target frame rate) ===
-  private pendingScreenUpdate: boolean = false
-  private screenUpdateTimeout: number | null = null
-  private lastScreenUpdateTime: number = 0
-  private readonly TARGET_FPS = 60
-  private readonly FRAME_INTERVAL_MS = 1000 / 60
-  private readonly MAX_BATCH_DELAY_MS = 33
+  private readonly screenUpdateBatcher: ScreenUpdateBatcher
   constructor() {
     logWorker.debug('WebWorkerDeviceAdapter created')
     this.webWorkerManager = new WebWorkerManager()
     this.screenStateManager = new ScreenStateManager()
     this.messageHandler = new MessageHandler(this.webWorkerManager.getPendingMessages())
+    this.screenUpdateBatcher = new ScreenUpdateBatcher(() => {
+      this.syncScreenStateToShared()
+      this.postScreenChanged()
+    })
     this.setupMessageListener()
   }
 
@@ -501,7 +501,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
     }
 
     // Batch screen updates to reduce Vue reactivity overhead
-    this.scheduleScreenUpdate()
+    this.screenUpdateBatcher.schedule()
   }
 
   debugOutput(output: string): void {
@@ -704,7 +704,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
       this.postScreenChanged()
       this.cancelPendingScreenUpdate()
     } else {
-      this.flushScreenUpdate()
+      this.screenUpdateBatcher.flush()
     }
   }
 
@@ -812,60 +812,8 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
     // Output is now handled by the device adapter in the web worker
   }
 
-  /**
-   * Schedule a batched screen update with FPS-based timing
-   * This batches multiple screen updates together to align with target frame rate
-   * and reduce message volume and Vue reactivity overhead on the receiving side
-   * 
-   * Strategy:
-   * - Calculate time since last update
-   * - If enough time has passed (>= frame interval), send immediately
-   * - Otherwise, schedule for the next frame boundary
-   * - This ensures updates are sent at consistent FPS intervals
-   */
-  private scheduleScreenUpdate(): void {
-    // Mark that we have a pending update
-    this.pendingScreenUpdate = true
-
-    // If there's already a scheduled update, don't schedule another one
-    // The existing scheduled update will pick up this pending change
-    if (this.screenUpdateTimeout !== null) {
-      return
-    }
-
-    const now = performance.now()
-    const timeSinceLastUpdate = now - this.lastScreenUpdateTime
-
-    // If enough time has passed since last update, send immediately
-    if (timeSinceLastUpdate >= this.FRAME_INTERVAL_MS) {
-      this.flushScreenUpdate()
-      return
-    }
-
-    // Calculate delay to next frame boundary (capped to prevent excessive lag)
-    const delayUntilNextFrame = this.FRAME_INTERVAL_MS - timeSinceLastUpdate
-    const delay = Math.min(delayUntilNextFrame, this.MAX_BATCH_DELAY_MS)
-    // Schedule the update to be sent at the next frame boundary
-    this.screenUpdateTimeout = self.setTimeout(() => {
-      this.flushScreenUpdate()
-    }, delay)
-  }
-
   /** Cancel any pending screen update (used by flush paths and tests to avoid timeouts after teardown) */
   cancelPendingScreenUpdate(): void {
-    if (this.screenUpdateTimeout !== null) {
-      self.clearTimeout(this.screenUpdateTimeout)
-      this.screenUpdateTimeout = null
-    }
-    this.pendingScreenUpdate = false
-  }
-  /** Flush pending screen update: write to shared buffer and send SCREEN_CHANGED */
-  private flushScreenUpdate(): void {
-    this.screenUpdateTimeout = null
-    if (!this.pendingScreenUpdate) return
-    this.pendingScreenUpdate = false
-    this.lastScreenUpdateTime = performance.now()
-    this.syncScreenStateToShared()
-    this.postScreenChanged()
+    this.screenUpdateBatcher.cancel()
   }
 }
