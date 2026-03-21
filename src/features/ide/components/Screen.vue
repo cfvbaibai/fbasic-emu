@@ -433,6 +433,7 @@ onDeactivated(cleanupScreen)
         <div class="crt-scanlines"></div>
         <div
           class="screen-stage-wrapper"
+          data-testid="ide-screen-stage"
           :style="{
             width: `${stageDisplayWidth}px`,
             height: `${stageDisplayHeight}px`,
