@@ -8,6 +8,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { createSharedDisplayBuffer } from '@/core/animation/sharedDisplayBuffer'
 import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
+import { TIMING } from '@/core/constants'
 import {
   createSharedJoystickBuffer,
   createViewsFromJoystickBuffer,
@@ -392,6 +393,47 @@ describe('WebWorkerDeviceAdapter - STICK typematic lifecycle reset', () => {
 
   afterEach(() => {
     vi.useRealTimers()
+  })
+
+  it('returns initial press immediately', () => {
+    setStickState(joystickView, 0, 8)
+    expect(adapter.getStickState(0)).toBe(8)
+  })
+
+  it('suppresses held direction reads until repeat interval elapses', () => {
+    setStickState(joystickView, 0, 1)
+    expect(adapter.getStickState(0)).toBe(1)
+
+    vi.advanceTimersByTime(TIMING.STICK_REPEAT_INTERVAL_MS - 1)
+    expect(adapter.getStickState(0)).toBe(0)
+
+    vi.advanceTimersByTime(1)
+    expect(adapter.getStickState(0)).toBe(1)
+  })
+
+  it('returns direction changes immediately', () => {
+    setStickState(joystickView, 0, 1)
+    expect(adapter.getStickState(0)).toBe(1)
+
+    vi.advanceTimersByTime(1)
+    expect(adapter.getStickState(0)).toBe(0)
+
+    setStickState(joystickView, 0, 2)
+    expect(adapter.getStickState(0)).toBe(2)
+  })
+
+  it('returns release immediately and resets typematic state', () => {
+    setStickState(joystickView, 0, 4)
+    expect(adapter.getStickState(0)).toBe(4)
+
+    vi.advanceTimersByTime(1)
+    expect(adapter.getStickState(0)).toBe(0)
+
+    setStickState(joystickView, 0, 0)
+    expect(adapter.getStickState(0)).toBe(0)
+
+    setStickState(joystickView, 0, 4)
+    expect(adapter.getStickState(0)).toBe(4)
   })
 
   it('should return held direction immediately after execution restart', () => {
