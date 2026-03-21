@@ -89,7 +89,7 @@ export class BasicInterpreter {
 
       // Create execution context (or reuse existing one if it has device adapter)
       if (!this.context?.deviceAdapter) {
-        console.log('[BasicInterpreter] Creating new context with sharedAnimationBuffer:', {
+        logInterpreter.debug('[BasicInterpreter] Creating new context with sharedAnimationBuffer:', {
           hasBuffer: !!this.config.sharedAnimationBuffer,
           byteLength: this.config.sharedAnimationBuffer?.byteLength,
         })

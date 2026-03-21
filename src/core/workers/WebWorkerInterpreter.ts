@@ -142,7 +142,7 @@ class WebWorkerInterpreter {
         maxIterations: config.maxIterations,
         maxOutputLines: config.maxOutputLines,
       })
-      console.log('[WebWorkerInterpreter] Creating BasicInterpreter with sharedAnimationBuffer:', {
+      logWorker.debug('[WebWorkerInterpreter] Creating BasicInterpreter with sharedAnimationBuffer:', {
         hasBuffer: !!this.sharedAnimationBuffer,
         byteLength: this.sharedAnimationBuffer?.byteLength,
       })
@@ -258,19 +258,19 @@ class WebWorkerInterpreter {
     }
     const { buffer } = data
     this.sharedAnimationBuffer = buffer
-    console.log('[WebWorkerInterpreter] SET_SHARED_ANIMATION_BUFFER received, buffer byteLength =', buffer.byteLength)
+    logWorker.debug('[WebWorkerInterpreter] SET_SHARED_ANIMATION_BUFFER received, buffer byteLength =', buffer.byteLength)
     const accessor = new SharedDisplayBufferAccessor(buffer)
     const animationManager = this.interpreter?.getAnimationManager()
-    console.log('[WebWorkerInterpreter] Interpreter exists:', !!this.interpreter, 'AnimationManager exists:', !!animationManager)
+    logWorker.debug('[WebWorkerInterpreter] Interpreter exists:', !!this.interpreter, 'AnimationManager exists:', !!animationManager)
     if (this.webWorkerDeviceAdapter) {
       this.webWorkerDeviceAdapter.setSharedDisplayBufferAccessor(accessor)
     }
     // Update AnimationManager's shared buffer for direct sync to AnimationWorker
     if (animationManager) {
-      console.log('[WebWorkerInterpreter] Updating existing AnimationManager with shared buffer')
+      logWorker.debug('[WebWorkerInterpreter] Updating existing AnimationManager with shared buffer')
       animationManager.setSharedAnimationBuffer(buffer)
     } else {
-      console.log('[WebWorkerInterpreter] AnimationManager not created yet, will use buffer when interpreter is created')
+      logWorker.debug('[WebWorkerInterpreter] AnimationManager not created yet, will use buffer when interpreter is created')
     }
   }
 
@@ -281,7 +281,7 @@ class WebWorkerInterpreter {
       return
     }
     const { buffer } = data
-    console.log('[WebWorkerInterpreter] SET_SHARED_JOYSTICK_BUFFER received, buffer byteLength =', buffer.byteLength)
+    logWorker.debug('[WebWorkerInterpreter] SET_SHARED_JOYSTICK_BUFFER received, buffer byteLength =', buffer.byteLength)
     if (this.webWorkerDeviceAdapter) {
       this.webWorkerDeviceAdapter.setSharedJoystickBuffer(buffer)
       logWorker.debug('[WebWorkerInterpreter] Shared joystick buffer set in WebWorkerDeviceAdapter')
@@ -297,7 +297,7 @@ class WebWorkerInterpreter {
       return
     }
     const { buffer } = data
-    console.log('[WebWorkerInterpreter] SET_SHARED_KEYBOARD_BUFFER received, buffer byteLength =', buffer.byteLength)
+    logWorker.debug('[WebWorkerInterpreter] SET_SHARED_KEYBOARD_BUFFER received, buffer byteLength =', buffer.byteLength)
     if (this.webWorkerDeviceAdapter) {
       this.webWorkerDeviceAdapter.setSharedKeyboardBuffer(buffer)
       logWorker.debug('[WebWorkerInterpreter] Shared keyboard buffer set in WebWorkerDeviceAdapter')

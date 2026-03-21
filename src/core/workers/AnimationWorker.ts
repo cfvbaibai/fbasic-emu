@@ -95,7 +95,7 @@ export class AnimationWorker {
    * Expects the combined display buffer (sharedDisplayBuffer.ts).
    */
   private handleSetSharedBuffer(buffer: SharedArrayBuffer): void {
-    console.log('[AnimationWorker] handleSetSharedBuffer called, byteLength =', buffer.byteLength)
+    logWorker.debug('[AnimationWorker] handleSetSharedBuffer called, byteLength =', buffer.byteLength)
     if (buffer.byteLength < SHARED_DISPLAY_BUFFER_BYTES) {
       throw new RangeError(
         `Shared buffer too small: ${buffer.byteLength} bytes, need at least ${SHARED_DISPLAY_BUFFER_BYTES}`
@@ -150,7 +150,7 @@ export class AnimationWorker {
           this.handleSetPositionFromSync(command.actionNumber, command.params.startX, command.params.startY)
           break
         case SyncCommandType.CLEAR_ALL_MOVEMENTS:
-          console.log('[AnimationWorker] CLEAR_ALL_MOVEMENTS: clearing all sprite data')
+          logWorker.debug('[AnimationWorker] CLEAR_ALL_MOVEMENTS: clearing all sprite data')
           this.handleClearAllMovementsFromSync()
           // Clear the command immediately after processing so it's not re-read every tick
           this.accessor.clearSyncCommand()
@@ -338,7 +338,11 @@ export class AnimationWorker {
    * Called when user clicks CLEAR button - clears all internal movement states and sprite buffer.
    */
   private handleClearAllMovementsFromSync(): void {
-    console.log('[AnimationWorker] CLEAR_ALL_MOVEMENTS: clearing', this.movementStates.size, 'movement states and all sprite data')
+    logWorker.debug(
+      '[AnimationWorker] CLEAR_ALL_MOVEMENTS: clearing',
+      this.movementStates.size,
+      'movement states and all sprite data'
+    )
 
     // Clear all internal movement states
     this.movementStates.clear()
@@ -363,7 +367,7 @@ export class AnimationWorker {
     this.isRunning = true
     this.lastTickTime = performance.now()
 
-    console.log('[AnimationWorker] Starting tick loop at 60Hz')
+    logWorker.debug('[AnimationWorker] Starting tick loop at 60Hz')
 
     // Use setInterval for fixed 60Hz tick rate
     this.tickInterval = self.setInterval(() => {

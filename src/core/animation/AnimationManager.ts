@@ -129,7 +129,12 @@ export class AnimationManager {
     }
 
     this.moveDefinitions.set(definition.actionNumber, definition)
-    console.log('[AnimationManager] defineMovement: stored definition for action', definition.actionNumber, 'total definitions:', this.moveDefinitions.size)
+    logWorker.debug(
+      '[AnimationManager] defineMovement: stored definition for action',
+      definition.actionNumber,
+      'total definitions:',
+      this.moveDefinitions.size
+    )
 
     // Write movement definition to shared buffer so Main Thread can create sprites immediately
     // This includes: characterType, colorCombination, direction, speed, priority
@@ -161,7 +166,10 @@ export class AnimationManager {
         definition.characterType,
         definition.colorCombination
       )
-      console.log('[AnimationManager] defineMovement: wrote definition to shared buffer for action', definition.actionNumber)
+      logWorker.debug(
+        '[AnimationManager] defineMovement: wrote definition to shared buffer for action',
+        definition.actionNumber
+      )
     }
 
     // Initialize POSITION for this action to screen center when DEF MOVE runs (like DEF SPRITE)
@@ -193,7 +201,7 @@ export class AnimationManager {
    * @throws Error if no definition exists for actionNumber
    */
   startMovement(actionNumber: number, startX?: number, startY?: number): void {
-    console.log('[AnimationManager] startMovement called for sprite', actionNumber)
+    logWorker.debug('[AnimationManager] startMovement called for sprite', actionNumber)
 
     const definition = this.moveDefinitions.get(actionNumber)
     if (!definition) {
@@ -210,14 +218,14 @@ export class AnimationManager {
     const initialX = startX ?? screenCenterX - halfSize
     const initialY = startY ?? screenCenterY - halfSize
 
-    console.log('[AnimationManager] Starting movement at position:', initialX, initialY)
+    logWorker.debug('[AnimationManager] Starting movement at position:', initialX, initialY)
 
     // Write START_MOVEMENT command to shared buffer
     if (!this.accessor) {
       throw new Error('[AnimationManager] Shared buffer not available - cannot start movement')
     }
 
-    console.log('[AnimationManager] Writing START_MOVEMENT command to buffer...')
+    logWorker.debug('[AnimationManager] Writing START_MOVEMENT command to buffer...')
     this.dispatchSyncCommand(SyncCommandType.START_MOVEMENT, actionNumber, {
       startX: initialX,
       startY: initialY,
@@ -326,12 +334,12 @@ export class AnimationManager {
    * @returns Array of MovementState for all defined movements
    */
   getAllMovementStates(): MovementState[] {
-    console.log('[AnimationManager] getAllMovementStates: moveDefinitions size:', this.moveDefinitions.size)
+    logWorker.debug('[AnimationManager] getAllMovementStates: moveDefinitions size:', this.moveDefinitions.size)
     const states = Array.from(this.moveDefinitions.values()).map(definition => ({
       actionNumber: definition.actionNumber,
       definition,
     }))
-    console.log('[AnimationManager] getAllMovementStates: returning', states.length, 'states')
+    logWorker.debug('[AnimationManager] getAllMovementStates: returning', states.length, 'states')
     return states
   }
 
