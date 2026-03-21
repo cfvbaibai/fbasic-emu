@@ -8,7 +8,15 @@
 
 import log from 'loglevel'
 
-const defaultLevel: log.LogLevelDesc = 'warn'
+export function resolveDefaultLogLevel(
+  env: Record<string, string | undefined> | undefined = (globalThis as {
+    process?: { env?: Record<string, string | undefined> }
+  }).process?.env
+): log.LogLevelDesc {
+  return env?.FBASIC_VERBOSE_LOGS === '1' ? 'debug' : 'warn'
+}
+
+const defaultLevel: log.LogLevelDesc = resolveDefaultLogLevel()
 log.setDefaultLevel(defaultLevel)
 
 /** IDE worker message handling (PROGRESS, ANIMATION_COMMAND, etc.). Use debug for verbose. */
