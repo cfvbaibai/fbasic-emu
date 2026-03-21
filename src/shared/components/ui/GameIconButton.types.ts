@@ -21,6 +21,8 @@ export interface GameIconButtonProps {
   title?: string
   /** Whether to use circular shape */
   circular?: boolean
+  /** Optional test selector forwarded to the native button element */
+  dataTestid?: string
 }
 
 export interface GameIconButtonEmits {

@@ -108,6 +108,7 @@ const handleInputModeChange = (value: InputMode) => {
       icon="mdi:play"
       size="small"
       :title="t('ide.controls.run')"
+      data-testid="ide-run-button"
       @click="handleRun"
     />
 
@@ -117,6 +118,7 @@ const handleInputModeChange = (value: InputMode) => {
       icon="mdi:pause"
       size="small"
       :title="t('ide.controls.stop')"
+      data-testid="ide-stop-button"
       @click="handleStop"
     />
 

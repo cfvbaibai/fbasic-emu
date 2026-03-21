@@ -128,7 +128,11 @@ onDeactivated(cleanup)
 </script>
 
 <template>
-  <div ref="editorContainer" class="monaco-editor-container"></div>
+  <div
+    ref="editorContainer"
+    class="monaco-editor-container"
+    data-testid="monaco-editor-container"
+  ></div>
 </template>
 
 <style scoped>

@@ -43,6 +43,7 @@ Vue 3 + TypeScript + Vite + Chevrotain parser
 | `pnpm build`                     | Production build                                          |
 | `pnpm vite build`                | Vite-only production build (used by GitHub Pages deploy)  |
 | `pnpm test:run`                  | Run tests                                                 |
+| `pnpm test:e2e`                  | Run Playwright smoke tests (Chromium)                    |
 | `pnpm lint`                      | Lint and auto-fix                                         |
 | `pnpm type-check`                | TypeScript check                                          |
 | `pnpm verify:build-size-budgets` | Enforce initial app-shell JS chunk budget (<= 1.5 MB raw) |
@@ -57,6 +58,7 @@ GitHub Actions CI runs on pushes/PRs to `master` and verifies:
 - ESLint + Stylelint + Type check
 - Test suite
 - Production build
+- Playwright E2E smoke suite (IDE boot/run)
 
 ## Deployment
 
