@@ -1,3 +1,9 @@
+import {
+  COI_SERVICE_WORKER_REGISTRATION_FAILED_EVENT,
+  type CoiServiceWorkerRegistrationFailedDetail,
+} from '@/shared/constants/coiServiceWorker'
+import { logApp } from '@/shared/logger'
+
 if (typeof window !== 'undefined') {
   // Register service worker only when cross-origin isolation is still missing.
   if (window.crossOriginIsolated === false && window.isSecureContext && 'serviceWorker' in navigator) {
@@ -14,7 +20,16 @@ if (typeof window !== 'undefined') {
           window.location.reload()
         })
       } catch (error) {
-        console.error('[coi-serviceworker] registration failed:', error)
+        const detail: CoiServiceWorkerRegistrationFailedDetail = {
+          errorMessage: error instanceof Error ? error.message : String(error),
+        }
+        const warningEvent = new CustomEvent<CoiServiceWorkerRegistrationFailedDetail>(
+          COI_SERVICE_WORKER_REGISTRATION_FAILED_EVENT,
+          { detail }
+        )
+
+        window.dispatchEvent(warningEvent)
+        logApp.debug('[coi-serviceworker] registration failed:', error)
       }
     })
   }
