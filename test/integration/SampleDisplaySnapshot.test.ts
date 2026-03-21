@@ -4,7 +4,7 @@ import { createSharedDisplayBuffer } from '@/core/animation/sharedDisplayBuffer'
 import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { EXECUTION_LIMITS } from '@/core/constants'
-import { getSampleCode } from '@/core/samples'
+import { getSampleCode, getSampleCodeKeys } from '@/core/samples'
 
 import { SharedBufferTestAdapter } from '../adapters/SharedBufferTestAdapter'
 import {
@@ -19,6 +19,8 @@ interface DeterministicCase {
   fixtureName: string
 }
 
+type SnapshotCoverageOptOuts = Record<string, string>
+
 const DETERMINISTIC_CASES: DeterministicCase[] = [
   { sampleKey: 'hello', fixtureName: 'hello-complete' },
   { sampleKey: 'basic', fixtureName: 'basic-complete' },
@@ -27,6 +29,56 @@ const DETERMINISTIC_CASES: DeterministicCase[] = [
   { sampleKey: 'screenFill', fixtureName: 'screen-fill-complete' },
   { sampleKey: 'spriteBasic', fixtureName: 'sprite-basic-complete' },
 ]
+
+// Coverage policy: every sample must be either fixture-covered or intentionally opted out.
+const SNAPSHOT_COVERAGE_OPT_OUTS: SnapshotCoverageOptOuts = {
+  input: 'Requires user input; non-deterministic completion flow',
+  beep: 'Audio-only sample; display fixture adds limited value',
+  pause: 'Timing-sensitive countdown; deterministic checkpoint not yet defined',
+  loops: 'Console-output focused; display fixture not a useful signal',
+  conditionals: 'Console-output focused; display fixture not a useful signal',
+  subroutines: 'Console-output focused; display fixture not a useful signal',
+  dataRead: 'Console-output focused; display fixture not a useful signal',
+  arrays: 'Console-output focused; display fixture not a useful signal',
+  allChars: 'Large matrix snapshot baseline not yet curated',
+  bgItems: 'High-surface BG tile fixture baseline not yet curated',
+  bgView: 'BG fixture baseline pending',
+  bgViewTitle: 'BG fixture baseline pending',
+  bgViewPlatform: 'BG fixture baseline pending',
+  cursorPosition: 'Cursor movement timing/checkpoint policy pending',
+  screenRead: 'Depends on runtime screen reads; checkpoint policy pending',
+  printableArea: 'BG layer interaction baseline pending',
+  spriteAnimation: 'Animation timeline sample; stable checkpoint policy pending',
+  spriteControl: 'Interactive-style control flow; deterministic checkpoint pending',
+  spriteTableB: 'Sprite/BG asset-heavy baseline pending',
+  spriteInteractive: 'Interactive joystick input required',
+  joystick: 'Covered by deterministic input checkpoint assertion test',
+  inkeyTest: 'Keyboard input required',
+  inkeyBlockingTest: 'Blocking keyboard input required',
+  beepInteractive: 'Interactive key/button input required',
+  shooting: 'Game loop sample; deterministic checkpoint policy pending',
+  knight: 'Game loop sample; deterministic checkpoint policy pending',
+  superMemory: 'Game loop sample; deterministic checkpoint policy pending',
+  ufo: 'Game loop sample; deterministic checkpoint policy pending',
+  route66: 'Game loop sample; deterministic checkpoint policy pending',
+  typeMaster: 'Interactive typing sample',
+  turtle: 'Game loop sample; deterministic checkpoint policy pending',
+  card: 'Game loop sample; deterministic checkpoint policy pending',
+  scrSample: 'Game loop sample; deterministic checkpoint policy pending',
+  musicPlayDemo: 'Audio-focused sample; display state not primary output',
+  musicTwinkle: 'Audio-focused sample; display state not primary output',
+  musicOdeToJoy: 'Audio-focused sample; display state not primary output',
+  musicMaryHadALittleLamb: 'Audio-focused sample; display state not primary output',
+  musicHappyBirthday: 'Audio-focused sample; display state not primary output',
+  musicJingleBells: 'Audio-focused sample; display state not primary output',
+  musicScale: 'Audio-focused sample; display state not primary output',
+  musicArpeggio: 'Audio-focused sample; display state not primary output',
+  musicThreeChannel: 'Audio-focused sample; display state not primary output',
+  musicPlayer: 'Interactive menu sample; user selection required',
+  musicLoopDemo: 'Audio-focused looping sample; deterministic stop checkpoint pending',
+  musicFurElise2Ch: 'Audio-focused sample; display state not primary output',
+  musicRocknRouge: 'Audio-focused sample; display state not primary output',
+}
 
 describe('Sample Display Snapshot Integration', () => {
   let adapter: SharedBufferTestAdapter
@@ -101,5 +153,13 @@ describe('Sample Display Snapshot Integration', () => {
 
     expect(rowTextFromSnapshot(snapshot, 0)).toMatch(/JOYSTICK TEST/)
     expect(snapshot.sequence).toBeGreaterThan(0)
+  })
+
+  it('requires snapshot coverage policy for every sample key', () => {
+    const fixtureCoveredKeys = new Set(DETERMINISTIC_CASES.map(testCase => testCase.sampleKey))
+    const coveredByPolicy = new Set([...fixtureCoveredKeys, ...Object.keys(SNAPSHOT_COVERAGE_OPT_OUTS)])
+    const sampleKeys = getSampleCodeKeys()
+    const missing = sampleKeys.filter(sampleKey => !coveredByPolicy.has(sampleKey))
+    expect(missing).toEqual([])
   })
 })
