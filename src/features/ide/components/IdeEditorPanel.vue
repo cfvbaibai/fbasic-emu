@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed, defineAsyncComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import BgEditorPanel from '@/features/bg-editor/components/BgEditorPanel.vue'
@@ -7,7 +8,6 @@ import { GameBlock, GameButton, GameIconButton } from '@/shared/components/ui'
 
 import EditorViewToggle from './EditorViewToggle.vue'
 import IdeControls from './IdeControls.vue'
-import MonacoCodeEditor from './MonacoCodeEditor.vue'
 import ProgramToolbar from './ProgramToolbar.vue'
 
 /**
@@ -33,6 +33,8 @@ const emit = defineEmits<{
   (e: 'openSampleSelector'): void
 }>()
 
+const MonacoCodeEditor = defineAsyncComponent(() => import('./MonacoCodeEditor.vue'))
+
 interface Props {
   /** Code content (v-model) */
   code: string
@@ -53,6 +55,11 @@ interface Props {
 }
 
 const { t } = useI18n()
+
+const useLiteEditor = computed(() => {
+  if (typeof window === 'undefined') return false
+  return new URLSearchParams(window.location.search).get('e2e') === 'lite'
+})
 </script>
 
 <template>
@@ -100,11 +107,18 @@ const { t } = useI18n()
       </div>
     </template>
     <!-- Code Editor View -->
-    <MonacoCodeEditor
-      v-show="props.editorView === 'code'"
-      :model-value="props.code"
-      @update:model-value="emit('update:code', $event)"
-    />
+    <template v-if="props.editorView === 'code'">
+      <div
+        v-if="useLiteEditor"
+        class="editor-lite-placeholder"
+        data-testid="ide-editor-lite-placeholder"
+      ></div>
+      <MonacoCodeEditor
+        v-else
+        :model-value="props.code"
+        @update:model-value="emit('update:code', $event)"
+      />
+    </template>
     <!-- BG Editor View -->
     <BgEditorPanel v-show="props.editorView === 'bg'" />
   </GameBlock>
@@ -148,5 +162,10 @@ const { t } = useI18n()
   min-width: auto;
   padding: 0.375rem 0.625rem;
   font-size: 0.8rem;
+}
+
+.editor-lite-placeholder {
+  flex: 1 1 0;
+  min-height: 400px;
 }
 </style>
