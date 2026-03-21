@@ -20,6 +20,7 @@ import { updateAnimatedSprites } from './useKonvaScreenRenderer'
 
 /** Dev-only render-loop trace toggle (set VITE_DEBUG_ANIMATION_LOOP=true in local env). */
 const DEBUG_ANIMATION_LOOP = import.meta.env.DEV && import.meta.env.VITE_DEBUG_ANIMATION_LOOP === 'true'
+const INSPECTOR_UPDATE_INTERVAL_MS = 1000 / 15
 
 export interface UseScreenAnimationLoopRenderOnlyOptions {
   layers: Ref<KonvaScreenLayers | Record<string, unknown>>
@@ -71,6 +72,7 @@ export function useScreenAnimationLoopRenderOnly(
   // Track last positions to detect changes (dirty tracking)
   const lastPositions = new Map<number, { x: number; y: number }>()
   let needsRedraw = false
+  let lastInspectorUpdateAt = Number.NEGATIVE_INFINITY
 
   /**
    * Animation loop - runs continuously at 60fps
@@ -79,7 +81,7 @@ export function useScreenAnimationLoopRenderOnly(
    * Detects orphaned nodes (nodes that exist but shouldn't be visible) and removes them
    * Uses dirty tracking to only redraw when positions actually change
    */
-  async function animationLoop(): Promise<void> {
+  async function animationLoop(timestamp = 0): Promise<void> {
     if (!sharedDisplayBufferAccessor) {
       animationFrameId = requestAnimationFrame(animationLoop)
       return
@@ -192,8 +194,13 @@ export function useScreenAnimationLoopRenderOnly(
 
     // Update inspector MOVE tab data with all sprite state (position, direction, speed, etc.)
     // Throttle to ~15fps instead of 60fps to reduce Vue reactivity overhead
-    if (updateInspectorMoveSlots && needsRedraw) {
+    if (
+      updateInspectorMoveSlots
+      && needsRedraw
+      && timestamp - lastInspectorUpdateAt >= INSPECTOR_UPDATE_INTERVAL_MS
+    ) {
       updateInspectorMoveSlots()
+      lastInspectorUpdateAt = timestamp
     }
 
     // Run pending static render at end of frame (animation first, then render)

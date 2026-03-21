@@ -58,7 +58,7 @@ describe('useScreenAnimationLoopRenderOnly', () => {
     vi.unstubAllGlobals()
   })
 
-  async function runNextFrame(): Promise<void> {
+  async function runNextFrame(atMs = performance.now()): Promise<void> {
     const next = rafCallbacks.entries().next()
     if (next.done) {
       throw new Error('No queued requestAnimationFrame callback')
@@ -66,7 +66,7 @@ describe('useScreenAnimationLoopRenderOnly', () => {
 
     const [id, callback] = next.value
     rafCallbacks.delete(id)
-    await Promise.resolve(callback(performance.now()))
+    await Promise.resolve(callback(atMs))
   }
 
   it('skips animation updates on idle frames', async () => {
@@ -112,6 +112,46 @@ describe('useScreenAnimationLoopRenderOnly', () => {
 
     expect(onRenderNeeded).toHaveBeenCalledTimes(1)
     expect(updateAnimatedSpritesMock).toHaveBeenCalledTimes(1)
+    stop()
+  })
+
+  it('throttles inspector MOVE updates to around 15fps under continuous movement', async () => {
+    let x = 0
+    const updateInspectorMoveSlots = vi.fn()
+    const spriteNode = {
+      x: vi.fn(),
+      y: vi.fn(),
+      destroy: vi.fn(),
+    }
+    const accessor: AccessorStub = {
+      readSpriteCharacterType: (actionNumber: number) => (actionNumber === 0 ? 2 : -1),
+      readSpriteIsVisible: (actionNumber: number) => actionNumber === 0,
+      readSpritePriority: () => 0,
+      readSpritePosition: (actionNumber: number) => {
+        if (actionNumber !== 0) return null
+        x += 1
+        return { x, y: 7 }
+      },
+    }
+
+    const stop = useScreenAnimationLoopRenderOnly({
+      layers: ref({
+        spriteFrontLayer: null,
+        spriteBackLayer: null,
+      }),
+      frontSpriteNodes: ref(new Map([[0, spriteNode]])),
+      backSpriteNodes: ref(new Map()),
+      spritePalette: ref(1),
+      sharedDisplayBufferAccessor: accessor as never,
+      getPendingStaticRender: () => false,
+      updateInspectorMoveSlots,
+    })
+
+    for (let frame = 0; frame < 8; frame += 1) {
+      await runNextFrame(frame * 16)
+    }
+
+    expect(updateInspectorMoveSlots).toHaveBeenCalledTimes(2)
     stop()
   })
 })
