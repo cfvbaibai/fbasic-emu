@@ -1,5 +1,8 @@
 # F-BASIC IDE
 
+[![CI](https://github.com/cfvbaibai/fbasic-ide/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/cfvbaibai/fbasic-ide/actions/workflows/ci.yml)
+[![Deploy Pages](https://github.com/cfvbaibai/fbasic-ide/actions/workflows/deploy-pages.yml/badge.svg?branch=master)](https://github.com/cfvbaibai/fbasic-ide/actions/workflows/deploy-pages.yml)
+
 A web-based IDE for F-BASIC (Family BASIC), the classic Nintendo programming language. Write, run, and debug F-BASIC programs directly in your browser.
 
 ## Live Site
@@ -34,14 +37,14 @@ Vue 3 + TypeScript + Vite + Chevrotain parser
 
 ## Scripts
 
-| Command | Description |
-|---------|-------------|
-| `pnpm dev` | Start dev server |
-| `pnpm build` | Production build |
-| `pnpm vite build` | Vite-only production build (used by GitHub Pages deploy) |
-| `pnpm test:run` | Run tests |
-| `pnpm lint` | Lint and auto-fix |
-| `pnpm type-check` | TypeScript check |
+| Command                          | Description                                               |
+| -------------------------------- | --------------------------------------------------------- |
+| `pnpm dev`                       | Start dev server                                          |
+| `pnpm build`                     | Production build                                          |
+| `pnpm vite build`                | Vite-only production build (used by GitHub Pages deploy)  |
+| `pnpm test:run`                  | Run tests                                                 |
+| `pnpm lint`                      | Lint and auto-fix                                         |
+| `pnpm type-check`                | TypeScript check                                          |
 | `pnpm verify:build-size-budgets` | Enforce initial app-shell JS chunk budget (<= 1.5 MB raw) |
 
 ## CI
