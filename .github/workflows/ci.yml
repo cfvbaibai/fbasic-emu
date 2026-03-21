@@ -31,20 +31,17 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version-file: ".nvmrc"
-          cache: "pnpm"
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Parser smoke check
-        run: pnpm check-syntax
-
-      - name: Script entrypoint verification
-        run: pnpm verify:script-entrypoints
-
-      - name: Build unresolved-asset verification
-        run: pnpm verify:build-no-unresolved-assets
+      - name: Validation gate checks
+        run: |
+          pnpm check-syntax
+          pnpm verify:script-entrypoints
+          pnpm verify:build-no-unresolved-assets
 
   verify-pr:
     name: Verify (PR branch)
@@ -65,20 +62,14 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version-file: ".nvmrc"
-          cache: "pnpm"
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Parser smoke check
-        run: pnpm check-syntax
-
-      - name: Script entrypoint verification
-        run: pnpm verify:script-entrypoints
-
-      - name: Build unresolved-asset verification
-        run: pnpm verify:build-no-unresolved-assets
+      - name: Validation gate checks
+        run: pnpm verify:gates
 
   lint-and-typecheck:
     name: Lint and Type Check
@@ -96,8 +87,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version-file: ".nvmrc"
-          cache: "pnpm"
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -127,8 +118,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version-file: ".nvmrc"
-          cache: "pnpm"
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -152,8 +143,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version-file: ".nvmrc"
-          cache: "pnpm"
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile

@@ -46,15 +46,14 @@ Vue 3 + TypeScript + Vite + Chevrotain parser
 | `pnpm test:e2e`                  | Run Playwright smoke tests (Chromium)                    |
 | `pnpm lint`                      | Lint and auto-fix                                         |
 | `pnpm type-check`                | TypeScript check                                          |
+| `pnpm verify:gates`              | Run parser + script-entrypoint + unresolved-asset gates   |
 | `pnpm verify:build-size-budgets` | Enforce initial app-shell JS chunk budget (<= 1.5 MB raw) |
 
 ## CI
 
 GitHub Actions CI runs on pushes/PRs to `master` and verifies:
 
-- Parser smoke check
-- Script entrypoint verification
-- Build unresolved-asset verification
+- Validation gate checks (`pnpm verify:gates`)
 - ESLint + Stylelint + Type check
 - Test suite
 - Production build
@@ -79,7 +78,7 @@ GitHub Pages deployment is automated via `.github/workflows/deploy-pages.yml`:
 
 1. Fork, branch, code
 2. Write tests for new features
-3. Run `pnpm exec eslint . && pnpm lint:style && pnpm type-check && pnpm test:run && pnpm build`
+3. Run `pnpm verify:gates && pnpm exec eslint . && pnpm lint:style && pnpm type-check && pnpm test:run && pnpm build`
 4. Submit PR
 
 ## License
