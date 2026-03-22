@@ -1,0 +1,7 @@
+{
+  "warning": {
+    "message": "由于未启用跨源隔离，高性能模式不可用。请尝试重新加载、使用 HTTPS，并确认已配置 COOP/COEP 头。",
+    "reload": "重新加载",
+    "dismiss": "关闭"
+  }
+}

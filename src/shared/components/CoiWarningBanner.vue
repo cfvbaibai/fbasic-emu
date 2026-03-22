@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import {
   COI_SERVICE_WORKER_REGISTRATION_FAILED_EVENT,
@@ -20,6 +21,8 @@ import GameIcon from './ui/GameIcon.vue'
 defineOptions({
   name: 'CoiWarningBanner',
 })
+
+const { t } = useI18n()
 
 const showCoiWarning = ref(false)
 
@@ -70,13 +73,12 @@ onBeforeUnmount(() => {
     <div class="coi-warning-content">
       <GameIcon icon="mdi:alert" size="small" />
       <p>
-        High-performance mode is unavailable because cross-origin isolation is not enabled.
-        Try reloading, use HTTPS, and confirm COOP/COEP headers are configured.
+        {{ t('coi.warning.message') }}
       </p>
     </div>
     <div class="coi-warning-actions">
-      <GameButton type="warning" size="small" @click="reloadPage">Reload</GameButton>
-      <GameButton size="small" @click="dismissCoiWarning">Dismiss</GameButton>
+      <GameButton type="warning" size="small" @click="reloadPage">{{ t('coi.warning.reload') }}</GameButton>
+      <GameButton size="small" @click="dismissCoiWarning">{{ t('coi.warning.dismiss') }}</GameButton>
     </div>
   </section>
 </template>

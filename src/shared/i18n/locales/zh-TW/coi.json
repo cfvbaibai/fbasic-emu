@@ -1,0 +1,7 @@
+{
+  "warning": {
+    "message": "由於未啟用跨來源隔離，高效能模式無法使用。請嘗試重新載入、使用 HTTPS，並確認已設定 COOP/COEP 標頭。",
+    "reload": "重新載入",
+    "dismiss": "關閉"
+  }
+}
