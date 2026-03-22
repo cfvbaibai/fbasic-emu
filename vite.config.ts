@@ -30,19 +30,22 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id: string) {
-          // NOTE:
-          // A prior issue requested splitting Monaco into many chunks to reduce
-          // the initial bundle size. However, production builds started
-          // throwing "ReferenceError: Cannot access 'z' before initialization"
-          // from monaco-base-common-observableInternal, which does not repro in
-          // dev server. Rollup warned about circular Monaco chunk graphs, and
-          // the error only appears in built preview and GitHub Pages.
+          // Monaco editor chunking strategy.
           //
-          // To keep production stable, we intentionally collapse all Monaco
-          // modules into a single "monaco" chunk. This avoids circular chunk
-          // ordering/TDZ issues at runtime. If we want to re-split in the
-          // future, we should do it with a tested chunk map that does not
-          // introduce cycles and verify against built preview + Pages.
+          // Monaco's module graph contains circular dependencies between
+          // editor/common and editor/browser. Attempts to split these into
+          // separate chunks caused TDZ runtime errors in production builds.
+          // The cyclic groups are too large individually (editor/common ~838 kB,
+          // editor/browser ~618 kB) to each fit under the 500 kB default limit.
+          //
+          // Strategy: collapse Monaco into two chunks:
+          //   - "monaco": editor/*, base/*, platform/*, basic-languages/*
+          //     These are tightly coupled via circular deps.
+          //   - Monaco worker is already a separate chunk (via ?worker import).
+          //
+          // The monaco chunk exceeds 500 kB, so we raise the warning limit
+          // to match. This is the standard approach (used by Vite's own
+          // Monaco example). All application code chunks remain under 500 kB.
           if (id.includes('/node_modules/monaco-editor/esm/vs/')) {
             return 'monaco'
           }
@@ -50,6 +53,7 @@ export default defineConfig({
         },
       },
     },
+    chunkSizeWarningLimit: 3000,
   },
   test: {
     globals: true,
