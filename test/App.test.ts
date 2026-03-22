@@ -23,11 +23,61 @@ vi.mock('@/shared/utils/reloadPage', () => ({
 }))
 
 describe('App', () => {
+  const originalCrossOriginIsolated = window.crossOriginIsolated
+
+  const setCrossOriginIsolated = (value: boolean) => {
+    Object.defineProperty(window, 'crossOriginIsolated', {
+      configurable: true,
+      value,
+    })
+  }
+
   afterEach(() => {
+    setCrossOriginIsolated(originalCrossOriginIsolated)
+    window.history.replaceState({}, '', '/')
     vi.restoreAllMocks()
   })
 
+  it('shows warning banner on mount when cross-origin isolation is missing', async () => {
+    setCrossOriginIsolated(false)
+
+    const wrapper = mount(App)
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.find('.coi-warning-banner').exists()).toBe(true)
+    wrapper.unmount()
+  })
+
+  it('does not show warning banner on mount when cross-origin isolation is available', () => {
+    setCrossOriginIsolated(true)
+
+    const wrapper = mount(App)
+
+    expect(wrapper.find('.coi-warning-banner').exists()).toBe(false)
+    wrapper.unmount()
+  })
+
+  it('does not show warning banner in e2e lite mode', async () => {
+    setCrossOriginIsolated(false)
+    window.history.replaceState({}, '', '/?e2e=lite')
+
+    const wrapper = mount(App)
+
+    expect(wrapper.find('.coi-warning-banner').exists()).toBe(false)
+
+    window.dispatchEvent(
+      new CustomEvent(COI_SERVICE_WORKER_REGISTRATION_FAILED_EVENT, {
+        detail: { errorMessage: 'registration blocked' },
+      })
+    )
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.find('.coi-warning-banner').exists()).toBe(false)
+    wrapper.unmount()
+  })
+
   it('shows warning banner when coi registration failure event is received', async () => {
+    setCrossOriginIsolated(true)
     const wrapper = mount(App)
 
     window.dispatchEvent(
