@@ -11,124 +11,126 @@
  * but execution is statement-based (statements are expanded into a flat list).
  */
 
-import { CstParser } from 'chevrotain'
 import type { CstNode, ILexingError, IRecognitionException, IToken } from 'chevrotain'
+import { CstParser } from 'chevrotain'
+
+import { normalizeLocationValue } from './normalizeLocationValue'
 import {
+  // Arithmetic functions
+  Abs,
+  allTokens,
+  // Logical operators
+  And,
+  Asc,
+  // BEEP statement
+  Beep,
+  Cgen,
+  Cgset,
+  Chr,
+  Clear,
+  Cls,
+  Colon,
+  Color,
+  // Punctuation
+  Comma,
+  Cont,
+  // Cursor position functions
+  Csrlin,
+  Cut,
+  Data,
+  Def,
+  Dim,
+  Divide,
+  End,
+  // Operators
+  Equal,
+  Era,
+  For,
+  Fre,
+  Gosub,
+  Goto,
+  // Comparison operators
+  GreaterThan,
+  GreaterThanOrEqual,
+  Hex,
+  HexLiteral,
+  Identifier,
+  If,
+  Inkey,
+  Input,
+  Key,
+  Keylist,
+  Left,
+  // String functions
+  Len,
+  LessThan,
+  LessThanOrEqual,
   // Keywords
   Let,
-  Print,
-  For,
-  To,
-  Step,
-  Next,
-  End,
-  Pause,
-  Play,
-  If,
-  Then,
-  Goto,
-  Gosub,
-  Return,
-  On,
-  Off,
-  Dim,
-  Data,
-  Read,
-  Restore,
-  Input,
+  // Lexer
+  lexer,
   Linput,
-  Cls,
-  Swap,
-  Clear,
+  // REPL-only commands
+  List,
+  Load,
   Locate,
-  Color,
-  Cgset,
-  Cgen,
+  LParen,
+  Mid,
+  Minus,
+  Mod,
+  Move,
+  Multiply,
+  New,
+  Next,
+  Not,
+  NotEqual,
+  NumberLiteral,
+  Off,
+  On,
+  Or,
   Palet,
   Paletb,
   Palets,
-  View,
-  Def,
-  Sprite,
-  Move,
-  Cut,
-  Era,
-  Position,
-  // REPL-only commands
-  List,
-  New,
-  Run,
-  Save,
-  Load,
-  Key,
-  Keylist,
-  Cont,
-  System,
+  Pause,
+  Peek,
+  Play,
+  Plus,
   // Limited utility commands
   Poke,
-  Peek,
-  Fre,
-  Inkey,
-  Stop,
-  // String functions
-  Len,
-  Left,
-  Right,
-  Mid,
-  Str,
-  Hex,
-  Chr,
-  Asc,
-  // Arithmetic functions
-  Abs,
-  Sgn,
-  Rnd,
-  Val,
-  // Controller input functions
-  Stick,
-  Strig,
-  Xpos,
-  Ypos,
-  // Cursor position functions
-  Csrlin,
   Pos,
+  Position,
+  Print,
+  Question,
+  Read,
+  Restore,
+  Return,
+  Right,
+  Rnd,
+  RParen,
+  Run,
+  Save,
   // Screen read function
   Scr,
-  // BEEP statement
-  Beep,
-  // Logical operators
-  And,
-  Or,
-  Xor,
-  Not,
-  // Comparison operators
-  GreaterThan,
-  LessThan,
-  NotEqual,
-  GreaterThanOrEqual,
-  LessThanOrEqual,
-  // Operators
-  Equal,
-  Plus,
-  Minus,
-  Multiply,
-  Divide,
-  Mod,
-  // Punctuation
-  Comma,
   Semicolon,
-  Colon,
-  LParen,
-  RParen,
-  Question,
+  Sgn,
+  Sprite,
+  Step,
+  // Controller input functions
+  Stick,
+  Stop,
+  Str,
+  Strig,
   // Literals
   StringLiteral,
-  HexLiteral,
-  NumberLiteral,
-  Identifier,
-  // Lexer
-  lexer,
-  allTokens,
+  Swap,
+  System,
+  Then,
+  To,
+  Val,
+  View,
+  Xor,
+  Xpos,
+  Ypos,
 } from './parser-tokens'
 
 // ============================================================================
@@ -1547,7 +1549,7 @@ function checkReplOnlyCommands(cst: CstNode): Array<{ message: string; line?: nu
           if (child && typeof child === 'object') {
             if ('name' in child) {
               // It's a CST node - recurse
-              traverse(child as CstNode, lineNumber)
+              traverse(child, lineNumber)
             }
             // Token objects don't need recursion
           }
@@ -1665,15 +1667,20 @@ export function parseWithChevrotain(source: string): {
       allErrors.push(
         ...parseErrors.map((err: IRecognitionException) => {
           const token = err.token
+          const column = normalizeLocationValue(token?.startColumn)
+          const length =
+            token?.endOffset != null && token?.startOffset != null
+              ? normalizeLocationValue(token.endOffset - token.startOffset)
+              : 1
           return {
             message: err.message || 'Syntax error',
             line: lineIndex + 1,
-            column: token?.startColumn,
-            length: token?.endOffset ? token.endOffset - token.startOffset : 1,
+            column,
+            length,
             location: {
               start: {
                 line: lineIndex + 1,
-                column: token?.startColumn || 1,
+                column,
               },
             },
           }
