@@ -19,7 +19,7 @@ test('IDE boots and key components mount', async ({ page }) => {
     pageErrors.push(error)
   })
 
-  await page.goto('/ide')
+  await page.goto('/#/ide')
   await page.waitForLoadState('networkidle')
 
   await expect(page.getByTestId('monaco-editor-container')).toBeVisible()
@@ -36,7 +36,7 @@ test('IDE run button is enabled and clickable', async ({ page }) => {
     pageErrors.push(error)
   })
 
-  await page.goto('/ide')
+  await page.goto('/#/ide')
   await page.waitForLoadState('networkidle')
 
   const runButton = page.getByTestId('ide-run-button')
