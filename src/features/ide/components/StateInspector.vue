@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n'
 
 import type { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
 import type { ScreenCell } from '@/core/interfaces'
-import type { MovementState, SpriteState } from '@/core/sprite/types'
+import type { SpriteState } from '@/core/sprite/types'
 import { GameBlock, GameTabPane, GameTabs } from '@/shared/components/ui'
 import { COLORS } from '@/shared/data/palette'
 
@@ -26,10 +26,6 @@ const props = withDefaults(
     cgenMode?: number
     spriteStates?: SpriteState[]
     spriteEnabled?: boolean
-    /** @deprecated Use sharedAnimationView instead - local state will be removed */
-    movementStates?: MovementState[]
-    /** @deprecated All data now read from sharedDisplayBufferAccessor */
-    movementPositionsFromBuffer?: Map<number, { x: number; y: number }>
     /** Shared display buffer accessor for reading sprite state */
     sharedDisplayBufferAccessor?: SharedDisplayBufferAccessor
   }>(),
@@ -43,8 +39,6 @@ const props = withDefaults(
     cgenMode: 2,
     spriteStates: () => [],
     spriteEnabled: false,
-    movementStates: () => [],
-    movementPositionsFromBuffer: () => new Map(),
   }
 )
 
@@ -70,8 +64,6 @@ const moveSlots = ref<MovementSlotData[]>([])
  */
 function updateMoveSlotsData(): void {
   const accessor = props.sharedDisplayBufferAccessor
-  const states = props.movementStates ?? []
-  const byAction = new Map(states.map(m => [m.actionNumber, m]))
 
   const slots: MovementSlotData[] = []
   for (let actionNumber = 0; actionNumber < MOVE_SLOT_COUNT; actionNumber++) {
@@ -88,14 +80,11 @@ function updateMoveSlotsData(): void {
     const characterType = accessor?.readSpriteCharacterType(actionNumber) ?? 0
     const colorCombination = accessor?.readSpriteColorCombination(actionNumber) ?? 0
 
-    // Fall back to local state for definition if not in buffer yet
-    const m = byAction.get(actionNumber)
     // Show slot if: active moving, OR has non-zero position
     const hasData = Boolean(isActive || (accessor && (x !== 0 || y !== 0)))
 
     slots.push({
       actionNumber,
-      m: m ?? undefined,
       hasData,
       x: Math.round(x),
       y: Math.round(y),

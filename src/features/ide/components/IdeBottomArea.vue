@@ -34,7 +34,6 @@ interface Props {
   cgenMode: number
   spriteStates: SpriteState[]
   spriteEnabled: boolean
-  movementPositionsFromBuffer: Map<number, { x: number; y: number }>
   sharedDisplayBufferAccessor: SharedDisplayBufferAccessor
 }
 
@@ -67,7 +66,6 @@ defineExpose({
         :cgen-mode="cgenMode"
         :sprite-states="spriteStates"
         :sprite-enabled="spriteEnabled"
-        :movement-positions-from-buffer="movementPositionsFromBuffer"
         :shared-display-buffer-accessor="sharedDisplayBufferAccessor"
       />
     </div>
