@@ -20,5 +20,8 @@ self.onmessage = (event: MessageEvent) => {
   worker.handleMessage(event.data)
 }
 
+// Explicit startup handshake so main thread can gate readiness.
+self.postMessage({ type: 'READY' })
+
 // Export for type checking (no runtime effect in workers)
 export {}

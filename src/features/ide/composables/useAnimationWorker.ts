@@ -12,6 +12,23 @@ import { type Ref, ref, watch } from 'vue'
 
 import type { AnimationWorkerCommand } from '@/core/workers/AnimationWorker'
 
+const ANIMATION_WORKER_READY_TIMEOUT_MS = 5000
+
+interface AnimationWorkerReadyMessage {
+  type: 'READY'
+}
+
+function isAnimationWorkerReadyMessage(data: unknown): data is AnimationWorkerReadyMessage {
+  return typeof data === 'object' && data !== null && 'type' in data && data.type === 'READY'
+}
+
+function toWorkerError(event: Event): Error {
+  if (event instanceof ErrorEvent && event.message) {
+    return new Error(`Animation Worker error: ${event.message}`)
+  }
+  return new Error('Animation Worker failed to initialize')
+}
+
 export interface UseAnimationWorkerOptions {
   sharedAnimationBuffer: Ref<SharedArrayBuffer | null>
   onReady?: () => void
@@ -36,13 +53,6 @@ export function useAnimationWorker(options: UseAnimationWorkerOptions) {
    * Initialize the Animation Worker
    */
   async function initialize(): Promise<void> {
-    console.log('[useAnimationWorker] initialize() called', {
-      isReady: isReady.value,
-      isInitializing: isInitializing.value,
-      hasBuffer: !!sharedAnimationBuffer.value,
-      bufferByteLength: sharedAnimationBuffer.value?.byteLength,
-    })
-
     if (isReady.value) {
       return
     }
@@ -55,7 +65,6 @@ export function useAnimationWorker(options: UseAnimationWorkerOptions) {
     initError.value = null
 
     try {
-      console.log('[useAnimationWorker] Creating Animation Worker...')
       // Create Animation Worker
       // Vite will bundle this automatically with the ?worker suffix pattern
       worker = new Worker(
@@ -65,28 +74,52 @@ export function useAnimationWorker(options: UseAnimationWorkerOptions) {
         }
       )
 
-      // Set up error handler
-      worker.onerror = (event) => {
-        const error = new Error(`Animation Worker error: ${event.message}`)
-        initError.value = error
-        onError?.(error)
-      }
-
-      // Wait for worker to be ready
+      // Wait for explicit READY handshake from worker.
+      const activeWorker = worker
       await new Promise<void>((resolve, reject) => {
-        if (!worker) {
+        if (!activeWorker) {
           reject(new Error('Worker failed to initialize'))
           return
         }
 
+        let settled = false
         const timeout = setTimeout(() => {
-          reject(new Error('Animation Worker initialization timeout'))
-        }, 5000)
+          if (settled) return
+          settled = true
+          cleanup()
+          reject(new Error('Animation Worker initialization timeout waiting for READY'))
+        }, ANIMATION_WORKER_READY_TIMEOUT_MS)
 
-        // Assume worker is ready immediately after creation
-        // (no handshake needed, just send the buffers)
-        clearTimeout(timeout)
-        resolve()
+        const handleError = (event: Event) => {
+          if (settled) return
+          settled = true
+          cleanup()
+          reject(toWorkerError(event))
+        }
+
+        const handleMessage = (event: MessageEvent<unknown>) => {
+          if (!isAnimationWorkerReadyMessage(event.data) || settled) {
+            return
+          }
+          settled = true
+          cleanup()
+          resolve()
+        }
+
+        const cleanup = () => {
+          clearTimeout(timeout)
+          activeWorker.removeEventListener('error', handleError)
+          activeWorker.removeEventListener('message', handleMessage)
+        }
+
+        activeWorker.addEventListener('error', handleError)
+        activeWorker.addEventListener('message', handleMessage)
+      })
+
+      worker.addEventListener('error', event => {
+        const error = toWorkerError(event)
+        initError.value = error
+        onError?.(error)
       })
 
       // Send shared buffers to animation worker (if available)
@@ -113,12 +146,6 @@ export function useAnimationWorker(options: UseAnimationWorkerOptions) {
 
   // Watch for buffer changes and send to worker when available
   watch(sharedAnimationBuffer, (newBuffer) => {
-    console.log('[useAnimationWorker] sharedAnimationBuffer changed:', {
-      isReady: isReady.value,
-      hasWorker: !!worker,
-      hasBuffer: !!newBuffer,
-      byteLength: newBuffer?.byteLength,
-    })
     if (isReady.value && worker) {
       if (newBuffer) {
         const setBufferCommand: AnimationWorkerCommand = {
@@ -126,7 +153,6 @@ export function useAnimationWorker(options: UseAnimationWorkerOptions) {
           buffer: newBuffer,
         }
         worker.postMessage(setBufferCommand)
-        console.log('[useAnimationWorker] Sent SET_SHARED_BUFFER to AnimationWorker, byteLength:', newBuffer.byteLength)
       }
     }
   })
