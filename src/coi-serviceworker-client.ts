@@ -9,7 +9,9 @@ if (typeof window !== 'undefined') {
   if (window.crossOriginIsolated === false && window.isSecureContext && 'serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
       try {
-        const registration = await navigator.serviceWorker.register('/coi-serviceworker.js')
+        const baseUrl = import.meta.env.BASE_URL ?? '/'
+        const swUrl = `${baseUrl}coi-serviceworker.js`
+        const registration = await navigator.serviceWorker.register(swUrl)
 
         if (registration.active && !navigator.serviceWorker.controller) {
           window.location.reload()
