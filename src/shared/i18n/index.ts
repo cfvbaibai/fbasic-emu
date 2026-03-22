@@ -4,6 +4,7 @@ import './vue-i18n.d.ts'
 import { createI18n } from 'vue-i18n'
 
 import enBgEditor from './locales/en/bg-editor.json'
+import enCoi from './locales/en/coi.json'
 import enCommon from './locales/en/common.json'
 import enDiagnostics from './locales/en/diagnostics.json'
 import enHome from './locales/en/home.json'
@@ -15,6 +16,7 @@ import enSoundTest from './locales/en/sound-test.json'
 import enSpriteViewer from './locales/en/sprite-viewer.json'
 import enTesting from './locales/en/testing.json'
 import jaBgEditor from './locales/ja/bg-editor.json'
+import jaCoi from './locales/ja/coi.json'
 import jaCommon from './locales/ja/common.json'
 import jaDiagnostics from './locales/ja/diagnostics.json'
 import jaHome from './locales/ja/home.json'
@@ -26,6 +28,7 @@ import jaSoundTest from './locales/ja/sound-test.json'
 import jaSpriteViewer from './locales/ja/sprite-viewer.json'
 import jaTesting from './locales/ja/testing.json'
 import zhCNBgEditor from './locales/zh-CN/bg-editor.json'
+import zhCNCoi from './locales/zh-CN/coi.json'
 import zhCNCommon from './locales/zh-CN/common.json'
 import zhCNDiagnostics from './locales/zh-CN/diagnostics.json'
 import zhCNHome from './locales/zh-CN/home.json'
@@ -37,6 +40,7 @@ import zhCNSoundTest from './locales/zh-CN/sound-test.json'
 import zhCNSpriteViewer from './locales/zh-CN/sprite-viewer.json'
 import zhCNTesting from './locales/zh-CN/testing.json'
 import zhTWBgEditor from './locales/zh-TW/bg-editor.json'
+import zhTWCoi from './locales/zh-TW/coi.json'
 import zhTWCommon from './locales/zh-TW/common.json'
 import zhTWDiagnostics from './locales/zh-TW/diagnostics.json'
 import zhTWHome from './locales/zh-TW/home.json'
@@ -85,6 +89,7 @@ const i18n = createI18n<{ message: MessageSchema }, Locale>({
       imageAnalyzer: enImageAnalyzer,
       monacoEditor: enMonacoEditor,
       bgEditor: enBgEditor,
+      coi: enCoi,
       soundTest: enSoundTest,
       diagnostics: enDiagnostics,
       testing: enTesting,
@@ -98,6 +103,7 @@ const i18n = createI18n<{ message: MessageSchema }, Locale>({
       imageAnalyzer: jaImageAnalyzer,
       monacoEditor: jaMonacoEditor,
       bgEditor: jaBgEditor,
+      coi: jaCoi,
       soundTest: jaSoundTest,
       diagnostics: jaDiagnostics,
       testing: jaTesting,
@@ -111,6 +117,7 @@ const i18n = createI18n<{ message: MessageSchema }, Locale>({
       imageAnalyzer: zhCNImageAnalyzer,
       monacoEditor: zhCNMonacoEditor,
       bgEditor: zhCNBgEditor,
+      coi: zhCNCoi,
       soundTest: zhCNSoundTest,
       diagnostics: zhCNDiagnostics,
       testing: zhCNTesting,
@@ -124,6 +131,7 @@ const i18n = createI18n<{ message: MessageSchema }, Locale>({
       imageAnalyzer: zhTWImageAnalyzer,
       monacoEditor: zhTWMonacoEditor,
       bgEditor: zhTWBgEditor,
+      coi: zhTWCoi,
       soundTest: zhTWSoundTest,
       diagnostics: zhTWDiagnostics,
       testing: zhTWTesting,

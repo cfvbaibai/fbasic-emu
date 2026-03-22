@@ -6,6 +6,7 @@
  */
 
 import type enBgEditor from './locales/en/bg-editor.json'
+import type enCoi from './locales/en/coi.json'
 import type enCommon from './locales/en/common.json'
 import type enDiagnostics from './locales/en/diagnostics.json'
 import type enHome from './locales/en/home.json'
@@ -27,6 +28,7 @@ export type MessageSchema = {
   imageAnalyzer: typeof enImageAnalyzer
   monacoEditor: typeof enMonacoEditor
   bgEditor: typeof enBgEditor
+  coi: typeof enCoi
   soundTest: typeof enSoundTest
   diagnostics: typeof enDiagnostics
   testing: typeof enTesting

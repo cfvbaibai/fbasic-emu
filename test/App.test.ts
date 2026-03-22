@@ -9,6 +9,7 @@ import { reloadPage } from '@/shared/utils/reloadPage'
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
     locale: ref('en'),
+    t: (key: string) => key,
   }),
 }))
 
@@ -103,7 +104,7 @@ describe('App', () => {
 
     const dismissButton = wrapper
       .findAll('button')
-      .find(button => button.text().trim() === 'Dismiss')
+      .find(button => button.text().trim() === 'coi.warning.dismiss')
     expect(dismissButton).toBeTruthy()
 
     await dismissButton!.trigger('click')
@@ -125,7 +126,7 @@ describe('App', () => {
 
     const reloadButton = wrapper
       .findAll('button')
-      .find(button => button.text().trim() === 'Reload')
+      .find(button => button.text().trim() === 'coi.warning.reload')
     expect(reloadButton).toBeTruthy()
 
     await reloadButton!.trigger('click')
