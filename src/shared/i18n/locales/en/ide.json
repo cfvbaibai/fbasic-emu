@@ -3,7 +3,8 @@
   "toolbar": {
     "new": "New",
     "import": "Import",
-    "export": "Export"
+    "export": "Export",
+    "discardConfirm": "Discard unsaved changes?"
   },
   "codeEditor": {
     "title": "Code Editor",

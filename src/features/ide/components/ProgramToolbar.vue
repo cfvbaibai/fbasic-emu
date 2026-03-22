@@ -21,7 +21,7 @@ const nameInputEl = useTemplateRef<HTMLInputElement>('nameInputEl')
 // Confirm dialog for unsaved changes
 function confirmDiscard(): boolean {
   if (!programStore.isDirty.value) return true
-  return confirm('Discard unsaved changes?')
+  return confirm(t('ide.toolbar.discardConfirm'))
 }
 
 // File operations

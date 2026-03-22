@@ -3,7 +3,8 @@
   "toolbar": {
     "new": "新規",
     "import": "インポート",
-    "export": "エクスポート"
+    "export": "エクスポート",
+    "discardConfirm": "未保存の変更を破棄しますか？"
   },
   "codeEditor": {
     "title": "コードエディター",
