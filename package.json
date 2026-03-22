@@ -11,6 +11,7 @@
         "build": "vue-tsc && vite build",
         "preview": "vite preview",
         "preview:spa": "serve -s dist -l 4317",
+        "preview:vite": "vite preview --port 4318 --host 127.0.0.1",
         "lint": "eslint . --fix && pnpm lint:style",
         "lint:style": "stylelint \"src/**/*.{css,vue}\"",
         "type-check": "vue-tsc --noEmit",
@@ -18,6 +19,7 @@
         "test:ui": "vitest --ui",
         "test:run": "vitest run",
         "test:e2e": "playwright test",
+        "test:built-preview": "playwright test --config=playwright.config.preview.ts",
         "test:run:parallel": "vitest run --pool=forks --poolOptions.forks.maxForks=8",
         "test:run:threads": "vitest run --pool=threads --poolOptions.threads.maxThreads=8",
         "test:run:single": "vitest run --pool=forks --poolOptions.forks.singleFork=true",
@@ -31,6 +33,7 @@
         "check-syntax": "tsx scripts/validation/check-syntax.ts",
         "verify:script-entrypoints": "tsx scripts/validation/verify-script-entrypoints.ts",
         "verify:build-no-unresolved-assets": "tsx scripts/validation/check-unresolved-assets.ts",
+        "verify:build-warnings": "tsx scripts/validation/check-build-warnings.ts",
         "verify:gates": "pnpm check-syntax && pnpm verify:script-entrypoints && pnpm verify:build-no-unresolved-assets",
         "verify:build-size-budgets": "node scripts/validation/check-build-size-budgets.mjs"
     },
