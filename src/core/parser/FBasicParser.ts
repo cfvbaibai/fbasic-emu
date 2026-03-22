@@ -10,14 +10,7 @@ import type { CstNode } from 'chevrotain'
 import type { ParserInfo } from '@/core/interfaces'
 
 import { parseWithChevrotain } from './FBasicChevrotainParser'
-
-function normalizeLocationValue(value: number | undefined, fallback = 1): number {
-  if (typeof value !== 'number' || !Number.isFinite(value)) {
-    return fallback
-  }
-  const normalized = Math.floor(value)
-  return normalized >= 1 ? normalized : fallback
-}
+import { normalizeLocationValue } from './normalizeLocationValue'
 
 /**
  * Parser error interface
