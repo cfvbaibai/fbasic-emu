@@ -40,11 +40,6 @@ export function useMovementStateSync(options: UseMovementStateSyncOptions) {
   watch(
     movementStatesFromBuffer,
     (newStates) => {
-      console.log('[useMovementStateSync] movementStates from buffer changed', {
-        newStatesCount: newStates.length,
-        actionNumbers: newStates.map(m => m.actionNumber),
-      })
-
       if (newStates.length === 0) {
         localMovementStates.value = []
         return
@@ -57,13 +52,8 @@ export function useMovementStateSync(options: UseMovementStateSyncOptions) {
         isActive: false, // Will be synced from buffer by animation loop
       }))
 
-      console.log('[useMovementStateSync] After sync, localMovementStates', {
-        total: localMovementStates.value.length,
-      })
-
       // Trigger callback after sync
       if (onSync) {
-        console.log('[useMovementStateSync] Calling onSync callback')
         onSync()
       }
     },
