@@ -30,6 +30,19 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id: string) {
+          // NOTE:
+          // A prior issue requested splitting Monaco into many chunks to reduce
+          // the initial bundle size. However, production builds started
+          // throwing "ReferenceError: Cannot access 'z' before initialization"
+          // from monaco-base-common-observableInternal, which does not repro in
+          // dev server. Rollup warned about circular Monaco chunk graphs, and
+          // the error only appears in built preview and GitHub Pages.
+          //
+          // To keep production stable, we intentionally collapse all Monaco
+          // modules into a single "monaco" chunk. This avoids circular chunk
+          // ordering/TDZ issues at runtime. If we want to re-split in the
+          // future, we should do it with a tested chunk map that does not
+          // introduce cycles and verify against built preview + Pages.
           if (id.includes('/node_modules/monaco-editor/esm/vs/')) {
             return 'monaco'
           }
