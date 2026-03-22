@@ -25,7 +25,28 @@ defineOptions({
 const { locale } = useI18n()
 const showCoiWarning = ref(false)
 
+const isE2ELiteMode = () => {
+  if (typeof window === 'undefined') {
+    return false
+  }
+
+  return new URLSearchParams(window.location.search).get('e2e') === 'lite'
+}
+
+const syncCoiWarningFromEnvironment = () => {
+  if (typeof window === 'undefined' || isE2ELiteMode()) {
+    showCoiWarning.value = false
+    return
+  }
+
+  showCoiWarning.value = window.crossOriginIsolated === false
+}
+
 const handleCoiServiceWorkerRegistrationFailed = (event: Event) => {
+  if (isE2ELiteMode()) {
+    return
+  }
+
   const customEvent = event as CustomEvent<CoiServiceWorkerRegistrationFailedDetail>
   if (customEvent.detail?.errorMessage) {
     showCoiWarning.value = true
@@ -51,6 +72,7 @@ watch(
 )
 
 onMounted(() => {
+  syncCoiWarningFromEnvironment()
   window.addEventListener(COI_SERVICE_WORKER_REGISTRATION_FAILED_EVENT, handleCoiServiceWorkerRegistrationFailed)
 })
 
