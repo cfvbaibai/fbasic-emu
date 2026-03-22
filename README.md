@@ -67,7 +67,7 @@ GitHub Pages deployment is automated via `.github/workflows/deploy-pages.yml`:
 - Build command: `pnpm vite build`
 - Base path: `VITE_BASE_PATH=/fbasic-ide/`
 - Publish directory: `dist`
-- SPA fallback: `dist/404.html` mirrors `dist/index.html` for refresh-safe routing
+- SPA fallback: Hash-based routing (no server-side 404 handling needed)
 
 ## Dev Debug Toggles
 
