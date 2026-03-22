@@ -403,7 +403,6 @@ function toggleInputMode() {
         :cgen-mode="cgenMode"
         :sprite-states="spriteStates"
         :sprite-enabled="spriteEnabled"
-        :movement-positions-from-buffer="movementPositionsFromBuffer"
         :shared-display-buffer-accessor="sharedDisplayBufferAccessor"
       />
 

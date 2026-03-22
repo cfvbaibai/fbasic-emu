@@ -1,12 +1,10 @@
 <script setup lang="ts">
-import type { MovementState } from '@/core/sprite/types'
 import { GameIcon } from '@/shared/components/ui'
 import { MoveCharacterCode } from '@/shared/data/types'
 
 /** Single movement slot data for display in StateInspector */
 export interface MovementSlotData {
   actionNumber: number
-  m: MovementState | undefined
   hasData: boolean
   x: number
   y: number
@@ -73,12 +71,12 @@ function characterTypeLabel(code: number): string {
       <span class="move-card-id" title="Action number">
         <span>{{ slot.actionNumber }}</span>
       </span>
-      <template v-if="slot.hasData || slot.m">
+      <template v-if="slot.hasData">
         <span
           class="move-card-char"
-          :title="characterTypeLabel(slot.characterType || slot.m?.definition.characterType || 0)"
+          :title="characterTypeLabel(slot.characterType)"
         >
-          {{ characterTypeLabel(slot.characterType || slot.m?.definition.characterType || 0).slice(0, 5) }}
+          {{ characterTypeLabel(slot.characterType).slice(0, 5) }}
         </span>
         <span class="move-card-status" :title="slot.isActive ? 'Active' : 'Paused'">
           <GameIcon
@@ -89,11 +87,11 @@ function characterTypeLabel(code: number): string {
         </span>
         <span
           class="move-card-dir"
-          :title="directionTitle(slot.direction || slot.m?.definition.direction || 0)"
-          :aria-label="`direction ${directionTitle(slot.direction || slot.m?.definition.direction || 0)}`"
+          :title="directionTitle(slot.direction)"
+          :aria-label="`direction ${directionTitle(slot.direction)}`"
         >
           <GameIcon
-            :icon="directionIcon(slot.direction || slot.m?.definition.direction || 0)"
+            :icon="directionIcon(slot.direction)"
             size="small"
             class="move-card-icon"
           />
@@ -103,34 +101,34 @@ function characterTypeLabel(code: number): string {
     <div class="move-card-body">
       <div class="move-card-cell">
         <GameIcon
-          v-if="slot.hasData || slot.m"
+          v-if="slot.hasData"
           icon="mdi:crosshairs-gps"
           size="small"
           class="move-card-icon"
         />
         <span class="move-card-value">
-          {{ (slot.hasData || slot.m) ? `${slot.x},${slot.y}` : '' }}
+          {{ slot.hasData ? `${slot.x},${slot.y}` : '' }}
         </span>
       </div>
       <div class="move-card-cell move-card-cell-left">
         <GameIcon
-          v-if="slot.hasData || slot.m"
+          v-if="slot.hasData"
           icon="mdi:ruler"
           size="small"
           class="move-card-icon"
         />
         <span class="move-card-value">
-          {{ (slot.hasData || slot.m) ? Math.round(slot.remainingDistance) : '' }}
+          {{ slot.hasData ? Math.round(slot.remainingDistance) : '' }}
         </span>
       </div>
       <div class="move-card-cell move-card-cell-right">
         <GameIcon
-          v-if="slot.hasData || slot.m"
+          v-if="slot.hasData"
           icon="mdi:speedometer"
           size="small"
           class="move-card-icon"
         />
-        <span class="move-card-value">{{ (slot.hasData || slot.m) ? slot.speed : '' }}</span>
+        <span class="move-card-value">{{ slot.hasData ? slot.speed : '' }}</span>
       </div>
     </div>
   </div>
