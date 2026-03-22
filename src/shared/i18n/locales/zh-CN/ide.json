@@ -42,7 +42,18 @@
     "spriteTest": "Sprite测试",
     "moveTest": "移动测试",
     "testMoveControl": "移动控制测试",
-    "inputDemo": "INPUT / LINPUT"
+    "inputDemo": "INPUT / LINPUT",
+    "bgIndicatorTitle": "\u5305\u542b BG \u6570\u636e",
+    "categories": {
+      "basics": "\u57fa\u7840",
+      "control": "\u6d41\u7a0b\u63a7\u5236",
+      "data": "\u6570\u636e\u4e0e\u6570\u7ec4",
+      "screen": "\u5c4f\u5e55",
+      "sprites": "\u7cbe\u7075",
+      "interactive": "\u4ea4\u4e92",
+      "comprehensive": "\u5b8c\u6574\u6f14\u793a",
+      "music": "\u97f3\u4e50"
+    }
   },
   "input": {
     "submit": "确定",

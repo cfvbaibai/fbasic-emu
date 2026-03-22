@@ -52,16 +52,10 @@ const selectedCategory = ref<string>('basics')
 
 const samplesInCategory = computed(() => categories.value.get(selectedCategory.value) ?? [])
 
-// Category display names
-const categoryNames: Record<string, string> = {
-  basics: 'Basics',
-  control: 'Control Flow',
-  data: 'Data & Arrays',
-  screen: 'Screen',
-  sprites: 'Sprites',
-  interactive: 'Interactive',
-  comprehensive: 'Full Demo',
-  music: 'Music',
+const getCategoryName = (category: string): string => {
+  const key = `ide.samples.categories.${category}`
+  const translated = t(key)
+  return translated === key ? category : translated
 }
 
 // Category colors for visual distinction
@@ -97,7 +91,7 @@ const categoryColors: Record<string, string> = {
           :style="selectedCategory === cat ? { borderColor: categoryColors[cat] } : {}"
           @click="selectedCategory = cat"
         >
-          {{ categoryNames[cat] || cat }}
+          {{ getCategoryName(cat) }}
         </button>
       </div>
 
@@ -112,13 +106,19 @@ const categoryColors: Record<string, string> = {
           <div class="sample-card-header">
             <h3 class="sample-card-name">
               {{ sample.name }}
-              <span v-if="sample.hasBg" class="bg-indicator" title="Includes BG data">BG</span>
+              <span
+                v-if="sample.hasBg"
+                class="bg-indicator"
+                :title="t('ide.samples.bgIndicatorTitle', 'Includes BG data')"
+              >
+                BG
+              </span>
             </h3>
             <span
               class="sample-card-tag"
               :style="{ backgroundColor: categoryColors[selectedCategory] }"
             >
-              {{ categoryNames[selectedCategory] || selectedCategory }}
+              {{ getCategoryName(selectedCategory) }}
             </span>
           </div>
           <p class="sample-card-desc">{{ sample.description }}</p>

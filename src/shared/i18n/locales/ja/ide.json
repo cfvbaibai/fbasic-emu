@@ -42,7 +42,18 @@
     "spriteTest": "スプライトテスト",
     "moveTest": "移動テスト",
     "testMoveControl": "移動制御テスト",
-    "inputDemo": "INPUT / LINPUT"
+    "inputDemo": "INPUT / LINPUT",
+    "bgIndicatorTitle": "BG\u30c7\u30fc\u30bf\u3092\u542b\u3080",
+    "categories": {
+      "basics": "\u57fa\u672c",
+      "control": "\u5236\u5fa1\u30d5\u30ed\u30fc",
+      "data": "\u30c7\u30fc\u30bf\u3068\u914d\u5217",
+      "screen": "\u753b\u9762",
+      "sprites": "\u30b9\u30d7\u30e9\u30a4\u30c8",
+      "interactive": "\u30a4\u30f3\u30bf\u30e9\u30af\u30c6\u30a3\u30d6",
+      "comprehensive": "\u30d5\u30eb\u30c7\u30e2",
+      "music": "\u97f3\u697d"
+    }
   },
   "input": {
     "submit": "OK",

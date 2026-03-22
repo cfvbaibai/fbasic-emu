@@ -38,6 +38,17 @@
     "gaming": "Joystick Test",
     "complex": "Complex",
     "comprehensive": "Full Demo",
+    "bgIndicatorTitle": "Includes BG data",
+    "categories": {
+      "basics": "Basics",
+      "control": "Control Flow",
+      "data": "Data & Arrays",
+      "screen": "Screen",
+      "sprites": "Sprites",
+      "interactive": "Interactive",
+      "comprehensive": "Full Demo",
+      "music": "Music"
+    },
     "allChars": "All Chars",
     "spriteTest": "Sprite Test",
     "moveTest": "Move Test",
