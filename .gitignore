@@ -102,3 +102,6 @@ test-results/
 !.automation/
 !.automation/.gitkeep
 !.automation/README.md
+
+# AI temp scripts/files
+.ai-temp/

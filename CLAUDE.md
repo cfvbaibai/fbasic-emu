@@ -1,4 +1,4 @@
-# CLAUDE.md
+﻿# CLAUDE.md
 
 AI-first configuration for the Family Basic IDE codebase.
 
@@ -35,10 +35,10 @@ Tech lead will:
 
 ## Teams
 
-- **Parser** (`/parser`) - Grammar, CST, Chevrotain → `src/core/parser/`
-- **Runtime** (`/runtime`) - Executors, state, expressions → `src/core/execution/`, `src/core/evaluation/`, `src/core/state/`
-- **UI** (`/ui`) - Vue, IDE, theming → `src/features/`, `src/shared/`
-- **Platform** (`/platform`) - Devices, sprites, animation → `src/core/animation/`, `src/core/sprite/`, `src/core/devices/`
+- **Parser** (`/parser`) - Grammar, CST, Chevrotain 鈫?`src/core/parser/`
+- **Runtime** (`/runtime`) - Executors, state, expressions 鈫?`src/core/execution/`, `src/core/evaluation/`, `src/core/state/`
+- **UI** (`/ui`) - Vue, IDE, theming 鈫?`src/features/`, `src/shared/`
+- **Platform** (`/platform`) - Devices, sprites, animation 鈫?`src/core/animation/`, `src/core/sprite/`, `src/core/devices/`
 
 Each team context: `docs/teams/<team>-team.md`
 
@@ -74,3 +74,7 @@ Use `/commit` command. Format: `feat:`, `fix:`, `refactor:`, `chore:`, `docs:`
 - `docs/reference/` - F-BASIC language manual
 - `docs/roadmap.md` - Active work planning
 - `docs/debugging-best-practices.md` - **Read before investigating bugs**
+
+## AI Temp Files
+All AI-generated temporary scripts/files should be placed in .ai-temp/ and not committed.
+
