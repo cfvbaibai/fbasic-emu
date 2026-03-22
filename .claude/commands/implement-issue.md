@@ -1,0 +1,239 @@
+# Implement Issue
+
+Autonomous issue implementation. This command orchestrates GitHub/git operations and delegates all code changes to `/lead` and specialist agents.
+
+## References
+
+- Prerequisites & config: `_shared/automation-conventions.md`
+- Paths: `_shared/path-conventions.md`
+- GitHub ops: `_shared/github-operations.md`
+- Self-improvement: `_shared/self-improvement-protocol.md`
+
+## Phase 0 — Prerequisites
+
+Follow `_shared/automation-conventions.md` prerequisites.
+
+## Phase 1 — Sync & Scan
+
+```bash
+git fetch origin master
+git merge --ff-only origin/master 2>/dev/null || echo "DIVERGED"
+```
+
+Update `config.md` with new `last_sync_commit` hash.
+
+If DIVERGED, do NOT rebase/reset. Base all work on `origin/master` explicitly.
+
+Check open PRs for maintenance needs (in this priority order):
+
+```bash
+gh pr list --json number,title,state,headRefName,baseRefName,mergeable,statusCheckRollup,reviews --state OPEN --limit 20
+```
+
+### PR Maintenance (stop after handling one if found)
+
+1. **Merge conflicts**: Any PR with `mergeable: CONFLICTING` → rebase on origin/master in the PR's existing worktree (or `worktrees/`), force push, report
+2. **Failing CI**: Any PR with failing check runs → `/lead` investigate and fix in worktree, push, report
+3. **Changes requested**: Any PR with review state `CHANGES_REQUESTED` or comments containing "REQUEST CHANGES" / "Request Change" → `/lead` address concerns in worktree, push, report
+
+**Important**: Before pushing any PR maintenance fix, always rebase the PR branch onto latest `origin/master`. CI runs on the merge commit, so the branch must be up-to-date with master to avoid phantom failures.
+
+If any PR was handled above, **stop here**. Write PR memory, run log, and report. Do not start new issue work.
+
+## Phase 2 — Pick Issue
+
+Query triaged, unassigned issues sorted by priority:
+
+```bash
+gh issue list --label triage --state open --json number,title,labels,assignees,body --limit 20
+```
+
+If no triaged issues exist, try all open unassigned issues:
+
+```bash
+gh issue list --state open --search "no:assignee" --json number,title,labels,body --limit 20
+```
+
+Select the **highest-priority unassigned** issue:
+- Prefer issues with `P1` or `P2` labels
+- Among same priority, prefer bugs over enhancements
+- Scan `~/.claude/automations/fbasic-ide/memory/issues/` for existing `issue-*.md` files to avoid re-picking
+
+If no suitable issue found, report "no issues to implement" and stop.
+
+## Phase 3 — Worktree Setup
+
+Before creating a worktree, check for collisions (existing worktrees for the same branch or from Codex):
+
+```bash
+# Check if branch already exists as a worktree
+git -c safe.directory="$(pwd)" worktree list | grep "$BRANCH"
+```
+
+If a worktree already exists for this branch, reuse it. If it exists but is stale (directory missing), prune it first.
+
+Create a worktree under the automation directory:
+
+```bash
+# Branch name: fix/issue-{N}-short-description or feat/issue-{N}-short-description
+BRANCH="fix/issue-${ISSUE_NUM}-$(echo "$ISSUE_TITLE" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | cut -c1-40)"
+
+# Worktree path — single folder named by issue ID
+WT_PATH="$HOME/.claude/automations/fbasic-ide/worktrees/${ISSUE_NUM}"
+
+# Clean up stale worktree entry if directory doesn't exist
+if [ ! -d "$WT_PATH" ]; then
+  git -c safe.directory="$(pwd)" worktree prune
+fi
+
+# Create worktree on origin/master
+git -c safe.directory="$(pwd)" worktree add -b "$BRANCH" "$WT_PATH" origin/master
+```
+
+Update `config.md` `active_worktrees` with the new worktree path.
+
+## Phase 4 — Delegate to /lead
+
+**Do NOT implement any code yourself.** Spawn a sub-agent via the `Agent` tool (not the `Skill` tool) with `subagent_type="general-purpose"`. This keeps the pipeline context intact — the Skill tool would replace your context with `/lead`'s instructions, causing the pipeline to lose momentum at this boundary.
+
+Agent prompt:
+
+```
+Invoke the /lead skill, then pass the following task to it:
+
+Fix issue #${ISSUE_NUM}: ${ISSUE_TITLE}
+
+Issue URL: ${ISSUE_URL}
+Issue body: ${ISSUE_BODY}
+
+Working directory: ${WT_PATH}
+
+This worktree contains a fresh checkout of origin/master. All implementation must happen inside this worktree.
+
+After implementation, run targeted tests for the files you changed:
+  cd ${WT_PATH} && pnpm install --frozen-lockfile && pnpm -s test:run -- <relevant-test-paths>
+
+Also always run eslint with --fix on changed files to catch and auto-fix lint errors before committing:
+  cd ${WT_PATH} && pnpm exec eslint --fix <changed-files> && git diff --exit-code  # fail if fix changed files (need to amend)
+
+Do NOT run full lint/test/build unless the change scope warrants it. Do NOT commit — I will handle the commit and PR.
+
+When done, report back: (1) root cause, (2) files changed, (3) test results.
+```
+
+When the sub-agent returns, **proceed immediately to Phase 5** without outputting a summary or stopping.
+
+## Phase 5 — Commit & PR
+
+```bash
+cd "$WT_PATH"
+
+# Single-commit squash rule
+git add <changed-files>
+git commit -m "fix: resolve #${ISSUE_NUM} - <short description>
+
+Closes #${ISSUE_NUM}
+
+Co-Authored-By: Claude <noreply@anthropic.com>"
+
+git push -u origin "$BRANCH"
+```
+
+Create/update PR:
+
+```bash
+gh pr create --title "fix: resolve #${ISSUE_NUM} - <short description>" \
+  --body "$(cat <<'EOF'
+## Summary
+- Fixes #${ISSUE_NUM}
+
+## Changes
+- <list key changes from specialist output>
+
+## Test plan
+- [ ] Targeted tests pass
+- [ ] CI passes
+EOF
+)" --base master --head "$BRANCH"
+```
+
+## Phase 6 — Cleanup
+
+After PR is created/updated, remove the worktree defensively (Windows worktree removal is unreliable):
+
+```bash
+# Remove worktree — may fail on Windows, use fallback
+git -c safe.directory="$(pwd)" worktree remove "$WT_PATH" --force 2>/dev/null
+git -c safe.directory="$(pwd)" worktree prune 2>/dev/null
+rm -rf "$WT_PATH" 2>/dev/null
+```
+
+Branch stays on remote for CI.
+
+**Always** update `config.md` to remove the worktree from `active_worktrees`, even if removal partially failed.
+
+## Phase 7 — Report
+
+Write memory, run log, and report following `_shared/path-conventions.md`:
+
+**Issue memory** — `memory/issues/issue-{N}.md`:
+```markdown
+# Issue #N
+- Title: <title>
+- Priority: <P1/P2/P3>
+- Status: pr-open
+- PR: <url>
+- Picked: YYYY-MM-DD
+- Root cause: <brief>
+- Fix: <brief>
+- Files: <list>
+```
+
+**Report** — `reports/YYYY-MM/YYYY-MM-DD.md`:
+```markdown
+# Implement Issue Run — YYYY-MM-DD
+
+## Issue
+- **#N**: <title> (<priority>)
+- **URL**: <issue URL>
+
+## Root Cause
+<detailed explanation from specialist>
+
+## Fix
+<detailed explanation from specialist>
+
+## Files Changed
+- <file> (<change summary>)
+
+## Validation
+- <test commands and results from specialist>
+
+## CI Status
+- <CI check results>
+
+## PR
+- **URL**: <PR URL>
+```
+
+**Update config.md** — increment `total_runs`, `total_issues_implemented` or `total_pr_maintenance`.
+
+Print a summary to the user with issue link, PR link, and key details.
+
+## Phase 8 — Self-Improvement
+
+Follow `_shared/self-improvement-protocol.md`. Focus on:
+- Worktree failures or collision handling
+- Wrong issue picked or specialist confusion
+- CI surprises or PR merge issues
+- Phase gaps or deviations from documented flow
+
+## Important Rules
+
+- **Never implement code directly** — always delegate to `/lead` and specialist agents
+- **Never modify the main repo directory** — all work in worktree
+- **Single-commit rule** — squash to exactly one commit before pushing
+- **Targeted validation only** — don't run full test suite for narrow changes
+- **GitHub CI is the merge gate** — report CI status but don't block on unrelated failures
+- **Stop after one issue** — handle one issue per run
+- **PR title must include issue number** and use closing keyword `Closes #N`
