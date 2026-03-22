@@ -45,6 +45,9 @@ jobs:
           VITE_BASE_PATH: /fbasic-ide/
         run: pnpm vite build
 
+      - name: Check for critical build warnings
+        run: pnpm verify:build-warnings -- --with-base
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
         with:
