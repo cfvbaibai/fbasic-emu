@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 
 test('ide run/stop buttons toggle state', async ({ page }) => {
-  await page.goto('/ide?e2e=lite')
+  await page.goto('/#/ide?e2e=lite')
 
   const runButton = page.getByTestId('ide-run-button')
   const stopButton = page.getByTestId('ide-stop-button')
