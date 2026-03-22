@@ -80,32 +80,7 @@ export function useBasicIde() {
   }
 
   const debugBuffer = () => {
-    const accessor = screen.sharedDisplayBufferAccessor
-    console.group('🔍 Shared Animation/Sprite Buffer')
-
-    // Show ALL sprite slots (0-7), no filtering
-    for (let i = 0; i < 8; i++) {
-      console.log(`Sprite ${i}:`, {
-        actionNumber: i,
-        position: accessor.readSpritePosition(i),
-        isActive: accessor.readSpriteIsActive(i),
-        isVisible: accessor.readSpriteIsVisible(i),
-        frameIndex: accessor.readSpriteFrameIndex(i),
-        remainingDistance: accessor.readSpriteRemainingDistance(i),
-        totalDistance: accessor.readSpriteTotalDistance(i),
-        direction: accessor.readSpriteDirection(i),
-        speed: accessor.readSpriteSpeed(i),
-        priority: accessor.readSpritePriority(i),
-        characterType: accessor.readSpriteCharacterType(i),
-        colorCombination: accessor.readSpriteColorCombination(i),
-      })
-    }
-
-    // Show sync command state
-    const syncCommand = accessor.readSyncCommand()
-    console.log('Sync Command:', syncCommand ?? '(none)')
-
-    console.groupEnd()
+    // no-op: console.log debug output removed; retained for API compatibility
   }
 
   watch(
