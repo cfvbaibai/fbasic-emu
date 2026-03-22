@@ -11,6 +11,7 @@
 import { type Ref, ref, watch } from 'vue'
 
 import type { AnimationWorkerCommand } from '@/core/workers/AnimationWorker'
+import { logComposable } from '@/shared/logger'
 
 const ANIMATION_WORKER_READY_TIMEOUT_MS = 5000
 
@@ -53,6 +54,13 @@ export function useAnimationWorker(options: UseAnimationWorkerOptions) {
    * Initialize the Animation Worker
    */
   async function initialize(): Promise<void> {
+    logComposable.debug('[useAnimationWorker] initialize() called', {
+      isReady: isReady.value,
+      isInitializing: isInitializing.value,
+      hasBuffer: !!sharedAnimationBuffer.value,
+      bufferByteLength: sharedAnimationBuffer.value?.byteLength,
+    })
+
     if (isReady.value) {
       return
     }
@@ -65,6 +73,8 @@ export function useAnimationWorker(options: UseAnimationWorkerOptions) {
     initError.value = null
 
     try {
+      logComposable.debug('[useAnimationWorker] Creating Animation Worker...')
+
       // Create Animation Worker
       // Vite will bundle this automatically with the ?worker suffix pattern
       worker = new Worker(
@@ -146,6 +156,12 @@ export function useAnimationWorker(options: UseAnimationWorkerOptions) {
 
   // Watch for buffer changes and send to worker when available
   watch(sharedAnimationBuffer, (newBuffer) => {
+    logComposable.debug('[useAnimationWorker] sharedAnimationBuffer changed:', {
+      isReady: isReady.value,
+      hasWorker: !!worker,
+      hasBuffer: !!newBuffer,
+      byteLength: newBuffer?.byteLength,
+    })
     if (isReady.value && worker) {
       if (newBuffer) {
         const setBufferCommand: AnimationWorkerCommand = {
@@ -153,6 +169,7 @@ export function useAnimationWorker(options: UseAnimationWorkerOptions) {
           buffer: newBuffer,
         }
         worker.postMessage(setBufferCommand)
+        logComposable.debug('[useAnimationWorker] Sent SET_SHARED_BUFFER to AnimationWorker, byteLength:', newBuffer.byteLength)
       }
     }
   })

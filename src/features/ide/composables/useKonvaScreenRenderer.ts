@@ -9,6 +9,7 @@ import type { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplay
 import type { ScreenCell } from '@/core/interfaces'
 import type { SpriteState } from '@/core/sprite/types'
 import { COLORS } from '@/shared/data/palette'
+import { logScreen } from '@/shared/logger'
 
 import {
   clearBackgroundTileCache,
@@ -63,7 +64,7 @@ export function initializeKonvaLayers(stage: Konva.Stage): KonvaScreenLayers {
   layers.spriteFrontLayer = new Konva.Layer()
   stage.add(layers.spriteFrontLayer)
 
-  console.log('[initializeKonvaLayers] Created layers:', {
+  logScreen.debug('[initializeKonvaLayers] Created layers:', {
     stageChildren: stage.getChildren().length,
   })
 
@@ -192,7 +193,7 @@ export async function renderSpriteLayer(
     movementsToRender.push(actionNumber)
   }
 
-  console.log('[renderSpriteLayer] Rendering', {
+  logScreen.debug('[renderSpriteLayer] Rendering', {
     priority,
     movementsToRender: movementsToRender.length,
     actions: movementsToRender,
@@ -201,7 +202,7 @@ export async function renderSpriteLayer(
   for (const actionNumber of movementsToRender) {
     // Render animated sprite (DEF MOVE) - both active and stopped movements
     const konvaImage = await createAnimatedSpriteKonvaImage(actionNumber, spritePaletteCode, accessor)
-    console.log('[renderSpriteLayer] After createAnimatedSpriteKonvaImage:', {
+    logScreen.debug('[renderSpriteLayer] After createAnimatedSpriteKonvaImage:', {
       action: actionNumber,
       hasImage: !!konvaImage,
       x: konvaImage?.x() ?? 'null',
@@ -219,7 +220,12 @@ export async function renderSpriteLayer(
     }
   }
 
-  console.log('[renderSpriteLayer] Before layer.batchDraw(), nodeMap size:', nodeMap.size, 'layer children:', layer.getChildren().length)
+  logScreen.debug(
+    '[renderSpriteLayer] Before layer.batchDraw(), nodeMap size:',
+    nodeMap.size,
+    'layer children:',
+    layer.getChildren().length
+  )
   // Draw the layer using batchDraw() for better performance with multiple sprite updates
   layer.batchDraw()
 
@@ -343,15 +349,6 @@ export async function renderAllScreenLayers(
 }> {
   const backgroundOnly = options?.backgroundOnly ?? false
   // lastBackgroundBuffer kept for API compatibility (background is now Canvas2D)
-
-  // Commented out to reduce log flooding
-  // console.log('[renderAllScreenLayers] Called with', {
-  //   backgroundOnly,
-  //   spriteStatesCount: spriteStates.length,
-  //   hasFrontLayer: !!layers.spriteFrontLayer,
-  //   hasBackLayer: !!layers.spriteBackLayer,
-  //   spriteEnabled,
-  // })
 
   // 1. Render backdrop layer (if layer exists, otherwise handled by template)
   if (layers.backdropLayer) {
