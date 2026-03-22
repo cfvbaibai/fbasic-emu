@@ -3,7 +3,8 @@
   "toolbar": {
     "new": "新建",
     "import": "导入",
-    "export": "导出"
+    "export": "导出",
+    "discardConfirm": "是否放弃未保存的更改？"
   },
   "codeEditor": {
     "title": "代码编辑器",
