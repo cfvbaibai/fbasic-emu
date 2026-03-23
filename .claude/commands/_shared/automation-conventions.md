@@ -40,6 +40,11 @@ Every command follows this structure:
 2. **Main Work** — command-specific logic
 3. **Report** — write run log and summary report
 4. **Self-Improvement** — reflect, update command, record improvements (see `_shared/self-improvement-protocol.md`)
+5. **Context Compact** — run `/compact` to compress accumulated context
+
+## Context Compact
+
+After every iteration (all 4 phases above complete), run `/compact` to compress the conversation context. This prevents context window overflow on non-Claude models that have smaller context limits (e.g., 200K vs Claude's 1M). This is critical when commands run via `/loop` since context accumulates across iterations.
 
 ## Run Log
 
