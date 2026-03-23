@@ -13,10 +13,10 @@ describe('Sample Code Parser Tests', () => {
       const result = await parser.parse(sample.code)
       const errors = result.errors ?? []
       if (errors.length > 0) {
-        console.log(`\n=== ${sample.name} (${sample.category}) ===`)
+        console.log(`\n=== ${sample.key} (${sample.category}) ===`)
         errors.forEach(e => console.log(`  Line ${e.location?.start?.line ?? '?'}: ${e.message}`))
       }
-      expect(errors, `${sample.name} should have no errors`).toHaveLength(0)
+      expect(errors, `${sample.key} should have no errors`).toHaveLength(0)
     }
   })
 })

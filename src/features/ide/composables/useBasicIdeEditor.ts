@@ -4,7 +4,7 @@
 
 import type { HighlighterInfo, ParserInfo } from '@/core/interfaces'
 import { FBasicParser } from '@/core/parser/FBasicParser'
-import { getSampleCode, getSampleCodeKeys, type SampleCode } from '@/core/samples'
+import { getSampleCodeKeys } from '@/core/samples'
 import { getSampleBgData, hasSampleBgData } from '@/core/samples/sampleBgData'
 import { createEmptyGrid } from '@/features/bg-editor/composables/useBgGrid'
 import { logComposable } from '@/shared/logger'
@@ -91,8 +91,7 @@ export function useBasicIdeEditor(state: BasicIdeState): BasicIdeEditor {
   }
 
   const sampleSelectOptions = getSampleCodeKeys().map(key => {
-    const sample: SampleCode | undefined = getSampleCode(key)
-    return { value: key, label: sample?.name ?? key }
+    return { value: key, label: key }
   })
 
   const getParserCapabilities = (): ParserInfo => parser.getParserInfo()
