@@ -51,9 +51,9 @@ describe('New screen function sample codes', () => {
     test(`${key} sample has correct metadata`, () => {
       const sample = getSampleCode(key)
       expect(sample).toBeDefined()
-      expect(sample?.name).toBeTruthy()
-      expect(sample?.description).toBeTruthy()
+      expect(sample?.key).toBeTruthy()
       expect(sample?.code).toBeTruthy()
+      expect(sample?.category).toBeTruthy()
     })
   }
 })
