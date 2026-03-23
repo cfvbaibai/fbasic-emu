@@ -16,6 +16,8 @@
  * @see {@link docs/reference/shared-display-buffer.md} for full buffer layout
  */
 
+import type { ScreenCell } from '@/core/interfaces'
+
 import {
   incrementSequence as incrementSequenceToOps,
   readCursor as readCursorFromOps,
@@ -56,7 +58,6 @@ import {
   SPRITE_DATA_FLOATS,
   SyncCommandType,
 } from './sharedDisplayBuffer'
-import type { ScreenCell } from '@/core/interfaces'
 import type { SyncCommand,SyncCommandParams } from './sharedDisplayBufferTypes'
 
 // Re-export types for convenience (preserve original public API)

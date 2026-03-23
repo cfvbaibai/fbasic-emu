@@ -14,9 +14,9 @@ import type {
   InterpreterConfig,
   OutputMessage,
 } from '@/core/interfaces'
+import type { CompiledAudio } from '@/core/sound/types'
 import type { SpriteState } from '@/core/sprite/types'
 import type { BgGridData } from '@/features/bg-editor/types'
-import type { CompiledAudio } from '@/core/sound/types'
 import { logWorker } from '@/shared/logger'
 
 import { copyBgGraphicToScreenBuffer } from './DeviceBgGraphicHelpers'
