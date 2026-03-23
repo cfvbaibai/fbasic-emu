@@ -45,16 +45,226 @@
     "moveTest": "移動テスト",
     "testMoveControl": "移動制御テスト",
     "inputDemo": "INPUT / LINPUT",
-    "bgIndicatorTitle": "BG\u30c7\u30fc\u30bf\u3092\u542b\u3080",
+    "bgIndicatorTitle": "BGデータを含む",
     "categories": {
-      "basics": "\u57fa\u672c",
-      "control": "\u5236\u5fa1\u30d5\u30ed\u30fc",
-      "data": "\u30c7\u30fc\u30bf\u3068\u914d\u5217",
-      "screen": "\u753b\u9762",
-      "sprites": "\u30b9\u30d7\u30e9\u30a4\u30c8",
-      "interactive": "\u30a4\u30f3\u30bf\u30e9\u30af\u30c6\u30a3\u30d6",
-      "comprehensive": "\u30d5\u30eb\u30c7\u30e2",
-      "music": "\u97f3\u697d"
+      "basics": "基本",
+      "control": "制御フロー",
+      "data": "データと配列",
+      "screen": "画面",
+      "sprites": "スプライト",
+      "interactive": "インタラクティブ",
+      "comprehensive": "フルデモ",
+      "music": "音楽"
+    },
+    "items": {
+      "basic": {
+        "name": "基本的なF-Basicプログラム",
+        "description": "LETとPRINTを使った簡単な算術"
+      },
+      "hello": {
+        "name": "ハローワールド",
+        "description": "シンプルなPRINTデモ"
+      },
+      "variables": {
+        "name": "変数と計算",
+        "description": "LET、算術、関数"
+      },
+      "input": {
+        "name": "INPUT / LINPUT",
+        "description": "ユーザー入力コマンド"
+      },
+      "beep": {
+        "name": "BEEPサウンド",
+        "description": "BEEP文 - ビープ音を鳴らす"
+      },
+      "pause": {
+        "name": "PAUSEコマンドデモ",
+        "description": "カウントダウンとタイミング遅延でPAUSEをデモ"
+      },
+      "loops": {
+        "name": "FOR-NEXT",
+        "description": "ループ文"
+      },
+      "conditionals": {
+        "name": "IF-THEN",
+        "description": "条件ロジック"
+      },
+      "subroutines": {
+        "name": "GOSUB-RETURN",
+        "description": "サブルーチン"
+      },
+      "dataRead": {
+        "name": "DATA & READ",
+        "description": "データ保存"
+      },
+      "arrays": {
+        "name": "DIM配列",
+        "description": "配列の使用"
+      },
+      "screen": {
+        "name": "画面と色",
+        "description": "LOCATE、CGSET、PALETB"
+      },
+      "screenFill": {
+        "name": "画面フィルテスト",
+        "description": "50行で画面を埋める - 基本的な画面出力テスト"
+      },
+      "allChars": {
+        "name": "全文字表示",
+        "description": "CHR$(0)からCHR$(255)まで全て表示"
+      },
+      "bgItems": {
+        "name": "BGキャラクタ表示",
+        "description": "全BGキャラクタアイテムを表示 - 数字、文字、記号、かな、画像タイル"
+      },
+      "bgView": {
+        "name": "BG VIEWテスト",
+        "description": "BG GRAPHICを背景画面にコピー - デモBGパターン付き"
+      },
+      "bgViewTitle": {
+        "name": "BGタイトル画面",
+        "description": "BG GRAPHICを使った装飾的なタイトル画面を表示"
+      },
+      "bgViewPlatform": {
+        "name": "BGプラットフォームレベル",
+        "description": "地面とプラットフォームがあるプラットフォームゲームの背景"
+      },
+      "cursorPosition": {
+        "name": "カーソル位置 (CSRLIN/POS)",
+        "description": "CSRLINとPOS関数 - 現在のカーソル位置を取得"
+      },
+      "screenRead": {
+        "name": "画面読み取り (SCR$)",
+        "description": "SCR$関数 - 画面から文字と色を読み取る"
+      },
+      "printableArea": {
+        "name": "PRINT領域とスプライト領域デモ",
+        "description": "PRINTしてからVIEW - BG GRAPHICが背景画面を上書きする様子を表示"
+      },
+      "spriteBasic": {
+        "name": "スプライト基本",
+        "description": "DEF SPRITE、SPRITEコマンド (8x8スプライト)"
+      },
+      "spriteAnimation": {
+        "name": "スプライトアニメーション",
+        "description": "DEF MOVEを使った複数スプライト - アニメーションデモ"
+      },
+      "spriteControl": {
+        "name": "スプライト制御",
+        "description": "POSITION、XPOS、YPOS、CUT、ERA - 単一スプライト制御"
+      },
+      "spriteTableB": {
+        "name": "スプライトテーブルBテスト",
+        "description": "CGEN 3でテーブルB（BGキャラクタ）を使うスプライトをテスト - フラグ(&HC7)とリンゴ(&HD7)をデモ"
+      },
+      "spriteInteractive": {
+        "name": "インタラクティブスプライト（適応タイミング）",
+        "description": "ジョイスティックでスプライトを制御 - レスポンス向上のための適応PAUSE + 速度制御"
+      },
+      "joystick": {
+        "name": "ジョイスティックテスト（適応タイミング）",
+        "description": "STICKとSTRIG関数 - レスポンス向上のための適応PAUSE"
+      },
+      "inkeyTest": {
+        "name": "INKEY$テスト",
+        "description": "INKEY$でキーボード入力をテスト - キーを押して文字を確認"
+      },
+      "inkeyBlockingTest": {
+        "name": "INKEY$(0)ブロッキングテスト",
+        "description": "ブロッキングモードのINKEY$をテスト - キー入力を待機"
+      },
+      "beepInteractive": {
+        "name": "BEEPインタラクティブ",
+        "description": "ボタン押下でBEEP - インタラクティブサウンドデモ"
+      },
+      "shooting": {
+        "name": "シューティングゲーム",
+        "description": "レベル、スプライト、スコア付きの完全なシューティングゲーム"
+      },
+      "knight": {
+        "name": "KNIGHT",
+        "description": "チェスのナイト移動ゲーム - 2人が交代でナイトの動きで駒を置く（F-BASICマニュアル p.94より）"
+      },
+      "superMemory": {
+        "name": "SUPER MEMORY",
+        "description": "メモリーマッチングゲーム - カラーパネルの順序を覚えて繰り返す（F-BASICマニュアル p.95より）"
+      },
+      "ufo": {
+        "name": "UFO",
+        "description": "UFOシューティングゲーム - ファイターフライから防衛（F-BASICマニュアル p.96より）"
+      },
+      "route66": {
+        "name": "ROUTE 66",
+        "description": "レーシングゲーム - 終わりのない道路で他の車を避ける（F-BASICマニュアル p.97より）"
+      },
+      "typeMaster": {
+        "name": "TYPE MASTER",
+        "description": "タイピング練習ゲーム - 一致する文字を見つけて入力（F-BASICマニュアル p.98より）"
+      },
+      "turtle": {
+        "name": "TURTLE",
+        "description": "タートルレーシングゲーム - 簡易版（F-BASICマニュアル p.99より）"
+      },
+      "card": {
+        "name": "CARD",
+        "description": "カードマッチングゲーム - 簡易版（F-BASICマニュアル p.100より）"
+      },
+      "scrSample": {
+        "name": "SCR$サンプル",
+        "description": "ペンギンチェイスデモ - スマイルを避けながら旗を集める（F-BASICマニュアル p.101より）"
+      },
+      "musicPlayDemo": {
+        "name": "PLAYコマンドデモ",
+        "description": "単音によるシンプルなPLAYデモ"
+      },
+      "musicTwinkle": {
+        "name": "きらきら星（完全版）",
+        "description": "GOTOループ付きの完全な童謡 - BASICの繰り返しをデモ"
+      },
+      "musicOdeToJoy": {
+        "name": "歓喜の歌（完全版 - ベートーヴェン）",
+        "description": "繰り返しフレーズにGOSUBを使った完全なメロディ - BASICサブルーチンをデモ"
+      },
+      "musicMaryHadALittleLamb": {
+        "name": "メリーさんのひつじ",
+        "description": "F-BASICマニュアル（34ページ）の童謡 - 3チャンネルハーモニー"
+      },
+      "musicHappyBirthday": {
+        "name": "ハッピーバースデー（完全版）",
+        "description": "全フレーズ付きの完全な誕生日ソング - 付点リズムをデモ"
+      },
+      "musicJingleBells": {
+        "name": "ジングルベル（完全版）",
+        "description": "サビにGOSUBを使った完全なクリスマスキャロル - BASICサブルーチンをデモ"
+      },
+      "musicScale": {
+        "name": "Cメジャースケール",
+        "description": "上行と下行のCメジャースケール - オクターブをデモ"
+      },
+      "musicArpeggio": {
+        "name": "Cメジャーアルペジオ",
+        "description": "Cメジャーアルペジオパターン - コードアルペジオをデモ"
+      },
+      "musicThreeChannel": {
+        "name": "3チャンネルハーモニーデモ",
+        "description": "PLAYによる3チャンネル同時再生をデモ"
+      },
+      "musicPlayer": {
+        "name": "メニュー付き音楽プレーヤー",
+        "description": "メニューループにGOTOを使うインタラクティブ音楽プレーヤーと曲選択"
+      },
+      "musicLoopDemo": {
+        "name": "音楽ループデモ",
+        "description": "音楽的反復パターンにFOR-NEXTとGOTOをデモ"
+      },
+      "musicFurElise2Ch": {
+        "name": "エリーゼのために2チャンネル（ベートーヴェン）",
+        "description": "右手メロディと左手ベースの2チャンネルピアノ版 - 実際のピアノ譜に対応"
+      },
+      "musicRocknRouge": {
+        "name": "ロックン・ルージュ（松田聖子）",
+        "description": "3チャンネルハーモニー付き日本語ポップス - GOTOループを使った複雑なPLAYをデモ（F-BASICマニュアル p.37-38より）"
+      }
     }
   },
   "input": {

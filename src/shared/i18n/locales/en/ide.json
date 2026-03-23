@@ -55,7 +55,217 @@
     "spriteTest": "Sprite Test",
     "moveTest": "Move Test",
     "testMoveControl": "Move Control Test",
-    "inputDemo": "INPUT / LINPUT"
+    "inputDemo": "INPUT / LINPUT",
+    "items": {
+      "basic": {
+        "name": "Basic F-Basic Program",
+        "description": "Simple arithmetic with LET and PRINT"
+      },
+      "hello": {
+        "name": "Hello World",
+        "description": "Simple PRINT demonstration"
+      },
+      "variables": {
+        "name": "Variables & Math",
+        "description": "LET, arithmetic, functions"
+      },
+      "input": {
+        "name": "INPUT / LINPUT",
+        "description": "User input commands"
+      },
+      "beep": {
+        "name": "BEEP Sound",
+        "description": "BEEP statement - produce a beep sound"
+      },
+      "pause": {
+        "name": "PAUSE Command Demo",
+        "description": "Demonstrates PAUSE with countdown and timing delays"
+      },
+      "loops": {
+        "name": "FOR-NEXT",
+        "description": "Looping statements"
+      },
+      "conditionals": {
+        "name": "IF-THEN",
+        "description": "Conditional logic"
+      },
+      "subroutines": {
+        "name": "GOSUB-RETURN",
+        "description": "Subroutines"
+      },
+      "dataRead": {
+        "name": "DATA & READ",
+        "description": "Data storage"
+      },
+      "arrays": {
+        "name": "DIM Arrays",
+        "description": "Array usage"
+      },
+      "screen": {
+        "name": "Screen & Colors",
+        "description": "LOCATE, CGSET, PALETB"
+      },
+      "screenFill": {
+        "name": "Screen Fill Test",
+        "description": "Fill screen with 50 lines - basic screen output test"
+      },
+      "allChars": {
+        "name": "All Characters",
+        "description": "Print all CHR$(0) to CHR$(255)"
+      },
+      "bgItems": {
+        "name": "BG Items Display",
+        "description": "Display all BG character items - numbers, letters, symbols, kana, and picture tiles"
+      },
+      "bgView": {
+        "name": "BG VIEW Test",
+        "description": "Copy BG GRAPHIC to background screen - includes demo BG pattern"
+      },
+      "bgViewTitle": {
+        "name": "BG Title Screen",
+        "description": "Display a decorative title screen using BG GRAPHIC"
+      },
+      "bgViewPlatform": {
+        "name": "BG Platform Level",
+        "description": "Platform game level background with ground and platforms"
+      },
+      "cursorPosition": {
+        "name": "Cursor Position (CSRLIN/POS)",
+        "description": "CSRLIN and POS functions - get current cursor position"
+      },
+      "screenRead": {
+        "name": "Screen Read (SCR$)",
+        "description": "SCR$ function - read characters and colors from screen"
+      },
+      "printableArea": {
+        "name": "PRINTable & Sprite Area Demo",
+        "description": "PRINT first then VIEW to show how BG GRAPHIC overwrites the Background Screen"
+      },
+      "spriteBasic": {
+        "name": "Sprite Basics",
+        "description": "DEF SPRITE, SPRITE commands (8x8 sprite)"
+      },
+      "spriteAnimation": {
+        "name": "Sprite Animation",
+        "description": "Multiple sprites with DEF MOVE - animation demo"
+      },
+      "spriteControl": {
+        "name": "Sprite Control",
+        "description": "POSITION, XPOS, YPOS, CUT, ERA - single sprite control"
+      },
+      "spriteTableB": {
+        "name": "Sprite Table B Test",
+        "description": "Test sprites using Table B (BG characters) with CGEN 3 - demonstrates flag (&HC7) and apple (&HD7)"
+      },
+      "spriteInteractive": {
+        "name": "Interactive Sprites (Adaptive Timing)",
+        "description": "Control sprites with joystick - adaptive PAUSE for responsive input + controlled speed"
+      },
+      "joystick": {
+        "name": "Joystick Test (Adaptive Timing)",
+        "description": "STICK and STRIG functions - adaptive PAUSE for responsive input"
+      },
+      "inkeyTest": {
+        "name": "INKEY$ Test",
+        "description": "Test keyboard input with INKEY$ - press keys to see characters"
+      },
+      "inkeyBlockingTest": {
+        "name": "INKEY$(0) Blocking Test",
+        "description": "Test INKEY$ with blocking mode - waits for key press"
+      },
+      "beepInteractive": {
+        "name": "BEEP Interactive",
+        "description": "BEEP on button press - interactive sound demo"
+      },
+      "shooting": {
+        "name": "Shooting Game",
+        "description": "Full shooting game with levels, sprites, and scoring"
+      },
+      "knight": {
+        "name": "KNIGHT",
+        "description": "Chess knight movement game - 2 players take turns placing pieces using knight moves (from F-BASIC Manual p.94)"
+      },
+      "superMemory": {
+        "name": "SUPER MEMORY",
+        "description": "Memory matching game - remember and repeat color panel sequences (from F-BASIC Manual p.95)"
+      },
+      "ufo": {
+        "name": "UFO",
+        "description": "UFO shooting game - defend against fighter flies (from F-BASIC Manual p.96)"
+      },
+      "route66": {
+        "name": "ROUTE 66",
+        "description": "Racing game - avoid other cars on the endless road (from F-BASIC Manual p.97)"
+      },
+      "typeMaster": {
+        "name": "TYPE MASTER",
+        "description": "Typing practice game - find and type the matching character (from F-BASIC Manual p.98)"
+      },
+      "turtle": {
+        "name": "TURTLE",
+        "description": "Turtle racing game - simplified version (from F-BASIC Manual p.99)"
+      },
+      "card": {
+        "name": "CARD",
+        "description": "Card matching game - simplified version (from F-BASIC Manual p.100)"
+      },
+      "scrSample": {
+        "name": "SCR$ Sample",
+        "description": "Penguin chase demo - collect flags while avoiding the smiley (from F-BASIC Manual p.101)"
+      },
+      "musicPlayDemo": {
+        "name": "PLAY Command Demo",
+        "description": "Simple PLAY demonstration with single notes"
+      },
+      "musicTwinkle": {
+        "name": "Twinkle Twinkle Little Star (Full)",
+        "description": "Complete classic nursery rhyme with GOTO loop - demonstrates BASIC repetition"
+      },
+      "musicOdeToJoy": {
+        "name": "Ode to Joy (Full - Beethoven)",
+        "description": "Complete melody with GOSUB for repeated phrases - demonstrates BASIC subroutines"
+      },
+      "musicMaryHadALittleLamb": {
+        "name": "Mary Had a Little Lamb",
+        "description": "Traditional children's song from F-BASIC Manual (page 34) - 3-channel harmony"
+      },
+      "musicHappyBirthday": {
+        "name": "Happy Birthday (Full)",
+        "description": "Complete traditional birthday song with all phrases - demonstrates dotted rhythms"
+      },
+      "musicJingleBells": {
+        "name": "Jingle Bells (Full)",
+        "description": "Complete Christmas carol with GOSUB for chorus - demonstrates BASIC subroutines"
+      },
+      "musicScale": {
+        "name": "C Major Scale",
+        "description": "Ascending and descending C major scale - demonstrates octaves"
+      },
+      "musicArpeggio": {
+        "name": "C Major Arpeggio",
+        "description": "C major arpeggio pattern - demonstrates chord arpeggios"
+      },
+      "musicThreeChannel": {
+        "name": "Three-Channel Harmony Demo",
+        "description": "Demonstrates 3-channel simultaneous playback with PLAY"
+      },
+      "musicPlayer": {
+        "name": "Music Player with Menu",
+        "description": "Interactive music player demonstrating GOTO for menu loop and song selection"
+      },
+      "musicLoopDemo": {
+        "name": "Music Loop Demo",
+        "description": "Demonstrates FOR-NEXT and GOTO for musical repetition patterns"
+      },
+      "musicFurElise2Ch": {
+        "name": "Fur Elise 2-Channel (Beethoven)",
+        "description": "2-channel piano version with right hand melody and left hand bass - matches real piano sheet"
+      },
+      "musicRocknRouge": {
+        "name": "Rock'n Rouge (Seiko Matsuda)",
+        "description": "Japanese pop song with 3-channel harmony - demonstrates complex PLAY with GOTO loops (from F-BASIC Manual p.37-38)"
+      }
+    }
   },
   "input": {
     "submit": "OK",
