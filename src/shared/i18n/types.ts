@@ -7,6 +7,7 @@
 
 import type enBgEditor from './locales/en/bg-editor.json'
 import type enCommon from './locales/en/common.json'
+import type enDiagnostics from './locales/en/diagnostics.json'
 import type enHome from './locales/en/home.json'
 import type enIde from './locales/en/ide.json'
 import type enImageAnalyzer from './locales/en/image-analyzer.json'
@@ -14,6 +15,7 @@ import type enMonacoEditor from './locales/en/monaco-editor.json'
 import type enNavigation from './locales/en/navigation.json'
 import type enSoundTest from './locales/en/sound-test.json'
 import type enSpriteViewer from './locales/en/sprite-viewer.json'
+import type enTesting from './locales/en/testing.json'
 
 // Define the master schema from English locale
 export type MessageSchema = {
@@ -26,6 +28,8 @@ export type MessageSchema = {
   monacoEditor: typeof enMonacoEditor
   bgEditor: typeof enBgEditor
   soundTest: typeof enSoundTest
+  diagnostics: typeof enDiagnostics
+  testing: typeof enTesting
 }
 
 // Define available locales

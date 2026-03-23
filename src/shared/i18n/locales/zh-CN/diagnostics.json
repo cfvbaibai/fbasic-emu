@@ -1,0 +1,8 @@
+{
+  "title": "性能诊断",
+  "testScenarios": "测试场景",
+  "settings": "设置",
+  "performanceMetrics": "性能指标",
+  "cpuTimeBreakdown": "CPU 时间分解",
+  "screenOutput": "屏幕输出"
+}

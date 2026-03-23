@@ -7,6 +7,7 @@
  */
 
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import RuntimeOutput from '@/features/ide/components/RuntimeOutput.vue'
 import { useBasicIde as useBasicIdeEnhanced } from '@/features/ide/composables/useBasicIdeEnhanced'
@@ -20,6 +21,8 @@ import { GameBlock, GameButton, GameLayout, GameSelect, GameSwitch } from '@/sha
 defineOptions({
   name: 'PerformanceDiagnosticsPage',
 })
+
+const { t } = useI18n()
 
 const {
   code,
@@ -104,7 +107,7 @@ const {
   <GameLayout>
     <div class="perf-diagnostics-container">
       <!-- Page Header -->
-      <GameBlock title="Performance Diagnostics" title-icon="mdi:speedometer">
+      <GameBlock :title="t('diagnostics.title')" title-icon="mdi:speedometer">
         <p class="description">
           Diagnose PRINT performance issues by running test scenarios and measuring timing at each
           stage: worker execution, message passing, and screen rendering.
@@ -112,7 +115,7 @@ const {
       </GameBlock>
 
       <!-- Test Controls -->
-      <GameBlock title="Test Scenarios" title-icon="mdi:test-tube">
+      <GameBlock :title="t('diagnostics.testScenarios')" title-icon="mdi:test-tube">
         <div class="scenario-buttons">
           <GameButton @click="runTest('light')" :disabled="isRunning" type="primary">
             Light (50 iterations)
@@ -134,7 +137,7 @@ const {
       </GameBlock>
 
       <!-- Settings -->
-      <GameBlock title="Settings" title-icon="mdi:cog">
+      <GameBlock :title="t('diagnostics.settings')" title-icon="mdi:cog">
         <div class="settings-grid">
           <div class="setting-item">
             <label class="setting-label">Screen Rendering</label>
@@ -164,7 +167,7 @@ const {
       </GameBlock>
 
       <!-- Real-time Metrics -->
-      <GameBlock title="Performance Metrics" title-icon="mdi:chart-line">
+      <GameBlock :title="t('diagnostics.performanceMetrics')" title-icon="mdi:chart-line">
         <div class="metrics-grid">
           <div class="metric-card">
             <div class="metric-label">FPS</div>
@@ -186,7 +189,7 @@ const {
       </GameBlock>
 
       <!-- CPU Time Breakdown -->
-      <GameBlock title="CPU Time Breakdown" title-icon="mdi:clock-outline">
+      <GameBlock :title="t('diagnostics.cpuTimeBreakdown')" title-icon="mdi:clock-outline">
         <div class="breakdown-bars">
           <div class="breakdown-item">
             <span class="breakdown-label">Worker Execution</span>
@@ -225,7 +228,12 @@ const {
       </GameBlock>
 
       <!-- Screen Output -->
-      <GameBlock v-if="renderingEnabled" title="Screen Output" title-icon="mdi:monitor" class="screen-output-block">
+      <GameBlock
+        v-if="renderingEnabled"
+        :title="t('diagnostics.screenOutput')"
+        title-icon="mdi:monitor"
+        class="screen-output-block"
+      >
         <RuntimeOutput
           :output="outputForDisplay"
           :is-running="isRunning"

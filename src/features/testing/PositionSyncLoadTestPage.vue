@@ -8,6 +8,7 @@
  */
 
 import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import RuntimeOutput from '@/features/ide/components/RuntimeOutput.vue'
 import { useBasicIde as useBasicIdeEnhanced } from '@/features/ide/composables/useBasicIdeEnhanced'
@@ -17,6 +18,8 @@ import { GameBlock, GameButton, GameLayout } from '@/shared/components/ui'
 defineOptions({
   name: 'PositionSyncLoadTestPage',
 })
+
+const { t } = useI18n()
 
 const {
   code,
@@ -129,7 +132,7 @@ onBeforeUnmount(() => {
   <GameLayout>
     <div class="load-test-container">
       <GameBlock
-        title="Position sync load test"
+        :title="t('testing.positionSync.title')"
         title-icon="mdi:speedometer"
         class="metrics-panel"
       >
@@ -156,7 +159,7 @@ onBeforeUnmount(() => {
         </template>
       </GameBlock>
 
-      <GameBlock title="Screen" title-icon="mdi:monitor" class="screen-panel">
+      <GameBlock :title="t('testing.screen')" title-icon="mdi:monitor" class="screen-panel">
         <RuntimeOutput
           :output="output"
           :is-running="isRunning"

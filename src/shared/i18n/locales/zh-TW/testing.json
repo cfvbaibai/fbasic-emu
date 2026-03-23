@@ -1,0 +1,9 @@
+{
+  "screen": "螢幕",
+  "printVsSprites": {
+    "title": "PRINT 與移動精靈對比（階段 6.1）"
+  },
+  "positionSync": {
+    "title": "位置同步負載測試"
+  }
+}

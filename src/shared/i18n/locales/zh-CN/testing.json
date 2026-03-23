@@ -1,0 +1,9 @@
+{
+  "screen": "屏幕",
+  "printVsSprites": {
+    "title": "PRINT 与移动精灵对比（阶段 6.1）"
+  },
+  "positionSync": {
+    "title": "位置同步负载测试"
+  }
+}

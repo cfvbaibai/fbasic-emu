@@ -8,6 +8,7 @@
  */
 
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import RuntimeOutput from '@/features/ide/components/RuntimeOutput.vue'
 import { useBasicIde as useBasicIdeEnhanced } from '@/features/ide/composables/useBasicIdeEnhanced'
@@ -17,6 +18,8 @@ import { GameBlock, GameButton, GameLayout } from '@/shared/components/ui'
 defineOptions({
   name: 'PrintVsSpritesTestPage',
 })
+
+const { t } = useI18n()
 
 const {
   code,
@@ -129,7 +132,7 @@ onBeforeUnmount(() => {
   <GameLayout>
     <div class="test-container">
       <GameBlock
-        title="PRINT vs moving sprites (Phase 6.1)"
+        :title="t('testing.printVsSprites.title')"
         title-icon="mdi:animation-outline"
         class="info-panel"
       >
@@ -156,7 +159,7 @@ onBeforeUnmount(() => {
         </template>
       </GameBlock>
 
-      <GameBlock title="Screen" title-icon="mdi:monitor" class="screen-panel">
+      <GameBlock :title="t('testing.screen')" title-icon="mdi:monitor" class="screen-panel">
         <RuntimeOutput
           :output="outputForDisplay"
           :is-running="isRunning"
