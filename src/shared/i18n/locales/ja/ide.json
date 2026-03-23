@@ -4,7 +4,8 @@
     "new": "新規",
     "import": "インポート",
     "export": "エクスポート",
-    "discardConfirm": "未保存の変更を破棄しますか？"
+    "discardConfirm": "未保存の変更を破棄しますか？",
+    "programNamePlaceholder": "プログラム名"
   },
   "codeEditor": {
     "title": "コードエディター",
@@ -95,6 +96,29 @@
         "select": "セレクト"
       }
     }
+  },
+  "editorViewToggle": {
+    "code": "コード",
+    "codeTitle": "コード",
+    "bg": "BG",
+    "bgTitle": "BG"
+  },
+  "inputModeToggle": {
+    "joystick": "ジョイ",
+    "joystickTitle": "ジョイスティックモード (STICK/STRIG)",
+    "keyboard": "キー",
+    "keyboardTitle": "キーボードモード (INKEY$)"
+  },
+  "commandPalette": {
+    "ariaLabel": "コマンドパレット",
+    "searchPlaceholder": "コマンドを入力...",
+    "searchLabel": "コマンドを検索",
+    "commandsLabel": "コマンド",
+    "noMatches": "一致するコマンドがありません"
+  },
+  "ideOutputPanel": {
+    "closeLogLevels": "ログレベルを閉じる",
+    "openLogLevels": "ログレベルを開く"
   },
   "stateInspector": {
     "title": "状態インスペクタ",

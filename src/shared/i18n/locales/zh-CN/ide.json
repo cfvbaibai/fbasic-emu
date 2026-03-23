@@ -4,7 +4,8 @@
     "new": "新建",
     "import": "导入",
     "export": "导出",
-    "discardConfirm": "是否放弃未保存的更改？"
+    "discardConfirm": "是否放弃未保存的更改？",
+    "programNamePlaceholder": "程序名称"
   },
   "codeEditor": {
     "title": "代码编辑器",
@@ -95,6 +96,29 @@
         "select": "选择"
       }
     }
+  },
+  "editorViewToggle": {
+    "code": "代码",
+    "codeTitle": "代码",
+    "bg": "背景",
+    "bgTitle": "背景"
+  },
+  "inputModeToggle": {
+    "joystick": "手柄",
+    "joystickTitle": "手柄模式 (STICK/STRIG)",
+    "keyboard": "键盘",
+    "keyboardTitle": "键盘模式 (INKEY$)"
+  },
+  "commandPalette": {
+    "ariaLabel": "命令面板",
+    "searchPlaceholder": "输入命令...",
+    "searchLabel": "搜索命令",
+    "commandsLabel": "命令",
+    "noMatches": "没有匹配的命令"
+  },
+  "ideOutputPanel": {
+    "closeLogLevels": "关闭日志级别",
+    "openLogLevels": "打开日志级别"
   },
   "stateInspector": {
     "title": "状态检查",

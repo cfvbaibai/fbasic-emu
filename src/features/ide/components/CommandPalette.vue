@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import type { CommandPaletteCommand } from '@/features/ide/composables/commandPalette'
 import { filterCommandPaletteCommands } from '@/features/ide/composables/commandPalette'
@@ -17,6 +18,8 @@ const emit = defineEmits<{
   (e: 'close'): void
   (e: 'execute', command: CommandPaletteCommand): void
 }>()
+
+const { t } = useI18n()
 
 const query = ref('')
 const selectedIndex = ref(0)
@@ -130,7 +133,7 @@ function handlePanelKeydown(event: KeyboardEvent) {
       class="command-palette-panel"
       role="dialog"
       aria-modal="true"
-      aria-label="Command palette"
+      :aria-label="t('ide.commandPalette.ariaLabel')"
       @keydown="handlePanelKeydown"
     >
       <div class="command-palette-header">
@@ -139,12 +142,12 @@ function handlePanelKeydown(event: KeyboardEvent) {
           v-model="query"
           type="text"
           class="command-palette-input"
-          placeholder="Type a command..."
-          aria-label="Search commands"
+          :placeholder="t('ide.commandPalette.searchPlaceholder')"
+          :aria-label="t('ide.commandPalette.searchLabel')"
         />
       </div>
 
-      <ul class="command-palette-list" role="listbox" aria-label="Commands">
+      <ul class="command-palette-list" role="listbox" :aria-label="t('ide.commandPalette.commandsLabel')">
         <li
           v-for="(command, index) in filteredCommands"
           :key="command.id"
@@ -165,7 +168,7 @@ function handlePanelKeydown(event: KeyboardEvent) {
         </li>
 
         <li v-if="filteredCommands.length === 0" class="command-palette-empty">
-          No matching commands
+          {{ t('ide.commandPalette.noMatches') }}
         </li>
       </ul>
     </div>

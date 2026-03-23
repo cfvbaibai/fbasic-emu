@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+
 import { GameButton, GameIconButton } from '@/shared/components/ui'
 
 import type { InputMode } from '../composables/useBasicIdeState'
@@ -20,6 +22,8 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
   (e: 'update:modelValue', value: InputMode): void
 }>()
+
+const { t } = useI18n()
 
 interface Props {
   /** Current input mode: 'joystick' or 'keyboard' */
@@ -45,7 +49,7 @@ function selectKeyboard() {
         type="default"
         icon="mdi:gamepad-variant"
         size="small"
-        title="Joystick Mode (STICK/STRIG)"
+        :title="t('ide.inputModeToggle.joystickTitle')"
         :selected="props.modelValue === 'joystick'"
         @click="selectJoystick"
       />
@@ -54,7 +58,7 @@ function selectKeyboard() {
         type="default"
         icon="mdi:keyboard"
         size="small"
-        title="Keyboard Mode (INKEY$)"
+        :title="t('ide.inputModeToggle.keyboardTitle')"
         :selected="props.modelValue === 'keyboard'"
         @click="selectKeyboard"
       />
@@ -68,7 +72,7 @@ function selectKeyboard() {
         :selected="props.modelValue === 'joystick'"
         @click="selectJoystick"
       >
-        Joy
+        {{ t('ide.inputModeToggle.joystick') }}
       </GameButton>
       <GameButton
         variant="toggle"
@@ -78,7 +82,7 @@ function selectKeyboard() {
         :selected="props.modelValue === 'keyboard'"
         @click="selectKeyboard"
       >
-        Key
+        {{ t('ide.inputModeToggle.keyboard') }}
       </GameButton>
     </template>
   </div>

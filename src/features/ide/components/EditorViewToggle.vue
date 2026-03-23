@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+
 import { GameButton, GameIconButton } from '@/shared/components/ui'
 
 /**
@@ -17,6 +19,8 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
   (e: 'update:modelValue', value: 'code' | 'bg'): void
 }>()
+
+const { t } = useI18n()
 
 interface Props {
   /** Current view: 'code' or 'bg' */
@@ -42,7 +46,7 @@ function selectBg() {
         type="default"
         icon="mdi:code-tags"
         size="small"
-        title="Code"
+        :title="t('ide.editorViewToggle.codeTitle')"
         :selected="props.modelValue === 'code'"
         @click="selectCode"
       />
@@ -51,7 +55,7 @@ function selectBg() {
         type="default"
         icon="mdi:view-grid"
         size="small"
-        title="BG"
+        :title="t('ide.editorViewToggle.bgTitle')"
         :selected="props.modelValue === 'bg'"
         @click="selectBg"
       />
@@ -65,7 +69,7 @@ function selectBg() {
         :selected="props.modelValue === 'code'"
         @click="selectCode"
       >
-        Code
+        {{ t('ide.editorViewToggle.code') }}
       </GameButton>
       <GameButton
         variant="toggle"
@@ -75,7 +79,7 @@ function selectBg() {
         :selected="props.modelValue === 'bg'"
         @click="selectBg"
       >
-        BG
+        {{ t('ide.editorViewToggle.bg') }}
       </GameButton>
     </template>
   </div>

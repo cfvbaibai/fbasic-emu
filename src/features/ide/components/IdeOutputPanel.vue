@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+
 import type { BasicVariable } from '@/core/interfaces'
 import { GameIconButton } from '@/shared/components/ui'
 
@@ -15,6 +17,8 @@ defineOptions({
 })
 
 defineProps<Props>()
+
+const { t } = useI18n()
 
 interface Props {
   // RuntimeOutput props
@@ -34,7 +38,7 @@ const logLevelPanelOpen = defineModel<boolean>('logLevelPanelOpen', { default: f
     <div class="log-level-toggle">
       <GameIconButton
         :icon="logLevelPanelOpen ? 'mdi:close' : 'mdi:format-list-bulleted-type'"
-        :title="logLevelPanelOpen ? 'Close log levels' : 'Open log levels'"
+        :title="logLevelPanelOpen ? t('ide.ideOutputPanel.closeLogLevels') : t('ide.ideOutputPanel.openLogLevels')"
         size="small"
         @click="logLevelPanelOpen = !logLevelPanelOpen"
       />
