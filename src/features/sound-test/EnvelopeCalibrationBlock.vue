@@ -7,6 +7,7 @@
  */
 
 import { computed, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import { ENVELOPE_DECAY_BASE } from '@/core/sound/constants'
 import { parseMusic } from '@/core/sound/MusicDSLParser'
@@ -24,6 +25,8 @@ defineOptions({
 const emit = defineEmits<{
   playingChange: [isPlaying: boolean]
 }>()
+
+const { t } = useI18n()
 
 // Audio player
 const { initialize, playMusic, stopAll } = useWebAudioPlayer()
@@ -117,16 +120,15 @@ defineExpose({
 </script>
 
 <template>
-  <GameBlock title="Envelope Calibration" title-icon="mdi:waveform" class="calibration-panel">
+  <GameBlock :title="t('soundTest.envelopeCalibration.title')" title-icon="mdi:waveform" class="calibration-panel">
     <div class="calibration-content">
       <p class="calibration-description">
-        Tune M1 envelope decay to match real F-BASIC hardware.
-        Adjust the decay factor until the sound matches your reference.
+        {{ t('soundTest.envelopeCalibration.description') }}
       </p>
 
       <div class="calibration-controls">
         <div class="control-group">
-          <label class="control-label">Envelope Value (V0-V15):</label>
+          <label class="control-label">{{ t('soundTest.envelopeCalibration.envelopeValue') }}</label>
           <div class="slider-container">
             <span class="slider-label">V0</span>
             <input
@@ -140,12 +142,19 @@ defineExpose({
             <span class="slider-label">V15</span>
           </div>
           <p class="current-value">
-            Testing: V{{ selectedEnvelopeValue }} ({{ scaledDecayTimes[selectedEnvelopeValue] }}ms decay)
+            {{
+              t('soundTest.envelopeCalibration.testingValue', {
+                value: selectedEnvelopeValue,
+                ms: scaledDecayTimes[selectedEnvelopeValue],
+              })
+            }}
           </p>
         </div>
 
         <div class="control-group">
-          <label class="control-label">Decay Factor: {{ decayFactor.toFixed(2) }}x</label>
+          <label class="control-label">{{
+            t('soundTest.envelopeCalibration.decayFactor', { factor: decayFactor.toFixed(2) })
+          }}</label>
           <div class="slider-container">
             <span class="slider-label">0x</span>
             <input
@@ -159,19 +168,23 @@ defineExpose({
             <span class="slider-label">3x</span>
           </div>
           <p class="slider-hint">
-            &lt; 1.0 = shorter decay | 1.0 = current | &gt; 1.0 = longer decay
+            {{ t('soundTest.envelopeCalibration.decayHint') }}
           </p>
         </div>
 
         <div class="calibration-actions">
           <GameButton :type="isCalibrationPlaying ? 'danger' : 'primary'" @click="togglePlay">
-            {{ isCalibrationPlaying ? 'Stop' : 'Play' }}
+            {{
+              isCalibrationPlaying
+                ? t('soundTest.envelopeCalibration.stop')
+                : t('soundTest.envelopeCalibration.play')
+            }}
           </GameButton>
         </div>
       </div>
 
       <div class="envelope-reference">
-        <h4 class="reference-title">Envelope Decay Mapping (ms):</h4>
+        <h4 class="reference-title">{{ t('soundTest.envelopeCalibration.envelopeMappingTitle') }}</h4>
         <div class="envelope-grid">
           <div v-for="(ms, v) in Object.entries(ENVELOPE_DECAY_BASE)" :key="v" class="envelope-item">
             <span class="envelope-key">V{{ v }}</span>
@@ -180,9 +193,7 @@ defineExpose({
           </div>
         </div>
         <p class="reference-note">
-          * Scaled values with current decay factor.
-          V0 = fastest decay (quick "ping"), V15 = slowest decay (long fade).
-          If decay is too long, use factor &lt; 1.0 to shorten.
+          {{ t('soundTest.envelopeCalibration.referenceNote') }}
         </p>
       </div>
     </div>
