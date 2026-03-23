@@ -4,7 +4,7 @@
 
 import type { HighlighterInfo, ParserInfo } from '@/core/interfaces'
 import { FBasicParser } from '@/core/parser/FBasicParser'
-import { getSampleCodeKeys } from '@/core/samples'
+import { getSampleCode, getSampleCodeKeys } from '@/core/samples'
 import { getSampleBgData, hasSampleBgData } from '@/core/samples/sampleBgData'
 import { createEmptyGrid } from '@/features/bg-editor/composables/useBgGrid'
 import { logComposable } from '@/shared/logger'
