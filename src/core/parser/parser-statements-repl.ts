@@ -44,6 +44,7 @@ import {
 export interface ReplStatementParserInstance {
   RULE(name: string, impl: () => void): () => CstNode
   SUBRULE(rule: () => CstNode, options?: Record<string, unknown>): CstNode
+  SUBRULE2(rule: () => CstNode, options?: Record<string, unknown>): CstNode
   CONSUME(tokenType: unknown, options?: Record<string, unknown>): unknown
   CONSUME2(tokenType: unknown, options?: Record<string, unknown>): unknown
   OPTION(impl: () => void): void

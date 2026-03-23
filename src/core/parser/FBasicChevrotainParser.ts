@@ -138,26 +138,30 @@ class FBasicChevrotainParser extends CstParser {
     })
 
     // Register rules in dependency order (bottom-up)
+    // Type assertion needed: module interfaces declare RULE as public,
+    // but Chevrotain's EmbeddedActionsParser has it as protected.
+    const self = this as never
+
     // 1. Expression rules (lowest level, no statement dependencies)
-    registerExpressionRules(this)
+    registerExpressionRules(self)
 
     // 2. Core statement rules (depend on expression rules)
-    registerCoreStatementRules(this)
+    registerCoreStatementRules(self)
 
     // 3. Data and array statement rules (depend on expression rules)
-    registerDataStatementRules(this)
+    registerDataStatementRules(self)
 
     // 4. Screen/display statement rules (depend on expression rules)
-    registerScreenStatementRules(this)
+    registerScreenStatementRules(self)
 
     // 5. Sprite and animation statement rules (depend on expression rules)
-    registerSpriteStatementRules(this)
+    registerSpriteStatementRules(self)
 
     // 6. REPL-only and limited utility command rules (depend on expression rules)
-    registerReplStatementRules(this)
+    registerReplStatementRules(self)
 
     // 7. Dispatcher rules (depend on all statement rules) - must be last
-    registerDispatcherRules(this)
+    registerDispatcherRules(self)
 
     this.performSelfAnalysis()
   }
