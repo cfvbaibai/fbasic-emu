@@ -7,11 +7,13 @@
 // Type Definitions
 // ============================================================================
 
+export type SampleCategory = 'basics' | 'control' | 'data' | 'screen' | 'sprites' | 'interactive' | 'comprehensive' | 'music'
+
 export interface SampleCode {
-  name: string
-  description: string
+  /** Sample key used for i18n lookup (ide.samples.items.{key}.name/description) */
+  key: string
   code: string
-  category: 'basics' | 'control' | 'data' | 'screen' | 'sprites' | 'interactive' | 'comprehensive' | 'music'
+  category: SampleCategory
   /** Optional BG data key for samples that use VIEW command */
   bgKey?: string
 }
@@ -88,137 +90,116 @@ import spriteTableB from './programs/sprites/sprite-table-b.bas?raw'
 export const SAMPLE_CODES: Record<string, SampleCode> = {
   // === BASICS ===
   basic: {
-    name: 'Basic F-Basic Program',
-    description: 'Simple arithmetic with LET and PRINT',
+    key: 'basic',
     category: 'basics',
     code: basic,
   },
   hello: {
-    name: 'Hello World',
-    description: 'Simple PRINT demonstration',
+    key: 'hello',
     category: 'basics',
     code: hello,
   },
   variables: {
-    name: 'Variables & Math',
-    description: 'LET, arithmetic, functions',
+    key: 'variables',
     category: 'basics',
     code: variables,
   },
   input: {
-    name: 'INPUT / LINPUT',
-    description: 'User input commands',
+    key: 'input',
     category: 'basics',
     code: inputSample,
   },
   beep: {
-    name: 'BEEP Sound',
-    description: 'BEEP statement - produce a beep sound',
+    key: 'beep',
     category: 'basics',
     code: beep,
   },
 
   // === CONTROL ===
   pause: {
-    name: 'PAUSE Command Demo',
-    description: 'Demonstrates PAUSE with countdown and timing delays',
+    key: 'pause',
     category: 'control',
     code: pause,
   },
   loops: {
-    name: 'FOR-NEXT',
-    description: 'Looping statements',
+    key: 'loops',
     category: 'control',
     code: loops,
   },
   conditionals: {
-    name: 'IF-THEN',
-    description: 'Conditional logic',
+    key: 'conditionals',
     category: 'control',
     code: conditionals,
   },
   subroutines: {
-    name: 'GOSUB-RETURN',
-    description: 'Subroutines',
+    key: 'subroutines',
     category: 'control',
     code: subroutines,
   },
 
   // === DATA ===
   dataRead: {
-    name: 'DATA & READ',
-    description: 'Data storage',
+    key: 'dataRead',
     category: 'data',
     code: dataRead,
   },
   arrays: {
-    name: 'DIM Arrays',
-    description: 'Array usage',
+    key: 'arrays',
     category: 'data',
     code: arrays,
   },
 
   // === SCREEN ===
   screen: {
-    name: 'Screen & Colors',
-    description: 'LOCATE, CGSET, PALETB',
+    key: 'screen',
     category: 'screen',
     code: screen,
   },
   screenFill: {
-    name: 'Screen Fill Test',
-    description: 'Fill screen with 50 lines - basic screen output test',
+    key: 'screenFill',
     category: 'screen',
     code: screenFill,
   },
   allChars: {
-    name: 'All Characters',
-    description: 'Print all CHR$(0) to CHR$(255)',
+    key: 'allChars',
     category: 'screen',
     code: allChars,
   },
   bgItems: {
-    name: 'BG Items Display',
-    description: 'Display all BG character items - numbers, letters, symbols, kana, and picture tiles',
+    key: 'bgItems',
     category: 'screen',
     code: bgItems,
   },
   bgView: {
-    name: 'BG VIEW Test',
-    description: 'Copy BG GRAPHIC to background screen - includes demo BG pattern',
+    key: 'bgView',
     category: 'screen',
     bgKey: 'bgView',
     code: bgView,
   },
   bgViewTitle: {
-    name: 'BG Title Screen',
-    description: 'Display a decorative title screen using BG GRAPHIC',
+    key: 'bgViewTitle',
     category: 'screen',
     bgKey: 'titleScreen',
     code: bgTitle,
   },
   bgViewPlatform: {
-    name: 'BG Platform Level',
-    description: 'Platform game level background with ground and platforms',
+    key: 'bgViewPlatform',
     category: 'screen',
     bgKey: 'platformGame',
     code: bgPlatform,
   },
   cursorPosition: {
-    name: 'Cursor Position (CSRLIN/POS)',
-    description: 'CSRLIN and POS functions - get current cursor position',
+    key: 'cursorPosition',
     category: 'screen',
     code: cursorPosition,
   },
   screenRead: {
-    name: 'Screen Read (SCR$)',
-    description: 'SCR$ function - read characters and colors from screen',
+    key: 'screenRead',
     category: 'screen',
     code: screenRead,
   },
   printableArea: {
-    name: 'PRINTable & Sprite Area Demo',
-    description: 'PRINT first then VIEW to show how BG GRAPHIC overwrites the Background Screen',
+    key: 'printableArea',
     category: 'screen',
     bgKey: 'layerBox',
     code: printableArea,
@@ -226,121 +207,103 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 
   // === SPRITES ===
   spriteBasic: {
-    name: 'Sprite Basics',
-    description: 'DEF SPRITE, SPRITE commands (8x8 sprite)',
+    key: 'spriteBasic',
     category: 'sprites',
     code: spriteBasic,
   },
   spriteAnimation: {
-    name: 'Sprite Animation',
-    description: 'Multiple sprites with DEF MOVE - animation demo',
+    key: 'spriteAnimation',
     category: 'sprites',
     code: spriteAnimation,
   },
   spriteControl: {
-    name: 'Sprite Control',
-    description: 'POSITION, XPOS, YPOS, CUT, ERA - single sprite control',
+    key: 'spriteControl',
     category: 'sprites',
     code: spriteControl,
   },
   spriteTableB: {
-    name: 'Sprite Table B Test',
-    description: 'Test sprites using Table B (BG characters) with CGEN 3 - demonstrates flag (&HC7) and apple (&HD7)',
+    key: 'spriteTableB',
     category: 'sprites',
     code: spriteTableB,
   },
 
   // === INTERACTIVE ===
   spriteInteractive: {
-    name: 'Interactive Sprites (Adaptive Timing)',
-    description: 'Control sprites with joystick - adaptive PAUSE for responsive input + controlled speed',
+    key: 'spriteInteractive',
     category: 'interactive',
     code: spriteInteractive,
   },
   joystick: {
-    name: 'Joystick Test (Adaptive Timing)',
-    description: 'STICK and STRIG functions - adaptive PAUSE for responsive input',
+    key: 'joystick',
     category: 'interactive',
     code: joystick,
   },
   inkeyTest: {
-    name: 'INKEY$ Test',
-    description: 'Test keyboard input with INKEY$ - press keys to see characters',
+    key: 'inkeyTest',
     category: 'interactive',
     code: inkeyTest,
   },
   inkeyBlockingTest: {
-    name: 'INKEY$(0) Blocking Test',
-    description: 'Test INKEY$ with blocking mode - waits for key press',
+    key: 'inkeyBlockingTest',
     category: 'interactive',
     code: inkeyBlockingTest,
   },
   beepInteractive: {
-    name: 'BEEP Interactive',
-    description: 'BEEP on button press - interactive sound demo',
+    key: 'beepInteractive',
     category: 'interactive',
     code: beepInteractive,
   },
 
   // === COMPREHENSIVE (Full Demo Games) ===
   shooting: {
-    name: 'Shooting Game',
-    description: 'Full shooting game with levels, sprites, and scoring',
+    key: 'shooting',
     category: 'comprehensive',
     code: shooting,
   },
   knight: {
-    name: 'KNIGHT',
-    description: 'Chess knight movement game - 2 players take turns placing pieces using knight moves (from F-BASIC Manual p.94)',
+    key: 'knight',
     category: 'comprehensive',
     bgKey: 'knight',
     code: knight,
   },
   superMemory: {
-    name: 'SUPER MEMORY',
-    description: 'Memory matching game - remember and repeat color panel sequences (from F-BASIC Manual p.95)',
+    key: 'superMemory',
     category: 'comprehensive',
     bgKey: 'superMemory',
     code: superMemory,
   },
   ufo: {
-    name: 'UFO',
-    description: 'UFO shooting game - defend against fighter flies (from F-BASIC Manual p.96)',
+    key: 'ufo',
     category: 'comprehensive',
     bgKey: 'ufo',
     code: ufo,
   },
   route66: {
-    name: 'ROUTE 66',
-    description: 'Racing game - avoid other cars on the endless road (from F-BASIC Manual p.97)',
+    key: 'route66',
     category: 'comprehensive',
     bgKey: 'route66',
     code: route66,
   },
   typeMaster: {
-    name: 'TYPE MASTER',
-    description: 'Typing practice game - find and type the matching character (from F-BASIC Manual p.98)',
+    key: 'typeMaster',
     category: 'comprehensive',
     bgKey: 'typeMaster',
     code: typeMaster,
   },
   turtle: {
-    name: 'TURTLE',
-    description: 'Turtle racing game - simplified version (from F-BASIC Manual p.99)',
+    key: 'turtle',
     category: 'comprehensive',
     bgKey: 'turtle',
     code: turtle,
   },
   card: {
-    name: 'CARD',
-    description: 'Card matching game - simplified version (from F-BASIC Manual p.100)',
+    key: 'card',
     category: 'comprehensive',
     bgKey: 'card',
     code: card,
   },
   scrSample: {
-    name: 'SCR$ Sample',
-    description: 'Penguin chase demo - collect flags while avoiding the smiley (from F-BASIC Manual p.101)',
+    key: 'scrSample',
     category: 'comprehensive',
     bgKey: 'scrSample',
     code: scrSample,
@@ -348,80 +311,67 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
 
   // === MUSIC ===
   musicPlayDemo: {
-    name: 'PLAY Command Demo',
-    description: 'Simple PLAY demonstration with single notes',
+    key: 'musicPlayDemo',
     category: 'music',
     code: musicPlayDemo,
   },
   musicTwinkle: {
-    name: 'Twinkle Twinkle Little Star (Full)',
-    description: 'Complete classic nursery rhyme with GOTO loop - demonstrates BASIC repetition',
+    key: 'musicTwinkle',
     category: 'music',
     code: musicTwinkle,
   },
   musicOdeToJoy: {
-    name: 'Ode to Joy (Full - Beethoven)',
-    description: 'Complete melody with GOSUB for repeated phrases - demonstrates BASIC subroutines',
+    key: 'musicOdeToJoy',
     category: 'music',
     code: musicOdeToJoy,
   },
   musicMaryHadALittleLamb: {
-    name: 'Mary Had a Little Lamb',
-    description: "Traditional children's song from F-BASIC Manual (page 34) - 3-channel harmony",
+    key: 'musicMaryHadALittleLamb',
     category: 'music',
     code: musicMaryHadALittleLamb,
   },
   musicHappyBirthday: {
-    name: 'Happy Birthday (Full)',
-    description: 'Complete traditional birthday song with all phrases - demonstrates dotted rhythms',
+    key: 'musicHappyBirthday',
     category: 'music',
     code: musicHappyBirthday,
   },
   musicJingleBells: {
-    name: 'Jingle Bells (Full)',
-    description: 'Complete Christmas carol with GOSUB for chorus - demonstrates BASIC subroutines',
+    key: 'musicJingleBells',
     category: 'music',
     code: musicJingleBells,
   },
   musicScale: {
-    name: 'C Major Scale',
-    description: 'Ascending and descending C major scale - demonstrates octaves',
+    key: 'musicScale',
     category: 'music',
     code: musicScale,
   },
   musicArpeggio: {
-    name: 'C Major Arpeggio',
-    description: 'C major arpeggio pattern - demonstrates chord arpeggios',
+    key: 'musicArpeggio',
     category: 'music',
     code: musicArpeggio,
   },
   musicThreeChannel: {
-    name: 'Three-Channel Harmony Demo',
-    description: 'Demonstrates 3-channel simultaneous playback with PLAY',
+    key: 'musicThreeChannel',
     category: 'music',
     code: musicThreeChannel,
   },
   musicPlayer: {
-    name: 'Music Player with Menu',
-    description: 'Interactive music player demonstrating GOTO for menu loop and song selection',
+    key: 'musicPlayer',
     category: 'music',
     code: musicPlayer,
   },
   musicLoopDemo: {
-    name: 'Music Loop Demo',
-    description: 'Demonstrates FOR-NEXT and GOTO for musical repetition patterns',
+    key: 'musicLoopDemo',
     category: 'music',
     code: musicLoopDemo,
   },
   musicFurElise2Ch: {
-    name: 'Fur Elise 2-Channel (Beethoven)',
-    description: '2-channel piano version with right hand melody and left hand bass - matches real piano sheet',
+    key: 'musicFurElise2Ch',
     category: 'music',
     code: musicFurElise2Ch,
   },
   musicRocknRouge: {
-    name: "Rock'n Rouge (Seiko Matsuda)",
-    description: 'Japanese pop song with 3-channel harmony - demonstrates complex PLAY with GOTO loops (from F-BASIC Manual p.37-38)',
+    key: 'musicRocknRouge',
     category: 'music',
     code: musicRocknRouge,
   },

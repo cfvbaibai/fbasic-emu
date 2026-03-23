@@ -35,10 +35,13 @@ const categories = computed(() => {
       }
       // Check if sample has BG data (either via bgKey or direct BG data)
       const hasBg = sample.bgKey ? hasSampleBgData(sample.bgKey) : false
+      // Use i18n to translate name and description
+      const translatedName = t(`ide.samples.items.${key}.name`)
+      const translatedDescription = t(`ide.samples.items.${key}.description`)
       cats.get(sample.category)!.push({
         key,
-        name: sample.name,
-        description: sample.description,
+        name: translatedName,
+        description: translatedDescription,
         hasBg,
       })
     }

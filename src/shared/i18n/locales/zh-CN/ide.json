@@ -44,16 +44,226 @@
     "moveTest": "移动测试",
     "testMoveControl": "移动控制测试",
     "inputDemo": "INPUT / LINPUT",
-    "bgIndicatorTitle": "\u5305\u542b BG \u6570\u636e",
+    "bgIndicatorTitle": "包含 BG 数据",
     "categories": {
-      "basics": "\u57fa\u7840",
-      "control": "\u6d41\u7a0b\u63a7\u5236",
-      "data": "\u6570\u636e\u4e0e\u6570\u7ec4",
-      "screen": "\u5c4f\u5e55",
-      "sprites": "\u7cbe\u7075",
-      "interactive": "\u4ea4\u4e92",
-      "comprehensive": "\u5b8c\u6574\u6f14\u793a",
-      "music": "\u97f3\u4e50"
+      "basics": "基础",
+      "control": "流程控制",
+      "data": "数据与数组",
+      "screen": "屏幕",
+      "sprites": "精灵",
+      "interactive": "交互",
+      "comprehensive": "完整演示",
+      "music": "音乐"
+    },
+    "items": {
+      "basic": {
+        "name": "基本 F-Basic 程序",
+        "description": "使用 LET 和 PRINT 的简单算术"
+      },
+      "hello": {
+        "name": "你好世界",
+        "description": "简单的 PRINT 演示"
+      },
+      "variables": {
+        "name": "变量与数学",
+        "description": "LET、算术、函数"
+      },
+      "input": {
+        "name": "INPUT / LINPUT",
+        "description": "用户输入命令"
+      },
+      "beep": {
+        "name": "BEEP 声音",
+        "description": "BEEP 语句 - 发出蜂鸣声"
+      },
+      "pause": {
+        "name": "PAUSE 命令演示",
+        "description": "演示带倒计时和定时延迟的 PAUSE"
+      },
+      "loops": {
+        "name": "FOR-NEXT 循环",
+        "description": "循环语句"
+      },
+      "conditionals": {
+        "name": "IF-THEN 条件",
+        "description": "条件逻辑"
+      },
+      "subroutines": {
+        "name": "GOSUB-RETURN 子程序",
+        "description": "子程序调用"
+      },
+      "dataRead": {
+        "name": "DATA & READ 数据",
+        "description": "数据存储"
+      },
+      "arrays": {
+        "name": "DIM 数组",
+        "description": "数组使用"
+      },
+      "screen": {
+        "name": "屏幕与颜色",
+        "description": "LOCATE、CGSET、PALETB"
+      },
+      "screenFill": {
+        "name": "屏幕填充测试",
+        "description": "用50行填充屏幕 - 基本屏幕输出测试"
+      },
+      "allChars": {
+        "name": "所有字符",
+        "description": "打印 CHR$(0) 到 CHR$(255) 所有字符"
+      },
+      "bgItems": {
+        "name": "BG 字符显示",
+        "description": "显示所有 BG 字符项目 - 数字、字母、符号、假名和图形块"
+      },
+      "bgView": {
+        "name": "BG VIEW 测试",
+        "description": "将 BG GRAPHIC 复制到背景屏幕 - 包含演示 BG 图案"
+      },
+      "bgViewTitle": {
+        "name": "BG 标题画面",
+        "description": "使用 BG GRAPHIC 显示装饰性标题画面"
+      },
+      "bgViewPlatform": {
+        "name": "BG 平台关卡",
+        "description": "带有地面和平台的平台游戏背景"
+      },
+      "cursorPosition": {
+        "name": "光标位置 (CSRLIN/POS)",
+        "description": "CSRLIN 和 POS 函数 - 获取当前光标位置"
+      },
+      "screenRead": {
+        "name": "屏幕读取 (SCR$)",
+        "description": "SCR$ 函数 - 从屏幕读取字符和颜色"
+      },
+      "printableArea": {
+        "name": "PRINT区域与精灵区域演示",
+        "description": "先 PRINT 再 VIEW - 展示 BG GRAPHIC 如何覆盖背景屏幕"
+      },
+      "spriteBasic": {
+        "name": "精灵基础",
+        "description": "DEF SPRITE、SPRITE 命令 (8x8 精灵)"
+      },
+      "spriteAnimation": {
+        "name": "精灵动画",
+        "description": "使用 DEF MOVE 的多精灵 - 动画演示"
+      },
+      "spriteControl": {
+        "name": "精灵控制",
+        "description": "POSITION、XPOS、YPOS、CUT、ERA - 单精灵控制"
+      },
+      "spriteTableB": {
+        "name": "精灵表B测试",
+        "description": "测试使用表B（BG字符）的精灵，CGEN 3 - 演示旗帜(&HC7)和苹果(&HD7)"
+      },
+      "spriteInteractive": {
+        "name": "交互式精灵（自适应计时）",
+        "description": "用手柄控制精灵 - 自适应 PAUSE 实现响应式输入 + 受控速度"
+      },
+      "joystick": {
+        "name": "手柄测试（自适应计时）",
+        "description": "STICK 和 STRIG 函数 - 自适应 PAUSE 实现响应式输入"
+      },
+      "inkeyTest": {
+        "name": "INKEY$ 测试",
+        "description": "用 INKEY$ 测试键盘输入 - 按键查看字符"
+      },
+      "inkeyBlockingTest": {
+        "name": "INKEY$(0) 阻塞测试",
+        "description": "测试阻塞模式的 INKEY$ - 等待按键"
+      },
+      "beepInteractive": {
+        "name": "BEEP 交互",
+        "description": "按键时 BEEP - 交互式声音演示"
+      },
+      "shooting": {
+        "name": "射击游戏",
+        "description": "完整的射击游戏，包含关卡、精灵和计分"
+      },
+      "knight": {
+        "name": "骑士棋",
+        "description": "国际象棋骑士移动游戏 - 2名玩家轮流用骑士移动放置棋子（来自F-BASIC手册第94页）"
+      },
+      "superMemory": {
+        "name": "超级记忆",
+        "description": "记忆配对游戏 - 记住并重复颜色面板序列（来自F-BASIC手册第95页）"
+      },
+      "ufo": {
+        "name": "UFO",
+        "description": "UFO 射击游戏 - 抵御战斗苍蝇（来自F-BASIC手册第96页）"
+      },
+      "route66": {
+        "name": "66号公路",
+        "description": "赛车游戏 - 在无尽的道路上躲避其他车辆（来自F-BASIC手册第97页）"
+      },
+      "typeMaster": {
+        "name": "打字大师",
+        "description": "打字练习游戏 - 找到并输入匹配的字符（来自F-BASIC手册第98页）"
+      },
+      "turtle": {
+        "name": "乌龟赛跑",
+        "description": "乌龟赛跑游戏 - 简化版（来自F-BASIC手册第99页）"
+      },
+      "card": {
+        "name": "卡片配对",
+        "description": "卡片配对游戏 - 简化版（来自F-BASIC手册第100页）"
+      },
+      "scrSample": {
+        "name": "SCR$ 示例",
+        "description": "企鹅追逐演示 - 收集旗帜同时避开笑脸（来自F-BASIC手册第101页）"
+      },
+      "musicPlayDemo": {
+        "name": "PLAY 命令演示",
+        "description": "单音符的简单 PLAY 演示"
+      },
+      "musicTwinkle": {
+        "name": "小星星（完整版）",
+        "description": "带 GOTO 循环的完整童谣 - 演示 BASIC 重复"
+      },
+      "musicOdeToJoy": {
+        "name": "欢乐颂（完整版 - 贝多芬）",
+        "description": "重复段落使用 GOSUB 的完整旋律 - 演示 BASIC 子程序"
+      },
+      "musicMaryHadALittleLamb": {
+        "name": "玛丽有只小羔羊",
+        "description": "F-BASIC手册（第34页）的童谣 - 3声道和声"
+      },
+      "musicHappyBirthday": {
+        "name": "生日快乐（完整版）",
+        "description": "包含所有段落的完整生日歌 - 演示附点节奏"
+      },
+      "musicJingleBells": {
+        "name": "铃儿响叮当（完整版）",
+        "description": "副歌使用 GOSUB 的完整圣诞颂歌 - 演示 BASIC 子程序"
+      },
+      "musicScale": {
+        "name": "C大调音阶",
+        "description": "上行和下行 C 大调音阶 - 演示八度"
+      },
+      "musicArpeggio": {
+        "name": "C大调琶音",
+        "description": "C大调琶音模式 - 演示和弦琶音"
+      },
+      "musicThreeChannel": {
+        "name": "三声道和声演示",
+        "description": "演示使用 PLAY 的三声道同时播放"
+      },
+      "musicPlayer": {
+        "name": "菜单式音乐播放器",
+        "description": "演示菜单循环使用 GOTO 和歌曲选择的交互式音乐播放器"
+      },
+      "musicLoopDemo": {
+        "name": "音乐循环演示",
+        "description": "演示音乐重复模式中使用 FOR-NEXT 和 GOTO"
+      },
+      "musicFurElise2Ch": {
+        "name": "致爱丽丝 双声道（贝多芬）",
+        "description": "右手旋律和左手低音的双声道钢琴版 - 匹配真实钢琴谱"
+      },
+      "musicRocknRouge": {
+        "name": "Rock'n Rouge（松田圣子）",
+        "description": "带三声道和声的日语流行歌曲 - 演示使用 GOTO 循环的复杂 PLAY（来自F-BASIC手册第37-38页）"
+      }
     }
   },
   "input": {
