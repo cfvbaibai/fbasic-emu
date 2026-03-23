@@ -6,6 +6,7 @@
  */
 
 import type { ScreenCell } from '@/core/interfaces'
+import { SyncCommandType } from './sharedDisplayBuffer'
 
 // Re-export SyncCommandType for convenience
 export { SyncCommandType } from './sharedDisplayBuffer'
