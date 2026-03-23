@@ -1,0 +1,8 @@
+{
+  "title": "パフォーマンス診断",
+  "testScenarios": "テストシナリオ",
+  "settings": "設定",
+  "performanceMetrics": "パフォーマンス指標",
+  "cpuTimeBreakdown": "CPU時間の内訳",
+  "screenOutput": "画面出力"
+}

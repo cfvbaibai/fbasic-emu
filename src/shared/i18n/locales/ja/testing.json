@@ -1,0 +1,9 @@
+{
+  "screen": "画面",
+  "printVsSprites": {
+    "title": "PRINT vs 移動スプライト（フェーズ6.1）"
+  },
+  "positionSync": {
+    "title": "位置同期負荷テスト"
+  }
+}
