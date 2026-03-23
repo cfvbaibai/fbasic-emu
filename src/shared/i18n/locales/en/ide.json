@@ -111,5 +111,10 @@
     "bgBuffer": "BG Screen Buffer",
     "cursor": "Cursor",
     "empty": "(none)"
+  },
+  "logLevels": {
+    "title": "Log Levels",
+    "description": "Set verbosity per area. {warn} = quiet; {debug} = verbose.",
+    "ariaLabelFor": "Log level for {name}"
   }
 }

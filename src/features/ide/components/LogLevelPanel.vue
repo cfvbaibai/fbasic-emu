@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, reactive, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import { GameBlock, GameIcon } from '@/shared/components/ui'
 import {
@@ -21,6 +22,8 @@ const props = withDefaults(
   }>(),
   { open: false }
 )
+
+const { t } = useI18n()
 
 /** Current level per logger key. */
 const levels = reactive<Record<string, LogLevelName>>(
@@ -50,12 +53,12 @@ watch(() => props.open, (open: boolean) => open && refreshLevels())
 
 <template>
   <div class="log-level-panel">
-    <GameBlock title="Log levels" title-icon="mdi:format-list-bulleted-type" class="panel-block">
+    <GameBlock :title="t('ide.logLevels.title')" title-icon="mdi:format-list-bulleted-type" class="panel-block">
       <template #right>
         <GameIcon icon="mdi:information-outline" size="small" />
       </template>
       <p class="panel-description">
-        Set verbosity per area. <strong>warn</strong> = quiet; <strong>debug</strong> = verbose.
+        {{ t('ide.logLevels.description') }}
       </p>
       <div class="logger-list">
         <div v-for="entry in LOGGER_REGISTRY" :key="entry.key" class="logger-row">
@@ -67,7 +70,7 @@ watch(() => props.open, (open: boolean) => open && refreshLevels())
             :key="`${entry.key}-${levels[entry.key] ?? 'warn'}`"
             :value="levels[entry.key] ?? 'warn'"
             class="level-select"
-            :aria-label="`Log level for ${entry.name}`"
+            :aria-label="t('ide.logLevels.ariaLabelFor', { name: entry.name })"
             @change="handleSelectChange(entry.key, $event)"
           >
             <option v-for="name in LOG_LEVEL_NAMES" :key="name" :value="name">
