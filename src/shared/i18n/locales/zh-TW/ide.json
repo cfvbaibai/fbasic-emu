@@ -4,7 +4,8 @@
     "new": "新建",
     "import": "匯入",
     "export": "匯出",
-    "discardConfirm": "是否放棄未儲存的變更？"
+    "discardConfirm": "是否放棄未儲存的變更？",
+    "programNamePlaceholder": "程式名稱"
   },
   "codeEditor": {
     "title": "程式碼編輯器",
@@ -95,6 +96,29 @@
         "select": "選擇"
       }
     }
+  },
+  "editorViewToggle": {
+    "code": "程式碼",
+    "codeTitle": "程式碼",
+    "bg": "背景",
+    "bgTitle": "背景"
+  },
+  "inputModeToggle": {
+    "joystick": "搖桿",
+    "joystickTitle": "搖桿模式 (STICK/STRIG)",
+    "keyboard": "鍵盤",
+    "keyboardTitle": "鍵盤模式 (INKEY$)"
+  },
+  "commandPalette": {
+    "ariaLabel": "命令面板",
+    "searchPlaceholder": "輸入命令...",
+    "searchLabel": "搜尋命令",
+    "commandsLabel": "命令",
+    "noMatches": "沒有符合的命令"
+  },
+  "ideOutputPanel": {
+    "closeLogLevels": "關閉日誌級別",
+    "openLogLevels": "開啟日誌級別"
   },
   "stateInspector": {
     "title": "狀態檢查",

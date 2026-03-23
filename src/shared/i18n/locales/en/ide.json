@@ -4,7 +4,8 @@
     "new": "New",
     "import": "Import",
     "export": "Export",
-    "discardConfirm": "Discard unsaved changes?"
+    "discardConfirm": "Discard unsaved changes?",
+    "programNamePlaceholder": "Program name"
   },
   "codeEditor": {
     "title": "Code Editor",
@@ -95,6 +96,29 @@
         "select": "Select"
       }
     }
+  },
+  "editorViewToggle": {
+    "code": "Code",
+    "codeTitle": "Code",
+    "bg": "BG",
+    "bgTitle": "BG"
+  },
+  "inputModeToggle": {
+    "joystick": "Joy",
+    "joystickTitle": "Joystick Mode (STICK/STRIG)",
+    "keyboard": "Key",
+    "keyboardTitle": "Keyboard Mode (INKEY$)"
+  },
+  "commandPalette": {
+    "ariaLabel": "Command palette",
+    "searchPlaceholder": "Type a command...",
+    "searchLabel": "Search commands",
+    "commandsLabel": "Commands",
+    "noMatches": "No matching commands"
+  },
+  "ideOutputPanel": {
+    "closeLogLevels": "Close log levels",
+    "openLogLevels": "Open log levels"
   },
   "stateInspector": {
     "title": "State Inspector",

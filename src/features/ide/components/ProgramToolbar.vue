@@ -182,7 +182,7 @@ onUnmounted(() => {
           v-model="tempName"
           type="text"
           class="program-name-input"
-          placeholder="Program name"
+          :placeholder="t('ide.toolbar.programNamePlaceholder')"
           @blur="finishRename"
           @keydown="handleNameKeydown"
         />
