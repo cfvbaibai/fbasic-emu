@@ -8,7 +8,7 @@
 import type { ScreenCell } from '@/core/interfaces'
 
 // Re-export SyncCommandType for convenience
-export type { SyncCommandType } from './sharedDisplayBuffer'
+export { SyncCommandType } from './sharedDisplayBuffer'
 
 /**
  * Decoded screen state read from shared buffer.

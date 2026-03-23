@@ -56,6 +56,7 @@ import {
   SPRITE_DATA_FLOATS,
   SyncCommandType,
 } from './sharedDisplayBuffer'
+import type { ScreenCell } from '@/core/interfaces'
 import type { SyncCommand,SyncCommandParams } from './sharedDisplayBufferTypes'
 
 // Re-export types for convenience (preserve original public API)
