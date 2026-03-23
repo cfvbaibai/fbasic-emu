@@ -7,6 +7,7 @@
  */
 
 import { computed, onBeforeUnmount, ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import { parseMusic } from '@/core/sound/MusicDSLParser'
 import { SoundStateManager } from '@/core/sound/SoundStateManager'
@@ -22,6 +23,8 @@ import { useSoundTestResults } from './useSoundTestResults'
 defineOptions({
   name: 'SoundTestPage',
 })
+
+const { t } = useI18n()
 
 // Audio player
 const {
@@ -118,34 +121,33 @@ onBeforeUnmount(() => {
 <template>
   <GameLayout>
     <div class="sound-test-container">
-      <GameBlock title="PLAY Command Sound Test" title-icon="mdi:music" class="header-panel">
+      <GameBlock :title="t('soundTest.page.title')" title-icon="mdi:music" class="header-panel">
         <div class="header-content">
           <p class="description">
-            Test F-BASIC PLAY command features by listening and recording results.
-            After testing, copy results to share with AI for analysis.
+            {{ t('soundTest.page.description') }}
           </p>
           <div class="stats-grid">
             <div class="stat-item pass">
               <span class="stat-value">{{ stats.pass }}</span>
-              <span class="stat-label">Passed</span>
+              <span class="stat-label">{{ t('soundTest.page.passed') }}</span>
             </div>
             <div class="stat-item fail">
               <span class="stat-value">{{ stats.fail }}</span>
-              <span class="stat-label">Failed</span>
+              <span class="stat-label">{{ t('soundTest.page.failed') }}</span>
             </div>
             <div class="stat-item untested">
               <span class="stat-value">{{ stats.untested }}</span>
-              <span class="stat-label">Untested</span>
+              <span class="stat-label">{{ t('soundTest.page.untested') }}</span>
             </div>
           </div>
           <div class="header-actions">
             <GameButton type="primary" @click="copyResults">
-              {{ copySuccess ? 'Copied!' : 'Copy Results' }}
+              {{ copySuccess ? t('soundTest.page.copied') : t('soundTest.page.copyResults') }}
             </GameButton>
-            <GameButton type="default" @click="markAllPass">Mark All Pass</GameButton>
-            <GameButton type="default" @click="resetAll">Reset All</GameButton>
+            <GameButton type="default" @click="markAllPass">{{ t('soundTest.page.markAllPass') }}</GameButton>
+            <GameButton type="default" @click="resetAll">{{ t('soundTest.page.resetAll') }}</GameButton>
             <GameButton v-if="currentlyPlaying" type="danger" @click="stopPlayback">
-              Stop Sound
+              {{ t('soundTest.page.stopSound') }}
             </GameButton>
           </div>
         </div>

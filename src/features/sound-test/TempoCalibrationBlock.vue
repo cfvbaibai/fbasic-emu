@@ -7,6 +7,7 @@
  */
 
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import { parseMusic } from '@/core/sound/MusicDSLParser'
 import { SoundStateManager } from '@/core/sound/SoundStateManager'
@@ -21,6 +22,8 @@ defineOptions({
 const emit = defineEmits<{
   playingChange: [isPlaying: boolean]
 }>()
+
+const { t } = useI18n()
 
 // Audio player
 const { initialize, playMusic, stopAll } = useWebAudioPlayer()
@@ -122,26 +125,27 @@ defineExpose({
 </script>
 
 <template>
-  <GameBlock title="Tempo Calibration" title-icon="mdi:speedometer" class="calibration-panel">
+  <GameBlock :title="t('soundTest.tempoCalibration.title')" title-icon="mdi:speedometer" class="calibration-panel">
     <div class="calibration-content">
       <p class="calibration-description">
-        Compare IDE playback speed against real F-BASIC hardware.
-        Adjust the speed factor until the tempo matches your reference.
+        {{ t('soundTest.tempoCalibration.description') }}
       </p>
 
       <div class="calibration-controls">
         <div class="control-group">
-          <label class="control-label">PLAY String:</label>
+          <label class="control-label">{{ t('soundTest.tempoCalibration.playString') }}</label>
           <input
             v-model="calibrationPlayString"
             type="text"
             class="play-string-input"
-            placeholder="Enter PLAY string..."
+            :placeholder="t('soundTest.tempoCalibration.playStringPlaceholder')"
           />
         </div>
 
         <div class="control-group">
-          <label class="control-label">Speed Factor: {{ speedFactor.toFixed(2) }}x</label>
+          <label class="control-label">{{
+            t('soundTest.tempoCalibration.speedFactor', { factor: speedFactor.toFixed(2) })
+          }}</label>
           <div class="slider-container">
             <span class="slider-label">0.25x</span>
             <input
@@ -155,19 +159,19 @@ defineExpose({
             <span class="slider-label">4x</span>
           </div>
           <p class="slider-hint">
-            &lt; 1.0 = slower | 1.0 = current | &gt; 1.0 = faster
+            {{ t('soundTest.tempoCalibration.speedHint') }}
           </p>
         </div>
 
         <div class="calibration-actions">
           <GameButton :type="isCalibrationPlaying ? 'danger' : 'primary'" @click="togglePlay">
-            {{ isCalibrationPlaying ? 'Stop' : 'Play' }}
+            {{ isCalibrationPlaying ? t('soundTest.tempoCalibration.stop') : t('soundTest.tempoCalibration.play') }}
           </GameButton>
         </div>
       </div>
 
       <div class="tempo-reference">
-        <h4 class="reference-title">Current Tempo Mapping (ms per whole note):</h4>
+        <h4 class="reference-title">{{ t('soundTest.tempoCalibration.tempoMappingTitle') }}</h4>
         <div class="tempo-grid">
           <div v-for="(ms, tempo) in TEMPO_MS_PER_WHOLE_NOTE" :key="tempo" class="tempo-item">
             <span class="tempo-key">T{{ tempo }}</span>
@@ -176,9 +180,7 @@ defineExpose({
           </div>
         </div>
         <p class="reference-note">
-          * Scaled values with current speed factor.
-          T1 = fastest, T8 = slowest (per F-BASIC manual).
-          If IDE plays too fast, use factor &gt; 1.0 to slow down.
+          {{ t('soundTest.tempoCalibration.referenceNote') }}
         </p>
       </div>
     </div>

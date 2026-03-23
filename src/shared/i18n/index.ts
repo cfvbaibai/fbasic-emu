@@ -10,6 +10,7 @@ import enIde from './locales/en/ide.json'
 import enImageAnalyzer from './locales/en/image-analyzer.json'
 import enMonacoEditor from './locales/en/monaco-editor.json'
 import enNavigation from './locales/en/navigation.json'
+import enSoundTest from './locales/en/sound-test.json'
 import enSpriteViewer from './locales/en/sprite-viewer.json'
 import jaBgEditor from './locales/ja/bg-editor.json'
 import jaCommon from './locales/ja/common.json'
@@ -18,6 +19,7 @@ import jaIde from './locales/ja/ide.json'
 import jaImageAnalyzer from './locales/ja/image-analyzer.json'
 import jaMonacoEditor from './locales/ja/monaco-editor.json'
 import jaNavigation from './locales/ja/navigation.json'
+import jaSoundTest from './locales/ja/sound-test.json'
 import jaSpriteViewer from './locales/ja/sprite-viewer.json'
 import zhCNBgEditor from './locales/zh-CN/bg-editor.json'
 import zhCNCommon from './locales/zh-CN/common.json'
@@ -26,6 +28,7 @@ import zhCNIde from './locales/zh-CN/ide.json'
 import zhCNImageAnalyzer from './locales/zh-CN/image-analyzer.json'
 import zhCNMonacoEditor from './locales/zh-CN/monaco-editor.json'
 import zhCNNavigation from './locales/zh-CN/navigation.json'
+import zhCNSoundTest from './locales/zh-CN/sound-test.json'
 import zhCNSpriteViewer from './locales/zh-CN/sprite-viewer.json'
 import zhTWBgEditor from './locales/zh-TW/bg-editor.json'
 import zhTWCommon from './locales/zh-TW/common.json'
@@ -34,6 +37,7 @@ import zhTWIde from './locales/zh-TW/ide.json'
 import zhTWImageAnalyzer from './locales/zh-TW/image-analyzer.json'
 import zhTWMonacoEditor from './locales/zh-TW/monaco-editor.json'
 import zhTWNavigation from './locales/zh-TW/navigation.json'
+import zhTWSoundTest from './locales/zh-TW/sound-test.json'
 import zhTWSpriteViewer from './locales/zh-TW/sprite-viewer.json'
 import type { Locale, MessageSchema } from './types'
 
@@ -73,6 +77,7 @@ const i18n = createI18n<{ message: MessageSchema }, Locale>({
       imageAnalyzer: enImageAnalyzer,
       monacoEditor: enMonacoEditor,
       bgEditor: enBgEditor,
+      soundTest: enSoundTest,
     },
     ja: {
       navigation: jaNavigation,
@@ -83,6 +88,7 @@ const i18n = createI18n<{ message: MessageSchema }, Locale>({
       imageAnalyzer: jaImageAnalyzer,
       monacoEditor: jaMonacoEditor,
       bgEditor: jaBgEditor,
+      soundTest: jaSoundTest,
     },
     'zh-CN': {
       navigation: zhCNNavigation,
@@ -93,6 +99,7 @@ const i18n = createI18n<{ message: MessageSchema }, Locale>({
       imageAnalyzer: zhCNImageAnalyzer,
       monacoEditor: zhCNMonacoEditor,
       bgEditor: zhCNBgEditor,
+      soundTest: zhCNSoundTest,
     },
     'zh-TW': {
       navigation: zhTWNavigation,
@@ -103,6 +110,7 @@ const i18n = createI18n<{ message: MessageSchema }, Locale>({
       imageAnalyzer: zhTWImageAnalyzer,
       monacoEditor: zhTWMonacoEditor,
       bgEditor: zhTWBgEditor,
+      soundTest: zhTWSoundTest,
     },
   },
 })

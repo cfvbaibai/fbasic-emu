@@ -6,6 +6,8 @@
  * and result recording (pass/fail/skip + notes).
  */
 
+import { useI18n } from 'vue-i18n'
+
 import type { SoundTestCase } from './soundTestCases'
 
 defineOptions({
@@ -24,6 +26,8 @@ const emit = defineEmits<{
   setResult: [testId: string, result: 'pass' | 'fail' | 'untested']
   setNotes: [testId: string, notes: string]
 }>()
+
+const { t } = useI18n()
 
 function handlePlay() {
   emit('play', props.testCase.musicString, props.testCase.id)
@@ -56,7 +60,7 @@ function handleNotesInput(event: Event) {
         @click="handlePlay"
         :title="testCase.description"
       >
-        {{ isPlaying ? 'Playing...' : 'Play' }}
+        {{ isPlaying ? t('soundTest.testCase.playing') : t('soundTest.testCase.play') }}
       </button>
     </div>
     <div class="test-info">
@@ -70,27 +74,27 @@ function handleNotesInput(event: Event) {
           :class="{ active: result === 'pass' }"
           @click="handleSetResult('pass')"
         >
-          Pass
+          {{ t('soundTest.testCase.pass') }}
         </button>
         <button
           class="result-btn fail"
           :class="{ active: result === 'fail' }"
           @click="handleSetResult('fail')"
         >
-          Fail
+          {{ t('soundTest.testCase.fail') }}
         </button>
         <button
           class="result-btn skip"
           :class="{ active: result === 'untested' }"
           @click="handleSetResult('untested')"
         >
-          Skip
+          {{ t('soundTest.testCase.skip') }}
         </button>
       </div>
       <input
         type="text"
         class="notes-input"
-        placeholder="Notes (optional)..."
+        :placeholder="t('soundTest.testCase.notesPlaceholder')"
         :value="notes"
         @input="handleNotesInput"
       />

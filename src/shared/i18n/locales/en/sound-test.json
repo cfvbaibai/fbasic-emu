@@ -1,0 +1,46 @@
+{
+  "page": {
+    "title": "PLAY Command Sound Test",
+    "description": "Test F-BASIC PLAY command features by listening and recording results. After testing, copy results to share with AI for analysis.",
+    "passed": "Passed",
+    "failed": "Failed",
+    "untested": "Untested",
+    "copied": "Copied!",
+    "copyResults": "Copy Results",
+    "markAllPass": "Mark All Pass",
+    "resetAll": "Reset All",
+    "stopSound": "Stop Sound"
+  },
+  "tempoCalibration": {
+    "title": "Tempo Calibration",
+    "description": "Compare IDE playback speed against real F-BASIC hardware. Adjust the speed factor until the tempo matches your reference.",
+    "playString": "PLAY String:",
+    "playStringPlaceholder": "Enter PLAY string...",
+    "speedFactor": "Speed Factor: {factor}x",
+    "speedHint": "< 1.0 = slower | 1.0 = current | > 1.0 = faster",
+    "stop": "Stop",
+    "play": "Play",
+    "tempoMappingTitle": "Current Tempo Mapping (ms per whole note):",
+    "referenceNote": "* Scaled values with current speed factor. T1 = fastest, T8 = slowest (per F-BASIC manual). If IDE plays too fast, use factor > 1.0 to slow down."
+  },
+  "envelopeCalibration": {
+    "title": "Envelope Calibration",
+    "description": "Tune M1 envelope decay to match real F-BASIC hardware. Adjust the decay factor until the sound matches your reference.",
+    "envelopeValue": "Envelope Value (V0-V15):",
+    "testingValue": "Testing: V{value} ({ms}ms decay)",
+    "decayFactor": "Decay Factor: {factor}x",
+    "decayHint": "< 1.0 = shorter decay | 1.0 = current | > 1.0 = longer decay",
+    "stop": "Stop",
+    "play": "Play",
+    "envelopeMappingTitle": "Envelope Decay Mapping (ms):",
+    "referenceNote": "* Scaled values with current decay factor. V0 = fastest decay (quick \"ping\"), V15 = slowest decay (long fade). If decay is too long, use factor < 1.0 to shorten."
+  },
+  "testCase": {
+    "playing": "Playing...",
+    "play": "Play",
+    "pass": "Pass",
+    "fail": "Fail",
+    "skip": "Skip",
+    "notesPlaceholder": "Notes (optional)..."
+  }
+}
