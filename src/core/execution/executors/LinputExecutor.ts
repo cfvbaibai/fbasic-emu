@@ -28,7 +28,7 @@ export class LinputExecutor {
     if (!device?.requestInput) {
       this.context.addError({
         line: 0,
-        message: 'LINPUT is not supported (no input device)',
+        message: 'LINPUT failed: device adapter does not support input requests',
         type: ERROR_TYPES.RUNTIME,
       })
       return
