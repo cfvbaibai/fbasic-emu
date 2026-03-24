@@ -25,6 +25,16 @@ Follow `_shared/github-operations.md` open issue cap logic. Threshold: 20.
 
 If cap reached, write run log and report noting "cap reached", update config `total_runs`, and stop.
 
+## Phase 2.5 — Skip Check (Consecutive Low-Yield Detection)
+
+Before scanning, check the last 3 discovery reports for this pattern:
+- Report shows "no issues" or only 0-1 issues created
+- Most findings are "skipped (duplicate of #N)"
+
+If the last 3 consecutive runs all had 0-1 new issues, report "skip: diminishing returns — last 3 runs produced 0-1 issues each. Stopping early to save tokens. Run a full scan manually when new features/commits are added." Then write the run log, update config `total_runs`, and stop.
+
+This prevents wasted token spend when the codebase is in a stable, well-tracked state.
+
 ## Phase 3 — Multi-Angle Scan
 
 Use `total_runs` modulo to rotate focus areas. Every run does a **baseline scan** of the most common patterns, then rotates deeper analysis:
@@ -72,9 +82,20 @@ git log origin/master --oneline -20
 git diff origin/master~20..origin/master --stat
 ```
 
-### 3e. Existing Issue Cross-Reference
+### 3e. Deep Analysis (rotates with primary focus)
 
-Before proposing any new issue:
+When baseline scans yield diminishing returns, use these deeper analysis techniques. Rotate one per run based on `total_runs % 4`:
+
+| Run % 4 | Deep analysis |
+|---------|--------------|
+| 0 | **Sample program logic bugs** — Read `.bas` files in `src/core/samples/programs/`, trace control flow for off-by-one, unreachable code, wrong variable scoping, inverted comparisons |
+| 1 | **Edge case coverage** — Check if recent code changes handle boundary conditions (empty arrays, undefined values, max buffer sizes, overflow in arithmetic) |
+| 2 | **Cross-module consistency** — Verify that related modules agree on interfaces (e.g., executor expectations match device adapter capabilities, parser output matches executor input shapes) |
+| 3 | **Enrich existing issues** — Review the top 3 open issues and check if recent commits have partially addressed them. Add progress comments or close if resolved. |
+
+### 3f. Existing Issue Cross-Reference
+
+Before proposing any new issue, always check the existing open issues list:
 ```bash
 gh issue list --state open --json number,title --limit 50
 ```
