@@ -125,7 +125,10 @@ Write outputs following `_shared/path-conventions.md`:
 
 **Update config** — increment `total_runs`, `total_issues_triaged`, update `last_triage_run`.
 
-Print summary to user with triaged issue links.
+Print summary to user with triaged issue links. When outputting messages (especially in loop contexts), prefix with Asia/Shanghai timestamp:
+```
+[YYYY-MM-DD HH:MM:SS CST] <message>
+```
 
 ## Phase 6 — Self-Improvement
 

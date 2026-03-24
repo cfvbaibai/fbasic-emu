@@ -32,6 +32,24 @@ Schema:
 
 Update relevant counters after each run.
 
+## Timestamp Format
+
+When outputting messages (especially in loop contexts), always include a timestamp in **Asia/Shanghai timezone** (UTC+8):
+
+```
+[YYYY-MM-DD HH:MM:SS CST] <message>
+```
+
+Example bash for getting Shanghai time:
+```bash
+TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S %Z'
+```
+
+This applies to:
+- Loop iteration start/end messages
+- Status updates printed to user
+- Report summaries
+
 ## Phase Ordering
 
 Every command follows this structure:
@@ -55,7 +73,7 @@ Increment NNN for same-day runs. Template:
 ```markdown
 # Run YYYY-MM-DD-NNN
 - Type: <issue-discovery | issue-triage | issue-implementation | pr-maintenance>
-- Started: HH:MM
+- Started: YYYY-MM-DD HH:MM:SS CST (Asia/Shanghai)
 - Duration: X min
 - Outcome: success | blocked | cap-reached | no-issues
 - Issues affected: #N, #N, ...

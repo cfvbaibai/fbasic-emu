@@ -218,7 +218,10 @@ Write memory, run log, and report following `_shared/path-conventions.md`:
 
 **Update config.md** — increment `total_runs`, `total_issues_implemented` or `total_pr_maintenance`.
 
-Print a summary to the user with issue link, PR link, and key details.
+Print a summary to the user with issue link, PR link, and key details. When outputting messages (especially in loop contexts), prefix with Asia/Shanghai timestamp:
+```
+[YYYY-MM-DD HH:MM:SS CST] <message>
+```
 
 ## Phase 8 — Self-Improvement
 
