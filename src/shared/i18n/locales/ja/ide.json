@@ -34,6 +34,7 @@
   },
   "samples": {
     "title": "サンプルを読み込む",
+    "closeAriaLabel": "閉じる",
     "load": "サンプル",
     "placeholder": "サンプル",
     "basic": "基本",
