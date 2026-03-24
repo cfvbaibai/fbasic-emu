@@ -1,4 +1,19 @@
-10 FOR I = 1 TO 5
-20 IF I=3 THEN PRINT "Three"
-30 NEXT
-40 END
+10 REM * CONDITIONALS DEMO *
+20 REM Show IF/THEN with comparisons
+30 PRINT "=== COMPARISONS ==="
+40 FOR I = 1 TO 5
+50 IF I = 1 THEN PRINT "ONE"
+60 IF I < 3 THEN PRINT I;" < 3"
+70 IF I > 3 THEN PRINT I;" > 3"
+80 IF I <> 3 THEN PRINT I;" <> 3"
+90 NEXT
+100 REM Show AND/OR logic
+110 PRINT "=== LOGIC ==="
+120 X = 5
+130 IF X > 0 AND X < 10 THEN PRINT "X in range"
+140 IF X < 0 OR X > 10 THEN PRINT "X out of range"
+150 REM Simulate IF/ELSE with separate IF
+160 IF X >= 5 THEN PRINT "X >= 5"
+170 IF X < 5 THEN PRINT "X < 5"
+180 PRINT "=== DONE ==="
+190 END
