@@ -278,7 +278,8 @@
     "inputPlaceholder": "多个值请用逗号分隔"
   },
   "errorPanel": {
-    "sourceLabel": "位置:"
+    "sourceLabel": "位置:",
+    "stackTrace": "堆栈跟踪"
   },
   "joystick": {
     "control": "手柄控制",
@@ -362,10 +363,24 @@
     "description": "设置各区域的详细程度。{warn} = 安静；{debug} = 详细。",
     "ariaLabelFor": "{name}的日志级别"
   },
+  "movementCard": {
+    "actionNumber": "动作编号",
+    "statusActive": "活动",
+    "statusPaused": "暂停",
+    "directionAria": "方向 {direction}",
+    "directions": {
+      "0": "无",
+      "1": "上",
+      "2": "右上",
+      "3": "右",
+      "4": "右下",
+      "5": "下",
+      "6": "左下",
+      "7": "左",
+      "8": "左上"
+    }
+  },
   "screenTab": {
     "grid": "网格"
-  },
-  "errorPanel": {
-    "stackTrace": "堆栈跟踪"
   }
 }

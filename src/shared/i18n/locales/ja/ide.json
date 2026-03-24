@@ -278,7 +278,8 @@
     "inputPlaceholder": "複数の値はカンマで区切ってください"
   },
   "errorPanel": {
-    "sourceLabel": "場所:"
+    "sourceLabel": "場所:",
+    "stackTrace": "スタックトレース"
   },
   "joystick": {
     "control": "ジョイスティック制御",
@@ -362,10 +363,24 @@
     "description": "各領域の詳細度を設定します。{warn} = 静か；{debug} = 詳細。",
     "ariaLabelFor": "{name}のログレベル"
   },
+  "movementCard": {
+    "actionNumber": "アクション番号",
+    "statusActive": "アクティブ",
+    "statusPaused": "一時停止",
+    "directionAria": "方向 {direction}",
+    "directions": {
+      "0": "なし",
+      "1": "上",
+      "2": "右上",
+      "3": "右",
+      "4": "右下",
+      "5": "下",
+      "6": "左下",
+      "7": "左",
+      "8": "左上"
+    }
+  },
   "screenTab": {
     "grid": "グリッド"
-  },
-  "errorPanel": {
-    "stackTrace": "スタックトレース"
   }
 }
