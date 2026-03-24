@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, shallowRef, useTemplateRef } from 'vue'
 
+import type { SharedDisplayViews } from '@/core/animation/sharedDisplayBuffer'
 import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
 import type {
   BasicVariable,
@@ -112,7 +113,16 @@ const sendStrigEvent = basicIde?.sendStrigEvent ?? (() => {})
 const sharedDisplayBufferAccessor =
   basicIde?.sharedDisplayBufferAccessor ?? ({} as SharedDisplayBufferAccessor)
 const sharedAnimationBuffer = basicIde?.sharedAnimationBuffer ?? ({} as SharedArrayBuffer)
-const sharedDisplayViews = basicIde?.sharedDisplayViews ?? ({ buffer: {} as SharedArrayBuffer } as any)
+const sharedDisplayViews: SharedDisplayViews = basicIde?.sharedDisplayViews ?? {
+  buffer: {} as SharedArrayBuffer,
+  spriteView: {} as Float64Array,
+  charView: {} as Uint8Array,
+  patternView: {} as Uint8Array,
+  cursorView: {} as Uint8Array,
+  sequenceView: {} as Int32Array,
+  scalarsView: {} as Uint8Array,
+  animationSyncView: {} as Float64Array,
+}
 const sharedJoystickBuffer = basicIde?.sharedJoystickBuffer ?? ({} as SharedArrayBuffer)
 const setDecodedScreenState = basicIde?.setDecodedScreenState ?? (() => {})
 const registerScheduleRender = basicIde?.registerScheduleRender ?? (() => {})
