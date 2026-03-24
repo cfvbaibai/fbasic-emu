@@ -29,7 +29,7 @@ export class InputExecutor {
     if (!device?.requestInput) {
       this.context.addError({
         line: 0,
-        message: 'INPUT is not supported (no input device)',
+        message: 'INPUT failed: device adapter does not support input requests',
         type: ERROR_TYPES.RUNTIME,
       })
       return

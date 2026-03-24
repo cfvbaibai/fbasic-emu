@@ -170,7 +170,7 @@ export function registerReplStatementRules(
     p.CONSUME(RParen)
   })
 
-  // INKEY$ - Immediate keypress (not applicable for IDE)
+  // INKEY$ - Immediate keypress (fully implemented — removed from REPL-only list)
   p.inkeyStatement = p.RULE('inkeyStatement', () => {
     p.CONSUME(Inkey)
   })
