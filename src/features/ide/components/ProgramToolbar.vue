@@ -201,7 +201,7 @@ onUnmounted(() => {
       </template>
 
       <!-- Dirty indicator -->
-      <span v-if="programStore.isDirty.value" class="dirty-indicator" title="Unsaved changes">
+      <span v-if="programStore.isDirty.value" class="dirty-indicator" :title="t('ide.toolbar.unsavedChanges')">
         ●
       </span>
     </div>

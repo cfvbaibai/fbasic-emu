@@ -5,7 +5,8 @@
     "import": "导入",
     "export": "导出",
     "discardConfirm": "是否放弃未保存的更改？",
-    "programNamePlaceholder": "程序名称"
+    "programNamePlaceholder": "程序名称",
+    "unsavedChanges": "未保存的更改"
   },
   "codeEditor": {
     "title": "代码编辑器",
@@ -341,6 +342,8 @@
     "cgen": "CGEN",
     "spriteStates": "SPRITE 状态",
     "spriteEnabled": "SPRITE ON",
+    "on": "开",
+    "off": "关",
     "moveStates": "MOVE 状态",
     "bgBuffer": "BG 屏幕缓冲",
     "cursor": "光标",

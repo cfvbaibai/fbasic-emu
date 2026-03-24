@@ -133,7 +133,10 @@ defineExpose({
 
         <GameTabPane name="sprite" :label="t('ide.stateInspector.tabSprite')">
           <div class="tab-pane horizontal sprite-tab">
-            <div class="meta-line">{{ t('ide.stateInspector.spriteEnabled') }}: {{ spriteEnabled ? 'ON' : 'OFF' }}</div>
+            <div class="meta-line">
+              {{ t('ide.stateInspector.spriteEnabled') }}:
+              {{ spriteEnabled ? t('ide.stateInspector.on') : t('ide.stateInspector.off') }}
+            </div>
             <div v-if="(spriteStates ?? []).length === 0" class="empty">{{ t('ide.stateInspector.empty') }}</div>
             <div v-else class="grid-cards">
               <div
@@ -141,7 +144,8 @@ defineExpose({
                 :key="s.spriteNumber"
                 class="card"
               >
-                #{{ s.spriteNumber }} ({{ s.x }},{{ s.y }}) {{ s.visible ? 'on' : 'off' }} p={{ s.priority }}
+                #{{ s.spriteNumber }} ({{ s.x }},{{ s.y }})
+                {{ s.visible ? t('ide.stateInspector.on') : t('ide.stateInspector.off') }} p={{ s.priority }}
               </div>
             </div>
           </div>
