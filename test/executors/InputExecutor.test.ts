@@ -116,6 +116,6 @@ describe('InputExecutor', () => {
     const result = await interp.execute(source)
     expect(result.success).toBe(false)
     expect(result.errors.length).toBeGreaterThan(0)
-    expect(result.errors[0]?.message).toMatch(/not supported/)
+    expect(result.errors[0]?.message).toMatch(/device adapter does not support input requests/)
   })
 })
