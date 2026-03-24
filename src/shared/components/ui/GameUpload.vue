@@ -108,21 +108,35 @@ const handleDrop = (event: DragEvent) => {
       style="display: none"
     />
 
-    <div v-if="drag" class="game-upload-drag-area bg-game-surface shadow-game-base" @click="handleClick">
+    <button
+      v-if="drag"
+      type="button"
+      class="game-upload-drag-area bg-game-surface shadow-game-base"
+      :disabled="disabled"
+      :aria-label="t('common.upload.dragAndDrop')"
+      @click="handleClick"
+    >
       <GameIcon icon="mdi:upload" size="large" />
       <p class="game-upload-text">
         {{ t('common.upload.dragAndDrop') }}
         <span class="game-upload-link">{{ t('common.upload.clickToBrowse') }}</span>
       </p>
-    </div>
+    </button>
 
-    <div v-else class="game-upload-button-wrapper" @click="handleClick">
+    <button
+      v-else
+      type="button"
+      class="game-upload-button-wrapper"
+      :disabled="disabled"
+      :aria-label="t('common.buttons.upload')"
+      @click="handleClick"
+    >
       <slot>
         <GameButton :disabled="disabled" icon="mdi:upload">
           {{ t('common.buttons.upload') }}
         </GameButton>
       </slot>
-    </div>
+    </button>
   </div>
 </template>
 
@@ -143,6 +157,16 @@ const handleDrop = (event: DragEvent) => {
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: center;
+
+  /* Reset button styles */
+  width: 100%;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+}
+
+.game-upload-drag-area:disabled {
+  cursor: not-allowed;
 }
 
 .game-upload-dragging .game-upload-drag-area {
@@ -174,6 +198,21 @@ const handleDrop = (event: DragEvent) => {
 
 .game-upload-disabled {
   opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.game-upload-button-wrapper {
+  /* Reset button styles */
+  display: inline-block;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.game-upload-button-wrapper:disabled {
   cursor: not-allowed;
 }
 </style>

@@ -80,7 +80,7 @@ const categoryColors: Record<string, string> = {
       <!-- Header -->
       <div class="sample-selector-header">
         <h2 class="sample-selector-title">{{ t('ide.samples.title', 'Load Sample') }}</h2>
-        <button class="sample-selector-close" @click="emit('close')">
+        <button class="sample-selector-close" :aria-label="t('ide.samples.closeAriaLabel')" @click="emit('close')">
           <span class="mdi mdi-close"></span>
         </button>
       </div>
