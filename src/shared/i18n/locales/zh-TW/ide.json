@@ -272,6 +272,13 @@
     "submit": "確定",
     "cancel": "取消"
   },
+  "inputModal": {
+    "linputPlaceholder": "輸入文字（最多31個字元）",
+    "inputPlaceholder": "多個值請用逗號分隔"
+  },
+  "errorPanel": {
+    "sourceLabel": "位置:"
+  },
   "joystick": {
     "control": "搖桿控制",
     "status": "搖桿狀態",

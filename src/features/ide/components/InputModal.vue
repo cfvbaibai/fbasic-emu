@@ -58,8 +58,8 @@ watch(
           type="text"
           :placeholder="
             pendingRequest.isLinput
-              ? 'Enter text (up to 31 chars)'
-              : 'Separate multiple values with commas'
+              ? t('ide.inputModal.linputPlaceholder')
+              : t('ide.inputModal.inputPlaceholder')
           "
           class="input-modal-field"
         />

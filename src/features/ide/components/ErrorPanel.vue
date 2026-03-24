@@ -36,7 +36,7 @@ const { t } = useI18n()
           </span>
         </div>
         <div v-if="error.sourceLine" class="error-source-line">
-          <span class="error-source-label">At:</span>
+          <span class="error-source-label">{{ t('ide.errorPanel.sourceLabel') }}</span>
           <code>{{ error.sourceLine }}</code>
         </div>
         <details v-if="error.stack" class="error-stack-details">
