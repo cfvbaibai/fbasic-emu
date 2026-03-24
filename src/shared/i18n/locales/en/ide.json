@@ -5,7 +5,8 @@
     "import": "Import",
     "export": "Export",
     "discardConfirm": "Discard unsaved changes?",
-    "programNamePlaceholder": "Program name"
+    "programNamePlaceholder": "Program name",
+    "unsavedChanges": "Unsaved changes"
   },
   "codeEditor": {
     "title": "Code Editor",
@@ -341,6 +342,8 @@
     "cgen": "CGEN",
     "spriteStates": "SPRITE States",
     "spriteEnabled": "SPRITE ON",
+    "on": "ON",
+    "off": "OFF",
     "moveStates": "MOVE States",
     "bgBuffer": "BG Screen Buffer",
     "cursor": "Cursor",

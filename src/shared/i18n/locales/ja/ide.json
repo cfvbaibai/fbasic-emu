@@ -5,7 +5,8 @@
     "import": "インポート",
     "export": "エクスポート",
     "discardConfirm": "未保存の変更を破棄しますか？",
-    "programNamePlaceholder": "プログラム名"
+    "programNamePlaceholder": "プログラム名",
+    "unsavedChanges": "未保存の変更"
   },
   "codeEditor": {
     "title": "コードエディター",
@@ -341,6 +342,8 @@
     "cgen": "CGEN",
     "spriteStates": "SPRITE状態",
     "spriteEnabled": "SPRITE ON",
+    "on": "ON",
+    "off": "OFF",
     "moveStates": "MOVE状態",
     "bgBuffer": "BG画面バッファ",
     "cursor": "カーソル",
