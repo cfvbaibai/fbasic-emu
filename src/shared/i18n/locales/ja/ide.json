@@ -272,6 +272,13 @@
     "submit": "OK",
     "cancel": "キャンセル"
   },
+  "inputModal": {
+    "linputPlaceholder": "テキストを入力（最大31文字）",
+    "inputPlaceholder": "複数の値はカンマで区切ってください"
+  },
+  "errorPanel": {
+    "sourceLabel": "場所:"
+  },
   "joystick": {
     "control": "ジョイスティック制御",
     "status": "ジョイスティック状態",

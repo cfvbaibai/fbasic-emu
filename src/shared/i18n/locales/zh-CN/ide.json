@@ -272,6 +272,13 @@
     "submit": "确定",
     "cancel": "取消"
   },
+  "inputModal": {
+    "linputPlaceholder": "输入文本（最多31个字符）",
+    "inputPlaceholder": "多个值请用逗号分隔"
+  },
+  "errorPanel": {
+    "sourceLabel": "位置:"
+  },
   "joystick": {
     "control": "手柄控制",
     "status": "手柄状态",

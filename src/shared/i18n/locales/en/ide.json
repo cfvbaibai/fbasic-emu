@@ -272,6 +272,13 @@
     "submit": "OK",
     "cancel": "Cancel"
   },
+  "inputModal": {
+    "linputPlaceholder": "Enter text (up to 31 chars)",
+    "inputPlaceholder": "Separate multiple values with commas"
+  },
+  "errorPanel": {
+    "sourceLabel": "At:"
+  },
   "joystick": {
     "control": "Joystick Control",
     "status": "Joystick Status",
