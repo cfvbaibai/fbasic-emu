@@ -27,6 +27,18 @@ Keep the command definition concise — only add what prevents the same problem.
 
 **Scope**: Update only the specific command being run. Only modify shared docs (`_shared/`) if the improvement applies to all commands.
 
+## Commit & Push
+
+If the Improve step modified any command definition (`.claude/commands/<name>.md`) or shared doc (`_shared/*.md`):
+
+1. Stage only the changed `.claude/commands/` files
+2. Commit with: `chore: improve <command-name> self-improvement — <brief summary>`
+3. Push to `origin/master`
+
+Do NOT push unrelated unstaged changes. If the working tree has other modifications, stage only the command files explicitly.
+
+If no command definitions were modified, skip this step.
+
 ## Record
 
 Append to `~/.claude/automations/fbasic-ide/memory/improvements.md`:
