@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+
 import { GameIcon } from '@/shared/components/ui'
 import { MoveCharacterCode } from '@/shared/data/types'
 
@@ -26,6 +28,8 @@ defineProps<{
   slot: MovementSlotData
 }>()
 
+const { t } = useI18n()
+
 /** Direction 0–8 as MDI arrow icon names (0=none, 1=up … 8=up-left). */
 const DIRECTION_ICONS: Record<number, string> = {
   0: 'mdi:circle-outline',
@@ -39,24 +43,12 @@ const DIRECTION_ICONS: Record<number, string> = {
   8: 'mdi:arrow-top-left',
 }
 
-const DIRECTION_NAMES: Record<number, string> = {
-  0: 'none',
-  1: 'up',
-  2: 'up-right',
-  3: 'right',
-  4: 'down-right',
-  5: 'down',
-  6: 'down-left',
-  7: 'left',
-  8: 'up-left',
-}
-
 function directionIcon(dir: number): string {
   return DIRECTION_ICONS[dir] ?? 'mdi:circle-outline'
 }
 
 function directionTitle(dir: number): string {
-  return DIRECTION_NAMES[dir] ?? `dir ${dir}`
+  return t(`ide.movementCard.directions.${dir}`)
 }
 
 function characterTypeLabel(code: number): string {
@@ -68,7 +60,7 @@ function characterTypeLabel(code: number): string {
 <template>
   <div class="card move-card">
     <div class="move-card-header">
-      <span class="move-card-id" title="Action number">
+      <span class="move-card-id" :title="t('ide.movementCard.actionNumber')">
         <span>{{ slot.actionNumber }}</span>
       </span>
       <template v-if="slot.hasData">
@@ -78,7 +70,10 @@ function characterTypeLabel(code: number): string {
         >
           {{ characterTypeLabel(slot.characterType).slice(0, 5) }}
         </span>
-        <span class="move-card-status" :title="slot.isActive ? 'Active' : 'Paused'">
+        <span
+          class="move-card-status"
+          :title="slot.isActive ? t('ide.movementCard.statusActive') : t('ide.movementCard.statusPaused')"
+        >
           <GameIcon
             :icon="slot.isActive ? 'mdi:play' : 'mdi:pause'"
             size="small"
@@ -88,7 +83,7 @@ function characterTypeLabel(code: number): string {
         <span
           class="move-card-dir"
           :title="directionTitle(slot.direction)"
-          :aria-label="`direction ${directionTitle(slot.direction)}`"
+          :aria-label="t('ide.movementCard.directionAria', { direction: directionTitle(slot.direction) })"
         >
           <GameIcon
             :icon="directionIcon(slot.direction)"

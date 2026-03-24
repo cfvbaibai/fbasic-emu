@@ -278,7 +278,8 @@
     "inputPlaceholder": "多個值請用逗號分隔"
   },
   "errorPanel": {
-    "sourceLabel": "位置:"
+    "sourceLabel": "位置:",
+    "stackTrace": "堆疊追蹤"
   },
   "joystick": {
     "control": "搖桿控制",
@@ -362,10 +363,24 @@
     "description": "設定各區域的詳細程度。{warn} = 安靜；{debug} = 詳細。",
     "ariaLabelFor": "{name}的日誌級別"
   },
+  "movementCard": {
+    "actionNumber": "動作編號",
+    "statusActive": "活動",
+    "statusPaused": "暫停",
+    "directionAria": "方向 {direction}",
+    "directions": {
+      "0": "無",
+      "1": "上",
+      "2": "右上",
+      "3": "右",
+      "4": "右下",
+      "5": "下",
+      "6": "左下",
+      "7": "左",
+      "8": "左上"
+    }
+  },
   "screenTab": {
     "grid": "網格"
-  },
-  "errorPanel": {
-    "stackTrace": "堆疊追蹤"
   }
 }

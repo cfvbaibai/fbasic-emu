@@ -278,7 +278,8 @@
     "inputPlaceholder": "Separate multiple values with commas"
   },
   "errorPanel": {
-    "sourceLabel": "At:"
+    "sourceLabel": "At:",
+    "stackTrace": "Stack trace"
   },
   "joystick": {
     "control": "Joystick Control",
@@ -362,10 +363,24 @@
     "description": "Set verbosity per area. {warn} = quiet; {debug} = verbose.",
     "ariaLabelFor": "Log level for {name}"
   },
+  "movementCard": {
+    "actionNumber": "Action number",
+    "statusActive": "Active",
+    "statusPaused": "Paused",
+    "directionAria": "direction {direction}",
+    "directions": {
+      "0": "none",
+      "1": "up",
+      "2": "up-right",
+      "3": "right",
+      "4": "down-right",
+      "5": "down",
+      "6": "down-left",
+      "7": "left",
+      "8": "up-left"
+    }
+  },
   "screenTab": {
     "grid": "Grid"
-  },
-  "errorPanel": {
-    "stackTrace": "Stack trace"
   }
 }
