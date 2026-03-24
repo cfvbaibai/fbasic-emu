@@ -353,5 +353,11 @@
     "title": "日志级别",
     "description": "设置各区域的详细程度。{warn} = 安静；{debug} = 详细。",
     "ariaLabelFor": "{name}的日志级别"
+  },
+  "screenTab": {
+    "grid": "网格"
+  },
+  "errorPanel": {
+    "stackTrace": "堆栈跟踪"
   }
 }

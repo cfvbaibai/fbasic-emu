@@ -353,5 +353,11 @@
     "title": "日誌級別",
     "description": "設定各區域的詳細程度。{warn} = 安靜；{debug} = 詳細。",
     "ariaLabelFor": "{name}的日誌級別"
+  },
+  "screenTab": {
+    "grid": "網格"
+  },
+  "errorPanel": {
+    "stackTrace": "堆疊追蹤"
   }
 }

@@ -73,7 +73,7 @@ const isGridShown = computed(() => showGrid.value)
           @click="toggleGrid"
         >
           <GameIcon icon="mdi:grid" size="small" />
-          Grid
+          {{ t('ide.screenTab.grid') }}
         </GameButton>
       </div>
     </template>

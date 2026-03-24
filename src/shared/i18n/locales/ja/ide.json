@@ -353,5 +353,11 @@
     "title": "ログレベル",
     "description": "各領域の詳細度を設定します。{warn} = 静か；{debug} = 詳細。",
     "ariaLabelFor": "{name}のログレベル"
+  },
+  "screenTab": {
+    "grid": "グリッド"
+  },
+  "errorPanel": {
+    "stackTrace": "スタックトレース"
   }
 }

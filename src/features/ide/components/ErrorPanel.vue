@@ -40,7 +40,7 @@ const { t } = useI18n()
           <code>{{ error.sourceLine }}</code>
         </div>
         <details v-if="error.stack" class="error-stack-details">
-          <summary>Stack trace</summary>
+          <summary>{{ t('ide.errorPanel.stackTrace') }}</summary>
           <pre class="error-stack">{{ error.stack }}</pre>
         </details>
       </div>
