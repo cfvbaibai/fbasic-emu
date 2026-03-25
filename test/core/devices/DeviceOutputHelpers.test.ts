@@ -12,6 +12,7 @@ import {
   postPlaySound,
   serializeAudioEvents,
 } from '@/core/devices/DeviceOutputHelpers'
+import type { PlaySoundMessage } from '@/core/interfaces'
 import type { CompiledAudio } from '@/core/sound/types'
 
 // Mock logger
@@ -152,7 +153,7 @@ describe('DeviceOutputHelpers', () => {
     })
 
     it('should include musicString when provided', () => {
-      const events = []
+      const events: PlaySoundMessage['data']['events'] = []
       const msg = buildPlaySoundMessage('exec-1', events, 'C4D4E4')
       expect(msg.data.musicString).toBe('C4D4E4')
     })
@@ -181,8 +182,9 @@ describe('DeviceOutputHelpers', () => {
       expect(capturedMessages.length).toBe(1)
       const msg = capturedMessages[0] as Record<string, unknown>
       expect(msg.type).toBe('PLAY_SOUND')
-      expect(msg.data.executionId).toBe('exec-1')
-      expect((msg.data.events as unknown[]).length).toBe(1)
+      const data = msg.data as Record<string, unknown>
+      expect(data.executionId).toBe('exec-1')
+      expect((data.events as unknown[]).length).toBe(1)
     })
   })
 
@@ -192,8 +194,9 @@ describe('DeviceOutputHelpers', () => {
       expect(capturedMessages.length).toBe(1)
       const msg = capturedMessages[0] as Record<string, unknown>
       expect(msg.type).toBe('PLAY_SOUND')
-      expect(msg.data.executionId).toBe('exec-1')
-      expect(msg.data.musicString).toBe('BEEP')
+      const data = msg.data as Record<string, unknown>
+      expect(data.executionId).toBe('exec-1')
+      expect(data.musicString).toBe('BEEP')
     })
   })
 })

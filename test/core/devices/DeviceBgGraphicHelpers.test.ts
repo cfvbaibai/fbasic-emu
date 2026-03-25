@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest'
 
 import { copyBgGraphicToScreenBuffer } from '@/core/devices/DeviceBgGraphicHelpers'
 import type { ScreenCell } from '@/core/interfaces'
-import type { BgCell } from '@/features/bg-editor/types'
+import type { BgCell, ColorPattern } from '@/features/bg-editor/types'
 
 /**
  * Create a 28x24 screen buffer filled with spaces and colorPattern 0
@@ -72,7 +72,7 @@ describe('DeviceBgGraphicHelpers', () => {
     it('should not exceed 28 columns', () => {
       const screenBuffer = createEmptyScreenBuffer()
       const bgGridData: BgCell[][] = [
-        Array.from({ length: 30 }, (_, i) => ({ charCode: 65 + i, colorPattern: i % 4 })),
+        Array.from({ length: 30 }, (_, i) => ({ charCode: 65 + i, colorPattern: (i % 4) as ColorPattern })),
       ]
 
       copyBgGraphicToScreenBuffer(bgGridData, screenBuffer)
@@ -85,7 +85,7 @@ describe('DeviceBgGraphicHelpers', () => {
     it('should not exceed 24 rows', () => {
       const screenBuffer = createEmptyScreenBuffer()
       const bgGridData: BgCell[][] = Array.from({ length: 26 }, (_, row) => [
-        { charCode: 65 + row, colorPattern: row % 4 },
+        { charCode: 65 + row, colorPattern: (row % 4) as ColorPattern },
       ])
 
       copyBgGraphicToScreenBuffer(bgGridData, screenBuffer)
@@ -98,12 +98,9 @@ describe('DeviceBgGraphicHelpers', () => {
     it('should skip falsy rows', () => {
       const screenBuffer = createEmptyScreenBuffer()
       // BgGridData is BgCell[][] but production code guards against falsy rows
-      // Use type assertion through a variable to satisfy no-restricted-syntax
-      const gridWithEmpty: (BgCell[] | undefined)[][] = [
-        undefined,
-        [{ charCode: 88, colorPattern: 1 }],
-      ]
-      const bgGridData = gridWithEmpty as BgCell[][]
+      const validRow: BgCell[] = [{ charCode: 88, colorPattern: 1 }]
+      // eslint-disable-next-line no-restricted-syntax
+      const bgGridData = [undefined, validRow] as unknown as BgCell[][]
 
       copyBgGraphicToScreenBuffer(bgGridData, screenBuffer)
 
