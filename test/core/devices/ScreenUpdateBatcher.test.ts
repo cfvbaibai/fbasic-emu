@@ -7,12 +7,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ScreenUpdateBatcher } from '@/core/devices/ScreenUpdateBatcher'
 
 describe('ScreenUpdateBatcher', () => {
-  let flushCallback: ReturnType<typeof vi.fn>
+  let flushCallback: () => void
   let batcher: ScreenUpdateBatcher
 
   beforeEach(() => {
     vi.useFakeTimers()
-    flushCallback = vi.fn()
+    flushCallback = vi.fn<() => void>()
     batcher = new ScreenUpdateBatcher(flushCallback)
   })
 

@@ -2,7 +2,7 @@
  * Unit tests for ScreenStateManager
  */
 
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ScreenStateManager } from '@/core/devices/ScreenStateManager'
 
@@ -390,7 +390,7 @@ describe('ScreenStateManager', () => {
       expect(msg.type).toBe('SCREEN_UPDATE')
       expect(msg.data.updateType).toBe('full')
       expect(msg.data.executionId).toBe('test-exec')
-      expect(msg.data.screenBuffer.length).toBe(24)
+      expect(msg.data.screenBuffer!.length).toBe(24)
       expect(msg.data.cursorX).toBe(0)
       expect(msg.data.cursorY).toBe(0)
     })

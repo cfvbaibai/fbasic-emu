@@ -82,7 +82,7 @@ describe('WebWorkerManager', () => {
 
     // Double assertion needed: test mock -> Worker browser API
     // eslint-disable-next-line no-restricted-syntax
-    const workerCtor = MockWorkerWrapper as unknown as { new (...args: never[]): Worker }
+    const workerCtor = MockWorkerWrapper as unknown as typeof Worker
     globalThis.Worker = workerCtor
 
     return { getLastInstance: () => lastInstance }
@@ -137,7 +137,7 @@ describe('WebWorkerManager', () => {
 
   describe('sendMessage', () => {
     it('should be safe to call before initialization (no-op)', () => {
-      expect(() => manager.sendMessage({ type: 'STOP', id: 'test', timestamp: 0, data: {} })).not.toThrow()
+      expect(() => manager.sendMessage({ type: 'STOP', id: 'test', timestamp: 0, data: { executionId: 'current' } })).not.toThrow()
     })
   })
 
@@ -180,9 +180,10 @@ describe('WebWorkerManager', () => {
 
       // Start an execution (will not complete since mock doesn't respond)
       const executePromise = manager.executeInWorker('10 PRINT "HELLO"', {
-        maxStatements: 1000,
-        maxExecutionTime: 5000,
-        collectCoverage: false,
+        maxIterations: 1000,
+        maxOutputLines: 100,
+        enableDebugMode: false,
+        strictMode: false,
       }, { timeout: 5000 })
 
       // Terminate immediately - should reject pending
@@ -205,13 +206,14 @@ describe('WebWorkerManager', () => {
 
       // Double assertion needed: test mock -> Worker browser API
       // eslint-disable-next-line no-restricted-syntax
-      const throwingCtor = ThrowingWorker as unknown as { new (...args: never[]): Worker }
+      const throwingCtor = ThrowingWorker as unknown as typeof Worker
       globalThis.Worker = throwingCtor
 
       await expect(manager.executeInWorker('10 PRINT "X"', {
-        maxStatements: 1000,
-        maxExecutionTime: 5000,
-        collectCoverage: false,
+        maxIterations: 1000,
+        maxOutputLines: 100,
+        enableDebugMode: false,
+        strictMode: false,
       })).rejects.toThrow()
     })
 
@@ -224,9 +226,10 @@ describe('WebWorkerManager', () => {
 
       // Start execution (worker already initialized, so no new Worker created)
       const executePromise = manager.executeInWorker('10 PRINT "TEST"', {
-        maxStatements: 1000,
-        maxExecutionTime: 5000,
-        collectCoverage: false,
+        maxIterations: 1000,
+        maxOutputLines: 100,
+        enableDebugMode: false,
+        strictMode: false,
       }, { timeout: 5000 })
 
       // Verify message was posted

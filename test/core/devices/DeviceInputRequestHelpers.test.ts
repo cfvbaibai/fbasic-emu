@@ -77,7 +77,7 @@ describe('DeviceInputRequestHelpers', () => {
       const map = createInputRequestsMap()
       const promise = createInputRequest(map, 'exec-1', '?', 2, false)
 
-      const requestId = (capturedMessages[0] as Record<string, Record<string, unknown>>).data.requestId as string
+      const requestId = (capturedMessages[0] as Record<string, Record<string, unknown>>).data!.requestId as string
 
       const message: InputValueMessage = {
         type: 'INPUT_VALUE',
@@ -99,7 +99,7 @@ describe('DeviceInputRequestHelpers', () => {
       const map = createInputRequestsMap()
       const promise = createInputRequest(map, 'exec-1', '?', 1, false)
 
-      const requestId = (capturedMessages[0] as Record<string, Record<string, unknown>>).data.requestId as string
+      const requestId = (capturedMessages[0] as Record<string, Record<string, unknown>>).data!.requestId as string
 
       const message: InputValueMessage = {
         type: 'INPUT_VALUE',
@@ -139,7 +139,7 @@ describe('DeviceInputRequestHelpers', () => {
 
       expect(map.size).toBe(1)
 
-      const requestId = (capturedMessages[0] as Record<string, Record<string, unknown>>).data.requestId as string
+      const requestId = (capturedMessages[0] as Record<string, Record<string, unknown>>).data!.requestId as string
 
       const message: InputValueMessage = {
         type: 'INPUT_VALUE',
