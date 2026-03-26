@@ -9,7 +9,7 @@
 90 PAUSE 30
 100 REM Eighth-note scale (faster)
 110 PRINT "Eighth notes:"
-120 PLAY "T120O2CDEFGABO3C"
+120 PLAY "T120L8O2CDEFGABO3C"
 130 PAUSE 30
 140 REM Half notes (slow)
 150 PRINT "Half notes:"

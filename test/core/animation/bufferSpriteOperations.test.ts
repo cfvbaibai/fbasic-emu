@@ -23,7 +23,7 @@ import {
   readSpriteTotalDistanceFromView,
   writeSpriteStateToView,
 } from '@/core/animation/bufferSpriteOperations'
-import { MAX_SPRITES, slotBase,SPRITE_DATA_FLOATS } from '@/core/animation/sharedDisplayBuffer'
+import { MAX_SPRITES, slotBase, SPRITE_DATA_FLOATS } from '@/core/animation/sharedDisplayBuffer'
 
 function createView(): Float64Array {
   return new Float64Array(SPRITE_DATA_FLOATS)

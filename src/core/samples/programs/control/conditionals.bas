@@ -6,6 +6,8 @@
 60 IF I < 3 THEN PRINT I;" < 3"
 70 IF I > 3 THEN PRINT I;" > 3"
 80 IF I <> 3 THEN PRINT I;" <> 3"
+85 IF I <= 2 THEN PRINT I;" <= 2"
+86 IF I >= 4 THEN PRINT I;" >= 4"
 90 NEXT
 100 REM Show AND/OR logic
 110 PRINT "=== LOGIC ==="
