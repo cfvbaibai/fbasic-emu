@@ -10,6 +10,7 @@ import type { CstNode } from 'chevrotain'
 
 import {
   Beep,
+  Bgplay,
   Cgen,
   Cgset,
   Clear,
@@ -100,6 +101,7 @@ export interface DispatcherRuleDeclarations {
   nextStatement: () => CstNode
   endStatement: () => CstNode
   pauseStatement: () => CstNode
+  bgplayStatement: () => CstNode
   playStatement: () => CstNode
   beepStatement: () => CstNode
   dimStatement: () => CstNode
@@ -203,6 +205,10 @@ export function registerDispatcherRules(
       {
         GATE: () => p.LA(1).tokenType === Play,
         ALT: () => p.SUBRULE(p.playStatement),
+      },
+      {
+        GATE: () => p.LA(1).tokenType === Bgplay,
+        ALT: () => p.SUBRULE(p.bgplayStatement),
       },
       {
         GATE: () => p.LA(1).tokenType === Beep,
