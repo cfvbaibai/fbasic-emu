@@ -171,10 +171,10 @@ describe('Shared Joystick Buffer Integration', () => {
 
       // Relative threshold avoids flaky absolute wall-clock assumptions while still
       // detecting major overhead regressions (e.g., accidental messaging/sync work).
-      // Using 20x multiplier to tolerate CI environment timing variance while still
+      // Using 12x multiplier to tolerate CI environment timing variance while still
       // catching major regressions (setStickState should be ~same speed as direct write).
       const baselineFloorMs = Math.max(baselineDuration, 0.5)
-      expect(setStickStateDuration).toBeLessThanOrEqual(baselineFloorMs * 20)
+      expect(setStickStateDuration).toBeLessThanOrEqual(baselineFloorMs * 12)
     })
 
     it('should support concurrent read/write (same joystick)', () => {
