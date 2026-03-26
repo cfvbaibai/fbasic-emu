@@ -1,5 +1,16 @@
-10 PRINT "BEEP Demo"
-20 PRINT "Beeping..."
-30 BEEP
-40 PRINT "Done!"
-50 END
+10 REM * BEEP Command Demo *
+20 PRINT "BEEP Demo"
+30 PRINT "Three beeps:"
+40 FOR I = 1 TO 3
+50 BEEP
+60 PAUSE 50
+70 NEXT
+80 PRINT ""
+90 PRINT "Countdown beeps:"
+100 FOR I = 3 TO 1 STEP -1
+110 PRINT I; "...";
+120 BEEP
+130 PAUSE 80
+140 NEXT
+150 PRINT "Go!"
+160 END
