@@ -84,14 +84,17 @@ git diff origin/master~20..origin/master --stat
 
 ### 3e. Deep Analysis (rotates with primary focus)
 
-When baseline scans yield diminishing returns, use these deeper analysis techniques. Rotate one per run based on `total_runs % 4`:
+Use these deeper analysis techniques to find issues beyond surface pattern matching. Rotate one per run based on `total_runs % 5`:
 
-| Run % 4 | Deep analysis |
+| Run % 5 | Deep analysis |
 |---------|--------------|
-| 0 | **Sample program logic bugs** — Read `.bas` files in `src/core/samples/programs/`, trace control flow for off-by-one, unreachable code, wrong variable scoping, inverted comparisons |
+| 0 | **Sample program quality** — Read `.bas` files in `src/core/samples/programs/`, evaluate whether they effectively demonstrate their target F-BASIC feature. Check: PAUSE/timing durations (too short to perceive?), visual output clarity, user feedback, completeness of use cases, educational value. Focus on samples visible in the SampleSelector. |
 | 1 | **Edge case coverage** — Check if recent code changes handle boundary conditions (empty arrays, undefined values, max buffer sizes, overflow in arithmetic) |
 | 2 | **Cross-module consistency** — Verify that related modules agree on interfaces (e.g., executor expectations match device adapter capabilities, parser output matches executor input shapes) |
 | 3 | **Enrich existing issues** — Review the top 3 open issues and check if recent commits have partially addressed them. Add progress comments or close if resolved. |
+| 4 | **UX quality review** — Scan Vue components and composables for usability issues that static analysis misses: confusing flows, missing loading states, poor error messages, inconsistent behavior, unclear labels, inaccessible features |
+
+**Agent verification requirements**: When using deep analysis agents, instruct them to: (1) read actual file content before making claims, (2) distinguish concrete user-facing problems from subjective quality opinions, (3) cross-reference existing open issues before proposing new findings.
 
 ### 3f. Existing Issue Cross-Reference
 

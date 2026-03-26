@@ -118,6 +118,10 @@ Also always run eslint with --fix on changed files to catch and auto-fix lint er
 
 Do NOT run full lint/test/build unless the change scope warrants it. Do NOT commit — I will handle the commit and PR.
 
+When creating new `.ts` files outside `src/`, `test/`, or `scripts/` (e.g., at the project root), also update `tsconfig.json` include array if the file is not already covered by existing glob patterns.
+
+When fixing routing/URL issues in E2E test files, grep ALL test files for the same pattern (e.g., `page.goto`) to catch all instances — partial fixes are a common failure mode.
+
 When done, report back: (1) root cause, (2) files changed, (3) test results.
 ```
 
