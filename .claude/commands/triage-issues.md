@@ -73,6 +73,34 @@ Based on the issue's domain, suggest which team should handle it:
 ### Duplicate Check
 Before classifying, cross-reference other open issues for potential duplicates. If a likely duplicate is found, note it in the report but don't apply labels to the newer one — suggest the author close it or add a `duplicate` label.
 
+### Complex Issue Decomposition
+If an issue has been marked **"TOO COMPLEX"** by the implementer (comment containing "TOO COMPLEX"), decompose it into smaller, independently-implementable sub-issues. This is the **triager's duty**, not the discoverer's.
+
+**Steps:**
+1. Read the implementer's comment to get the suggested split
+2. Create focused sub-issues, each covering one logical step or subsystem
+3. Title each sub-issue: `<type>: <focused action> — Step N of M for #<parent>`
+   - Type should match the parent (use `feat:` or `fix:` based on context, default to `enhancement` for new features)
+4. Body of each sub-issue must include: `Parent: #<N>` and a brief description of scope
+5. Label each sub-issue: `enhancement` (or parent's type), `p3`, `claude-automation`
+6. **Keep the parent issue open** — do not close it
+7. Note the sub-issues in the report under "Complex Issues Decomposed"
+
+**Sub-issue filing example:**
+```bash
+gh issue create --title "feat: add BGPLAY parser statement (grammar only) — Step 1 of 5 for #179" \
+  --body "Parent: #179
+
+Implements the grammar rule for the BGPLAY statement. No execution semantics." \
+  --label "enhancement" --label "p3" --label "claude-automation"
+```
+
+**Rules:**
+- Only file sub-issues if the implementer explicitly marked the parent as TOO COMPLEX
+- Each sub-issue must be independently implementable (no cross-step dependencies unless clearly declared)
+- Default to enhancement + p3 unless a sub-issue clearly warrants a different type/priority
+- Do not attempt to estimate implementation order beyond what the implementer suggested
+
 ## Phase 4 — Apply Labels
 
 For each classified issue:
@@ -117,10 +145,17 @@ Write outputs following `_shared/path-conventions.md`:
 ## Potential Duplicates
 - #N similar to #M — <similarity description>
 
+## Complex Issues Decomposed
+- #N (parent): marked TOO COMPLEX by implementer — filed as:
+  - #N+1: <sub-issue title>
+  - #N+2: <sub-issue title>
+  ...
+
 ## Summary
 - Issues triaged: N
 - Issues skipped (already labeled): N
 - Potential duplicates: N
+- Complex issues decomposed: N
 ```
 
 **Update config** — increment `total_runs`, `total_issues_triaged`, update `last_triage_run`.
@@ -139,3 +174,4 @@ Focus on:
 - Were type classifications correct?
 - Were there issues we couldn't classify confidently?
 - Did we miss any duplicate relationships?
+- For decomposed "TOO COMPLEX" issues: were sub-issues well-scoped and independently implementable?

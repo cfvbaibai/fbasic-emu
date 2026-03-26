@@ -59,7 +59,23 @@ Select the **highest-priority unassigned** issue:
 - Among same priority, prefer bugs over enhancements
 - Scan `~/.claude/automations/fbasic-ide/memory/issues/` for existing `issue-*.md` files to avoid re-picking
 
-If no suitable issue found, report "no issues to implement" and stop.
+If all remaining open issues are too complex for the pipeline (multi-module features requiring architectural decisions), post a `## TOO COMPLEX` comment with suggested sub-issue splits. Then report "no issues to implement" and stop.
+
+Too-complex comment template:
+```
+## TOO COMPLEX for automated pipeline
+
+This issue is too large for the automated pipeline. **Please split into smaller, focused sub-issues** that can be implemented independently.
+
+Suggested split:
+1. <sub-issue 1>
+2. <sub-issue 2>
+...
+
+**Blocked for automation until decomposed.**
+```
+
+Only post this comment once per issue (check for existing "TOO COMPLEX" comments first).
 
 ## Phase 3 — Worktree Setup
 
@@ -113,7 +129,9 @@ This worktree contains a fresh checkout of origin/master. All implementation mus
 After implementation, run targeted tests for the files you changed:
   cd ${WT_PATH} && pnpm install --frozen-lockfile && pnpm -s test:run -- <relevant-test-paths>
 
-Also always run eslint with --fix on changed files to catch and auto-fix lint errors before committing:
+Also always run type-check and eslint with --fix on changed files to catch and auto-fix errors before committing:
+  cd ${WT_PATH} && pnpm -s type-check
+  cd ${WT_PATH} && pnpm exec eslint --fix <changed-files> && git diff --exit-code  # fail if fix changed files (need to amend)
   cd ${WT_PATH} && pnpm exec eslint --fix <changed-files> && git diff --exit-code  # fail if fix changed files (need to amend)
 
 Do NOT run full lint/test/build unless the change scope warrants it. Do NOT commit — I will handle the commit and PR.
@@ -161,9 +179,62 @@ EOF
 )" --base master --head "$BRANCH"
 ```
 
-## Phase 6 — Cleanup
+## Phase 6 — Wait for CI & Fix
 
-After PR is created/updated, remove the worktree defensively (Windows worktree removal is unreliable):
+**You MUST NOT proceed past this phase until all CI checks pass.** This is a hard gate — do not stop, do not report "awaiting CI", do not move to cleanup.
+
+After pushing, poll CI status every 30 seconds until all checks complete:
+
+```bash
+gh pr view ${PR_NUMBER} --json statusCheckRollup --jq '.statusCheckRollup[] | "\(.name): \(.conclusion // .status)"'
+```
+
+Wait for all checks to reach `SUCCESS` or `FAILURE` (not `QUEUED`/`IN_PROGRESS`).
+
+### If CI passes (all SUCCESS)
+
+Proceed to Phase 7.
+
+### If CI fails
+
+**Fix immediately.** Do not stop or defer to a future run.
+
+1. Fetch the CI failure logs:
+   ```bash
+   gh run view ${RUN_ID} --log-failed 2>&1 | head -200
+   ```
+
+2. Re-create the worktree from the PR branch:
+   ```bash
+   git -c safe.directory="$(pwd)" worktree prune
+   git -c safe.directory="$(pwd)" worktree add "$WT_PATH" origin/"$BRANCH"
+   ```
+
+3. Fix the issue in the worktree. Common CI failures:
+   - **Type errors**: Run `pnpm -s type-check` locally to reproduce. Use codebase helpers (e.g., `getFirstCstNode()` from `cst-helpers.ts`) instead of raw CST access.
+   - **Lint errors**: Run `pnpm exec eslint --fix <files>` then amend if needed.
+   - **Test failures**: Run the specific failing test to reproduce.
+   - **Build failures**: Usually caused by type errors — check type-check output first.
+
+4. Amend the fix into the original commit and force-push:
+   ```bash
+   cd "$WT_PATH"
+   git add <changed-files>
+   git commit --amend --no-edit
+   git push origin "$BRANCH" --force-with-lease
+   ```
+
+5. **Do NOT create a separate fix commit** — always amend to maintain the single-commit rule.
+
+6. Return to the top of Phase 6 and poll again.
+
+### CI retry limit
+
+If CI fails 3 times on the same PR (after 3 fix attempts), stop and report the persistent failure with full logs. This prevents infinite loops on truly broken CI infrastructure.
+
+## Phase 7 — Cleanup
+
+After PR is created/updated and CI is green, remove the worktree defensively (Windows worktree removal is unreliable):
 
 ```bash
 # Remove worktree — may fail on Windows, use fallback
@@ -176,7 +247,7 @@ Branch stays on remote for CI.
 
 **Always** update `config.md` to remove the worktree from `active_worktrees`, even if removal partially failed.
 
-## Phase 7 — Report
+## Phase 8 — Report
 
 Write memory, run log, and report following `_shared/path-conventions.md`:
 
@@ -227,7 +298,7 @@ Print a summary to the user with issue link, PR link, and key details. When outp
 [YYYY-MM-DD HH:MM:SS CST] <message>
 ```
 
-## Phase 8 — Self-Improvement
+## Phase 9 — Self-Improvement
 
 Follow `_shared/self-improvement-protocol.md`. Focus on:
 - Worktree failures or collision handling
@@ -239,8 +310,9 @@ Follow `_shared/self-improvement-protocol.md`. Focus on:
 
 - **Never implement code directly** — always delegate to `/lead` and specialist agents
 - **Never modify the main repo directory** — all work in worktree
-- **Single-commit rule** — squash to exactly one commit before pushing
+- **Single-commit rule** — squash to exactly one commit before pushing; CI fix commits must be amended into the original, not pushed separately
 - **Targeted validation only** — don't run full test suite for narrow changes
-- **GitHub CI is the merge gate** — report CI status but don't block on unrelated failures
+- **CI is a hard gate** — wait for all CI checks to pass before cleanup/report; fix failures immediately, do not defer
+- **Run type-check locally** — always run `pnpm -s type-check` in the worktree before pushing; CI type errors are the most common failure mode
 - **Stop after one issue** — handle one issue per run
 - **PR title must include issue number** and use closing keyword `Closes #N`
