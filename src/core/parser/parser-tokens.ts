@@ -22,6 +22,8 @@ export const Next = createToken({ name: 'Next', pattern: /\bNEXT\b/i })
 export const End = createToken({ name: 'End', pattern: /\bEND\b/i })
 export const Rem = createToken({ name: 'Rem', pattern: /\bREM\b/i })
 export const Pause = createToken({ name: 'Pause', pattern: /\bPAUSE\b/i })
+// BGPLAY must come before PLAY to match the longer form first
+export const Bgplay = createToken({ name: 'Bgplay', pattern: /\bBGPLAY\b/i })
 export const Play = createToken({ name: 'Play', pattern: /\bPLAY\b/i })
 export const If = createToken({ name: 'If', pattern: /\bIF\b/i })
 export const Then = createToken({ name: 'Then', pattern: /\bTHEN\b/i })
@@ -204,6 +206,7 @@ export const allTokens = [
   End,
   Rem,
   Pause,
+  Bgplay,
   Play,
   If,
   Then,

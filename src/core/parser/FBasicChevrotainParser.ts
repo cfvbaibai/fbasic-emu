@@ -68,6 +68,7 @@ class FBasicChevrotainParser extends CstParser {
   declare nextStatement: () => CstNode
   declare endStatement: () => CstNode
   declare pauseStatement: () => CstNode
+  declare bgplayStatement: () => CstNode
   declare playStatement: () => CstNode
   declare beepStatement: () => CstNode
   declare ifThenStatement: () => CstNode

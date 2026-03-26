@@ -2,7 +2,7 @@
  * Core Statement Parsing Rules
  *
  * Registers core F-BASIC statement grammar rules on the parser instance.
- * Includes: print, let, for/next, end, pause, play, beep, goto, gosub, return,
+ * Includes: print, let, for/next, end, pause, play, bgplay, beep, goto, gosub, return,
  * on, input, linput, swap, clear, and if/then.
  */
 
@@ -10,6 +10,7 @@ import type { CstNode } from 'chevrotain'
 
 import {
   Beep,
+  Bgplay,
   Clear,
   Comma,
   End,
@@ -73,6 +74,7 @@ export interface CoreStatementRuleDeclarations {
   nextStatement: () => CstNode
   endStatement: () => CstNode
   pauseStatement: () => CstNode
+  bgplayStatement: () => CstNode
   playStatement: () => CstNode
   beepStatement: () => CstNode
   gotoStatement: () => CstNode
@@ -187,6 +189,13 @@ export function registerCoreStatementRules(
   // Plays back music according to the sound specified by the string data
   p.playStatement = p.RULE('playStatement', () => {
     p.CONSUME(Play)
+    p.SUBRULE(p.expression) // String expression with music data
+  })
+
+  // BGPLAY StringExpression
+  // Background music playback (identical grammar to PLAY)
+  p.bgplayStatement = p.RULE('bgplayStatement', () => {
+    p.CONSUME(Bgplay)
     p.SUBRULE(p.expression) // String expression with music data
   })
 

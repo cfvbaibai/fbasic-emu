@@ -11,6 +11,7 @@
 
 import { beforeEach, describe, expect, it } from 'vitest'
 
+import { getFirstCstNode } from '@/core/parser/cst-helpers'
 import { FBasicParser } from '@/core/parser/FBasicParser'
 
 describe('parser-statements-core: GOTO Statement', () => {
@@ -150,6 +151,60 @@ describe('parser-statements-core: PLAY Statement', () => {
     const result = await parser.parse('10 PLAY "C" + "D"')
     expect(result.success).toBe(true)
     expect(result.cst).toBeDefined()
+  })
+})
+
+describe('parser-statements-core: BGPLAY Statement', () => {
+  let parser: FBasicParser
+
+  beforeEach(() => {
+    parser = new FBasicParser()
+  })
+
+  it('should parse BGPLAY with string literal', async () => {
+    const result = await parser.parse('10 BGPLAY "CDEFG"')
+    expect(result.success).toBe(true)
+    expect(result.cst).toBeDefined()
+  })
+
+  it('should parse BGPLAY with variable', async () => {
+    const result = await parser.parse('10 BGPLAY M$')
+    expect(result.success).toBe(true)
+    expect(result.cst).toBeDefined()
+  })
+
+  it('should parse BGPLAY with string concatenation', async () => {
+    const result = await parser.parse('10 BGPLAY "C" + "D"')
+    expect(result.success).toBe(true)
+    expect(result.cst).toBeDefined()
+  })
+
+  it('should reject BGPLAY without argument', async () => {
+    const result = await parser.parse('10 BGPLAY')
+    expect(result.success).toBe(false)
+    expect(result.errors).toBeDefined()
+  })
+
+  it('should distinguish BGPLAY from PLAY', async () => {
+    const bgplayResult = await parser.parse('10 BGPLAY "C"')
+    const playResult = await parser.parse('10 PLAY "C"')
+    expect(bgplayResult.success).toBe(true)
+    expect(playResult.success).toBe(true)
+    // Verify they produce different CST node names
+    // CST path: statement -> commandList -> command -> singleCommand -> bgplayStatement/playStatement
+    const bgplayCmdList = getFirstCstNode(bgplayResult.cst?.children?.statement)
+    const playCmdList = getFirstCstNode(playResult.cst?.children?.statement)
+    const bgplayCmd = getFirstCstNode(bgplayCmdList?.children?.commandList)
+    const playCmd = getFirstCstNode(playCmdList?.children?.commandList)
+    const bgplaySingle = getFirstCstNode(bgplayCmd?.children?.command)
+    const playSingle = getFirstCstNode(playCmd?.children?.command)
+    const bgplayLeaf = getFirstCstNode(bgplaySingle?.children?.singleCommand)
+    const playLeaf = getFirstCstNode(playSingle?.children?.singleCommand)
+    expect(getFirstCstNode(bgplayLeaf?.children?.bgplayStatement)).toBeDefined()
+    expect(getFirstCstNode(playLeaf?.children?.playStatement)).toBeDefined()
+    // Cross-check: BGPLAY should NOT produce playStatement and vice versa
+    expect(getFirstCstNode(bgplayLeaf?.children?.playStatement)).toBeUndefined()
+    expect(getFirstCstNode(playLeaf?.children?.bgplayStatement)).toBeUndefined()
   })
 })
 
