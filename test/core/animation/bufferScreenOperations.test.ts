@@ -235,7 +235,7 @@ describe('bufferScreenOperations', () => {
 
     it('should skip when screenBuffer is null', () => {
       expect(() =>
-        writeScreenState(charView, patternView, cursorView, scalarsView, null as never, 0, 0, 0, 0, 0, 0)
+        writeScreenState(charView, patternView, cursorView, scalarsView, null, 0, 0, 0, 0, 0, 0)
       ).not.toThrow()
     })
 

@@ -126,7 +126,7 @@ export function writeScreenState(
   patternView: Uint8Array,
   cursorView: Uint8Array,
   scalarsView: Uint8Array,
-  screenBuffer: ScreenCell[][],
+  screenBuffer: ScreenCell[][] | null,
   cursorX: number,
   cursorY: number,
   bgPalette: number,
