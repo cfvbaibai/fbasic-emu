@@ -56,13 +56,23 @@ function checkReplOnlyCommands(cst: CstNode): Array<{ message: string; line?: nu
       return
     }
 
+    // Extract line number from NumberLiteral token in statement nodes
+    let currentLineNumber = lineNumber
+    if (cstNode.name === 'statement' && cstNode.children.NumberLiteral?.[0]) {
+      const token = cstNode.children.NumberLiteral[0] as IToken
+      const parsed = parseInt(token.image, 10)
+      if (!isNaN(parsed)) {
+        currentLineNumber = parsed
+      }
+    }
+
     // Check if this node is a REPL-only statement
     const errorMsg = REPL_ONLY_COMMANDS[cstNode.name]
     if (errorMsg && !seenErrors.has(errorMsg)) {
       seenErrors.add(errorMsg)
       errors.push({
         message: errorMsg,
-        line: lineNumber,
+        line: currentLineNumber,
         column: 1,
       })
     }
@@ -80,7 +90,7 @@ function checkReplOnlyCommands(cst: CstNode): Array<{ message: string; line?: nu
                 seenErrors.add(funcError)
                 errors.push({
                   message: funcError,
-                  line: lineNumber,
+                  line: currentLineNumber,
                   column: 1,
                 })
               }
@@ -98,7 +108,7 @@ function checkReplOnlyCommands(cst: CstNode): Array<{ message: string; line?: nu
           if (child && typeof child === 'object') {
             if ('name' in child) {
               // It's a CST node - recurse
-              traverse(child, lineNumber)
+              traverse(child, currentLineNumber)
             }
             // Token objects don't need recursion
           }

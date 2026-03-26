@@ -1,6 +1,7 @@
-import { describe, expect,test } from 'vitest'
+import { describe, expect, test } from 'vitest'
 
 import { parseWithChevrotain } from '@/core/parser/FBasicChevrotainParser'
+import { FBasicParser } from '@/core/parser/FBasicParser'
 
 describe('REPL-only Commands Parser', () => {
   // REPL-only commands that should parse but produce errors
@@ -88,6 +89,33 @@ describe('REPL-only Commands Parser', () => {
     expect(result.success).toBe(true)
     expect(result.cst).toBeDefined()
     expect(result.errors).toBeUndefined()
+  })
+
+  test('includes concrete line number for LIST diagnostic', () => {
+    const result = parseWithChevrotain('10 LIST')
+
+    expect(result.success).toBe(false)
+    expect(result.errors?.[0]?.message).toBe('LIST: Not applicable for IDE version')
+    expect(result.errors?.[0]?.line).toBe(10)
+    expect(result.errors?.[0]?.column).toBe(1)
+  })
+
+  test('includes concrete line number for PEEK diagnostic', () => {
+    const result = parseWithChevrotain('120 A=PEEK(&H7000)')
+
+    expect(result.success).toBe(false)
+    expect(result.errors?.[0]?.message).toBe('PEEK: Not applicable for IDE version')
+    expect(result.errors?.[0]?.line).toBe(120)
+    expect(result.errors?.[0]?.column).toBe(1)
+  })
+
+  test('parser error message never reports line undefined', async () => {
+    const parser = new FBasicParser()
+    const result = await parser.parse('10 LIST')
+
+    expect(result.success).toBe(false)
+    expect(result.errors?.[0]?.message).toContain('(line 10, col 1)')
+    expect(result.errors?.[0]?.message).not.toContain('line undefined')
   })
 
   // INKEY$ is now a fully implemented function (GitHub issue #4)
