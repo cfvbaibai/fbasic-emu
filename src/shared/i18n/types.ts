@@ -12,6 +12,7 @@ import type enDiagnostics from './locales/en/diagnostics.json'
 import type enHome from './locales/en/home.json'
 import type enIde from './locales/en/ide.json'
 import type enImageAnalyzer from './locales/en/image-analyzer.json'
+import type enKonvaTest from './locales/en/konva-test.json'
 import type enMonacoEditor from './locales/en/monaco-editor.json'
 import type enNavigation from './locales/en/navigation.json'
 import type enSoundTest from './locales/en/sound-test.json'
@@ -32,6 +33,7 @@ export type MessageSchema = {
   soundTest: typeof enSoundTest
   diagnostics: typeof enDiagnostics
   testing: typeof enTesting
+  konvaTest: typeof enKonvaTest
 }
 
 // Define available locales

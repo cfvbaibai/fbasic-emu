@@ -1,0 +1,20 @@
+{
+  "title": "Konva 精靈動畫測試",
+  "description": "使用 Konva.js 測試 Family BASIC 精靈動畫",
+  "movements": "動作數：",
+  "note": "注意：",
+  "noteMessage": "簡化版動畫；完整動畫由 Animation Worker 處理",
+  "spriteCount": "精靈數量：",
+  "speed": "速度：",
+  "background": "背景：",
+  "randomBgChange": "隨機背景變化：",
+  "reinitialize": "重新初始化",
+  "reset": "重設",
+  "speedVerySlow": "非常慢（{value}）",
+  "speedSlow": "慢速（{value}）",
+  "speedNormal": "正常（{value}）",
+  "speedFast": "快速（{value}）",
+  "speedVeryFast": "非常快（{value}）",
+  "speedUltraFast": "超快（{value}）",
+  "spriteCountLabel": "{count} 個精靈"
+}

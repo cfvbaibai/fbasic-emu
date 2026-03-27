@@ -2,6 +2,7 @@
 import Konva from 'konva'
 import type { Ref } from 'vue'
 import { computed, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import type { MovementState } from '@/core/sprite/types'
 import { GameButton, GameLayout, GameSelect, GameSwitch } from '@/shared/components/ui'
@@ -15,6 +16,8 @@ defineOptions({
   name: 'KonvaSpriteTestPage',
 })
 
+const { t } = useI18n()
+
 const CANVAS_WIDTH = 256
 const CANVAS_HEIGHT = 240
 
@@ -25,25 +28,25 @@ const showBackgroundItems = ref<boolean>(true)
 const randomBgChange = ref<boolean>(true)
 
 // Speed options (speed value: 60/speed = dots per second)
-const speedOptions = [
-  { label: 'Very Slow (5)', value: 5 },
-  { label: 'Slow (8)', value: 8 },
-  { label: 'Normal (10)', value: 10 },
-  { label: 'Fast (12)', value: 12 },
-  { label: 'Very Fast (15)', value: 15 },
-  { label: 'Ultra Fast (20)', value: 20 },
-]
+const speedOptions = computed(() => [
+  { label: t('konvaTest.speedVerySlow', { value: 5 }), value: 5 },
+  { label: t('konvaTest.speedSlow', { value: 8 }), value: 8 },
+  { label: t('konvaTest.speedNormal', { value: 10 }), value: 10 },
+  { label: t('konvaTest.speedFast', { value: 12 }), value: 12 },
+  { label: t('konvaTest.speedVeryFast', { value: 15 }), value: 15 },
+  { label: t('konvaTest.speedUltraFast', { value: 20 }), value: 20 },
+])
 
 // Count options
-const countOptions = [
-  { label: '1 Sprite', value: 1 },
-  { label: '2 Sprites', value: 2 },
-  { label: '4 Sprites', value: 4 },
-  { label: '6 Sprites', value: 6 },
-  { label: '8 Sprites', value: 8 },
-  { label: '12 Sprites', value: 12 },
-  { label: '16 Sprites', value: 16 },
-]
+const countOptions = computed(() => [
+  { label: t('konvaTest.spriteCountLabel', { count: 1 }), value: 1 },
+  { label: t('konvaTest.spriteCountLabel', { count: 2 }), value: 2 },
+  { label: t('konvaTest.spriteCountLabel', { count: 4 }), value: 4 },
+  { label: t('konvaTest.spriteCountLabel', { count: 6 }), value: 6 },
+  { label: t('konvaTest.spriteCountLabel', { count: 8 }), value: 8 },
+  { label: t('konvaTest.spriteCountLabel', { count: 12 }), value: 12 },
+  { label: t('konvaTest.spriteCountLabel', { count: 16 }), value: 16 },
+])
 
 const movements = ref<MovementState[]>(generateMovements(8, 10))
 const spriteRefs = ref<Map<number, Konva.Image>>(new Map())
@@ -124,17 +127,17 @@ onUnmounted(() => {
   <GameLayout>
     <div class="konva-test-page">
       <div class="test-header">
-        <h1>Konva Sprite Animation Test</h1>
-        <p>Testing Konva.js for sprite animation with Family BASIC sprites</p>
+        <h1>{{ t('konvaTest.title') }}</h1>
+        <p>{{ t('konvaTest.description') }}</p>
         <div class="test-info">
-          <p><strong>Movements:</strong> {{ movements.length }}</p>
-          <p><strong>Note:</strong> Simplified animation; full animation is handled by Animation Worker</p>
+          <p><strong>{{ t('konvaTest.movements') }}</strong> {{ movements.length }}</p>
+          <p><strong>{{ t('konvaTest.note') }}</strong> {{ t('konvaTest.noteMessage') }}</p>
         </div>
       </div>
 
       <div class="test-controls">
         <div class="control-group">
-          <label class="control-label">Sprite Count:</label>
+          <label class="control-label">{{ t('konvaTest.spriteCount') }}</label>
           <GameSelect
             :model-value="spriteCount"
             :options="countOptions"
@@ -144,7 +147,7 @@ onUnmounted(() => {
           />
         </div>
         <div class="control-group">
-          <label class="control-label">Speed:</label>
+          <label class="control-label">{{ t('konvaTest.speed') }}</label>
           <GameSelect
             :model-value="spriteSpeed"
             :options="speedOptions"
@@ -154,7 +157,7 @@ onUnmounted(() => {
           />
         </div>
         <div class="control-group">
-          <label class="control-label">Background:</label>
+          <label class="control-label">{{ t('konvaTest.background') }}</label>
           <GameSwitch
             :model-value="showBackgroundItems"
             size="small"
@@ -162,7 +165,7 @@ onUnmounted(() => {
           />
         </div>
         <div class="control-group">
-          <label class="control-label">Random BG Change:</label>
+          <label class="control-label">{{ t('konvaTest.randomBgChange') }}</label>
           <GameSwitch
             :model-value="randomBgChange"
             size="small"
@@ -171,10 +174,10 @@ onUnmounted(() => {
           />
         </div>
         <GameButton type="primary" size="small" @click="initializeSprites">
-          Reinitialize
+          {{ t('konvaTest.reinitialize') }}
         </GameButton>
         <GameButton type="default" size="small" @click="resetMovements">
-          Reset
+          {{ t('konvaTest.reset') }}
         </GameButton>
       </div>
 

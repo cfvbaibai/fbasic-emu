@@ -1,0 +1,20 @@
+{
+  "title": "Konva スプライトアニメーションテスト",
+  "description": "Family BASIC スプライトでの Konva.js アニメーションテスト",
+  "movements": "動作数：",
+  "note": "注意：",
+  "noteMessage": "簡略化されたアニメーション。完全なアニメーションは Animation Worker で処理されます",
+  "spriteCount": "スプライト数：",
+  "speed": "速度：",
+  "background": "背景：",
+  "randomBgChange": "ランダム背景変更：",
+  "reinitialize": "再初期化",
+  "reset": "リセット",
+  "speedVerySlow": "非常に遅い（{value}）",
+  "speedSlow": "遅い（{value}）",
+  "speedNormal": "通常（{value}）",
+  "speedFast": "速い（{value}）",
+  "speedVeryFast": "非常に速い（{value}）",
+  "speedUltraFast": "超高速（{value}）",
+  "spriteCountLabel": "{count} スプライト"
+}
