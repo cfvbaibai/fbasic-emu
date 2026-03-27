@@ -143,7 +143,7 @@ When fixing routing/URL issues in E2E test files, grep ALL test files for the sa
 When done, report back: (1) root cause, (2) files changed, (3) test results.
 ```
 
-When the sub-agent returns, **proceed immediately to Phase 5** without outputting a summary or stopping.
+When the sub-agent returns, **proceed to Phase 5** without outputting a summary or stopping.
 
 ## Phase 5 — Commit & PR
 
@@ -210,11 +210,33 @@ Proceed to Phase 7.
    git -c safe.directory="$(pwd)" worktree add "$WT_PATH" origin/"$BRANCH"
    ```
 
-3. Fix the issue in the worktree. Common CI failures:
-   - **Type errors**: Run `pnpm -s type-check` locally to reproduce. Use codebase helpers (e.g., `getFirstCstNode()` from `cst-helpers.ts`) instead of raw CST access.
-   - **Lint errors**: Run `pnpm exec eslint --fix <files>` then amend if needed.
-   - **Test failures**: Run the specific failing test to reproduce.
-   - **Build failures**: Usually caused by type errors — check type-check output first.
+3. **Follow systematic debugging** — do NOT guess or apply blind fixes. Work through these phases:
+
+   **Phase 1 — Root Cause Investigation:**
+   - Read CI error logs carefully (line numbers, error codes, stack traces)
+   - Reproduce locally: run `pnpm -s type-check` or the specific failing test in the worktree
+   - Check `git diff` of changes to understand what was introduced
+   - Trace data flow backward from the error to find the source
+
+   **Phase 2 — Pattern Analysis:**
+   - Find working examples of the same pattern in the codebase
+   - Compare against reference implementations (e.g., existing test patterns, helper usage)
+   - Identify what differs between working code and the failing change
+
+   **Phase 3 — Hypothesis & Test:**
+   - Form a single hypothesis: "I think X fails because Y"
+   - Make the SMALLEST possible change to test it (one variable at a time)
+   - Verify locally before amending: run the failing check command
+
+   **Phase 4 — Implement & Verify:**
+   - Amend the fix into the original commit and force-push (see step 4 below)
+   - Return to CI polling (step 6 below)
+
+   Common CI failures and local reproduction:
+   - **Type errors**: `pnpm -s type-check` — use codebase helpers (e.g., `getFirstCstNode()` from `cst-helpers.ts`) instead of raw CST access
+   - **Lint errors**: `pnpm exec eslint --fix <files>` then amend if needed
+   - **Test failures**: `pnpm -s test:run -- <failing-test-file>`
+   - **Build failures**: Usually type errors — check type-check output first
 
 4. Amend the fix into the original commit and force-push:
    ```bash
@@ -316,3 +338,4 @@ Follow `_shared/self-improvement-protocol.md`. Focus on:
 - **Run type-check locally** — always run `pnpm -s type-check` in the worktree before pushing; CI type errors are the most common failure mode
 - **Stop after one issue** — handle one issue per run
 - **PR title must include issue number** and use closing keyword `Closes #N`
+- **Systematic CI debugging** — follow the 4-phase debugging process for CI failures (root cause → pattern analysis → hypothesis → implement); no guess-and-fix
