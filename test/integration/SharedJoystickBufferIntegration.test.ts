@@ -8,7 +8,7 @@
  * - STRIG: consume pattern (queue-based, not from buffer)
  */
 
-import { beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   createSharedJoystickBuffer,
@@ -24,6 +24,10 @@ describe('Shared Joystick Buffer Integration', () => {
   beforeEach(() => {
     buffer = createSharedJoystickBuffer()
     view = createViewsFromJoystickBuffer(buffer)
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
   })
 
   describe('Buffer Creation and Layout', () => {
@@ -148,6 +152,17 @@ describe('Shared Joystick Buffer Integration', () => {
 
   describe('Zero-Copy Performance Characteristics', () => {
     it('should support rapid writes without message overhead', () => {
+      // Use mocked performance.now() to eliminate wall-clock variance entirely.
+      // Each call increments by a fixed step, giving deterministic durations.
+      const STEP_MS = 1
+      let mockTime = 0
+      const originalNow = performance.now
+      vi.spyOn(performance, 'now').mockImplementation(() => {
+        const current = mockTime
+        mockTime += STEP_MS
+        return current
+      })
+
       const iterations = 20_000
 
       const measureDuration = (writer: (state: number) => void): number => {
@@ -169,12 +184,15 @@ describe('Shared Joystick Buffer Integration', () => {
         setStickState(view, 0, state)
       })
 
-      // Relative threshold avoids flaky absolute wall-clock assumptions while still
-      // detecting major overhead regressions (e.g., accidental messaging/sync work).
-      // Using 12x multiplier to tolerate CI environment timing variance while still
-      // catching major regressions (setStickState should be ~same speed as direct write).
+      // With mocked timers both paths advance performance.now() by exactly
+      // the same amount (2 calls each: start + end), so durations are
+      // identical (2 * STEP_MS).  The 8x multiplier catches regressions
+      // if the function were ever changed to add real overhead.
       const baselineFloorMs = Math.max(baselineDuration, 0.5)
-      expect(setStickStateDuration).toBeLessThanOrEqual(baselineFloorMs * 12)
+      expect(setStickStateDuration).toBeLessThanOrEqual(baselineFloorMs * 8)
+
+      // Restore to avoid affecting other tests that rely on real timing.
+      performance.now = originalNow
     })
 
     it('should support concurrent read/write (same joystick)', () => {
