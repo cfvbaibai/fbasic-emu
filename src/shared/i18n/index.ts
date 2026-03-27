@@ -10,6 +10,7 @@ import enDiagnostics from './locales/en/diagnostics.json'
 import enHome from './locales/en/home.json'
 import enIde from './locales/en/ide.json'
 import enImageAnalyzer from './locales/en/image-analyzer.json'
+import enKonvaTest from './locales/en/konva-test.json'
 import enMonacoEditor from './locales/en/monaco-editor.json'
 import enNavigation from './locales/en/navigation.json'
 import enSoundTest from './locales/en/sound-test.json'
@@ -22,6 +23,7 @@ import jaDiagnostics from './locales/ja/diagnostics.json'
 import jaHome from './locales/ja/home.json'
 import jaIde from './locales/ja/ide.json'
 import jaImageAnalyzer from './locales/ja/image-analyzer.json'
+import jaKonvaTest from './locales/ja/konva-test.json'
 import jaMonacoEditor from './locales/ja/monaco-editor.json'
 import jaNavigation from './locales/ja/navigation.json'
 import jaSoundTest from './locales/ja/sound-test.json'
@@ -34,6 +36,7 @@ import zhCNDiagnostics from './locales/zh-CN/diagnostics.json'
 import zhCNHome from './locales/zh-CN/home.json'
 import zhCNIde from './locales/zh-CN/ide.json'
 import zhCNImageAnalyzer from './locales/zh-CN/image-analyzer.json'
+import zhCNKonvaTest from './locales/zh-CN/konva-test.json'
 import zhCNMonacoEditor from './locales/zh-CN/monaco-editor.json'
 import zhCNNavigation from './locales/zh-CN/navigation.json'
 import zhCNSoundTest from './locales/zh-CN/sound-test.json'
@@ -46,6 +49,7 @@ import zhTWDiagnostics from './locales/zh-TW/diagnostics.json'
 import zhTWHome from './locales/zh-TW/home.json'
 import zhTWIde from './locales/zh-TW/ide.json'
 import zhTWImageAnalyzer from './locales/zh-TW/image-analyzer.json'
+import zhTWKonvaTest from './locales/zh-TW/konva-test.json'
 import zhTWMonacoEditor from './locales/zh-TW/monaco-editor.json'
 import zhTWNavigation from './locales/zh-TW/navigation.json'
 import zhTWSoundTest from './locales/zh-TW/sound-test.json'
@@ -93,6 +97,7 @@ const i18n = createI18n<{ message: MessageSchema }, Locale>({
       soundTest: enSoundTest,
       diagnostics: enDiagnostics,
       testing: enTesting,
+      konvaTest: enKonvaTest,
     },
     ja: {
       navigation: jaNavigation,
@@ -107,6 +112,7 @@ const i18n = createI18n<{ message: MessageSchema }, Locale>({
       soundTest: jaSoundTest,
       diagnostics: jaDiagnostics,
       testing: jaTesting,
+      konvaTest: jaKonvaTest,
     },
     'zh-CN': {
       navigation: zhCNNavigation,
@@ -121,6 +127,7 @@ const i18n = createI18n<{ message: MessageSchema }, Locale>({
       soundTest: zhCNSoundTest,
       diagnostics: zhCNDiagnostics,
       testing: zhCNTesting,
+      konvaTest: zhCNKonvaTest,
     },
     'zh-TW': {
       navigation: zhTWNavigation,
@@ -135,6 +142,7 @@ const i18n = createI18n<{ message: MessageSchema }, Locale>({
       soundTest: zhTWSoundTest,
       diagnostics: zhTWDiagnostics,
       testing: zhTWTesting,
+      konvaTest: zhTWKonvaTest,
     },
   },
 })

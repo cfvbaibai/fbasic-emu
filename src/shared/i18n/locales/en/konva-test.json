@@ -1,0 +1,20 @@
+{
+  "title": "Konva Sprite Animation Test",
+  "description": "Testing Konva.js for sprite animation with Family BASIC sprites",
+  "movements": "Movements:",
+  "note": "Note:",
+  "noteMessage": "Simplified animation; full animation is handled by Animation Worker",
+  "spriteCount": "Sprite Count:",
+  "speed": "Speed:",
+  "background": "Background:",
+  "randomBgChange": "Random BG Change:",
+  "reinitialize": "Reinitialize",
+  "reset": "Reset",
+  "speedVerySlow": "Very Slow ({value})",
+  "speedSlow": "Slow ({value})",
+  "speedNormal": "Normal ({value})",
+  "speedFast": "Fast ({value})",
+  "speedVeryFast": "Very Fast ({value})",
+  "speedUltraFast": "Ultra Fast ({value})",
+  "spriteCountLabel": "{count} Sprite | {count} Sprites"
+}

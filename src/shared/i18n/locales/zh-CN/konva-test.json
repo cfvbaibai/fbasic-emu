@@ -1,0 +1,20 @@
+{
+  "title": "Konva 精灵动画测试",
+  "description": "使用 Konva.js 测试 Family BASIC 精灵动画",
+  "movements": "动作数：",
+  "note": "注意：",
+  "noteMessage": "简化版动画；完整动画由 Animation Worker 处理",
+  "spriteCount": "精灵数量：",
+  "speed": "速度：",
+  "background": "背景：",
+  "randomBgChange": "随机背景变化：",
+  "reinitialize": "重新初始化",
+  "reset": "重置",
+  "speedVerySlow": "非常慢（{value}）",
+  "speedSlow": "慢速（{value}）",
+  "speedNormal": "正常（{value}）",
+  "speedFast": "快速（{value}）",
+  "speedVeryFast": "非常快（{value}）",
+  "speedUltraFast": "超快（{value}）",
+  "spriteCountLabel": "{count} 个精灵"
+}
