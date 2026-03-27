@@ -25,6 +25,10 @@
     "copyError": "複製到剪貼簿失敗",
     "allStatementsCopied": "所有語句已複製到剪貼簿！"
   },
+  "confirmDialog": {
+    "confirm": "確定",
+    "cancel": "取消"
+  },
   "labels": {
     "yes": "是",
     "no": "否"

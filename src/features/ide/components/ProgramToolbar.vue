@@ -3,7 +3,7 @@ import { nextTick, onMounted, onUnmounted, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { useProgramStore } from '@/features/ide/composables/useProgramStore'
-import { GameButton, GameIconButton } from '@/shared/components/ui'
+import { ConfirmDialog, GameButton, GameIconButton } from '@/shared/components/ui'
 import GameIcon from '@/shared/components/ui/GameIcon.vue'
 
 const props = withDefaults(defineProps<{ isCompact?: boolean }>(), {
@@ -18,21 +18,38 @@ const editingName = ref(false)
 const tempName = ref('')
 const nameInputEl = useTemplateRef<HTMLInputElement>('nameInputEl')
 
-// Confirm dialog for unsaved changes
-function confirmDiscard(): boolean {
-  if (!programStore.isDirty.value) return true
-  return confirm(t('ide.toolbar.discardConfirm'))
+// Confirm dialog state
+const showConfirmDialog = ref(false)
+const pendingAction = ref<(() => void) | null>(null)
+
+function confirmDiscard(action: () => void): void {
+  if (!programStore.isDirty.value) {
+    action()
+    return
+  }
+  pendingAction.value = action
+  showConfirmDialog.value = true
+}
+
+function handleConfirmDiscard(): void {
+  showConfirmDialog.value = false
+  const action = pendingAction.value
+  pendingAction.value = null
+  action?.()
+}
+
+function handleCancelDiscard(): void {
+  showConfirmDialog.value = false
+  pendingAction.value = null
 }
 
 // File operations
 function handleNew() {
-  if (!confirmDiscard()) return
-  programStore.newProgram()
+  confirmDiscard(() => programStore.newProgram())
 }
 
-async function handleOpen() {
-  if (!confirmDiscard()) return
-  await programStore.open()
+function handleOpen() {
+  confirmDiscard(() => void programStore.open())
 }
 
 async function handleSave() {
@@ -205,6 +222,14 @@ onUnmounted(() => {
         ●
       </span>
     </div>
+
+    <!-- Confirm dialog for unsaved changes -->
+    <ConfirmDialog
+      :visible="showConfirmDialog"
+      :message="t('ide.toolbar.discardConfirm')"
+      @confirm="handleConfirmDiscard"
+      @cancel="handleCancelDiscard"
+    />
   </div>
 </template>
 

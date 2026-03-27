@@ -25,6 +25,10 @@
     "copyError": "复制到剪贴板失败",
     "allStatementsCopied": "所有语句已复制到剪贴板！"
   },
+  "confirmDialog": {
+    "confirm": "确定",
+    "cancel": "取消"
+  },
   "labels": {
     "yes": "是",
     "no": "否"

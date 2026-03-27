@@ -25,6 +25,10 @@
     "copyError": "クリップボードへのコピーに失敗しました",
     "allStatementsCopied": "すべてのステートメントをクリップボードにコピーしました！"
   },
+  "confirmDialog": {
+    "confirm": "OK",
+    "cancel": "キャンセル"
+  },
   "labels": {
     "yes": "はい",
     "no": "いいえ"

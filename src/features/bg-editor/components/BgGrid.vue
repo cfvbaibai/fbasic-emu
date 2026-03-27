@@ -8,10 +8,11 @@
  */
 
 import { useMouseInElement } from '@vueuse/core'
-import { computed, nextTick, onMounted, shallowRef, useTemplateRef, watch } from 'vue'
+import { computed, nextTick, onMounted, ref, shallowRef, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { GameBlock, GameIconButton, GameSelect } from '@/shared/components/ui'
+import ConfirmDialog from '@/shared/components/ui/ConfirmDialog.vue'
 
 import { useBgEditorState } from '../composables/useBgEditorState'
 import {
@@ -127,10 +128,20 @@ const currentMode = computed({
   set: (value: BgEditorMode) => setMode(value),
 })
 
+// Confirm dialog state
+const showClearConfirm = ref(false)
+
 function handleClear(): void {
-  if (confirm(t('bgEditor.toolbar.clearConfirm'))) {
-    clearGrid()
-  }
+  showClearConfirm.value = true
+}
+
+function handleConfirmClear(): void {
+  showClearConfirm.value = false
+  clearGrid()
+}
+
+function handleCancelClear(): void {
+  showClearConfirm.value = false
 }
 
 /**
@@ -307,6 +318,14 @@ onMounted(() => {
         {{ t('bgEditor.grid.selectDestination') }}
       </div>
     </div>
+
+    <!-- Confirm dialog for clear action -->
+    <ConfirmDialog
+      :visible="showClearConfirm"
+      :message="t('bgEditor.toolbar.clearConfirm')"
+      @confirm="handleConfirmClear"
+      @cancel="handleCancelClear"
+    />
   </GameBlock>
 </template>
 
