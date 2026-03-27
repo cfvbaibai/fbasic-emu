@@ -206,7 +206,7 @@ const commandPaletteCommands = computed<CommandPaletteCommand[]>(() => [
     id: 'run.start',
     title: 'Run Program',
     description: 'Execute the current BASIC program.',
-    shortcut: 'F5',
+    shortcut: 'Ctrl+Enter / Cmd+Enter',
     keywords: ['execute', 'start', 'run'],
     enabled: !isRunning.value,
     execute: () => {
@@ -217,7 +217,7 @@ const commandPaletteCommands = computed<CommandPaletteCommand[]>(() => [
     id: 'run.stop',
     title: 'Stop Program',
     description: 'Stop the currently running program.',
-    shortcut: 'Shift+F5',
+    shortcut: 'Ctrl+Shift+Enter / Cmd+Shift+Enter',
     keywords: ['halt', 'stop'],
     enabled: isRunning.value,
     execute: stopCode,
@@ -226,7 +226,7 @@ const commandPaletteCommands = computed<CommandPaletteCommand[]>(() => [
     id: 'run.restart',
     title: 'Restart Program',
     description: 'Stop and execute the current program again.',
-    shortcut: 'Ctrl+Shift+F5 / Cmd+Shift+F5',
+    shortcut: 'Ctrl+Shift+R / Cmd+Shift+R',
     keywords: ['restart', 'rerun'],
     execute: () => {
       void restartCode()
@@ -326,19 +326,19 @@ function handleGlobalKeydown(e: KeyboardEvent) {
 
   if (commandPaletteOpen.value || isEditableTarget(e.target)) return
 
-  if (matchesAnyShortcut(e, ['F5'])) {
+  if (matchesAnyShortcut(e, ['Ctrl+Enter', 'Meta+Enter'])) {
     e.preventDefault()
     void runCode()
     return
   }
 
-  if (matchesAnyShortcut(e, ['Shift+F5'])) {
+  if (matchesAnyShortcut(e, ['Ctrl+Shift+Enter', 'Meta+Shift+Enter'])) {
     e.preventDefault()
     stopCode()
     return
   }
 
-  if (matchesAnyShortcut(e, ['Ctrl+Shift+F5', 'Meta+Shift+F5'])) {
+  if (matchesAnyShortcut(e, ['Ctrl+Shift+R', 'Meta+Shift+R'])) {
     e.preventDefault()
     void restartCode()
     return
