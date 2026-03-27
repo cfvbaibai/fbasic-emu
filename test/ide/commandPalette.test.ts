@@ -47,7 +47,7 @@ describe('commandPalette helpers', () => {
   })
 
   it('supports multiple shortcut variants', () => {
-    const restartEvent = new KeyboardEvent('keydown', { key: 'F5', metaKey: true, shiftKey: true })
-    expect(matchesAnyShortcut(restartEvent, ['Ctrl+Shift+F5', 'Meta+Shift+F5'])).toBe(true)
+    const restartEvent = new KeyboardEvent('keydown', { key: 'r', metaKey: true, shiftKey: true })
+    expect(matchesAnyShortcut(restartEvent, ['Ctrl+Shift+R', 'Meta+Shift+R'])).toBe(true)
   })
 })
