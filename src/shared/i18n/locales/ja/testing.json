@@ -1,9 +1,18 @@
 {
   "screen": "画面",
   "printVsSprites": {
-    "title": "PRINT vs 移動スプライト（フェーズ6.1）"
+    "title": "PRINT vs 移動スプライト（フェーズ6.1）",
+    "description": "8つの移動スプライトと多数のPRINTを行うタイトループを実行します。スプライトはスタックせずにスムーズに移動する必要があります（ダーティバックグラウンド、バッファのみレンダリング、アニメーション優先）。",
+    "fps": "FPS",
+    "runTest": "テスト実行",
+    "stop": "停止"
   },
   "positionSync": {
-    "title": "位置同期負荷テスト"
+    "title": "位置同期負荷テスト",
+    "description": "8つの同時MOVEアクションを実行します。位置とisActiveは毎フレーム共有バッファに書き込まれます（postMessageなし）。ワーカーはXPOS/YPOSとMOVE(n)のために読み取ります。",
+    "fps": "FPS",
+    "mainThread": "メインスレッド",
+    "startLoadTest": "負荷テスト開始",
+    "stop": "停止"
   }
 }

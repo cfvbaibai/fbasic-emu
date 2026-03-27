@@ -1,9 +1,18 @@
 {
   "screen": "屏幕",
   "printVsSprites": {
-    "title": "PRINT 与移动精灵对比（阶段 6.1）"
+    "title": "PRINT 与移动精灵对比（阶段 6.1）",
+    "description": "运行 8 个移动精灵和一个紧密循环，执行大量 PRINT。精灵应平滑移动而不卡顿（脏背景、仅缓冲区渲染、动画优先）。",
+    "fps": "FPS",
+    "runTest": "运行测试",
+    "stop": "停止"
   },
   "positionSync": {
-    "title": "位置同步负载测试"
+    "title": "位置同步负载测试",
+    "description": "运行 8 个同步 MOVE 操作。位置和 isActive 每帧写入共享缓冲区（无 postMessage）。工作线程读取以处理 XPOS/YPOS 和 MOVE(n)。",
+    "fps": "FPS",
+    "mainThread": "主线程",
+    "startLoadTest": "开始负载测试",
+    "stop": "停止"
   }
 }

@@ -138,22 +138,21 @@ onBeforeUnmount(() => {
       >
         <template #default>
           <p class="description">
-            Runs 8 simultaneous MOVE actions. Positions and isActive are written to a shared
-            buffer every frame (no postMessage). Worker reads for XPOS/YPOS and MOVE(n).
+            {{ t('testing.positionSync.description') }}
           </p>
           <div class="metrics-grid">
             <div class="metric">
-              <span class="metric-label">FPS</span>
+              <span class="metric-label">{{ t('testing.positionSync.fps') }}</span>
               <span class="metric-value">{{ fps }}</span>
-              <span class="metric-hint">main thread</span>
+              <span class="metric-hint">{{ t('testing.positionSync.mainThread') }}</span>
             </div>
           </div>
           <div class="actions">
             <GameButton type="primary" @click="startLoadTest" :disabled="isRunning">
-              Start load test
+              {{ t('testing.positionSync.startLoadTest') }}
             </GameButton>
             <GameButton type="default" @click="stopCode" :disabled="!isRunning">
-              Stop
+              {{ t('testing.positionSync.stop') }}
             </GameButton>
           </div>
         </template>

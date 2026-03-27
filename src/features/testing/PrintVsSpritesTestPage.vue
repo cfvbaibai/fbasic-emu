@@ -138,22 +138,20 @@ onBeforeUnmount(() => {
       >
         <template #default>
           <p class="description">
-            Runs 8 moving sprites and a tight loop that <strong>PRINT</strong>s many lines.
-            Sprites should move smoothly without sticking (dirty background, buffer-only
-            render, animation-first).
+            {{ t('testing.printVsSprites.description') }}
           </p>
           <div class="metrics-row">
             <div class="metric">
-              <span class="metric-label">FPS</span>
+              <span class="metric-label">{{ t('testing.printVsSprites.fps') }}</span>
               <span class="metric-value">{{ fps }}</span>
             </div>
           </div>
           <div class="actions">
             <GameButton type="primary" @click="startTest" :disabled="isRunning">
-              Run test
+              {{ t('testing.printVsSprites.runTest') }}
             </GameButton>
             <GameButton type="default" @click="stopCode" :disabled="!isRunning">
-              Stop
+              {{ t('testing.printVsSprites.stop') }}
             </GameButton>
           </div>
         </template>
@@ -190,10 +188,6 @@ onBeforeUnmount(() => {
   margin: 0 0 1rem;
   color: var(--game-text-secondary);
   font-size: var(--game-font-size-base);
-}
-
-.description strong {
-  color: var(--game-text-primary);
 }
 
 .metrics-row {

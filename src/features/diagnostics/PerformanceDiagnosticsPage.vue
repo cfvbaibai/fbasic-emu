@@ -109,8 +109,7 @@ const {
       <!-- Page Header -->
       <GameBlock :title="t('diagnostics.title')" title-icon="mdi:speedometer">
         <p class="description">
-          Diagnose PRINT performance issues by running test scenarios and measuring timing at each
-          stage: worker execution, message passing, and screen rendering.
+          {{ t('diagnostics.description') }}
         </p>
       </GameBlock>
 
@@ -118,20 +117,20 @@ const {
       <GameBlock :title="t('diagnostics.testScenarios')" title-icon="mdi:test-tube">
         <div class="scenario-buttons">
           <GameButton @click="runTest('light')" :disabled="isRunning" type="primary">
-            Light (50 iterations)
+            {{ t('diagnostics.light') }}
           </GameButton>
           <GameButton @click="runTest('medium')" :disabled="isRunning" type="primary">
-            Medium (200 iterations)
+            {{ t('diagnostics.medium') }}
           </GameButton>
           <GameButton @click="runTest('heavy')" :disabled="isRunning" type="primary">
-            Heavy (500 iterations)
+            {{ t('diagnostics.heavy') }}
           </GameButton>
           <GameButton @click="runTest('infinite')" :disabled="isRunning" type="primary">
-            Infinite Loop
+            {{ t('diagnostics.infiniteLoop') }}
           </GameButton>
-          <GameButton @click="stopCode" :disabled="!isRunning" type="danger">Stop</GameButton>
+          <GameButton @click="stopCode" :disabled="!isRunning" type="danger">{{ t('diagnostics.stop') }}</GameButton>
           <GameButton @click="clearMetrics" :disabled="isRunning" type="default">
-            Clear Metrics
+            {{ t('diagnostics.clearMetrics') }}
           </GameButton>
         </div>
       </GameBlock>
@@ -140,21 +139,21 @@ const {
       <GameBlock :title="t('diagnostics.settings')" title-icon="mdi:cog">
         <div class="settings-grid">
           <div class="setting-item">
-            <label class="setting-label">Screen Rendering</label>
+            <label class="setting-label">{{ t('diagnostics.screenRendering') }}</label>
             <GameSwitch
               :model-value="renderingEnabled"
               @update:model-value="(val) => (renderingEnabled = Boolean(val))"
             />
           </div>
           <div class="setting-item">
-            <label class="setting-label">OUTPUT Messages</label>
+            <label class="setting-label">{{ t('diagnostics.outputMessages') }}</label>
             <GameSwitch
               :model-value="messageOutputEnabled"
               @update:model-value="(val) => (messageOutputEnabled = Boolean(val))"
             />
           </div>
           <div class="setting-item">
-            <label class="setting-label">Render FPS Target</label>
+            <label class="setting-label">{{ t('diagnostics.renderFpsTarget') }}</label>
             <GameSelect
               :model-value="renderFpsTarget"
               @update:model-value="(val) => (renderFpsTarget = Number(val))"
@@ -170,19 +169,19 @@ const {
       <GameBlock :title="t('diagnostics.performanceMetrics')" title-icon="mdi:chart-line">
         <div class="metrics-grid">
           <div class="metric-card">
-            <div class="metric-label">FPS</div>
+            <div class="metric-label">{{ t('diagnostics.fps') }}</div>
             <div class="metric-value">{{ fps }}</div>
           </div>
           <div class="metric-card">
-            <div class="metric-label">Messages/sec</div>
+            <div class="metric-label">{{ t('diagnostics.messagesPerSecond') }}</div>
             <div class="metric-value">{{ messagesPerSecond }}</div>
           </div>
           <div class="metric-card">
-            <div class="metric-label">Renders/sec</div>
+            <div class="metric-label">{{ t('diagnostics.rendersPerSecond') }}</div>
             <div class="metric-value">{{ rendersPerSecond }}</div>
           </div>
           <div class="metric-card">
-            <div class="metric-label">Total Time</div>
+            <div class="metric-label">{{ t('diagnostics.totalTime') }}</div>
             <div class="metric-value">{{ totalTime }}ms</div>
           </div>
         </div>
@@ -192,7 +191,7 @@ const {
       <GameBlock :title="t('diagnostics.cpuTimeBreakdown')" title-icon="mdi:clock-outline">
         <div class="breakdown-bars">
           <div class="breakdown-item">
-            <span class="breakdown-label">Worker Execution</span>
+            <span class="breakdown-label">{{ t('diagnostics.workerExecution') }}</span>
             <div class="breakdown-bar">
               <div class="breakdown-fill worker" :style="{ width: workerTimePercent + '%' }"></div>
               <span class="breakdown-value"
@@ -201,7 +200,7 @@ const {
             </div>
           </div>
           <div class="breakdown-item">
-            <span class="breakdown-label">Message Handling</span>
+            <span class="breakdown-label">{{ t('diagnostics.messageHandling') }}</span>
             <div class="breakdown-bar">
               <div
                 class="breakdown-fill message"
@@ -213,7 +212,7 @@ const {
             </div>
           </div>
           <div class="breakdown-item">
-            <span class="breakdown-label">Screen Rendering</span>
+            <span class="breakdown-label">{{ t('diagnostics.screenRendering') }}</span>
             <div class="breakdown-bar">
               <div
                 class="breakdown-fill render"

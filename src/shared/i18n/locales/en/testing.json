@@ -1,9 +1,18 @@
 {
   "screen": "Screen",
   "printVsSprites": {
-    "title": "PRINT vs moving sprites (Phase 6.1)"
+    "title": "PRINT vs moving sprites (Phase 6.1)",
+    "description": "Runs 8 moving sprites and a tight loop that PRINTs many lines. Sprites should move smoothly without sticking (dirty background, buffer-only render, animation-first).",
+    "fps": "FPS",
+    "runTest": "Run test",
+    "stop": "Stop"
   },
   "positionSync": {
-    "title": "Position sync load test"
+    "title": "Position sync load test",
+    "description": "Runs 8 simultaneous MOVE actions. Positions and isActive are written to a shared buffer every frame (no postMessage). Worker reads for XPOS/YPOS and MOVE(n).",
+    "fps": "FPS",
+    "mainThread": "main thread",
+    "startLoadTest": "Start load test",
+    "stop": "Stop"
   }
 }
