@@ -6,6 +6,7 @@ import ProgramToolbar from '@/features/ide/components/ProgramToolbar.vue'
 
 const mockNewProgram = vi.fn()
 const mockOpen = vi.fn()
+const isDirtyRef = ref(true)
 
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
@@ -28,7 +29,7 @@ vi.mock('vue-i18n', () => ({
 
 vi.mock('@/features/ide/composables/useProgramStore', () => ({
   useProgramStore: () => ({
-    isDirty: ref(true),
+    isDirty: isDirtyRef,
     programName: 'Test Program',
     newProgram: mockNewProgram,
     open: mockOpen,
@@ -42,6 +43,7 @@ describe('ProgramToolbar', () => {
   beforeEach(() => {
     mockNewProgram.mockReset()
     mockOpen.mockReset()
+    isDirtyRef.value = true
   })
 
   it('shows confirm dialog when New is clicked and program is dirty', async () => {
@@ -65,32 +67,24 @@ describe('ProgramToolbar', () => {
   })
 
   it('does not show confirm dialog when New is clicked and program is not dirty', async () => {
+    isDirtyRef.value = false
+
     const wrapper = mount(ProgramToolbar, {
       props: { isCompact: false },
-      global: {
-        mocks: {
-          // Override isDirty for this test
-        },
-      },
     })
 
-    // Manually set isDirty to false by re-mounting with different mock
+    // Click the New button
+    const buttons = wrapper.findAll('button')
+    expect(buttons.length).toBeGreaterThanOrEqual(1)
+    await buttons[0]!.trigger('click')
+
+    // No confirm dialog should appear
+    expect(wrapper.find('.confirm-dialog-overlay').exists()).toBe(false)
+
+    // newProgram should be called directly without confirmation
+    expect(mockNewProgram).toHaveBeenCalledTimes(1)
+
     wrapper.unmount()
-
-    vi.doMock('@/features/ide/composables/useProgramStore', () => ({
-      useProgramStore: () => ({
-        isDirty: ref(false),
-        programName: 'Test Program',
-        newProgram: mockNewProgram,
-        open: mockOpen,
-        save: vi.fn(),
-        currentProgram: ref(null),
-        loadProgram: vi.fn(),
-      }),
-    }))
-
-    // Clicking new when not dirty should directly call newProgram
-    // (tested via behavior: no dialog appears)
   })
 
   it('proceeds with new program when confirm is clicked', async () => {
