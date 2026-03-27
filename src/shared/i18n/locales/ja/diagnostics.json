@@ -4,5 +4,21 @@
   "settings": "設定",
   "performanceMetrics": "パフォーマンス指標",
   "cpuTimeBreakdown": "CPU時間の内訳",
-  "screenOutput": "画面出力"
+  "screenOutput": "画面出力",
+  "description": "テストシナリオを実行し、ワーカー実行、メッセージパッシング、画面レンダリングの各段階のタイミングを測定して、PRINTのパフォーマンス問題を診断します。",
+  "light": "軽量（50回反復）",
+  "medium": "中程度（200回反復）",
+  "heavy": "高負荷（500回反復）",
+  "infiniteLoop": "無限ループ",
+  "stop": "停止",
+  "clearMetrics": "指標をクリア",
+  "screenRendering": "画面レンダリング",
+  "outputMessages": "OUTPUT メッセージ",
+  "renderFpsTarget": "レンダリング FPS 目標",
+  "fps": "FPS",
+  "messagesPerSecond": "メッセージ/秒",
+  "rendersPerSecond": "レンダリング/秒",
+  "totalTime": "合計時間",
+  "workerExecution": "ワーカー実行",
+  "messageHandling": "メッセージ処理"
 }

@@ -4,5 +4,21 @@
   "settings": "设置",
   "performanceMetrics": "性能指标",
   "cpuTimeBreakdown": "CPU 时间分解",
-  "screenOutput": "屏幕输出"
+  "screenOutput": "屏幕输出",
+  "description": "通过运行测试场景并测量各阶段（工作线程执行、消息传递、屏幕渲染）的耗时来诊断 PRINT 性能问题。",
+  "light": "轻量（50 次迭代）",
+  "medium": "中等（200 次迭代）",
+  "heavy": "高负载（500 次迭代）",
+  "infiniteLoop": "无限循环",
+  "stop": "停止",
+  "clearMetrics": "清除指标",
+  "screenRendering": "屏幕渲染",
+  "outputMessages": "OUTPUT 消息",
+  "renderFpsTarget": "渲染 FPS 目标",
+  "fps": "FPS",
+  "messagesPerSecond": "消息/秒",
+  "rendersPerSecond": "渲染/秒",
+  "totalTime": "总时间",
+  "workerExecution": "工作线程执行",
+  "messageHandling": "消息处理"
 }

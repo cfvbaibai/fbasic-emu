@@ -1,9 +1,18 @@
 {
   "screen": "螢幕",
   "printVsSprites": {
-    "title": "PRINT 與移動精靈對比（階段 6.1）"
+    "title": "PRINT 與移動精靈對比（階段 6.1）",
+    "description": "執行 8 個移動精靈和一個緊密迴圈，進行大量 PRINT。精靈應平滑移動而不卡頓（髒背景、僅緩衝區渲染、動畫優先）。",
+    "fps": "FPS",
+    "runTest": "執行測試",
+    "stop": "停止"
   },
   "positionSync": {
-    "title": "位置同步負載測試"
+    "title": "位置同步負載測試",
+    "description": "執行 8 個同步 MOVE 操作。位置和 isActive 每幀寫入共享緩衝區（無 postMessage）。工作執行緒讀取以處理 XPOS/YPOS 和 MOVE(n)。",
+    "fps": "FPS",
+    "mainThread": "主執行緒",
+    "startLoadTest": "開始負載測試",
+    "stop": "停止"
   }
 }

@@ -4,5 +4,21 @@
   "settings": "Settings",
   "performanceMetrics": "Performance Metrics",
   "cpuTimeBreakdown": "CPU Time Breakdown",
-  "screenOutput": "Screen Output"
+  "screenOutput": "Screen Output",
+  "description": "Diagnose PRINT performance issues by running test scenarios and measuring timing at each stage: worker execution, message passing, and screen rendering.",
+  "light": "Light (50 iterations)",
+  "medium": "Medium (200 iterations)",
+  "heavy": "Heavy (500 iterations)",
+  "infiniteLoop": "Infinite Loop",
+  "stop": "Stop",
+  "clearMetrics": "Clear Metrics",
+  "screenRendering": "Screen Rendering",
+  "outputMessages": "OUTPUT Messages",
+  "renderFpsTarget": "Render FPS Target",
+  "fps": "FPS",
+  "messagesPerSecond": "Messages/sec",
+  "rendersPerSecond": "Renders/sec",
+  "totalTime": "Total Time",
+  "workerExecution": "Worker Execution",
+  "messageHandling": "Message Handling"
 }
