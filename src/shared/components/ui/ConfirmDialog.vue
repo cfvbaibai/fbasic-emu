@@ -15,7 +15,7 @@
  * ```
  */
 
-import { onMounted, onUnmounted, useTemplateRef } from 'vue'
+import { nextTick, onMounted, onUnmounted, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import type { ConfirmDialogEmits, ConfirmDialogProps } from './ConfirmDialog.types'
@@ -29,6 +29,17 @@ const emit = defineEmits<ConfirmDialogEmits>()
 
 const { t } = useI18n()
 const confirmButtonRef = useTemplateRef<HTMLButtonElement>('confirmButtonRef')
+
+watch(
+  () => props.visible,
+  (visible) => {
+    if (visible) {
+      void nextTick(() => {
+        confirmButtonRef.value?.focus()
+      })
+    }
+  },
+)
 
 function handleConfirm(): void {
   emit('confirm')
