@@ -25,6 +25,10 @@
     "copyError": "Failed to copy to clipboard",
     "allStatementsCopied": "All statements copied to clipboard!"
   },
+  "confirmDialog": {
+    "confirm": "OK",
+    "cancel": "Cancel"
+  },
   "labels": {
     "yes": "Yes",
     "no": "No"

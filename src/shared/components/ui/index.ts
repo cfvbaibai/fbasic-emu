@@ -3,6 +3,7 @@
  * Centralized export for all game-style UI components
  */
 
+export { default as ConfirmDialog } from './ConfirmDialog.vue'
 export { default as GameBlock } from './GameBlock.vue'
 export { default as GameButton } from './GameButton.vue'
 export { default as GameButtonGroup } from './GameButtonGroup.vue'
@@ -28,6 +29,7 @@ export { default as GameUpload } from './GameUpload.vue'
 export { default as HeroSection } from './HeroSection.vue'
 
 // Type exports
+export type { ConfirmDialogEmits, ConfirmDialogProps } from './ConfirmDialog.types'
 export type { GameBlockEmits, GameBlockProps } from './GameBlock.types'
 export type { GameButtonEmits, GameButtonProps } from './GameButton.types'
 export type { GameCardEmits, GameCardProps } from './GameCard.types'

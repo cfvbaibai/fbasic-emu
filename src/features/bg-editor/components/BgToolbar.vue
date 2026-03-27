@@ -3,10 +3,10 @@
  * BgToolbar component - Tool buttons for SELECT, COPY, MOVE, CHAR modes and CLEAR action
  */
 
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { GameButton, GameButtonGroup } from '@/shared/components/ui'
+import { ConfirmDialog, GameButton, GameButtonGroup } from '@/shared/components/ui'
 
 import { useBgEditorState } from '../composables/useBgEditorState'
 import { BG_EDITOR_MODES } from '../constants'
@@ -14,6 +14,9 @@ import type { BgEditorMode } from '../types'
 
 const { t } = useI18n()
 const { mode, setMode, clearGrid } = useBgEditorState()
+
+// Confirm dialog state
+const showClearConfirm = ref(false)
 
 const modes: { key: BgEditorMode; label: string }[] = [
   { key: BG_EDITOR_MODES.SELECT, label: t('bgEditor.toolbar.select') },
@@ -28,9 +31,16 @@ const currentMode = computed({
 })
 
 function handleClear(): void {
-  if (confirm(t('bgEditor.toolbar.clearConfirm'))) {
-    clearGrid()
-  }
+  showClearConfirm.value = true
+}
+
+function handleConfirmClear(): void {
+  showClearConfirm.value = false
+  clearGrid()
+}
+
+function handleCancelClear(): void {
+  showClearConfirm.value = false
 }
 </script>
 
@@ -51,6 +61,13 @@ function handleClear(): void {
     <GameButton variant="action" @click="handleClear">
       {{ t('bgEditor.toolbar.clear') }}
     </GameButton>
+
+    <ConfirmDialog
+      :visible="showClearConfirm"
+      :message="t('bgEditor.toolbar.clearConfirm')"
+      @confirm="handleConfirmClear"
+      @cancel="handleCancelClear"
+    />
   </div>
 </template>
 
