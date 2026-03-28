@@ -90,7 +90,7 @@ const useLiteEditor = computed(() => {
             type="default"
             icon="mdi:folder-open"
             size="small"
-            :title="t('ide.samples.load', 'Load Sample')"
+            :title="t('ide.samples.load')"
             @click="emit('openSampleSelector')"
           />
         </template>
