@@ -381,6 +381,24 @@
       "6": "左下",
       "7": "左",
       "8": "左上"
+    },
+    "characterTypes": {
+      "MARIO": "马里奥",
+      "LADY": "女士",
+      "FIGHTER_FLY": "斗士蝇",
+      "ACHILLES": "阿喀琉斯",
+      "PENGUIN": "企鹅",
+      "FIREBALL": "火球",
+      "CAR": "赛车",
+      "SPINNER": "旋转器",
+      "STAR_KILLER": "星杀者",
+      "STARSHIP": "星际飞船",
+      "EXPLOSION": "爆炸",
+      "SMILEY": "笑脸",
+      "LASER": "激光",
+      "SHELL_CREEPER": "龟壳怪",
+      "SIDE_STEPPER": "侧步怪",
+      "NITPICKER": "啄木鸟"
     }
   },
   "screenTab": {

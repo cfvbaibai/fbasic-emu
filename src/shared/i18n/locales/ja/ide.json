@@ -381,6 +381,24 @@
       "6": "左下",
       "7": "左",
       "8": "左上"
+    },
+    "characterTypes": {
+      "MARIO": "マリオ",
+      "LADY": "レディ",
+      "FIGHTER_FLY": "ファイターフライ",
+      "ACHILLES": "アキレス",
+      "PENGUIN": "ペンギン",
+      "FIREBALL": "ファイアボール",
+      "CAR": "カー",
+      "SPINNER": "スピナー",
+      "STAR_KILLER": "スターキラー",
+      "STARSHIP": "スターシップ",
+      "EXPLOSION": "エクスプロージョン",
+      "SMILEY": "スマイリー",
+      "LASER": "レーザー",
+      "SHELL_CREEPER": "シェルクリーパー",
+      "SIDE_STEPPER": "サイドステッパー",
+      "NITPICKER": "ニットピッカー"
     }
   },
   "screenTab": {

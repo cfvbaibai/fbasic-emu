@@ -381,6 +381,24 @@
       "6": "down-left",
       "7": "left",
       "8": "up-left"
+    },
+    "characterTypes": {
+      "MARIO": "Mario",
+      "LADY": "Lady",
+      "FIGHTER_FLY": "Fighter Fly",
+      "ACHILLES": "Achilles",
+      "PENGUIN": "Penguin",
+      "FIREBALL": "Fireball",
+      "CAR": "Car",
+      "SPINNER": "Spinner",
+      "STAR_KILLER": "Star Killer",
+      "STARSHIP": "Starship",
+      "EXPLOSION": "Explosion",
+      "SMILEY": "Smiley",
+      "LASER": "Laser",
+      "SHELL_CREEPER": "Shellcreeper",
+      "SIDE_STEPPER": "Sidestepper",
+      "NITPICKER": "Nitpicker"
     }
   },
   "screenTab": {
