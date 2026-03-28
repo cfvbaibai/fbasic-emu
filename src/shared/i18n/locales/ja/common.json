@@ -32,5 +32,10 @@
   "labels": {
     "yes": "はい",
     "no": "いいえ"
+  },
+  "ariaLabels": {
+    "toggleCollapse": "折りたたみの切り替え",
+    "clear": "クリア",
+    "close": "閉じる"
   }
 }

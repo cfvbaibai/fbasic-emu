@@ -32,5 +32,10 @@
   "labels": {
     "yes": "是",
     "no": "否"
+  },
+  "ariaLabels": {
+    "toggleCollapse": "切換摺疊",
+    "clear": "清除",
+    "close": "關閉"
   }
 }

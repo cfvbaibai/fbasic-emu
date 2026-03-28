@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import GameIcon from './GameIcon.vue'
 import type { GameTagEmits, GameTagProps } from './GameTag.types'
@@ -27,6 +28,8 @@ const props = withDefaults(defineProps<GameTagProps>(), {
 })
 
 const emit = defineEmits<GameTagEmits>()
+
+const { t } = useI18n()
 
 const tagClasses = computed(() => {
   const baseClasses = {
@@ -59,7 +62,15 @@ const handleClose = () => {
     <span v-if="$slots.default" class="game-tag-content">
       <slot />
     </span>
-    <button v-if="closable" type="button" class="game-tag-close" @click="handleClose" aria-label="Close">×</button>
+    <button
+      v-if="closable"
+      type="button"
+      class="game-tag-close"
+      @click="handleClose"
+      :aria-label="t('common.ariaLabels.close')"
+    >
+      ×
+    </button>
   </span>
 </template>
 

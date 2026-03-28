@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+
 import GameIcon from './GameIcon.vue'
 
 /**
@@ -24,6 +26,8 @@ withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<Emits>()
 
+const { t } = useI18n()
+
 interface Props {
   expanded?: boolean
   size?: 'small' | 'medium' | 'large'
@@ -46,7 +50,7 @@ const handleClick = (event: Event) => {
     @click="handleClick"
     type="button"
     :aria-expanded="expanded"
-    aria-label="Toggle collapse"
+    :aria-label="t('common.ariaLabels.toggleCollapse')"
   >
     <GameIcon :icon="expanded ? 'mdi:chevron-up' : 'mdi:chevron-down'" :size="size" />
   </button>
