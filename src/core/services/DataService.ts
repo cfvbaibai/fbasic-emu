@@ -119,6 +119,8 @@ export class DataService {
           message: `RESTORE target line ${lineNumber} not found`,
           type: ERROR_TYPES.RUNTIME,
         })
+        // Reset to 0 as a safe default so dataIndex is never left stale
+        this.context.dataIndex = 0
       }
     } else {
       // Restore to beginning

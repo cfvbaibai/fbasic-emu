@@ -203,10 +203,10 @@ describe('RestoreExecutor', () => {
 `
       const result = await interpreter.execute(source)
 
-      // Should error or fall back to beginning
-      // The behavior depends on implementation
-      // For now, we check it doesn't crash
+      // Should produce a runtime error and halt execution
       expect(result).toBeDefined()
+      expect(result.errors.length).toBeGreaterThanOrEqual(1)
+      expect(result.errors[0]?.message).toEqual('RESTORE target line 999 not found')
     })
 
     it('should handle RESTORE before any DATA statements', async () => {

@@ -236,6 +236,24 @@ describe('DataService', () => {
       expect(errors[0]?.message).toEqual('RESTORE target line 100 not found')
     })
 
+    it('should reset dataIndex to 0 when RESTORE targets non-existent line', () => {
+      service.addDataValuesCst([
+        createNumberLiteralCst('10'),
+        createNumberLiteralCst('20'),
+        createNumberLiteralCst('30'),
+      ] as never)
+      service.readNextDataValue() // reads 10, dataIndex = 1
+      service.readNextDataValue() // reads 20, dataIndex = 2
+
+      expect(service.getCurrentDataIndex()).toEqual(2)
+
+      context.statements = []
+      service.restoreData(9999)
+
+      // dataIndex must not be left stale at 2 — it should be reset to 0
+      expect(service.getCurrentDataIndex()).toEqual(0)
+    })
+
     it('should log debug output when debug mode is enabled', () => {
       const debugContext = createTestContext({ enableDebugMode: true })
       const mockAdapter = { debugOutput: vi.fn() }
