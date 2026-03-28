@@ -235,6 +235,56 @@ describe('ReadExecutor', () => {
       expect(context.variables.get('D$')?.value).toBe('WORLD')
     })
 
+    it('should report TM ERROR when reading string into numeric variable', async () => {
+      context.dataValues = ['HELLO']
+      context.dataIndex = 0
+
+      const readStmtCst = await parseReadStatement('10 READ A')
+      expect(readStmtCst).not.toBeNull()
+
+      executor.execute(readStmtCst!, 10)
+
+      const errors = context.getErrors()
+      expect(errors.length).toBe(1)
+      expect(errors[0]?.message).toBe('TM ERROR')
+      // Variable should NOT be set with the wrong type
+      expect(context.variables.get('A')).toBeUndefined()
+    })
+
+    it('should report TM ERROR when reading number into string variable', async () => {
+      context.dataValues = [123]
+      context.dataIndex = 0
+
+      const readStmtCst = await parseReadStatement('10 READ B$')
+      expect(readStmtCst).not.toBeNull()
+
+      executor.execute(readStmtCst!, 10)
+
+      const errors = context.getErrors()
+      expect(errors.length).toBe(1)
+      expect(errors[0]?.message).toBe('TM ERROR')
+      // Variable should NOT be set with the wrong type
+      expect(context.variables.get('B$')).toBeUndefined()
+    })
+
+    it('should halt on first type mismatch in multi-variable READ', async () => {
+      context.dataValues = [10, 'HELLO', 30]
+      context.dataIndex = 0
+
+      const readStmtCst = await parseReadStatement('10 READ A, B, C')
+      expect(readStmtCst).not.toBeNull()
+
+      executor.execute(readStmtCst!, 10)
+
+      const errors = context.getErrors()
+      expect(errors.length).toBe(1)
+      expect(errors[0]?.message).toBe('TM ERROR')
+      // First variable was set correctly (numeric into numeric)
+      expect(context.variables.get('A')?.value).toBe(10)
+      // Data pointer should have advanced past the consumed value
+      expect(context.dataIndex).toBe(2)
+    })
+
     it('should report OD ERROR when out of data', async () => {
       context.dataValues = [10]
       context.dataIndex = 0
