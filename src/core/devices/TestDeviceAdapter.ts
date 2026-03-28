@@ -9,6 +9,13 @@ import type { BasicDeviceAdapter } from '@/core/interfaces'
 import type { CompiledAudio } from '@/core/sound/types'
 import { logDevice } from '@/shared/logger'
 
+import {
+  aggregateAllOutputs,
+  applyPaletteCombination,
+  DEFAULT_BACKGROUND_PALETTES,
+  DEFAULT_SPRITE_PALETTES,
+} from './TestDeviceAdapterHelpers'
+
 export class TestDeviceAdapter implements BasicDeviceAdapter {
   // === JOYSTICK STATE ===
   private joystickCount = 2
@@ -36,40 +43,12 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
     bgPalette: 1,
     spritePalette: 1,
   }
-  public runtimeBackgroundPalettes = [
-    [
-      [0x00, 0x2c, 0x15, 0x07] as [number, number, number, number],
-      [0x00, 0x27, 0x21, 0x12] as [number, number, number, number],
-      [0x00, 0x29, 0x36, 0x17] as [number, number, number, number],
-      [0x00, 0x30, 0x26, 0x07] as [number, number, number, number],
-    ],
-    [
-      [0x00, 0x30, 0x21, 0x02] as [number, number, number, number],
-      [0x00, 0x30, 0x27, 0x18] as [number, number, number, number],
-      [0x00, 0x30, 0x27, 0x16] as [number, number, number, number],
-      [0x00, 0x29, 0x36, 0x17] as [number, number, number, number],
-    ],
-  ]
-  public runtimeSpritePalettes = [
-    [
-      [0x00, 0x36, 0x16, 0x02] as [number, number, number, number],
-      [0x00, 0x27, 0x30, 0x19] as [number, number, number, number],
-      [0x00, 0x35, 0x25, 0x17] as [number, number, number, number],
-      [0x00, 0x30, 0x27, 0x16] as [number, number, number, number],
-    ],
-    [
-      [0x00, 0x30, 0x16, 0x01] as [number, number, number, number],
-      [0x00, 0x10, 0x00, 0x01] as [number, number, number, number],
-      [0x00, 0x30, 0x29, 0x09] as [number, number, number, number],
-      [0x00, 0x30, 0x16, 0x07] as [number, number, number, number],
-    ],
-    [
-      [0x00, 0x30, 0x26, 0x12] as [number, number, number, number],
-      [0x00, 0x30, 0x15, 0x12] as [number, number, number, number],
-      [0x00, 0x30, 0x12, 0x16] as [number, number, number, number],
-      [0x00, 0x30, 0x26, 0x19] as [number, number, number, number],
-    ],
-  ]
+  public runtimeBackgroundPalettes = DEFAULT_BACKGROUND_PALETTES.map(
+    p => p.map(c => [...c] as [number, number, number, number])
+  )
+  public runtimeSpritePalettes = DEFAULT_SPRITE_PALETTES.map(
+    p => p.map(c => [...c] as [number, number, number, number])
+  )
   public backdropColorCalls: number[] = []
   public currentBackdropColor: number = 0 // Default backdrop color (0 = black)
   public cgenModeCalls: number[] = []
@@ -309,16 +288,16 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
 
   setPaletteCombination(target: 'B' | 'S', combination: number, c1: number, c2: number, c3: number, c4: number): void {
     const colors: [number, number, number, number] = [c1, c2, c3, c4]
-    if (target === 'B') {
-      const paletteIndex = Math.max(0, Math.min(1, this.currentColorPalette.bgPalette))
-      this.runtimeBackgroundPalettes[paletteIndex]![combination] = colors
-      this.paletteCombinationCalls.push({ target, paletteIndex, combination, colors })
-      return
-    }
-
-    const paletteIndex = Math.max(0, Math.min(2, this.currentColorPalette.spritePalette))
-    this.runtimeSpritePalettes[paletteIndex]![combination] = colors
-    this.paletteCombinationCalls.push({ target, paletteIndex, combination, colors })
+    const result = applyPaletteCombination(
+      target,
+      combination,
+      colors,
+      this.currentColorPalette.bgPalette,
+      this.currentColorPalette.spritePalette,
+      this.runtimeBackgroundPalettes,
+      this.runtimeSpritePalettes
+    )
+    this.paletteCombinationCalls.push(result)
   }
 
   setBackdropColor(colorCode: number): void {
@@ -399,35 +378,11 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
   }
 
   /**
-   * Get all captured outputs as a single string
-   * Error outputs are formatted as "RUNTIME: {message}" to match IDE format
-   * Note: Each output may already contain a newline (from PRINT statements that don't end with semicolon/comma)
-   * Outputs that don't end with newline (from PRINT statements ending with semicolon/comma) should be concatenated
+   * Get all captured outputs as a single string.
+   * Delegates to aggregateAllOutputs helper.
    */
   getAllOutputs(): string {
-    const allOutputs = [
-      ...this.printOutputs,
-      ...this.debugOutputs.map(o => `DEBUG: ${o}`),
-      ...this.errorOutputs.map(o => `RUNTIME: ${o}`),
-    ]
-
-    if (allOutputs.length === 0) return ''
-
-    // Concatenate outputs:
-    // - Outputs ending with newline are kept as-is (they already have their newline)
-    // - Outputs not ending with newline are concatenated directly (no separator)
-    // - Only add newline separator when transitioning from newline-ending to non-newline-starting output
-    let result = ''
-    for (const output of allOutputs) {
-      if (output.endsWith('\n')) {
-        // Output ends with newline - add it as-is
-        result += output
-      } else {
-        // Output doesn't end with newline - concatenate directly
-        result += output
-      }
-    }
-    return result
+    return aggregateAllOutputs(this.printOutputs, this.debugOutputs, this.errorOutputs)
   }
 
   /**
