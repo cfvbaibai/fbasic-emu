@@ -76,9 +76,7 @@ const getIconSize = computed(() => {
     @click="handleClick"
     type="button"
   >
-    <span v-if="loading" class="game-icon-button-spinner">
-      <GameIcon :icon="icon" :size="getIconSize" rotate />
-    </span>
+    <span v-if="loading" class="game-icon-button-spinner" aria-label="Loading" />
     <GameIcon v-else-if="icon" :icon="icon" :size="getIconSize" class="game-icon-button-icon" />
     <slot v-else />
   </button>
@@ -290,9 +288,28 @@ const getIconSize = computed(() => {
 }
 
 .game-icon-button-spinner {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  display: inline-block;
+  width: var(--spinner-size, 1em);
+  height: var(--spinner-size, 1em);
+  border: 2px solid var(--base-alpha-gray-100-20);
+  border-top-color: var(--game-text-secondary);
+  border-radius: 50%;
+  animation: spinner-rotate 0.6s linear infinite;
+}
+
+.game-icon-button-small .game-icon-button-spinner {
+  --spinner-size: 0.875em;
+  border-width: 1.5px;
+}
+
+.game-icon-button-large .game-icon-button-spinner {
+  --spinner-size: 1.125em;
+}
+
+@keyframes spinner-rotate {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .game-icon-button-icon {
