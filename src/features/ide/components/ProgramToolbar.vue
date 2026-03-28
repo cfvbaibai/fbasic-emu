@@ -22,6 +22,34 @@ const nameInputEl = useTemplateRef<HTMLInputElement>('nameInputEl')
 const showConfirmDialog = ref(false)
 const pendingAction = ref<(() => void) | null>(null)
 
+// File operation state
+const isFileOperationPending = ref(false)
+const errorMessage = ref('')
+let errorTimer: ReturnType<typeof setTimeout> | null = null
+
+onUnmounted(() => {
+  if (errorTimer !== null) {
+    clearTimeout(errorTimer)
+  }
+})
+
+function clearError(): void {
+  errorMessage.value = ''
+  if (errorTimer !== null) {
+    clearTimeout(errorTimer)
+    errorTimer = null
+  }
+}
+
+function showError(message: string): void {
+  clearError()
+  errorMessage.value = message
+  errorTimer = setTimeout(() => {
+    errorMessage.value = ''
+    errorTimer = null
+  }, 5000)
+}
+
 function confirmDiscard(action: () => void): void {
   if (!programStore.isDirty.value) {
     action()
@@ -49,11 +77,30 @@ function handleNew() {
 }
 
 function handleOpen() {
-  confirmDiscard(() => void programStore.open())
+  confirmDiscard(async () => {
+    isFileOperationPending.value = true
+    try {
+      const success = await programStore.open()
+      if (!success) {
+        showError(t('ide.toolbar.openFailed'))
+      }
+    } catch {
+      showError(t('ide.toolbar.openFailed'))
+    } finally {
+      isFileOperationPending.value = false
+    }
+  })
 }
 
 async function handleSave() {
-  await programStore.save()
+  isFileOperationPending.value = true
+  try {
+    await programStore.save()
+  } catch {
+    showError(t('ide.toolbar.saveFailed'))
+  } finally {
+    isFileOperationPending.value = false
+  }
 }
 
 // Renaming
@@ -145,6 +192,7 @@ onUnmounted(() => {
           type="default"
           icon="mdi:file-plus"
           size="small"
+          :disabled="isFileOperationPending"
           :title="`${t('ide.toolbar.new')} (Ctrl+N)`"
           @click="handleNew"
         />
@@ -152,6 +200,7 @@ onUnmounted(() => {
           type="default"
           icon="mdi:import"
           size="small"
+          :loading="isFileOperationPending"
           :title="`${t('ide.toolbar.import')} (Ctrl+O)`"
           @click="handleOpen"
         />
@@ -159,6 +208,7 @@ onUnmounted(() => {
           type="primary"
           icon="mdi:export"
           size="small"
+          :loading="isFileOperationPending"
           :title="`${t('ide.toolbar.export')} (Ctrl+S)`"
           @click="handleSave"
         />
@@ -168,6 +218,7 @@ onUnmounted(() => {
           type="default"
           icon="mdi:file-plus"
           size="small"
+          :disabled="isFileOperationPending"
           @click="handleNew"
         >
           {{ t('ide.toolbar.new') }}
@@ -176,6 +227,7 @@ onUnmounted(() => {
           type="default"
           icon="mdi:import"
           size="small"
+          :loading="isFileOperationPending"
           @click="handleOpen"
         >
           {{ t('ide.toolbar.import') }}
@@ -184,12 +236,20 @@ onUnmounted(() => {
           type="primary"
           icon="mdi:export"
           size="small"
+          :loading="isFileOperationPending"
           @click="handleSave"
         >
           {{ t('ide.toolbar.export') }}
         </GameButton>
       </template>
     </div>
+
+    <!-- Error message -->
+    <Transition name="error-fade">
+      <span v-if="errorMessage" class="error-message" @click="clearError">
+        {{ errorMessage }}
+      </span>
+    </Transition>
 
     <!-- Program name -->
     <div class="program-name-container">
@@ -315,5 +375,25 @@ onUnmounted(() => {
   color: var(--base-solid-primary-90);
   font-size: 0.75rem;
   line-height: 1;
+}
+
+.error-message {
+  color: var(--semantic-solid-danger);
+  font-size: 0.75rem;
+  cursor: pointer;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.error-fade-enter-active,
+.error-fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.error-fade-enter-from,
+.error-fade-leave-to {
+  opacity: 0;
 }
 </style>

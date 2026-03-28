@@ -6,6 +6,7 @@ import ProgramToolbar from '@/features/ide/components/ProgramToolbar.vue'
 
 const mockNewProgram = vi.fn()
 const mockOpen = vi.fn()
+const mockSave = vi.fn()
 const isDirtyRef = ref(true)
 
 vi.mock('vue-i18n', () => ({
@@ -18,6 +19,8 @@ vi.mock('vue-i18n', () => ({
         'ide.toolbar.discardConfirm': 'Discard unsaved changes?',
         'ide.toolbar.programNamePlaceholder': 'Program name',
         'ide.toolbar.unsavedChanges': 'Unsaved changes',
+        'ide.toolbar.openFailed': 'Failed to open file',
+        'ide.toolbar.saveFailed': 'Failed to save file',
         'common.confirmDialog.confirm': 'OK',
         'common.confirmDialog.cancel': 'Cancel',
       }
@@ -33,7 +36,7 @@ vi.mock('@/features/ide/composables/useProgramStore', () => ({
     programName: 'Test Program',
     newProgram: mockNewProgram,
     open: mockOpen,
-    save: vi.fn(),
+    save: mockSave,
     currentProgram: ref(null),
     loadProgram: vi.fn(),
   }),
@@ -43,6 +46,7 @@ describe('ProgramToolbar', () => {
   beforeEach(() => {
     mockNewProgram.mockReset()
     mockOpen.mockReset()
+    mockSave.mockReset()
     isDirtyRef.value = true
   })
 
@@ -146,5 +150,168 @@ describe('ProgramToolbar', () => {
     expect(overlay.attributes('aria-describedby')).toEqual('confirm-dialog-message')
 
     wrapper.unmount()
+  })
+
+  describe('file operation loading state', () => {
+    it('disables New button while file operation is pending', async () => {
+      let resolveOpen!: () => void
+      mockOpen.mockReturnValue(
+        new Promise<boolean>((resolve) => {
+          resolveOpen = () => resolve(true)
+        }),
+      )
+
+      isDirtyRef.value = false
+      const wrapper = mount(ProgramToolbar, {
+        props: { isCompact: false },
+      })
+
+      // Click Import (Open) button
+      const buttons = wrapper.findAll('button')
+      await buttons[1]!.trigger('click')
+      await wrapper.vm.$nextTick()
+
+      // New button should be disabled during file operation
+      expect(buttons[0]!.attributes('disabled')).toBeDefined()
+
+      // Resolve the pending operation
+      resolveOpen()
+      await wrapper.vm.$nextTick()
+
+      wrapper.unmount()
+    })
+
+    it('disables New button while save is pending', async () => {
+      let resolveSave!: () => void
+      mockSave.mockReturnValue(
+        new Promise<void>((resolve) => {
+          resolveSave = () => resolve()
+        }),
+      )
+
+      const wrapper = mount(ProgramToolbar, {
+        props: { isCompact: false },
+      })
+
+      // Click Export (Save) button
+      const buttons = wrapper.findAll('button')
+      await buttons[2]!.trigger('click')
+      await wrapper.vm.$nextTick()
+
+      // New button should be disabled during file operation
+      expect(buttons[0]!.attributes('disabled')).toBeDefined()
+
+      // Resolve the pending operation
+      resolveSave()
+      await wrapper.vm.$nextTick()
+
+      wrapper.unmount()
+    })
+  })
+
+  describe('error handling', () => {
+    it('shows error message when open fails (returns false)', async () => {
+      mockOpen.mockResolvedValue(false)
+
+      isDirtyRef.value = false
+      const wrapper = mount(ProgramToolbar, {
+        props: { isCompact: false },
+      })
+
+      // Click Import button
+      const buttons = wrapper.findAll('button')
+      await buttons[1]!.trigger('click')
+      await wrapper.vm.$nextTick()
+
+      // Error message should be displayed
+      expect(wrapper.find('.error-message').exists()).toBe(true)
+      expect(wrapper.find('.error-message').text()).toEqual('Failed to open file')
+
+      wrapper.unmount()
+    })
+
+    it('shows error message when open throws', async () => {
+      mockOpen.mockRejectedValue(new Error('read error'))
+
+      isDirtyRef.value = false
+      const wrapper = mount(ProgramToolbar, {
+        props: { isCompact: false },
+      })
+
+      // Click Import button
+      const buttons = wrapper.findAll('button')
+      await buttons[1]!.trigger('click')
+      await wrapper.vm.$nextTick()
+
+      // Error message should be displayed
+      expect(wrapper.find('.error-message').exists()).toBe(true)
+      expect(wrapper.find('.error-message').text()).toEqual('Failed to open file')
+
+      wrapper.unmount()
+    })
+
+    it('shows error message when save throws', async () => {
+      mockSave.mockRejectedValue(new Error('write error'))
+
+      const wrapper = mount(ProgramToolbar, {
+        props: { isCompact: false },
+      })
+
+      // Click Export (Save) button
+      const buttons = wrapper.findAll('button')
+      await buttons[2]!.trigger('click')
+      await wrapper.vm.$nextTick()
+
+      // Error message should be displayed
+      expect(wrapper.find('.error-message').exists()).toBe(true)
+      expect(wrapper.find('.error-message').text()).toEqual('Failed to save file')
+
+      wrapper.unmount()
+    })
+
+    it('clears error message when clicked', async () => {
+      mockOpen.mockResolvedValue(false)
+
+      isDirtyRef.value = false
+      const wrapper = mount(ProgramToolbar, {
+        props: { isCompact: false },
+      })
+
+      // Click Import button to trigger error
+      const buttons = wrapper.findAll('button')
+      await buttons[1]!.trigger('click')
+      await wrapper.vm.$nextTick()
+
+      // Error message should be visible
+      expect(wrapper.find('.error-message').exists()).toBe(true)
+
+      // Click the error message to dismiss
+      await wrapper.find('.error-message').trigger('click')
+      await wrapper.vm.$nextTick()
+
+      // Error message should be gone
+      expect(wrapper.find('.error-message').exists()).toBe(false)
+
+      wrapper.unmount()
+    })
+
+    it('does not show error when open succeeds', async () => {
+      mockOpen.mockResolvedValue(true)
+
+      isDirtyRef.value = false
+      const wrapper = mount(ProgramToolbar, {
+        props: { isCompact: false },
+      })
+
+      // Click Import button
+      const buttons = wrapper.findAll('button')
+      await buttons[1]!.trigger('click')
+      await wrapper.vm.$nextTick()
+
+      // No error message should be displayed
+      expect(wrapper.find('.error-message').exists()).toBe(false)
+
+      wrapper.unmount()
+    })
   })
 })
