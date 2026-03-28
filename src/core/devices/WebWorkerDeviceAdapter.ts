@@ -36,6 +36,11 @@ import {
   rejectAllInputRequests as rejectAllInput,
 } from './DeviceInputRequestHelpers'
 import { postBeep, postOutputMessage, postPlaySound } from './DeviceOutputHelpers'
+import {
+  getSpritePosition as getSpritePositionFromHelper,
+  postSpriteStates,
+  type SpritePositionCache,
+} from './DeviceSpritePositionHelpers'
 import { MessageHandler } from './MessageHandler'
 import { ScreenStateManager } from './ScreenStateManager'
 import { ScreenUpdateBatcher } from './ScreenUpdateBatcher'
@@ -60,7 +65,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   /** Shared keyboard buffer view for INKEY$. Set when receiving SET_SHARED_KEYBOARD_BUFFER. */
   private sharedKeyboardView: KeyboardBufferView | null = null
   /** Last POSITION per sprite; getSpritePosition returns it so MOVE uses it (not buffer 0,0). */
-  private lastPositionBySprite: Map<number, { x: number; y: number }> = new Map()
+  private lastPositionBySprite: SpritePositionCache = new Map()
   private isEnabled = true
   /** BG GRAPHIC data for VIEW command. Set via SET_BG_DATA message from main thread. */
   private bgGridData: BgGridData | null = null
@@ -224,20 +229,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   }
 
   getSpritePosition(actionNumber: number): { x: number; y: number } | null {
-    if (this.sharedDisplayAccessor) {
-      const livePos = this.sharedDisplayAccessor.readSpritePosition(actionNumber)
-      if (livePos !== null) {
-        const isOrigin = livePos.x === 0 && livePos.y === 0
-        const hasLiveSpriteState =
-          this.sharedDisplayAccessor.readSpriteIsActive(actionNumber) ||
-          this.sharedDisplayAccessor.readSpriteIsVisible(actionNumber)
-        if (!isOrigin || hasLiveSpriteState) {
-          this.lastPositionBySprite.set(actionNumber, livePos)
-          return livePos
-        }
-      }
-    }
-    return this.lastPositionBySprite.get(actionNumber) ?? null
+    return getSpritePositionFromHelper(this.sharedDisplayAccessor, this.lastPositionBySprite, actionNumber)
   }
 
   setSpritePosition(actionNumber: number, x: number, y: number): void {
@@ -256,12 +248,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
 
   /** Send sprite states to main thread for rendering. */
   sendSpriteStates(spriteStates: SpriteState[], spriteEnabled: boolean): void {
-    self.postMessage({
-      type: 'SPRITE_STATES',
-      id: `sprite-states-${Date.now()}`,
-      timestamp: Date.now(),
-      data: { spriteStates, spriteEnabled },
-    })
+    postSpriteStates(spriteStates, spriteEnabled)
   }
 
   // === BG GRAPHIC METHODS (VIEW command) ===
