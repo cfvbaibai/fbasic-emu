@@ -233,6 +233,111 @@ describe('PauseExecutor', () => {
     )
   })
 
+  // === String-to-number conversion (defensive path) ===
+
+  it('should convert numeric string variable to pause duration', async () => {
+    const debugInterpreter = new BasicInterpreter({
+      maxIterations: 1000,
+      maxOutputLines: 100,
+      enableDebugMode: true,
+      strictMode: false,
+      deviceAdapter: deviceAdapter,
+    })
+
+    const source = `
+10 LET A$ = "5"
+20 PAUSE A$
+30 END
+`
+    const result = await debugInterpreter.execute(source)
+
+    expect(result.success).toBe(true)
+    expect(result.errors).toHaveLength(0)
+    // Verify the string "5" was converted to numeric 5 pause units
+    expect(deviceAdapter.debugOutputs).toEqual(
+      expect.arrayContaining([expect.stringMatching(/PAUSE: 5 units/)])
+    )
+  })
+
+  it('should clamp non-numeric string variable to 0 (no delay)', async () => {
+    const debugInterpreter = new BasicInterpreter({
+      maxIterations: 1000,
+      maxOutputLines: 100,
+      enableDebugMode: true,
+      strictMode: false,
+      deviceAdapter: deviceAdapter,
+    })
+
+    const source = `
+10 LET A$ = "abc"
+20 PAUSE A$
+30 END
+`
+    const start = performance.now()
+    const result = await debugInterpreter.execute(source)
+    const elapsed = performance.now() - start
+
+    expect(result.success).toBe(true)
+    expect(result.errors).toHaveLength(0)
+    // Non-numeric string "abc" -> NaN -> clamped to 0
+    expect(deviceAdapter.debugOutputs).toEqual(
+      expect.arrayContaining([expect.stringMatching(/PAUSE: 0 units/)])
+    )
+    // No delay expected for 0 units
+    expect(elapsed).toBeLessThan(50)
+  })
+
+  it('should clamp empty string variable to 0 (no delay)', async () => {
+    const debugInterpreter = new BasicInterpreter({
+      maxIterations: 1000,
+      maxOutputLines: 100,
+      enableDebugMode: true,
+      strictMode: false,
+      deviceAdapter: deviceAdapter,
+    })
+
+    const source = `
+10 LET A$ = ""
+20 PAUSE A$
+30 END
+`
+    const start = performance.now()
+    const result = await debugInterpreter.execute(source)
+    const elapsed = performance.now() - start
+
+    expect(result.success).toBe(true)
+    expect(result.errors).toHaveLength(0)
+    // Empty string -> NaN -> clamped to 0
+    expect(deviceAdapter.debugOutputs).toEqual(
+      expect.arrayContaining([expect.stringMatching(/PAUSE: 0 units/)])
+    )
+    expect(elapsed).toBeLessThan(50)
+  })
+
+  it('should convert string variable with decimal value to pause duration', async () => {
+    const debugInterpreter = new BasicInterpreter({
+      maxIterations: 1000,
+      maxOutputLines: 100,
+      enableDebugMode: true,
+      strictMode: false,
+      deviceAdapter: deviceAdapter,
+    })
+
+    const source = `
+10 LET A$ = "10.9"
+20 PAUSE A$
+30 END
+`
+    const result = await debugInterpreter.execute(source)
+
+    expect(result.success).toBe(true)
+    expect(result.errors).toHaveLength(0)
+    // "10.9" -> parseFloat -> 10.9 -> Math.floor -> 10
+    expect(deviceAdapter.debugOutputs).toEqual(
+      expect.arrayContaining([expect.stringMatching(/PAUSE: 10 units/)])
+    )
+  })
+
   // === PAUSE not reached after END ===
 
   it('should not execute PAUSE after END', async () => {
