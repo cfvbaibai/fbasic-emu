@@ -127,6 +127,62 @@ describe('SpriteStateManager', () => {
     })
   })
 
+  describe('hideAllSprites', () => {
+    it('should hide all visible sprites', () => {
+      manager.defineSprite(createDefinition({ spriteNumber: 0 }))
+      manager.defineSprite(createDefinition({ spriteNumber: 3 }))
+      manager.defineSprite(createDefinition({ spriteNumber: 7 }))
+      manager.displaySprite(0, 10, 20)
+      manager.displaySprite(3, 50, 60)
+      manager.displaySprite(7, 100, 110)
+
+      manager.hideAllSprites()
+
+      expect(manager.getVisibleSprites()).toEqual([])
+    })
+
+    it('should preserve sprite definitions after hiding', () => {
+      const def0 = createDefinition({ spriteNumber: 0 })
+      const def3 = createDefinition({ spriteNumber: 3, priority: 1 })
+      manager.defineSprite(def0)
+      manager.defineSprite(def3)
+      manager.displaySprite(0, 10, 20)
+      manager.displaySprite(3, 50, 60)
+
+      manager.hideAllSprites()
+
+      expect(manager.getSpriteState(0)?.definition).toEqual(def0)
+      expect(manager.getSpriteState(3)?.definition).toEqual(def3)
+    })
+
+    it('should preserve sprite positions after hiding', () => {
+      manager.defineSprite(createDefinition({ spriteNumber: 2 }))
+      manager.displaySprite(2, 123, 45)
+
+      manager.hideAllSprites()
+
+      const state = manager.getSpriteState(2)
+      expect(state?.x).toEqual(123)
+      expect(state?.y).toEqual(45)
+    })
+
+    it('should work when no sprites are visible', () => {
+      manager.hideAllSprites()
+
+      expect(manager.getVisibleSprites()).toEqual([])
+    })
+
+    it('should work on already-hidden sprites', () => {
+      manager.defineSprite(createDefinition({ spriteNumber: 0 }))
+      manager.displaySprite(0, 10, 10)
+      manager.hideSprite(0)
+
+      manager.hideAllSprites()
+
+      expect(manager.getSpriteState(0)?.visible).toEqual(false)
+    })
+  })
+
   describe('hideSprite', () => {
     it('should hide a visible sprite', () => {
       manager.defineSprite(createDefinition())
