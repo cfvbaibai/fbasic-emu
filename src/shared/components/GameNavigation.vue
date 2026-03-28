@@ -1,8 +1,6 @@
 <script setup lang="ts">
-/* eslint-disable max-lines -- Navigation component requires template styles that exceed 500 lines */
 import { computed, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { RouteRecordNormalized } from 'vue-router'
 import { useRoute, useRouter } from 'vue-router'
 
 import { buildInfo } from '@/buildInfo'
@@ -10,6 +8,7 @@ import { useLocale } from '@/shared/composables/useLocale'
 import { useSkin } from '@/shared/composables/useSkin'
 
 import { useNavigationDropdown } from './composables/useNavigationDropdown'
+import { useNavigationRoutes } from './composables/useNavigationRoutes'
 import GameIcon from './ui/GameIcon.vue'
 import GameSelect from './ui/GameSelect.vue'
 
@@ -28,6 +27,7 @@ defineOptions({
 const { t } = useI18n()
 const { currentSkin, setSkin, availableSkins } = useSkin()
 const { currentLocale, setLocale, availableLocales } = useLocale()
+const { groupedRoutes } = useNavigationRoutes()
 
 const route = useRoute()
 const router = useRouter()
@@ -55,59 +55,6 @@ const testingDropdown = useNavigationDropdown({
   headerRef: testingHeaderRef,
   dropdownRef: testingDropdownRef,
   otherDropdowns: [toolsExpanded],
-})
-
-// Get translation key from route name
-const getItemKey = (routeName: string): string => {
-  const nameMap: Record<string, string> = {
-    Home: 'home',
-    Ide: 'ide',
-    CharacterSpriteViewer: 'spriteViewer',
-    ImageAnalyzer: 'imageAnalyzer',
-    MonacoEditor: 'monaco',
-    PerformanceDiagnostics: 'performanceDiagnostics',
-    KonvaSpriteTest: 'konvaSpriteTest',
-    PositionSyncLoadTest: 'positionSyncLoadTest',
-    PrintVsSpritesTest: 'printVsSpritesTest',
-  }
-  return nameMap[routeName] || routeName.toLowerCase()
-}
-
-interface NavRoute {
-  path: string
-  name: string
-  icon: string
-  title: string
-  description: string
-}
-
-interface GroupedRoutes {
-  main: NavRoute[]
-  tools: NavRoute[]
-  testing: NavRoute[]
-}
-
-// Get routes from router and group them
-const groupedRoutes = computed<GroupedRoutes>(() => {
-  const groups: GroupedRoutes = { main: [], tools: [], testing: [] }
-
-  router
-    .getRoutes()
-    .filter((r: RouteRecordNormalized) => r.meta.showInNav === true)
-    .forEach((r: RouteRecordNormalized) => {
-      const group = (r.meta.group as 'main' | 'tools' | 'testing') || 'main'
-      const itemKey = getItemKey(String(r.name))
-
-      groups[group].push({
-        path: r.path,
-        name: String(r.name),
-        icon: r.meta.icon as string,
-        title: t(`navigation.items.${itemKey}.name`),
-        description: t(`navigation.items.${itemKey}.description`),
-      })
-    })
-
-  return groups
 })
 
 const isActive = (path: string) => {
