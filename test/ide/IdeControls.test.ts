@@ -34,7 +34,7 @@ describe('IdeControls', () => {
     })
 
     const buttons = wrapper.findAll('button')
-    expect(buttons.length).toEqual(5) // run, stop, clear, debug, debugBuffer
+    expect(buttons.length).toEqual(4) // run, stop, clear, debug
     wrapper.unmount()
   })
 
@@ -172,24 +172,6 @@ describe('IdeControls', () => {
     await buttons[3]!.trigger('click') // debug toggle button
 
     expect(wrapper.emitted('toggleDebug')).toHaveLength(1)
-    wrapper.unmount()
-  })
-
-  it('emits debugBuffer event when debug buffer button is clicked', async () => {
-    const wrapper = mount(IdeControls, {
-      props: { isRunning: false },
-      global: {
-        stubs: {
-          GameIconButton: gameIconButtonStub,
-          InputModeToggle: inputModeToggleStub,
-        },
-      },
-    })
-
-    const buttons = wrapper.findAll('button')
-    await buttons[4]!.trigger('click') // debug buffer button (5th button)
-
-    expect(wrapper.emitted('debugBuffer')).toHaveLength(1)
     wrapper.unmount()
   })
 

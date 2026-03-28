@@ -29,7 +29,6 @@ const emit = defineEmits<{
   (e: 'stop'): void
   (e: 'clear'): void
   (e: 'toggleDebug'): void
-  (e: 'debugBuffer'): void
   (e: 'openSampleSelector'): void
 }>()
 
@@ -115,7 +114,6 @@ const useLiteEditor = computed(() => {
           @stop="emit('stop')"
           @clear="emit('clear')"
           @toggle-debug="emit('toggleDebug')"
-          @debug-buffer="emit('debugBuffer')"
           @update:input-mode="emit('update:inputMode', $event)"
         />
       </div>

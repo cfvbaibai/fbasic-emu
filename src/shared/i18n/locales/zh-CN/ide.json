@@ -19,8 +19,7 @@
     "run": "运行",
     "stop": "停止",
     "clear": "清除",
-    "debug": "调试",
-    "debugBuffer": "缓冲区"
+    "debug": "调试"
   },
   "output": {
     "title": "运行时输出",

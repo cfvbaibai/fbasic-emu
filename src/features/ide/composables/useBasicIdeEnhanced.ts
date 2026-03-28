@@ -79,10 +79,6 @@ export function useBasicIde() {
     state.debugMode.value = !state.debugMode.value
   }
 
-  const debugBuffer = () => {
-    // no-op: console.log debug output removed; retained for API compatibility
-  }
-
   watch(
     state.code,
     () => {
@@ -143,7 +139,6 @@ export function useBasicIde() {
     getParserCapabilities: editor.getParserCapabilities,
     getHighlighterCapabilities: editor.getHighlighterCapabilities,
     toggleDebugMode,
-    debugBuffer,
 
     // Web worker / screen
     sendStickEvent: worker.sendStickEvent,
