@@ -77,19 +77,6 @@ export class SpriteStateManager {
   }
 
   /**
-   * Hide all sprites (set visible = false for all 8 slots).
-   * Used by CLS to clear sprites from screen without removing definitions.
-   */
-  hideAllSprites(): void {
-    for (let i = 0; i < 8; i++) {
-      const sprite = this.spriteStates.get(i)
-      if (sprite) {
-        sprite.visible = false
-      }
-    }
-  }
-
-  /**
    * Hide a sprite
    */
   hideSprite(spriteNumber: number): void {
