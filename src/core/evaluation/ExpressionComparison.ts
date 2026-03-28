@@ -5,14 +5,47 @@
  * Extracted from ExpressionEvaluator.ts for modularity.
  */
 
+/** Regex matching strings that represent numeric values (integer or decimal). */
+const NUMERIC_STRING_REGEX = /^-?\d+(\.\d+)?$/
+
 /**
- * Check if a value is a numeric string (parseable as a finite number).
- * Integer-only strings like "42" or "-7" return true.
- * Strings like "3.14", "hello", "" return false.
+ * Check if a value is a string that represents a numeric value.
+ * Accepts integer strings ("42", "-7") and decimal strings ("3.14", "-0.5").
  */
-function isNumericString(value: string): boolean {
-  if (value.length === 0) return false
-  return /^-?\d+$/.test(value)
+export function isNumericString(value: number | string): value is string {
+  return typeof value === 'string' && NUMERIC_STRING_REGEX.test(value)
+}
+
+/** Compare two numbers using the given operator. Returns -1 for true, 0 for false. */
+function compareNumbers(
+  left: number,
+  right: number,
+  operator: '=' | '<>' | '<' | '>' | '<=' | '>='
+): number {
+  switch (operator) {
+    case '=': return left === right ? -1 : 0
+    case '<>': return left !== right ? -1 : 0
+    case '<': return left < right ? -1 : 0
+    case '>': return left > right ? -1 : 0
+    case '<=': return left <= right ? -1 : 0
+    case '>=': return left >= right ? -1 : 0
+  }
+}
+
+/** Compare two strings lexicographically using the given operator. Returns -1 for true, 0 for false. */
+function compareStrings(
+  left: string,
+  right: string,
+  operator: '=' | '<>' | '<' | '>' | '<=' | '>='
+): number {
+  switch (operator) {
+    case '=': return left === right ? -1 : 0
+    case '<>': return left !== right ? -1 : 0
+    case '<': return left < right ? -1 : 0
+    case '>': return left > right ? -1 : 0
+    case '<=': return left <= right ? -1 : 0
+    case '>=': return left >= right ? -1 : 0
+  }
 }
 
 /**
@@ -22,59 +55,28 @@ function isNumericString(value: string): boolean {
  * Comparison rules:
  * - number vs number: numeric comparison
  * - string vs string: lexicographic comparison
- * - number vs string (or string vs number): if the string is a valid integer,
- *   do numeric comparison; otherwise fall back to string comparison
+ * - number vs string (or string vs number): if the string is a valid numeric
+ *   string (integer or decimal), do numeric comparison; otherwise fall back to
+ *   lexicographic string comparison
  */
 export function compareValues(
   leftValue: number | string,
   rightValue: number | string,
   operator: '=' | '<>' | '<' | '>' | '<=' | '>='
 ): number {
-  const leftIsString = typeof leftValue === 'string'
-  const rightIsString = typeof rightValue === 'string'
-
-  // Mixed types: number vs string — try numeric comparison if string is numeric
-  if (leftIsString !== rightIsString) {
-    const strValue = leftIsString ? (leftValue) : (rightValue as string)
-    if (isNumericString(strValue)) {
-      const leftNum = Number(leftValue)
-      const rightNum = Number(rightValue)
-      switch (operator) {
-        case '=': return leftNum === rightNum ? -1 : 0
-        case '<>': return leftNum !== rightNum ? -1 : 0
-        case '<': return leftNum < rightNum ? -1 : 0
-        case '>': return leftNum > rightNum ? -1 : 0
-        case '<=': return leftNum <= rightNum ? -1 : 0
-        case '>=': return leftNum >= rightNum ? -1 : 0
-      }
-    }
-    // Non-numeric string vs number: fall through to string comparison
+  // Both numbers: numeric comparison
+  if (typeof leftValue === 'number' && typeof rightValue === 'number') {
+    return compareNumbers(leftValue, rightValue, operator)
   }
 
-  // Both strings, or mixed with non-numeric string — lexicographic comparison
-  if (leftIsString || rightIsString) {
-    const leftStr = String(leftValue)
-    const rightStr = String(rightValue)
-    switch (operator) {
-      case '=': return leftStr === rightStr ? -1 : 0
-      case '<>': return leftStr !== rightStr ? -1 : 0
-      case '<': return leftStr < rightStr ? -1 : 0
-      case '>': return leftStr > rightStr ? -1 : 0
-      case '<=': return leftStr <= rightStr ? -1 : 0
-      case '>=': return leftStr >= rightStr ? -1 : 0
-    }
+  // Mixed type: check if the string operand is a numeric string
+  if (typeof leftValue === 'number' && isNumericString(rightValue)) {
+    return compareNumbers(leftValue, Number(rightValue), operator)
+  }
+  if (typeof rightValue === 'number' && isNumericString(leftValue)) {
+    return compareNumbers(Number(leftValue), rightValue, operator)
   }
 
-  // Both numbers — numeric comparison
-  const leftNum = Number(leftValue)
-  const rightNum = Number(rightValue)
-  switch (operator) {
-    case '=': return leftNum === rightNum ? -1 : 0
-    case '<>': return leftNum !== rightNum ? -1 : 0
-    case '<': return leftNum < rightNum ? -1 : 0
-    case '>': return leftNum > rightNum ? -1 : 0
-    case '<=': return leftNum <= rightNum ? -1 : 0
-    case '>=': return leftNum >= rightNum ? -1 : 0
-  }
-  return 0
+  // Both strings, or mixed type with non-numeric string: lexicographic comparison
+  return compareStrings(String(leftValue), String(rightValue), operator)
 }
