@@ -49,6 +49,7 @@
     "moveTest": "移動測試",
     "testMoveControl": "移動控制測試",
     "inputDemo": "INPUT / LINPUT",
+    "emptyCategory": "該分類暫無範例",
     "bgIndicatorTitle": "包含 BG 資料",
     "categories": {
       "basics": "基礎",

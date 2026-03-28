@@ -100,6 +100,10 @@ const categoryColors: Record<string, string> = {
 
       <!-- Sample Grid -->
       <div class="sample-grid">
+        <div v-if="samplesInCategory.length === 0" class="sample-grid-empty">
+          <span class="mdi mdi-folder-open-outline sample-grid-empty-icon"></span>
+          <p class="sample-grid-empty-text">{{ t('ide.samples.emptyCategory') }}</p>
+        </div>
         <div
           v-for="sample in samplesInCategory"
           :key="sample.key"
@@ -236,6 +240,29 @@ const categoryColors: Record<string, string> = {
   padding: 1rem 1.5rem;
   overflow-y: auto;
   min-height: 0;
+}
+
+/* Empty state */
+.sample-grid-empty {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 3rem 1rem;
+  color: var(--game-text-secondary);
+}
+
+.sample-grid-empty-icon {
+  font-size: 2.5rem;
+  opacity: 0.5;
+}
+
+.sample-grid-empty-text {
+  margin: 0;
+  font-size: 0.95rem;
+  opacity: 0.7;
 }
 
 .sample-card {
