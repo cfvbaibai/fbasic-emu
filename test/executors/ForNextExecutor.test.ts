@@ -151,10 +151,8 @@ describe('FOR/NEXT Executor', () => {
   })
 
   describe('Loop Execution Conditions', () => {
-    it('should execute loop once then exit when start > end with positive step', async () => {
-      // Note: According to manual page 65, when condition is not met, loop should not execute.
-      // However, current implementation executes loop body once before checking condition at NEXT.
-      // This test reflects the current implementation behavior.
+    it('should not execute loop body when start > end with positive step', async () => {
+      // Per Family BASIC manual page 65: "When the condition is not met, the loop should not execute."
       const source = `
 10 FOR I = 10 TO 1
 20 PRINT I;
@@ -167,16 +165,12 @@ describe('FOR/NEXT Executor', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
-      // PRINT I; ends with semicolon, so "Done" continues on same line
-      // But PRINT "Done" doesn't end with semicolon, so adds newline
-      // Numbers always get a space BEFORE them, strings don't get spaces
-      expect(outputs).toEqual(' 10Done\n')
+      // Loop should not execute at all; only "Done" should print
+      expect(outputs).toEqual('Done\n')
     })
 
-    it('should execute loop once then exit when start < end with negative step', async () => {
-      // Note: According to manual, when condition is not met, loop should not execute.
-      // However, current implementation executes loop body once before checking condition at NEXT.
-      // This test reflects the current implementation behavior.
+    it('should not execute loop body when start < end with negative step', async () => {
+      // Per Family BASIC manual page 65: "When the condition is not met, the loop should not execute."
       const source = `
 10 FOR I = 1 TO 10 STEP -1
 20 PRINT I;
@@ -189,10 +183,8 @@ describe('FOR/NEXT Executor', () => {
       expect(result.success).toBe(true)
       expect(result.errors).toHaveLength(0)
       const outputs = deviceAdapter.getAllOutputs()
-      // PRINT I; ends with semicolon, so "Done" continues on same line
-      // But PRINT "Done" doesn't end with semicolon, so adds newline
-      // Numbers always get a space BEFORE them, strings don't get spaces
-      expect(outputs).toEqual(' 1Done\n')
+      // Loop should not execute at all; only "Done" should print
+      expect(outputs).toEqual('Done\n')
     })
 
     it('should execute loop exactly once when start equals end', async () => {
@@ -367,6 +359,43 @@ describe('FOR/NEXT Executor', () => {
       // After loop ends, I should be 4 (3 + 1)
       // Numbers always get a space BEFORE them
       expect(outputs).toEqual(' 4')
+    })
+
+    it('should set loop variable to start value when loop does not execute', async () => {
+      const source = `
+10 FOR I = 10 TO 1
+20 PRINT I;
+30 NEXT
+40 PRINT I;
+50 END
+`
+      const result = await interpreter.execute(source)
+
+      expect(result.success).toBe(true)
+      expect(result.errors).toHaveLength(0)
+      const outputs = deviceAdapter.getAllOutputs()
+      // Loop does not execute; I retains start value 10
+      // PRINT I; ends with semicolon, so output is just " 10"
+      expect(outputs).toEqual(' 10')
+    })
+
+    it('should respect user modification of loop variable inside body', async () => {
+      const source = `
+10 FOR I = 1 TO 10
+20 I = 100
+30 PRINT I;
+40 NEXT
+50 END
+`
+      const result = await interpreter.execute(source)
+
+      expect(result.success).toBe(true)
+      expect(result.errors).toHaveLength(0)
+      const outputs = deviceAdapter.getAllOutputs()
+      // User sets I = 100; NEXT reads 100, adds step 1 -> 101
+      // 101 > end value 10, so loop exits after first iteration
+      // PRINT I; prints the user-set value 100
+      expect(outputs).toEqual(' 100')
     })
   })
 
