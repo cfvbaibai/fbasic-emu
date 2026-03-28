@@ -6,7 +6,9 @@
     "export": "エクスポート",
     "discardConfirm": "未保存の変更を破棄しますか？",
     "programNamePlaceholder": "プログラム名",
-    "unsavedChanges": "未保存の変更"
+    "unsavedChanges": "未保存の変更",
+    "openFailed": "ファイルを開けませんでした",
+    "saveFailed": "ファイルを保存できませんでした"
   },
   "codeEditor": {
     "title": "コードエディター",

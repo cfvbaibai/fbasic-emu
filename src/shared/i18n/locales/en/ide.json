@@ -6,7 +6,9 @@
     "export": "Export",
     "discardConfirm": "Discard unsaved changes?",
     "programNamePlaceholder": "Program name",
-    "unsavedChanges": "Unsaved changes"
+    "unsavedChanges": "Unsaved changes",
+    "openFailed": "Failed to open file",
+    "saveFailed": "Failed to save file"
   },
   "codeEditor": {
     "title": "Code Editor",

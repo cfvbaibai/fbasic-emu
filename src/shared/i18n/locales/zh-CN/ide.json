@@ -6,7 +6,9 @@
     "export": "导出",
     "discardConfirm": "是否放弃未保存的更改？",
     "programNamePlaceholder": "程序名称",
-    "unsavedChanges": "未保存的更改"
+    "unsavedChanges": "未保存的更改",
+    "openFailed": "打开文件失败",
+    "saveFailed": "保存文件失败"
   },
   "codeEditor": {
     "title": "代码编辑器",
