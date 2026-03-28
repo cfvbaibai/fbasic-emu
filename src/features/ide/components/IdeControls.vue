@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import type { InputMode } from '@/features/ide/composables/useBasicIdeState'
@@ -27,7 +28,7 @@ defineOptions({
   name: 'IdeControls',
 })
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   canRun: true,
   canStop: false,
   debugMode: false,
@@ -35,6 +36,27 @@ withDefaults(defineProps<Props>(), {
 })
 
 const emit = defineEmits<Emits>()
+
+/**
+ * Loading state for the Run button.
+ * Set on click, cleared once isRunning flips to true (or canRun flips to false).
+ * Prevents double-clicks during the async startup window.
+ */
+const isStarting = ref(false)
+
+watch(
+  () => props.isRunning,
+  (running) => {
+    if (running) isStarting.value = false
+  }
+)
+
+watch(
+  () => props.canRun,
+  (canRun) => {
+    if (!canRun) isStarting.value = false
+  }
+)
 
 const { t } = useI18n()
 
@@ -67,6 +89,7 @@ interface Emits {
 }
 
 const handleRun = () => {
+  isStarting.value = true
   emit('run')
 }
 
@@ -105,6 +128,7 @@ const handleInputModeChange = (value: InputMode) => {
     <GameIconButton
       type="primary"
       :disabled="!canRun"
+      :loading="isStarting"
       icon="mdi:play"
       size="small"
       :title="t('ide.controls.run')"
@@ -115,7 +139,7 @@ const handleInputModeChange = (value: InputMode) => {
     <GameIconButton
       type="danger"
       :disabled="!canStop"
-      icon="mdi:pause"
+      icon="mdi:stop"
       size="small"
       :title="t('ide.controls.stop')"
       data-testid="ide-stop-button"

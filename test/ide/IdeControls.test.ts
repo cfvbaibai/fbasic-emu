@@ -11,8 +11,8 @@ vi.mock('vue-i18n', () => ({
 }))
 
 const gameIconButtonStub = defineComponent({
-  props: ['type', 'disabled', 'icon', 'size', 'title', 'variant', 'selected'],
-  template: '<button :disabled="disabled" :data-testid="$attrs[\'data-testid\']" :data-type="type" :data-icon="icon" :data-variant="variant" :data-selected="selected" :title="title"><slot /></button>',
+  props: ['type', 'disabled', 'icon', 'size', 'title', 'variant', 'selected', 'loading'],
+  template: '<button :disabled="disabled || loading" :data-testid="$attrs[\'data-testid\']" :data-type="type" :data-icon="icon" :data-variant="variant" :data-selected="selected" :data-loading="loading" :title="title"><slot /></button>',
 })
 
 const inputModeToggleStub = defineComponent({
@@ -242,6 +242,63 @@ describe('IdeControls', () => {
     })
 
     expect(wrapper.find('.control-divider').exists()).toBe(true)
+    wrapper.unmount()
+  })
+
+  it('stop button uses mdi:stop icon', () => {
+    const wrapper = mount(IdeControls, {
+      props: { isRunning: true, canStop: true },
+      global: {
+        stubs: {
+          GameIconButton: gameIconButtonStub,
+          InputModeToggle: inputModeToggleStub,
+        },
+      },
+    })
+
+    const stopButton = wrapper.find('[data-testid="ide-stop-button"]')
+    expect(stopButton.attributes('data-icon')).toEqual('mdi:stop')
+    wrapper.unmount()
+  })
+
+  it('run button shows loading state after click', async () => {
+    const wrapper = mount(IdeControls, {
+      props: { isRunning: false, canRun: true },
+      global: {
+        stubs: {
+          GameIconButton: gameIconButtonStub,
+          InputModeToggle: inputModeToggleStub,
+        },
+      },
+    })
+
+    const runButton = wrapper.find('[data-testid="ide-run-button"]')
+    expect(runButton.attributes('data-loading')).toEqual('false')
+
+    await runButton.trigger('click')
+    expect(runButton.attributes('data-loading')).toEqual('true')
+    expect(wrapper.emitted('run')).toHaveLength(1)
+    wrapper.unmount()
+  })
+
+  it('run button loading clears when isRunning becomes true', async () => {
+    const wrapper = mount(IdeControls, {
+      props: { isRunning: false, canRun: true },
+      global: {
+        stubs: {
+          GameIconButton: gameIconButtonStub,
+          InputModeToggle: inputModeToggleStub,
+        },
+      },
+    })
+
+    const runButton = wrapper.find('[data-testid="ide-run-button"]')
+    await runButton.trigger('click')
+    expect(runButton.attributes('data-loading')).toEqual('true')
+
+    // Simulate the parent setting isRunning to true
+    await wrapper.setProps({ isRunning: true, canRun: false, canStop: true })
+    expect(runButton.attributes('data-loading')).toEqual('false')
     wrapper.unmount()
   })
 })
