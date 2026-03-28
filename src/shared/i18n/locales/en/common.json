@@ -32,5 +32,10 @@
   "labels": {
     "yes": "Yes",
     "no": "No"
+  },
+  "ariaLabels": {
+    "toggleCollapse": "Toggle collapse",
+    "clear": "Clear",
+    "close": "Close"
   }
 }

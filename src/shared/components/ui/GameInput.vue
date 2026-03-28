@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import type { GameInputEmits, GameInputProps } from './GameInput.types'
 
@@ -30,6 +31,8 @@ const props = withDefaults(defineProps<GameInputProps>(), {
 })
 
 const emit = defineEmits<GameInputEmits>()
+
+const { t } = useI18n()
 
 const inputValue = computed({
   get: () => props.modelValue,
@@ -85,7 +88,7 @@ const inputClasses = computed(() => {
       type="button"
       class="game-input-clear"
       @click="handleClear"
-      aria-label="Clear"
+      :aria-label="t('common.ariaLabels.clear')"
     >
       ×
     </button>
