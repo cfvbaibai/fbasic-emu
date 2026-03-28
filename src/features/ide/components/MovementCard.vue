@@ -53,7 +53,8 @@ function directionTitle(dir: number): string {
 
 function characterTypeLabel(code: number): string {
   const name = MoveCharacterCode[code as MoveCharacterCode]
-  return name ?? String(code)
+  if (name === undefined) return String(code)
+  return t(`ide.movementCard.characterTypes.${name}`)
 }
 </script>
 

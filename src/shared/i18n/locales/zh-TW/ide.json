@@ -381,6 +381,24 @@
       "6": "左下",
       "7": "左",
       "8": "左上"
+    },
+    "characterTypes": {
+      "MARIO": "瑪利歐",
+      "LADY": "女士",
+      "FIGHTER_FLY": "鬥士蠅",
+      "ACHILLES": "阿基里斯",
+      "PENGUIN": "企鵝",
+      "FIREBALL": "火球",
+      "CAR": "賽車",
+      "SPINNER": "旋轉器",
+      "STAR_KILLER": "星殺者",
+      "STARSHIP": "星際飛船",
+      "EXPLOSION": "爆炸",
+      "SMILEY": "笑臉",
+      "LASER": "雷射",
+      "SHELL_CREEPER": "龜殼怪",
+      "SIDE_STEPPER": "側步怪",
+      "NITPICKER": "啄木鳥"
     }
   },
   "screenTab": {
