@@ -8,7 +8,7 @@ import type { CstNode } from 'chevrotain'
 
 import { DEFAULTS, ERROR_TYPES } from '@/core/constants'
 import type { ExpressionEvaluator } from '@/core/evaluation/ExpressionEvaluator'
-import { getCstNodes, getFirstToken } from '@/core/parser/cst-helpers'
+import { getCstNodes, getFirstCstNode, getFirstToken } from '@/core/parser/cst-helpers'
 import type { VariableService } from '@/core/services/VariableService'
 import type { LoopState } from '@/core/state/ExecutionContext'
 
@@ -91,6 +91,37 @@ export class ForExecutor {
     // Initialize loop variable with start value
     this.variableService.setVariable(varName, startValue)
 
+    // Determine if the loop should execute at all
+    const shouldExecute = this.shouldExecuteLoop(startValue, endValue, stepValue)
+
+    if (!shouldExecute) {
+      // Loop condition not met: skip to after the matching NEXT statement
+      // Per Family BASIC manual page 65: "When the condition is not met, the loop should not execute."
+      if (this.context.config.enableDebugMode) {
+        this.context.addDebugOutput(
+          `FOR: ${varName} = ${startValue} TO ${endValue} STEP ${stepValue} (shouldExecute: false, skipping to NEXT)`
+        )
+      }
+
+      // Find the matching NEXT by scanning forward and counting nesting depth
+      const nextStatementIndex = this.findMatchingNext(statementIndex)
+      if (nextStatementIndex === -1) {
+        this.context.addError({
+          line: lineNumber,
+          message: 'FOR without matching NEXT',
+          type: ERROR_TYPES.RUNTIME,
+        })
+        return
+      }
+
+      // Set the loop variable to start value (spec: variable gets the start value even if loop doesn't execute)
+      this.variableService.setVariable(varName, startValue)
+
+      // Jump past the NEXT statement (NEXT itself should not execute)
+      this.context.jumpToStatement(nextStatementIndex + 1)
+      return
+    }
+
     // Create loop state
     // Note: statementIndex is the current statement index where FOR is located
     // When NEXT jumps back, it should jump to the same statement (to re-execute the loop body)
@@ -101,7 +132,7 @@ export class ForExecutor {
       stepValue,
       currentValue: startValue,
       statementIndex, // Jump back to the same statement index
-      shouldExecute: this.shouldExecuteLoop(startValue, endValue, stepValue),
+      shouldExecute: true,
     }
 
     // Push loop state onto stack
@@ -109,7 +140,7 @@ export class ForExecutor {
 
     if (this.context.config.enableDebugMode) {
       this.context.addDebugOutput(
-        `FOR: ${varName} = ${startValue} TO ${endValue} STEP ${stepValue} (shouldExecute: ${loopState.shouldExecute})`
+        `FOR: ${varName} = ${startValue} TO ${endValue} STEP ${stepValue} (shouldExecute: true)`
       )
     }
   }
@@ -128,5 +159,32 @@ export class ForExecutor {
       // Zero step: infinite loop (should be an error, but handle gracefully)
       return false
     }
+  }
+
+  /**
+   * Find the statement index of the matching NEXT for the FOR at the given index.
+   * Handles nested FOR/NEXT pairs by tracking nesting depth.
+   * Returns -1 if no matching NEXT is found.
+   */
+  private findMatchingNext(forStatementIndex: number): number {
+    let depth = 0
+    for (let i = forStatementIndex; i < this.context.statements.length; i++) {
+      const stmt = this.context.statements[i]
+      if (!stmt) continue
+
+      const commandCst = stmt.command
+      const singleCommandCst = getFirstCstNode(commandCst.children.singleCommand)
+      if (!singleCommandCst) continue
+
+      if (singleCommandCst.children.forStatement) {
+        depth++
+      } else if (singleCommandCst.children.nextStatement) {
+        depth--
+        if (depth === 0) {
+          return i
+        }
+      }
+    }
+    return -1
   }
 }

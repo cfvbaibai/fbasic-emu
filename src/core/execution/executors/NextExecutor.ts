@@ -37,8 +37,14 @@ export class NextExecutor {
 
     const loopState = this.context.loopStack[this.context.loopStack.length - 1]!
 
-    // Increment loop variable
-    loopState.currentValue += loopState.stepValue
+    // Read the current variable value to respect any user modifications inside the loop body
+    const actualVariable = this.variableService.getVariable(loopState.variableName)
+    const currentValue = actualVariable && typeof actualVariable.value === 'number'
+      ? actualVariable.value
+      : loopState.currentValue
+
+    // Compute next value from the actual current value
+    loopState.currentValue = currentValue + loopState.stepValue
 
     // Update the actual variable
     this.variableService.setVariable(loopState.variableName, loopState.currentValue)
