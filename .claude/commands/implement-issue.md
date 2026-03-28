@@ -61,6 +61,7 @@ gh issue list --state open --search "no:assignee" --json number,title,labels,ass
 Select the **highest-priority unassigned** issue:
 - Prefer issues with `P1` or `P2` labels
 - Among same priority, prefer bugs over enhancements
+- Among same priority and type, **prefer lower issue numbers** (older issues have been waiting longer)
 - Scan `~/.claude/automations/fbasic-ide/memory/issues/` for existing `issue-*.md` files to avoid re-picking
 
 If all remaining open issues are too complex for the pipeline (multi-module features requiring architectural decisions), post a `## TOO COMPLEX` comment with suggested sub-issue splits. Then report "no issues to implement" and stop.
