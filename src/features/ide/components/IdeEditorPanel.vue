@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, defineAsyncComponent } from 'vue'
+import { computed, defineAsyncComponent, h } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import BgEditorPanel from '@/features/bg-editor/components/BgEditorPanel.vue'
@@ -33,7 +33,21 @@ const emit = defineEmits<{
   (e: 'openSampleSelector'): void
 }>()
 
-const MonacoCodeEditor = defineAsyncComponent(() => import('./MonacoCodeEditor.vue'))
+const MonacoCodeEditor = defineAsyncComponent({
+  loader: () => import('./MonacoCodeEditor.vue'),
+  loadingComponent: {
+    name: 'MonacoCodeEditorLoading',
+    setup() {
+      const { t } = useI18n()
+      return () =>
+        h('div', { class: 'editor-loading', 'data-testid': 'monaco-editor-loading' }, [
+          h('span', { class: 'editor-loading-spinner' }),
+          h('span', { class: 'editor-loading-text' }, t('ide.codeEditor.loading')),
+        ])
+    },
+  },
+  delay: 200,
+})
 
 interface Props {
   /** Code content (v-model) */
@@ -167,5 +181,35 @@ const useLiteEditor = computed(() => {
 .editor-lite-placeholder {
   flex: 1 1 0;
   min-height: 400px;
+}
+
+.editor-loading {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  min-height: 400px;
+  color: var(--game-text-secondary);
+}
+
+.editor-loading-spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--game-surface-border);
+  border-top-color: currentcolor;
+  border-radius: 50%;
+  animation: editor-loading-spin 0.8s linear infinite;
+}
+
+.editor-loading-text {
+  font-size: 0.85rem;
+}
+
+@keyframes editor-loading-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>

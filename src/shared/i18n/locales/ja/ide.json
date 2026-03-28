@@ -10,7 +10,8 @@
   },
   "codeEditor": {
     "title": "コードエディター",
-    "placeholder": "F-BASICコードをここに入力..."
+    "placeholder": "F-BASICコードをここに入力...",
+    "loading": "エディターを読み込み中..."
   },
   "controls": {
     "run": "実行",
