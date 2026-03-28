@@ -16,8 +16,7 @@
     "run": "Run",
     "stop": "Stop",
     "clear": "Clear",
-    "debug": "Debug",
-    "debugBuffer": "Buffer"
+    "debug": "Debug"
   },
   "output": {
     "title": "Runtime Output",

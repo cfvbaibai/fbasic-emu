@@ -108,7 +108,6 @@ const toggleDebugMode =
   (() => {
     debugMode.value = !debugMode.value
   })
-const debugBuffer = basicIde?.debugBuffer ?? (() => {})
 const sendStrigEvent = basicIde?.sendStrigEvent ?? (() => {})
 const sharedDisplayBufferAccessor =
   basicIde?.sharedDisplayBufferAccessor ?? ({} as SharedDisplayBufferAccessor)
@@ -380,7 +379,6 @@ function toggleInputMode() {
             @stop="stopCode"
             @clear="clearOutput"
             @toggle-debug="toggleDebugMode"
-            @debug-buffer="debugBuffer"
             @open-sample-selector="sampleSelectorOpen = true"
           />
         </div>

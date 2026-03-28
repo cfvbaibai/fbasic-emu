@@ -16,8 +16,7 @@
     "run": "実行",
     "stop": "停止",
     "clear": "クリア",
-    "debug": "デバッグ",
-    "debugBuffer": "バッファ"
+    "debug": "デバッグ"
   },
   "output": {
     "title": "実行出力",
