@@ -161,6 +161,80 @@ describe('ReadExecutor (Integration)', () => {
     })
   })
 
+  describe('TM ERROR (type mismatch)', () => {
+    it('should report TM ERROR when reading string into numeric variable', async () => {
+      const source = `
+10 DATA "HELLO"
+20 READ A
+30 PRINT A
+40 END
+`
+      const result = await interpreter.execute(source)
+
+      expect(result.success).toBe(false)
+      expect(result.errors.length).toBeGreaterThan(0)
+      expect(result.errors[0]?.message).toEqual('TM ERROR')
+    })
+
+    it('should report TM ERROR when reading number into string variable', async () => {
+      const source = `
+10 DATA 123
+20 READ B$
+30 PRINT B$
+40 END
+`
+      const result = await interpreter.execute(source)
+
+      expect(result.success).toBe(false)
+      expect(result.errors.length).toBeGreaterThan(0)
+      expect(result.errors[0]?.message).toEqual('TM ERROR')
+    })
+
+    it('should report TM ERROR when reading string into numeric array element', async () => {
+      const source = `
+10 DATA "BAD"
+20 DIM X(2)
+30 READ X(0)
+40 PRINT X(0)
+50 END
+`
+      const result = await interpreter.execute(source)
+
+      expect(result.success).toBe(false)
+      expect(result.errors.length).toBeGreaterThan(0)
+      expect(result.errors[0]?.message).toEqual('TM ERROR')
+    })
+
+    it('should report TM ERROR when reading number into string array element', async () => {
+      const source = `
+10 DATA 999
+20 DIM X$(2)
+30 READ X$(0)
+40 PRINT X$(0)
+50 END
+`
+      const result = await interpreter.execute(source)
+
+      expect(result.success).toBe(false)
+      expect(result.errors.length).toBeGreaterThan(0)
+      expect(result.errors[0]?.message).toEqual('TM ERROR')
+    })
+
+    it('should halt on first type mismatch in multi-variable READ', async () => {
+      const source = `
+10 DATA 10, "HELLO", 30
+20 READ A, B, C
+30 PRINT A; B; C
+40 END
+`
+      const result = await interpreter.execute(source)
+
+      expect(result.success).toBe(false)
+      expect(result.errors.length).toBeGreaterThan(0)
+      expect(result.errors[0]?.message).toEqual('TM ERROR')
+    })
+  })
+
   describe('READ in a loop', () => {
     it('should read data values inside a FOR loop', async () => {
       const source = `
