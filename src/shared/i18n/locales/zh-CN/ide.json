@@ -12,7 +12,8 @@
   },
   "codeEditor": {
     "title": "代码编辑器",
-    "placeholder": "在此输入您的 F-BASIC 代码..."
+    "placeholder": "在此输入您的 F-BASIC 代码...",
+    "loading": "正在加载编辑器..."
   },
   "controls": {
     "run": "运行",

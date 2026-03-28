@@ -12,7 +12,8 @@
   },
   "codeEditor": {
     "title": "Code Editor",
-    "placeholder": "Enter your F-BASIC code here..."
+    "placeholder": "Enter your F-BASIC code here...",
+    "loading": "Loading editor..."
   },
   "controls": {
     "run": "Run",
