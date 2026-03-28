@@ -352,4 +352,168 @@ describe('Relational Operators', () => {
       expect(deviceAdapter.getAllOutputs()).toEqual('Equal\n')
     })
   })
+
+  describe('Mixed-Type Comparisons (numeric string vs number)', () => {
+    it('should compare integer string variable with number using equality', async () => {
+      const code = `
+10 LET A$ = "42"
+20 IF A$ = 42 THEN PRINT "Match"
+30 END
+`
+      const result = await interpreter.execute(code)
+
+      expect(result.success).toBe(true)
+      expect(deviceAdapter.getAllOutputs()).toEqual('Match\n')
+    })
+
+    it('should compare integer string variable with number using inequality', async () => {
+      const code = `
+10 LET A$ = "42"
+20 IF A$ <> 99 THEN PRINT "Different"
+30 END
+`
+      const result = await interpreter.execute(code)
+
+      expect(result.success).toBe(true)
+      expect(deviceAdapter.getAllOutputs()).toEqual('Different\n')
+    })
+
+    it('should compare integer string variable with number using less than', async () => {
+      const code = `
+10 LET A$ = "3"
+20 IF A$ < 5 THEN PRINT "Less"
+30 END
+`
+      const result = await interpreter.execute(code)
+
+      expect(result.success).toBe(true)
+      expect(deviceAdapter.getAllOutputs()).toEqual('Less\n')
+    })
+
+    it('should compare integer string variable with number using greater than', async () => {
+      const code = `
+10 LET A$ = "10"
+20 IF A$ > 5 THEN PRINT "Greater"
+30 END
+`
+      const result = await interpreter.execute(code)
+
+      expect(result.success).toBe(true)
+      expect(deviceAdapter.getAllOutputs()).toEqual('Greater\n')
+    })
+
+    it('should compare decimal string variable with number using less than', async () => {
+      const code = `
+10 LET A$ = "3.14"
+20 IF A$ < 4 THEN PRINT "Less"
+30 END
+`
+      const result = await interpreter.execute(code)
+
+      expect(result.success).toBe(true)
+      expect(deviceAdapter.getAllOutputs()).toEqual('Less\n')
+    })
+
+    it('should compare decimal string variable with number using greater than', async () => {
+      const code = `
+10 LET A$ = "3.14"
+20 IF A$ > 3 THEN PRINT "Greater"
+30 END
+`
+      const result = await interpreter.execute(code)
+
+      expect(result.success).toBe(true)
+      expect(deviceAdapter.getAllOutputs()).toEqual('Greater\n')
+    })
+
+    it('should return false when decimal string does not equal number', async () => {
+      const code = `
+10 LET A$ = "3.14"
+20 IF A$ = 3 THEN PRINT "Wrong"
+30 END
+`
+      const result = await interpreter.execute(code)
+
+      expect(result.success).toBe(true)
+      expect(deviceAdapter.getAllOutputs()).toEqual('')
+    })
+
+    it('should compare negative integer string with number', async () => {
+      const code = `
+10 LET A$ = "-5"
+20 IF A$ < 0 THEN PRINT "Negative"
+30 END
+`
+      const result = await interpreter.execute(code)
+
+      expect(result.success).toBe(true)
+      expect(deviceAdapter.getAllOutputs()).toEqual('Negative\n')
+    })
+
+    it('should compare negative decimal string with number', async () => {
+      const code = `
+10 LET A$ = "-3.14"
+20 IF A$ < -3 THEN PRINT "Less"
+30 END
+`
+      const result = await interpreter.execute(code)
+
+      expect(result.success).toBe(true)
+      expect(deviceAdapter.getAllOutputs()).toEqual('Less\n')
+    })
+
+    it('should use lexicographic comparison for non-numeric string vs number', async () => {
+      const code = `
+10 LET A$ = "hello"
+20 IF A$ = 0 THEN PRINT "Wrong"
+30 IF A$ <> 0 THEN PRINT "Different"
+40 END
+`
+      const result = await interpreter.execute(code)
+
+      expect(result.success).toBe(true)
+      // "hello" is not a numeric string, so it falls through to lexicographic: "hello" vs "0"
+      expect(deviceAdapter.getAllOutputs()).toEqual('Different\n')
+    })
+
+    it('should compare number with integer string on the right side', async () => {
+      const code = `
+10 LET A$ = "10"
+20 IF 10 = A$ THEN PRINT "Match"
+30 END
+`
+      const result = await interpreter.execute(code)
+
+      expect(result.success).toBe(true)
+      expect(deviceAdapter.getAllOutputs()).toEqual('Match\n')
+    })
+
+    it('should compare number with integer string using greater than (lexicographic mismatch)', async () => {
+      const code = `
+10 LET A$ = "10"
+20 IF A$ > 5 THEN PRINT "Greater"
+30 END
+`
+      const result = await interpreter.execute(code)
+
+      expect(result.success).toBe(true)
+      // Without fix: "10" > "5" lexicographically is FALSE ('1' < '5')
+      // With fix: 10 > 5 numerically is TRUE
+      expect(deviceAdapter.getAllOutputs()).toEqual('Greater\n')
+    })
+
+    it('should compare number with integer string using less than (lexicographic mismatch)', async () => {
+      const code = `
+10 LET A$ = "9"
+20 IF A$ < 10 THEN PRINT "Less"
+30 END
+`
+      const result = await interpreter.execute(code)
+
+      expect(result.success).toBe(true)
+      // Without fix: "9" < "10" lexicographically is FALSE ('9' > '1')
+      // With fix: 9 < 10 numerically is TRUE
+      expect(deviceAdapter.getAllOutputs()).toEqual('Less\n')
+    })
+  })
 })
