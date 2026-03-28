@@ -74,9 +74,9 @@ interface CommandPaletteState {
 **Command Categories:**
 
 **Run Commands:**
-- `run.start` - Start program execution (F5)
-- `run.stop` - Stop execution (Shift+F5)
-- `run.restart` - Restart program (Ctrl+Shift+F5)
+- `run.start` - Start program execution (Ctrl+Enter / Cmd+Enter)
+- `run.stop` - Stop execution (Ctrl+Shift+Enter / Cmd+Shift+Enter)
+- `run.restart` - Restart program (Ctrl+Shift+R / Cmd+Shift+R)
 - `run.step` - Step execution (F10)
 - `run.clearScreen` - Clear output screen (Ctrl+L)
 
@@ -137,9 +137,9 @@ interface KeybindingConfig {
 | Command | Windows/Linux | macOS | Context |
 |---------|---------------|-------|---------|
 | **Run** |
-| Start program | F5 | F5 | Always |
-| Stop program | Shift+F5 | Shift+F5 | Running |
-| Restart | Ctrl+Shift+F5 | Cmd+Shift+F5 | Always |
+| Start program | Ctrl+Enter | Cmd+Enter | Always |
+| Stop program | Ctrl+Shift+Enter | Cmd+Shift+Enter | Running |
+| Restart | Ctrl+Shift+R | Cmd+Shift+R | Always |
 | Step | F10 | F10 | Debugging |
 | Clear screen | Ctrl+L | Cmd+L | Always |
 | **Editor** |
@@ -494,7 +494,7 @@ registerCommand({
   description: 'Execute the current F-BASIC program',
   category: 'run',
   icon: 'play',
-  shortcut: 'F5',
+  shortcut: 'Ctrl+Enter',
   handler: async () => {
     await executeProgram()
   }
@@ -508,8 +508,8 @@ await executeCommand('run.start')
 // Keybinding Configuration
 export const DEFAULT_KEYBINDINGS: KeybindingConfig = {
   shortcuts: [
-    { command: 'run.start', key: 'F5' },
-    { command: 'run.stop', key: 'Shift+F5' },
+    { command: 'run.start', key: 'Ctrl+Enter', mac: 'Cmd+Enter' },
+    { command: 'run.stop', key: 'Ctrl+Shift+Enter', mac: 'Cmd+Shift+Enter' },
     { command: 'commands.showPalette', key: 'Ctrl+Shift+P', mac: 'Cmd+Shift+P' },
     { command: 'quickOpen.show', key: 'Ctrl+P', mac: 'Cmd+P' },
     // ... more shortcuts
