@@ -47,6 +47,7 @@
     "moveTest": "移动测试",
     "testMoveControl": "移动控制测试",
     "inputDemo": "INPUT / LINPUT",
+    "emptyCategory": "该分类暂无示例",
     "bgIndicatorTitle": "包含 BG 数据",
     "categories": {
       "basics": "基础",

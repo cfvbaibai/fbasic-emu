@@ -42,6 +42,7 @@
     "gaming": "Joystick Test",
     "complex": "Complex",
     "comprehensive": "Full Demo",
+    "emptyCategory": "No samples in this category",
     "bgIndicatorTitle": "Includes BG data",
     "categories": {
       "basics": "Basics",

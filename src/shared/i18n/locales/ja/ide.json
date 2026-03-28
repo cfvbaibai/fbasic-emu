@@ -47,6 +47,7 @@
     "moveTest": "移動テスト",
     "testMoveControl": "移動制御テスト",
     "inputDemo": "INPUT / LINPUT",
+    "emptyCategory": "このカテゴリにサンプルはありません",
     "bgIndicatorTitle": "BGデータを含む",
     "categories": {
       "basics": "基本",
