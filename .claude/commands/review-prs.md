@@ -13,11 +13,7 @@ Before reviewing, check if PRs have already been reviewed and whether they've ch
 gh pr list --state open --json number,title,headRefOid,files
 ```
 
-Then search memory for previous reviews:
-
-```
-mcp__plugin_claude-mem_mcp-search__search: query="PR review #[number]"
-```
+Then check memory file at `~/.claude/projects/C--Users-Tony-code-GitHub-fbasic-ide/memory/MEMORY.md` for previous reviews.
 
 **Skip PR if:**
 - Previously reviewed AND
@@ -29,24 +25,9 @@ mcp__plugin_claude-mem_mcp-search__search: query="PR review #[number]"
 - Previous verdict was REQUEST CHANGES or NEEDS DISCUSSION
 - No previous review found
 
-### Step 8: Save Review Results to Memory
+### Save Review Results to Memory
 
-After each review, save to memory:
-
-```
-mcp__plugin_claude-mem_mcp-search__save_memory:
-  title: "PR #[number] Review: [verdict] - [title]"
-  text: "PR #[number]: [title]
-Commit: [headRefOid]
-Verdict: [APPROVE/REQUEST CHANGES/NEEDS DISCUSSION]
-Date: [current date]
-Specialist: [specialist name]
-
-Summary: [review summary]
-Key Findings: [findings]
-Issues: [issues if any]"
-  project: "fbasic-ide"
-```
+After each review, update `~/.claude/projects/C--Users-Tony-code-GitHub-fbasic-ide/memory/MEMORY.md` and `~/.claude/projects/C--Users-Tony-code-GitHub-fbasic-ide/memory/pr-reviews.md` with the review result.
 
 ## Workflow
 
@@ -58,13 +39,7 @@ gh pr list --state open --json number,title,author,files,additions,deletions,lab
 
 ### Step 2: Filter Already-Reviewed PRs
 
-For each PR, check memory:
-
-```
-mcp__plugin_claude-mem_mcp-search__search:
-  query: "PR #[number] review"
-  project: "fbasic-ide"
-```
+For each PR, check memory (MEMORY.md and pr-reviews.md) for previous reviews.
 
 Compare commit SHAs:
 - **Same SHA + APPROVE** → Skip (no changes)
@@ -72,61 +47,41 @@ Compare commit SHAs:
 - **Different SHA** → Re-review needed
 - **Not found** → New PR, needs review
 
-### Step 3: Categorize Remaining PRs by Specialist
+### Step 3: Identify Specialist for Each PR
 
-Map each PR to the appropriate specialist based on files changed:
+Map each PR to the appropriate specialist based on files changed (for review comment attribution):
 
 | Files Changed | Specialist |
 |---------------|------------|
-| `src/core/parser/` | `/parser` |
-| `src/core/execution/`, `src/core/evaluation/`, `src/core/state/` | `/runtime` |
-| `src/core/sound/` | `/sound` |
-| `src/core/devices/` | `/device` |
-| `src/core/animation/`, `src/core/sprite/` | `/graphics` |
-| `src/features/ide/`, `src/features/monaco-editor/`, `src/shared/` | `/ide` |
-| `src/features/sprite-viewer/`, `src/features/bg-editor/`, `src/features/sound-test/` | `/tools` |
-| Build scripts, package.json, tooling | `/tools` |
+| `src/core/parser/` | Parser |
+| `src/core/execution/`, `src/core/evaluation/`, `src/core/state/` | Runtime |
+| `src/core/sound/` | Sound |
+| `src/core/devices/` | Device |
+| `src/core/animation/`, `src/core/sprite/` | Graphics |
+| `src/features/ide/`, `src/features/monaco-editor/`, `src/shared/` | IDE |
+| `src/features/sprite-viewer/`, `src/features/bg-editor/`, `src/features/sound-test/` | Tools |
+| Build scripts, package.json, tooling | Tools |
 
-### Step 4: Create Coordination Team
+### Step 4: Review Each PR Directly
 
+For each PR that needs review, fetch the diff and review it directly (no team agents):
+
+```bash
+gh pr view <number> --json title,body,files,additions,deletions,headRefOid
+gh pr diff <number>
 ```
-TeamCreate: team_name="pr-review-session", description="Review open PRs"
-```
 
-Create a task for each PR needing review using TaskCreate.
+For complex PRs or multiple PRs, you MAY use the Agent tool with `subagent_type="general-purpose"` (NOT team_name) to parallelize reviews. Each agent should return its verdict and feedback as text — do NOT use TeamCreate, SendMessage, or team-based features.
 
-### Step 5: Spawn Specialists in Parallel
-
-For each PR, spawn a specialist agent:
-
-```
-Agent: subagent_type="general-purpose", team_name="pr-review-session"
-Prompt: "You are [Specialist] for F-BASIC IDE.
-
-First, invoke /[skill] to load your context.
-
-Then review PR #[number]: '[title]'
-
-Run:
-gh pr view [number] --json title,body,files,additions,deletions,headRefOid
-gh pr diff [number]
-
-Review for:
+**Review checklist:**
 1. Correctness - Does the code do what it claims?
-2. Code quality - Follows conventions, proper patterns?
-3. Test coverage - Adequate tests for the changes?
+2. Code quality - Follows conventions (TypeScript strict, import type, no any, files under 500 lines, scoped styles)?
+3. Test coverage - Adequate tests? Use `.toEqual()` not `.toContain()`?
 4. Edge cases - Error handling, boundary conditions?
 5. Potential issues - Breaking changes, side effects?
-6. **TEST INTEGRITY** - Were any tests removed, weakened, loosened, or skipped to avoid fixing a real bug? This is a CRITICAL check. Look for: deleted test cases, loosened assertions (e.g., toEqual→toContain), changed expected values to match wrong output, added skip/todo/pending. If detected, verdict MUST be REQUEST CHANGES.
+6. **TEST INTEGRITY (CRITICAL)** - Were any tests removed, weakened, loosened, or skipped to avoid fixing a real bug? Look for: deleted test cases, loosened assertions (e.g., toEqual→toContain), changed expected values to match wrong output, added skip/todo/pending. If detected, verdict MUST be REQUEST CHANGES.
 
-Provide verdict: APPROVE / REQUEST CHANGES / NEEDS DISCUSSION
-
-Include specific feedback on any issues found."
-```
-
-### Step 6: Collect Results and Post to GitHub
-
-For each completed review:
+### Step 5: Post Reviews to GitHub
 
 **APPROVE:**
 ```bash
@@ -172,11 +127,9 @@ gh pr review <number> --comment --body "## Review: NEEDS DISCUSSION
 🤖 Reviewed by Claude Code ([Specialist] specialist)"
 ```
 
-### Step 7: Create Follow-up Issues for Non-blocking Suggestions
+### Step 6: Create Follow-up Issues for Non-blocking Suggestions
 
 **IMPORTANT: Create a GitHub issue for EVERY non-blocking suggestion found during review, regardless of size or perceived importance.** The triage process decides what to work on, not the reviewer. Every suggestion becomes a tracked issue.
-
-After posting each review, create issues for all non-blocking observations:
 
 **Always create issues for:**
 - Non-blocking improvement suggestions ("Consider...", "Optional...")
@@ -201,7 +154,7 @@ From PR #<number> review: https://github.com/cfvbaibai/fbasic-ide/pull/<number>"
 
 Issue title prefixes: `fix:` for bugs/correctness, `style:` for formatting, `refactor:` for patterns, `docs:` for documentation/samples.
 
-### Step 8: Handle Wrong Requirements
+### Step 7: Handle Wrong Requirements
 
 If a PR is based on an incorrect requirement:
 
@@ -212,32 +165,9 @@ gh pr close <number> --comment "## Closing: <reason>
 gh issue close <issue-number> --comment "[Explanation]"
 ```
 
-### Step 9: Save to Memory
+### Step 8: Save to Memory
 
-After posting each review:
-
-```
-mcp__plugin_claude-mem_mcp-search__save_memory:
-  title: "PR #[number] Review: [verdict] - [title]"
-  text: "PR #[number]: [title]
-Commit: [headRefOid]
-Verdict: [APPROVE/REQUEST CHANGES/NEEDS DISCUSSION]
-Date: [current date]
-Specialist: [specialist name]
-
-Summary: [review summary]
-Key Findings: [findings]"
-  project: "fbasic-ide"
-```
-
-### Step 10: Cleanup
-
-Shutdown all specialists and delete the team:
-
-```
-SendMessage: to="*", message={"type": "shutdown_request", "reason": "Reviews complete"}
-TeamDelete
-```
+After posting each review, update memory files with the review result.
 
 ## Review Checklist
 

@@ -42,17 +42,21 @@ If any PR was handled above, **stop here**. Write PR memory, run log, and report
 
 ## Phase 2 — Pick Issue
 
-Query triaged, unassigned issues sorted by priority:
+Query triaged, unassigned issues sorted by priority, **excluding invalid issues**:
 
 ```bash
-gh issue list --label triage --state open --json number,title,labels,assignees,body --limit 20
+gh issue list --state open --search "no:assignee" --json number,title,labels,assignees,body --limit 20
 ```
 
-If no triaged issues exist, try all open unassigned issues:
+Filter out issues with the `invalid` label — do not pick up issues that contradict F-BASIC manual behavior.
+
+If no triaged issues exist, try all open unassigned issues (still excluding invalid):
 
 ```bash
-gh issue list --state open --search "no:assignee" --json number,title,labels,body --limit 20
+gh issue list --state open --search "no:assignee" --json number,title,labels,assignees,body --limit 50
 ```
+
+**Skip issues with the `invalid` label** — they contradict F-BASIC manual behavior and should not be implemented.
 
 Select the **highest-priority unassigned** issue:
 - Prefer issues with `P1` or `P2` labels
