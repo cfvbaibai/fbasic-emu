@@ -205,6 +205,130 @@ describe('Relational Operators', () => {
     })
   })
 
+  describe('Mixed Type Comparisons (number vs numeric string)', () => {
+    it('should compare number < numeric string numerically (5 < "10" = TRUE)', async () => {
+      const code = `
+10 A$ = "10"
+20 IF 5 < A$ THEN PRINT "TRUE"
+30 END
+`
+      const result = await interpreter.execute(code)
+
+      expect(result.success).toBe(true)
+      expect(deviceAdapter.getAllOutputs()).toEqual('TRUE\n')
+    })
+
+    it('should compare number > numeric string numerically (100 > "9" = TRUE)', async () => {
+      const code = `
+10 A$ = "9"
+20 IF 100 > A$ THEN PRINT "TRUE"
+30 END
+`
+      const result = await interpreter.execute(code)
+
+      expect(result.success).toBe(true)
+      expect(deviceAdapter.getAllOutputs()).toEqual('TRUE\n')
+    })
+
+    it('should compare numeric string < number numerically ("5" < 10 = TRUE)', async () => {
+      const code = `
+10 A$ = "5"
+20 IF A$ < 10 THEN PRINT "TRUE"
+30 END
+`
+      const result = await interpreter.execute(code)
+
+      expect(result.success).toBe(true)
+      expect(deviceAdapter.getAllOutputs()).toEqual('TRUE\n')
+    })
+
+    it('should compare number = numeric string as equal (5 = "5" = TRUE)', async () => {
+      const code = `
+10 A$ = "5"
+20 IF 5 = A$ THEN PRINT "TRUE"
+30 END
+`
+      const result = await interpreter.execute(code)
+
+      expect(result.success).toBe(true)
+      expect(deviceAdapter.getAllOutputs()).toEqual('TRUE\n')
+    })
+
+    it('should compare numeric string = number as equal ("5" = 5 = TRUE)', async () => {
+      const code = `
+10 A$ = "5"
+20 IF A$ = 5 THEN PRINT "TRUE"
+30 END
+`
+      const result = await interpreter.execute(code)
+
+      expect(result.success).toBe(true)
+      expect(deviceAdapter.getAllOutputs()).toEqual('TRUE\n')
+    })
+
+    it('should detect inequality between number and numeric string (5 <> "10" = TRUE)', async () => {
+      const code = `
+10 A$ = "10"
+20 IF 5 <> A$ THEN PRINT "TRUE"
+30 END
+`
+      const result = await interpreter.execute(code)
+
+      expect(result.success).toBe(true)
+      expect(deviceAdapter.getAllOutputs()).toEqual('TRUE\n')
+    })
+
+    it('should compare number <= numeric string numerically (5 <= "5" = TRUE)', async () => {
+      const code = `
+10 A$ = "5"
+20 IF 5 <= A$ THEN PRINT "TRUE"
+30 END
+`
+      const result = await interpreter.execute(code)
+
+      expect(result.success).toBe(true)
+      expect(deviceAdapter.getAllOutputs()).toEqual('TRUE\n')
+    })
+
+    it('should compare numeric string >= number numerically ("10" >= 10 = TRUE)', async () => {
+      const code = `
+10 A$ = "10"
+20 IF A$ >= 10 THEN PRINT "TRUE"
+30 END
+`
+      const result = await interpreter.execute(code)
+
+      expect(result.success).toBe(true)
+      expect(deviceAdapter.getAllOutputs()).toEqual('TRUE\n')
+    })
+
+    it('should use string comparison for non-numeric string vs number', async () => {
+      // "hello" vs 5 — "hello" is not a numeric string, so compare as strings
+      // String("hello") = "hello", String(5) = "5", "hello" > "5" lexicographically
+      const code = `
+10 A$ = "hello"
+20 IF A$ > 5 THEN PRINT "TRUE"
+30 END
+`
+      const result = await interpreter.execute(code)
+
+      expect(result.success).toBe(true)
+      expect(deviceAdapter.getAllOutputs()).toEqual('TRUE\n')
+    })
+
+    it('should handle negative numeric strings correctly (5 > "-3" = TRUE)', async () => {
+      const code = `
+10 A$ = "-3"
+20 IF 5 > A$ THEN PRINT "TRUE"
+30 END
+`
+      const result = await interpreter.execute(code)
+
+      expect(result.success).toBe(true)
+      expect(deviceAdapter.getAllOutputs()).toEqual('TRUE\n')
+    })
+  })
+
   describe('String Comparisons', () => {
     it('should compare strings lexicographically', async () => {
       const code = `
