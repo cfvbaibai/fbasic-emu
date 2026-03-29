@@ -73,6 +73,15 @@ Based on the issue's domain, suggest which team should handle it:
 ### Duplicate Check
 Before classifying, cross-reference other open issues for potential duplicates. If a likely duplicate is found, note it in the report but don't apply labels to the newer one — suggest the author close it or add a `duplicate` label.
 
+### Dependency Check
+If issue A clearly depends on another issue B (e.g., A cannot be implemented until B is resolved), add a dependency comment to issue A:
+
+```bash
+gh issue comment $NUMBER --body "This issue depends on #B — it cannot be implemented until #B is resolved."
+```
+
+Note dependencies in the report under "Issue Dependencies Found".
+
 ### Complex Issue Decomposition
 If an issue has been marked **"TOO COMPLEX"** by the implementer (comment containing "TOO COMPLEX"), decompose it into smaller, independently-implementable sub-issues. This is the **triager's duty**, not the discoverer's.
 
@@ -145,6 +154,9 @@ Write outputs following `_shared/path-conventions.md`:
 ## Potential Duplicates
 - #N similar to #M — <similarity description>
 
+## Issue Dependencies Found
+- #A depends on #B — <reason>
+
 ## Complex Issues Decomposed
 - #N (parent): marked TOO COMPLEX by implementer — filed as:
   - #N+1: <sub-issue title>
@@ -155,6 +167,7 @@ Write outputs following `_shared/path-conventions.md`:
 - Issues triaged: N
 - Issues skipped (already labeled): N
 - Potential duplicates: N
+- Issue dependencies found: N
 - Complex issues decomposed: N
 ```
 

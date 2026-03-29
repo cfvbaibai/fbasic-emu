@@ -25,16 +25,6 @@ Follow `_shared/github-operations.md` open issue cap logic. Threshold: 20.
 
 If cap reached, write run log and report noting "cap reached", update config `total_runs`, and stop.
 
-## Phase 2.5 — Skip Check (Consecutive Low-Yield Detection)
-
-Before scanning, check the last 3 discovery reports for this pattern:
-- Report shows "no issues" or only 0-1 issues created
-- Most findings are "skipped (duplicate of #N)"
-
-If the last 3 consecutive runs all had 0-1 new issues, report "skip: diminishing returns — last 3 runs produced 0-1 issues each. Stopping early to save tokens. Run a full scan manually when new features/commits are added." Then write the run log, update config `total_runs`, and stop.
-
-This prevents wasted token spend when the codebase is in a stable, well-tracked state.
-
 ## Phase 3 — Multi-Angle Scan
 
 Use `total_runs` modulo to rotate focus areas. Every run does a **baseline scan** of the most common patterns, then rotates deeper analysis:

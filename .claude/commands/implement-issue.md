@@ -50,7 +50,17 @@ gh issue list --state open --search "no:assignee" --json number,title,labels,ass
 
 Filter out issues with the `invalid` label — do not pick up issues that contradict F-BASIC manual behavior.
 
-If no triaged issues exist, try all open unassigned issues (still excluding invalid):
+### Dependency Check
+
+For each candidate issue, check for dependency comments:
+
+```bash
+gh issue comment list $ISSUE_NUM --limit 10 --json body --jq '.[] | .body'
+```
+
+If the issue has a comment containing "depends on #", extract the referenced issue number and verify it is closed. If the dependency is not yet closed, **skip this issue** — it cannot be implemented until its dependency is resolved.
+
+If all candidate issues are blocked by dependencies, report "no issues to implement" and stop.
 
 ```bash
 gh issue list --state open --search "no:assignee" --json number,title,labels,assignees,body --limit 50
@@ -298,6 +308,9 @@ Write memory, run log, and report following `_shared/path-conventions.md`:
 ## Issue
 - **#N**: <title> (<priority>)
 - **URL**: <issue URL>
+
+## Dependencies
+- <list any dependencies and their resolution status>
 
 ## Root Cause
 <detailed explanation from specialist>
