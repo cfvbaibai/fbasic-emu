@@ -17,7 +17,9 @@
 // SPRITE SECTION CONSTANTS
 // ============================================================================
 
-export const MAX_SPRITES = 8
+import { SCREEN_DIMENSIONS } from '@/core/constants'
+
+export const MAX_SPRITES = SCREEN_DIMENSIONS.SPRITE_COUNT
 // 12 floats per sprite: x, y, isActive, isVisible, frameIndex, remainingDistance, totalDistance,
 // direction, speed, priority, characterType, colorCombination
 export const FLOATS_PER_SPRITE = 12

@@ -53,7 +53,7 @@ export function writeSpriteStateToView(
  * Sets all sprites to inactive, invisible, with characterType = -1 (uninitialized).
  */
 export function clearAllSprites(spriteView: Float64Array): void {
-  for (let i = 0; i < 8; i++) {
+  for (let i = 0; i < MAX_SPRITES; i++) {
     writeSpriteStateToView(spriteView, i, 0, 0, false, false, 0, 0, 0, 0, 0, 0, -1, 0)
   }
 }
@@ -214,7 +214,7 @@ export function readAllMovementStates(
     }
   }> = []
 
-  for (let actionNumber = 0; actionNumber < 8; actionNumber++) {
+  for (let actionNumber = 0; actionNumber < MAX_SPRITES; actionNumber++) {
     const characterType = readCharacterType(actionNumber)
     // characterType = -1 means uninitialized (no DEF MOVE)
     // characterType >= 0 means a valid DEF MOVE exists

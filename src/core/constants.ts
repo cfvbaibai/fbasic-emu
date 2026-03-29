@@ -186,6 +186,8 @@ export const SCREEN_DIMENSIONS = {
     DEFAULT_X: 128,
     DEFAULT_Y: 120,
   },
+  /** Number of sprite slots (0 to SPRITE_COUNT-1). Hardware limit for F-BASIC. */
+  SPRITE_COUNT: 8,
 } as const
 
 // Color patterns and codes
