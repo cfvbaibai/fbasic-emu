@@ -110,6 +110,11 @@ export function postPlaySound(executionId: string, audio: CompiledAudio): string
   return message.data.playId
 }
 
+/** Post a PLAY_SOUND message for background (non-blocking) playback. Used by BGPLAY. */
+export function postPlaySoundBackground(executionId: string, audio: CompiledAudio): void {
+  postPlaySound(executionId, audio)
+}
+
 /** Post a BEEP message to main thread. */
 export function postBeep(executionId: string): void {
   logWorker.debug('Playing beep')
