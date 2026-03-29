@@ -407,5 +407,8 @@
   },
   "screenTab": {
     "grid": "網格"
+  },
+  "errors": {
+    "executionTimeout": "執行在5分鐘後逾時。您的程式可能包含無限迴圈。"
   }
 }
