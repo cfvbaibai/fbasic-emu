@@ -6,6 +6,7 @@
 import { EXECUTION_LIMITS } from '@/core/constants'
 import type { BasicVariable } from '@/core/interfaces'
 import { ExecutionError } from '@/features/ide/errors/ExecutionError'
+import i18n from '@/shared/i18n'
 import { logComposable } from '@/shared/logger'
 
 import { formatArrayForDisplay } from './useBasicIdeFormatting'
@@ -138,10 +139,15 @@ export function useBasicIdeExecution(
           },
         ]
       } else {
+        const rawMessage = error instanceof Error ? error.message : 'Execution error'
+        const message =
+          rawMessage === 'Web worker message timeout'
+            ? i18n.global.t('ide.errors.executionTimeout')
+            : rawMessage
         state.errors.value = [
           {
             line: 0,
-            message: error instanceof Error ? error.message : 'Execution error',
+            message,
             type: 'runtime',
           },
         ]
