@@ -663,8 +663,8 @@ export interface CompactBg {
  * Contains BASIC source code and associated BG graphic
  */
 export interface ProgramData {
-  /** Schema version for future migrations */
-  version: 1
+  /** Schema version for future migrations (auto-incremented on update) */
+  version: number
   /** Unique program identifier (UUID) */
   id: string
   /** User-visible program name */
