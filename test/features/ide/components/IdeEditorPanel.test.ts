@@ -94,20 +94,16 @@ describe('IdeEditorPanel', () => {
     wrapper.unmount()
   })
 
-  it('shows loading state while Monaco is downloading', () => {
-    // defineAsyncComponent with delay: 200 shows loadingComponent after 200ms.
-    // In tests with stubs, the stub replaces the resolved component, but
-    // the loadingComponent is rendered during the delay window.
-    // We verify the loading component is defined by checking the data-testid
-    // appears when the async import is pending.
+  it('resolves MonacoCodeEditor stub immediately (loading state cannot be tested with stubs)', () => {
+    // LIMITATION: The source component uses defineAsyncComponent with loadingComponent
+    // and delay:200 to show a spinner while Monaco downloads (see IdeEditorPanel.vue).
+    // With global stubs (MonacoCodeEditor stub), the stub replaces the entire async
+    // wrapper — the loader function never runs, so loadingComponent is never rendered.
+    // This is inherent to how VTU handles defineAsyncComponent stubs and cannot be
+    // worked around without removing the stub (which would require loading real Monaco).
+    // The loading state is verified via browser automation (e2e) on port 5174 instead.
     const wrapper = createWrapper()
 
-    // Advance timers past the 200ms delay to allow loadingComponent to render
-    vi.advanceTimersByTime(250)
-
-    // After the async component resolves, the stub replaces it.
-    // The loading state was shown during the delay period (verified by the
-    // loadingComponent option on defineAsyncComponent in the source code).
     const editorContainer = wrapper.find('[data-testid="monaco-editor-container"]')
     expect(editorContainer.exists()).toBe(true)
     wrapper.unmount()
