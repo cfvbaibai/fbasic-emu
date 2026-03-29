@@ -162,6 +162,14 @@ export interface BasicDeviceAdapter {
   playSound?(audio: CompiledAudio): Promise<void>
 
   /**
+   * Play compiled audio in background (non-blocking).
+   * Used by BGPLAY statement - sends audio but does not wait for completion.
+   * No PLAY_SOUND_COMPLETE message is expected.
+   * @param audio - Compiled audio with calculated frequencies and durations
+   */
+  playSoundBackground?(audio: CompiledAudio): void
+
+  /**
    * Play a beep sound (BEEP statement)
    * Produces a short beep tone using Web Audio API
    */

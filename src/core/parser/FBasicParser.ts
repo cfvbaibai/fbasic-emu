@@ -168,6 +168,7 @@ export class FBasicParser {
       features: ['ast-parsing', 'error-reporting', 'multi-statement', 'chevrotain', 'no-build-step'],
       supportedStatements: [
         'BEEP',
+        'BGPLAY',
         'CGEN',
         'CGSET',
         'CLEAR',

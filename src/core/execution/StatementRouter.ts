@@ -12,6 +12,7 @@ import type { VariableService } from '@/core/services/VariableService'
 import type { ExecutionContext } from '@/core/state/ExecutionContext'
 
 import { BeepExecutor } from './executors/BeepExecutor'
+import { BgplayExecutor } from './executors/BgplayExecutor'
 import { CgenExecutor } from './executors/CgenExecutor'
 import { CgsetExecutor } from './executors/CgsetExecutor'
 import { ClearExecutor } from './executors/ClearExecutor'
@@ -84,6 +85,7 @@ export class StatementRouter {
   private eraExecutor: EraExecutor
   private positionExecutor: PositionExecutor
   private playExecutor: PlayExecutor
+  private bgplayExecutor: BgplayExecutor
   private viewExecutor: ViewExecutor
   private beepExecutor: BeepExecutor
 
@@ -127,6 +129,7 @@ export class StatementRouter {
     this.eraExecutor = new EraExecutor(context, evaluator)
     this.positionExecutor = new PositionExecutor(context, evaluator)
     this.playExecutor = new PlayExecutor(context, evaluator)
+    this.bgplayExecutor = new BgplayExecutor(context, evaluator)
     this.viewExecutor = new ViewExecutor(context)
     this.beepExecutor = new BeepExecutor(context)
   }
@@ -440,6 +443,11 @@ export class StatementRouter {
       const playStmtCst = getFirstCstNode(singleCommandCst.children.playStatement)
       if (playStmtCst) {
         await this.playExecutor.execute(playStmtCst, expandedStatement.lineNumber)
+      }
+    } else if (singleCommandCst.children.bgplayStatement) {
+      const bgplayStmtCst = getFirstCstNode(singleCommandCst.children.bgplayStatement)
+      if (bgplayStmtCst) {
+        await this.bgplayExecutor.execute(bgplayStmtCst, expandedStatement.lineNumber)
       }
     } else if (singleCommandCst.children.viewStatement) {
       const viewStmtCst = getFirstCstNode(singleCommandCst.children.viewStatement)
