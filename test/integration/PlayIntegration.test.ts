@@ -240,3 +240,105 @@ describe('PLAY Integration', () => {
     expect(countNotes(deviceAdapter.playSoundCalls[2]!)).toBe(1)
   })
 })
+
+describe('PLAY Integration - zero/empty duration (PR #275)', () => {
+  let interpreter: BasicInterpreter
+  let deviceAdapter: TestDeviceAdapter
+
+  beforeEach(() => {
+    deviceAdapter = new TestDeviceAdapter()
+    interpreter = new BasicInterpreter({
+      maxIterations: 1000,
+      maxOutputLines: 100,
+      enableDebugMode: false,
+      strictMode: false,
+      suppressOkPrompt: true,
+      deviceAdapter: deviceAdapter,
+    })
+  })
+
+  it('should complete without hanging when PLAY receives empty string', async () => {
+    const code = `
+10 PLAY ""
+20 PRINT "after empty play"
+30 END
+`
+
+    const result = await interpreter.execute(code)
+
+    expect(result.success).toBe(true)
+    expect(result.errors).toHaveLength(0)
+    expect(deviceAdapter.playSoundCalls.length).toBe(1)
+    expect(countNotes(deviceAdapter.playSoundCalls[0]!)).toBe(0)
+    expect(deviceAdapter.printOutputs).toEqual(['after empty play\n'])
+  })
+
+  it('should complete without hanging when PLAY receives whitespace-only string', async () => {
+    const code = `
+10 PLAY " "
+20 PRINT "after whitespace play"
+30 END
+`
+
+    const result = await interpreter.execute(code)
+
+    expect(result.success).toBe(true)
+    expect(result.errors).toHaveLength(0)
+    expect(deviceAdapter.playSoundCalls.length).toBe(1)
+    expect(countNotes(deviceAdapter.playSoundCalls[0]!)).toBe(0)
+    expect(deviceAdapter.printOutputs).toEqual(['after whitespace play\n'])
+  })
+
+  it('should complete without hanging when PLAY variable holds empty string', async () => {
+    const code = `
+10 A$ = ""
+20 PLAY A$
+30 PRINT "after variable play"
+40 END
+`
+
+    const result = await interpreter.execute(code)
+
+    expect(result.success).toBe(true)
+    expect(result.errors).toHaveLength(0)
+    expect(deviceAdapter.playSoundCalls.length).toBe(1)
+    expect(countNotes(deviceAdapter.playSoundCalls[0]!)).toBe(0)
+    expect(deviceAdapter.printOutputs).toEqual(['after variable play\n'])
+  })
+
+  it('should allow continued execution after empty PLAY in a loop', async () => {
+    const code = `
+10 FOR I = 1 TO 3
+20 PLAY ""
+30 NEXT
+40 PRINT "loop done"
+50 END
+`
+
+    const result = await interpreter.execute(code)
+
+    expect(result.success).toBe(true)
+    expect(result.errors).toHaveLength(0)
+    expect(deviceAdapter.playSoundCalls.length).toBe(3)
+    expect(countNotes(deviceAdapter.playSoundCalls[0]!)).toBe(0)
+    expect(countNotes(deviceAdapter.playSoundCalls[1]!)).toBe(0)
+    expect(countNotes(deviceAdapter.playSoundCalls[2]!)).toBe(0)
+    expect(deviceAdapter.printOutputs).toEqual(['loop done\n'])
+  })
+
+  it('should complete without hanging when PLAY receives only channel separators', async () => {
+    const code = `
+10 PLAY "::"
+20 PRINT "after separator play"
+30 END
+`
+
+    const result = await interpreter.execute(code)
+
+    expect(result.success).toBe(true)
+    expect(result.errors).toHaveLength(0)
+    expect(deviceAdapter.playSoundCalls.length).toBe(1)
+    expect(countNotes(deviceAdapter.playSoundCalls[0]!)).toBe(0)
+    expect(deviceAdapter.printOutputs).toEqual(['after separator play\n'])
+  })
+})
