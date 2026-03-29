@@ -13,6 +13,7 @@ import type {
   InputValueMessage,
   InterpreterConfig,
   OutputMessage,
+  PlaySoundCompleteMessage,
 } from '@/core/interfaces'
 import type { CompiledAudio } from '@/core/sound/types'
 import type { SpriteState } from '@/core/sprite/types'
@@ -36,6 +37,7 @@ import {
   rejectAllInputRequests as rejectAllInput,
 } from './DeviceInputRequestHelpers'
 import { postBeep, postOutputMessage, postPlaySound } from './DeviceOutputHelpers'
+import { createPlayCompleteRequest, handlePlaySoundCompleteMessage as handlePlayComplete, rejectAllPlayCompleteRequests as rejectAllPlayComplete } from './DevicePlayCompleteHelpers'
 import {
   getSpritePosition as getSpritePositionFromHelper,
   postSpriteStates,
@@ -80,6 +82,8 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
     string,
     { resolve: (values: string[]) => void; reject: (err: Error) => void }
   > = new Map()
+  // === PLAY COMPLETE (worker only: sync PLAY) ===
+  private pendingPlayComplete: Map<string, { resolve: () => void; reject: (err: Error) => void }> = new Map()
   // === SCREEN UPDATE BATCHING ===
   private readonly screenUpdateBatcher: ScreenUpdateBatcher
 
@@ -411,9 +415,15 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
     handleInputValue(this.pendingInputRequests, message)
   }
 
+  /** Resolve a pending play completion request. */
+  handlePlaySoundCompleteMessage(message: PlaySoundCompleteMessage): void {
+    handlePlayComplete(this.pendingPlayComplete, message)
+  }
+
   /** Reject all pending input requests. */
   rejectAllInputRequests(reason: string = 'Execution stopped'): void {
     rejectAllInput(this.pendingInputRequests, reason)
+    rejectAllPlayComplete(this.pendingPlayComplete, reason)
   }
 
   // === EXECUTION MANAGEMENT ===
@@ -437,9 +447,11 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
 
   // === SOUND METHODS (delegated to DeviceOutputHelpers) ===
 
-  /** Play compiled audio. */
-  playSound(audio: CompiledAudio): void {
-    postPlaySound(this.screenStateManager.getCurrentExecutionId() ?? 'unknown', audio)
+  /** Play compiled audio synchronously. Blocks until PLAY_SOUND_COMPLETE is received. */
+  playSound(audio: CompiledAudio): Promise<void> {
+    const executionId = this.screenStateManager.getCurrentExecutionId() ?? 'unknown'
+    const playId = postPlaySound(executionId, audio)
+    return createPlayCompleteRequest(this.pendingPlayComplete, playId)
   }
 
   /** Play a beep sound. */

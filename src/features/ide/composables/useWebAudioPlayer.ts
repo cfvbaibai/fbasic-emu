@@ -267,6 +267,8 @@ export function useWebAudioPlayer() {
     initialize,
     playMusic,
     playMusicSequential,
+    /** Total playback time (ms) for the given channels. */
+    getTotalDurationMs,
     stopAll,
     cleanup,
   }

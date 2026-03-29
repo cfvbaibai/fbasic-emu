@@ -228,15 +228,16 @@ export function handleProgressMessage(message: AnyServiceWorkerMessage, _context
 
 /**
  * Handle PLAY_SOUND message from web worker
- * Converts flat event array back to per-channel structure and plays via Web Audio API
+ * Converts flat event array back to per-channel structure and plays via Web Audio API.
+ * Sends PLAY_SOUND_COMPLETE back to the worker when audio finishes.
  */
-export function handlePlaySoundMessage(message: AnyServiceWorkerMessage, _context: MessageHandlerContext): void {
+export function handlePlaySoundMessage(message: AnyServiceWorkerMessage, context: MessageHandlerContext): void {
   if (message.type !== 'PLAY_SOUND') return
 
   const playSoundMessage = message
-  const { events } = playSoundMessage.data
+  const { events, executionId, playId } = playSoundMessage.data
 
-  logIdeMessages.debug('🎵 Handling PLAY_SOUND:', events.length, 'events')
+  logIdeMessages.debug('Handling PLAY_SOUND:', events.length, 'events', 'playId:', playId)
 
   // Initialize audio context on first use (requires user gesture)
   if (!audioPlayer.isInitialized.value) {
@@ -283,6 +284,22 @@ export function handlePlaySoundMessage(message: AnyServiceWorkerMessage, _contex
 
   // Play sequentially: next PLAY starts after current melody finishes (F-BASIC behavior)
   audioPlayer.playMusicSequential(channels)
+
+  // Schedule PLAY_SOUND_COMPLETE after total duration so the worker can resume execution
+  const totalDurationMs = audioPlayer.getTotalDurationMs(channels)
+  if (totalDurationMs > 0 && playId) {
+    setTimeout(() => {
+      const worker = context.webWorkerManager.worker
+      if (worker) {
+        worker.postMessage({
+          type: 'PLAY_SOUND_COMPLETE',
+          id: `play-complete-${Date.now()}`,
+          timestamp: Date.now(),
+          data: { executionId, playId },
+        })
+      }
+    }, totalDurationMs)
+  }
 }
 
 /**

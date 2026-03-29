@@ -15,6 +15,7 @@ import type {
   ExecuteMessage,
   InputValueMessage,
   OutputMessage,
+  PlaySoundCompleteMessage,
   ResultMessage,
   SetBgDataMessage,
   SetSharedAnimationBufferMessage,
@@ -98,6 +99,9 @@ class WebWorkerInterpreter {
           break
         case 'INPUT_VALUE':
           this.handleInputValue(message)
+          break
+        case 'PLAY_SOUND_COMPLETE':
+          this.handlePlaySoundComplete(message)
           break
         case 'CLEAR_DISPLAY':
           logWorker.debug('Handling CLEAR_DISPLAY message')
@@ -231,6 +235,12 @@ class WebWorkerInterpreter {
   handleInputValue(message: InputValueMessage) {
     if (this.webWorkerDeviceAdapter) {
       this.webWorkerDeviceAdapter.handleInputValueMessage(message)
+    }
+  }
+
+  handlePlaySoundComplete(message: PlaySoundCompleteMessage) {
+    if (this.webWorkerDeviceAdapter) {
+      this.webWorkerDeviceAdapter.handlePlaySoundCompleteMessage(message)
     }
   }
 

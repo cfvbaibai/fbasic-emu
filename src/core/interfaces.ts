@@ -154,10 +154,12 @@ export interface BasicDeviceAdapter {
 
   // === SOUND OUTPUT ===
   /**
-   * Play compiled audio
+   * Play compiled audio synchronously (blocking).
+   * Blocks until audio playback completes (main thread sends PLAY_SOUND_COMPLETE).
    * @param audio - Compiled audio with calculated frequencies and durations
+   * @returns Promise that resolves when playback finishes
    */
-  playSound?(audio: CompiledAudio): void
+  playSound?(audio: CompiledAudio): Promise<void>
 
   /**
    * Play a beep sound (BEEP statement)
@@ -321,6 +323,7 @@ export type ServiceWorkerMessageType =
   | 'REQUEST_INPUT'
   | 'INPUT_VALUE'
   | 'PLAY_SOUND'
+  | 'PLAY_SOUND_COMPLETE'
   | 'CLEAR_DISPLAY'
 
 // Execute message - sent from UI to service worker
@@ -569,6 +572,7 @@ export interface PlaySoundMessage extends ServiceWorkerMessage {
   data: {
     executionId: string
     musicString: string
+    playId: string
     events: Array<{
       frequency?: number
       duration: number
@@ -577,6 +581,15 @@ export interface PlaySoundMessage extends ServiceWorkerMessage {
       envelope: number
       volumeOrLength: number
     }>
+  }
+}
+
+// Play sound complete - sent from main to worker when PLAY audio finishes
+export interface PlaySoundCompleteMessage extends ServiceWorkerMessage {
+  type: 'PLAY_SOUND_COMPLETE'
+  data: {
+    executionId: string
+    playId: string
   }
 }
 
@@ -604,6 +617,7 @@ export type AnyServiceWorkerMessage =
   | RequestInputMessage
   | InputValueMessage
   | PlaySoundMessage
+  | PlaySoundCompleteMessage
 
 // Message handler interface for type-safe message handling
 export interface ServiceWorkerMessageHandler {

@@ -439,7 +439,7 @@ export class StatementRouter {
     } else if (singleCommandCst.children.playStatement) {
       const playStmtCst = getFirstCstNode(singleCommandCst.children.playStatement)
       if (playStmtCst) {
-        this.playExecutor.execute(playStmtCst, expandedStatement.lineNumber)
+        await this.playExecutor.execute(playStmtCst, expandedStatement.lineNumber)
       }
     } else if (singleCommandCst.children.viewStatement) {
       const viewStmtCst = getFirstCstNode(singleCommandCst.children.viewStatement)
