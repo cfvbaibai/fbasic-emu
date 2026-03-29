@@ -26,9 +26,10 @@ export class PlayExecutor {
 
   /**
    * Execute a PLAY statement from CST
-   * Plays music according to string data specification
+   * Plays music according to string data specification.
+   * Blocks (awaits) until audio playback completes on the main thread.
    */
-  execute(playStmtCst: CstNode, lineNumber?: number): void {
+  async execute(playStmtCst: CstNode, lineNumber?: number): Promise<void> {
     // 1. Get expression from CST
     const expressions = getCstNodes(playStmtCst.children.expression)
 
@@ -101,10 +102,9 @@ export class PlayExecutor {
       return
     }
 
-    // 4. Call device adapter to play compiled audio
-    // Device adapter just transmits the audio to main thread - no state management
+    // 4. Call device adapter to play compiled audio (blocks until playback completes)
     if (this.context.deviceAdapter?.playSound) {
-      this.context.deviceAdapter.playSound(compiledAudio)
+      await this.context.deviceAdapter.playSound(compiledAudio)
     }
 
     // 5. Debug output

@@ -73,14 +73,17 @@ export function serializeAudioEvents(audio: CompiledAudio): SerializedAudioEvent
 export function buildPlaySoundMessage(
   executionId: string,
   events: SerializedAudioEvent[],
-  musicString?: string
+  musicString?: string,
+  playId?: string
 ) {
+  const id = playId ?? `play-sound-${Date.now()}`
   return {
     type: 'PLAY_SOUND' as const,
-    id: `play-sound-${Date.now()}`,
+    id,
     timestamp: Date.now(),
     data: {
       executionId,
+      playId: id,
       events,
       ...(musicString ? { musicString } : {}),
     },
@@ -98,11 +101,13 @@ export function buildBeepMessage(executionId: string) {
   )
 }
 
-/** Post a PLAY_SOUND message to main thread. */
-export function postPlaySound(executionId: string, audio: CompiledAudio): void {
+/** Post a PLAY_SOUND message to main thread. Returns the playId for completion tracking. */
+export function postPlaySound(executionId: string, audio: CompiledAudio): string {
   logWorker.debug('Playing sound, channels:', audio.channels.length)
   const events = serializeAudioEvents(audio)
-  self.postMessage(buildPlaySoundMessage(executionId, events))
+  const message = buildPlaySoundMessage(executionId, events)
+  self.postMessage(message)
+  return message.data.playId
 }
 
 /** Post a BEEP message to main thread. */

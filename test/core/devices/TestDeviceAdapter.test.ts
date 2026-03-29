@@ -349,14 +349,14 @@ describe('TestDeviceAdapter', () => {
   // Sound
   // ---------------------------------------------------------------------------
   describe('sound', () => {
-    it('should capture playSound calls', () => {
+    it('should capture playSound calls', async () => {
       const adapter = createAdapter()
       const audio = {
         channels: [[
           { frequency: 440, duration: 500, channel: 0, duty: 2, envelope: 0, volumeOrLength: 15 },
         ]],
       }
-      adapter.playSound!(audio as never)
+      await adapter.playSound!(audio as never)
       expect(adapter.playSoundCalls.length).toBe(1)
     })
 

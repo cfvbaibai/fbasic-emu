@@ -200,9 +200,10 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
   /** Captured playSound calls for testing */
   public playSoundCalls: CompiledAudio[] = []
 
-  playSound?(audio: CompiledAudio): void {
+  playSound?(audio: CompiledAudio): Promise<void> {
     this.playSoundCalls.push(audio)
     logDevice.debug('Play sound, channels:', audio.channels.length)
+    return Promise.resolve()
   }
 
   /** Captured beep calls for testing */
