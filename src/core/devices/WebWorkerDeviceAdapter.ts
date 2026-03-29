@@ -12,7 +12,6 @@ import type {
   ExecutionResult,
   InputValueMessage,
   InterpreterConfig,
-  OutputMessage,
   PlaySoundCompleteMessage,
 } from '@/core/interfaces'
 import type { CompiledAudio } from '@/core/sound/types'
@@ -36,7 +35,7 @@ import {
   handleInputValueMessage as handleInputValue,
   rejectAllInputRequests as rejectAllInput,
 } from './DeviceInputRequestHelpers'
-import { postBeep, postOutputMessage, postPlaySound } from './DeviceOutputHelpers'
+import { postBeep, postOutputMessage, postPlaySound, postPlaySoundBackground } from './DeviceOutputHelpers'
 import { createPlayCompleteRequest, handlePlaySoundCompleteMessage as handlePlayComplete, rejectAllPlayCompleteRequests as rejectAllPlayComplete } from './DevicePlayCompleteHelpers'
 import {
   getSpritePosition as getSpritePositionFromHelper,
@@ -449,15 +448,13 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
 
   /** Play compiled audio synchronously. Blocks until PLAY_SOUND_COMPLETE is received. */
   playSound(audio: CompiledAudio): Promise<void> {
-    const executionId = this.screenStateManager.getCurrentExecutionId() ?? 'unknown'
-    const playId = postPlaySound(executionId, audio)
+    const playId = postPlaySound(this.screenStateManager.getCurrentExecutionId() ?? 'unknown', audio)
     return createPlayCompleteRequest(this.pendingPlayComplete, playId)
   }
 
   /** Play compiled audio in background (non-blocking). Used by BGPLAY statement. */
   playSoundBackground(audio: CompiledAudio): void {
-    const executionId = this.screenStateManager.getCurrentExecutionId() ?? 'unknown'
-    postPlaySound(executionId, audio)
+    postPlaySoundBackground(this.screenStateManager.getCurrentExecutionId() ?? 'unknown', audio)
   }
 
   /** Play a beep sound. */
@@ -486,14 +483,10 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
 
   private handleWorkerMessage(message: AnyServiceWorkerMessage): void {
     this.messageHandler.handleWorkerMessage(message, outputMessage => {
-      this.handleOutputMessage(outputMessage)
-    })
-  }
-
-  private handleOutputMessage(message: OutputMessage): void {
-    logWorker.debug('Handling OUTPUT message:', {
-      outputType: message.data.outputType,
-      outputLength: message.data.output.length,
+      logWorker.debug('Handling OUTPUT message:', {
+        outputType: outputMessage.data.outputType,
+        outputLength: outputMessage.data.output.length,
+      })
     })
   }
 
