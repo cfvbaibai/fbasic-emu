@@ -266,6 +266,7 @@ export class ProgramDB {
     const updated: ProgramData = {
       ...existing,
       ...updates,
+      version: existing.version + 1,
       updatedAt: Date.now(),
     }
 

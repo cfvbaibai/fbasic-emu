@@ -300,6 +300,36 @@ describe('ProgramDB', () => {
     it('throws ProgramNotFoundError for non-existent program', async () => {
       await expect(db.update('ghost-id', { name: 'Nope' })).rejects.toThrow(ProgramNotFoundError)
     })
+
+    it('auto-increments version from 1 to 2 on first update', async () => {
+      const id = await db.create(createTestProgram())
+      const created = await db.getByIdOrThrow(id)
+      expect(created.version).toEqual(1)
+
+      await db.update(id, { name: 'Updated' })
+      const updated = await db.getByIdOrThrow(id)
+      expect(updated.version).toEqual(2)
+    })
+
+    it('auto-increments version on successive updates', async () => {
+      const id = await db.create(createTestProgram())
+      await db.update(id, { name: 'V2' })
+      expect((await db.getByIdOrThrow(id)).version).toEqual(2)
+
+      await db.update(id, { name: 'V3' })
+      expect((await db.getByIdOrThrow(id)).version).toEqual(3)
+
+      await db.update(id, { name: 'V4' })
+      expect((await db.getByIdOrThrow(id)).version).toEqual(4)
+    })
+
+    it('ignores version in update payload and always auto-increments', async () => {
+      const id = await db.create(createTestProgram())
+      // Even if someone tries to pass version, it's not in the Pick type,
+      // but the version should still auto-increment
+      await db.update(id, { name: 'Updated' })
+      expect((await db.getByIdOrThrow(id)).version).toEqual(2)
+    })
   })
 
   // --------------------------------------------------------------------------
