@@ -43,7 +43,7 @@ Tech lead will:
 Each team context: `docs/teams/<team>-team.md`
 
 ## Code Constraints
-- Files: **MAX 500 lines** - extract to focused modules when approaching limit
+- Files: **MAX 500 lines** — see `docs/file-splitting-guide.md` for how to split large files correctly. Do not just extract methods into a `*Helpers.ts` dump; diagnose the root cause and decompose by responsibility.
 - TypeScript: strict mode, no `any`, `import type` for types
 - Vue: `<style scoped>` only (exception: `@/shared/styles/*` imports)
 - Tests: `.toEqual()` for exact matching, not `.toContain()`
@@ -74,6 +74,7 @@ Use `/commit` command. Format: `feat:`, `fix:`, `refactor:`, `chore:`, `docs:`
 - `docs/reference/` - F-BASIC language manual
 - `docs/roadmap.md` - Active work planning
 - `docs/debugging-best-practices.md` - **Read before investigating bugs**
+- `docs/file-splitting-guide.md` - **Read before splitting files over 500 lines**
 
 ## AI Temp Files
 All AI-generated temporary scripts/files should be placed in .ai-temp/ and not committed.
