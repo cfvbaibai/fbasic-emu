@@ -249,6 +249,8 @@ class WebWorkerInterpreter {
     this.webWorkerDeviceAdapter?.clearAllSpritePositions?.()
     // Reset sound state when CLEAR is pressed
     this.webWorkerDeviceAdapter?.resetSoundState?.()
+    // Reject pending play complete promises so PLAY executor doesn't hang
+    this.webWorkerDeviceAdapter?.rejectAllInputRequests?.('CLEAR pressed during PLAY')
   }
 
   handleStrigEvent(message: StrigEventMessage) {
