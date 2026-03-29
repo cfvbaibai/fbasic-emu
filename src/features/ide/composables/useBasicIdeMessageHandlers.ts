@@ -287,8 +287,8 @@ export function handlePlaySoundMessage(message: AnyServiceWorkerMessage, context
 
   // Schedule PLAY_SOUND_COMPLETE after total duration so the worker can resume execution
   const totalDurationMs = audioPlayer.getTotalDurationMs(channels)
-  if (totalDurationMs > 0 && playId) {
-    setTimeout(() => {
+  if (playId) {
+    const sendComplete = (): void => {
       const worker = context.webWorkerManager.worker
       if (worker) {
         worker.postMessage({
@@ -298,7 +298,12 @@ export function handlePlaySoundMessage(message: AnyServiceWorkerMessage, context
           data: { executionId, playId },
         })
       }
-    }, totalDurationMs)
+    }
+    if (totalDurationMs > 0) {
+      setTimeout(sendComplete, totalDurationMs)
+    } else {
+      sendComplete()
+    }
   }
 }
 
