@@ -440,6 +440,92 @@ describe('ProgramDB', () => {
       // Empty string matches everything
       expect(results).toHaveLength(1)
     })
+
+    // -- Index-based search behavior tests --
+
+    it('uses name index cursor for substring match across many records', async () => {
+      // Create many programs to exercise cursor iteration
+      for (let i = 0; i < 20; i++) {
+        await db.create(createTestProgram({ name: `Program ${i}` }))
+      }
+      await db.create(createTestProgram({ name: 'Game A' }))
+      await db.create(createTestProgram({ name: 'Game B' }))
+
+      const results = await db.searchByName('Game')
+      expect(results).toHaveLength(2)
+      const names = results.map((r) => r.name)
+      expect(names).toContain('Game A')
+      expect(names).toContain('Game B')
+    })
+
+    it('correctly iterates index cursor when names span different sort ranges', async () => {
+      // Names that exercise different parts of the index B-tree
+      const names = ['Alpha Game', 'Beta Game', 'Zeta Game', 'Alpha Tool', 'Gamma']
+      for (const name of names) {
+        await db.create(createTestProgram({ name }))
+      }
+
+      const results = await db.searchByName('Game')
+      expect(results).toHaveLength(3)
+      const matched = results.map((r) => r.name).sort()
+      expect(matched).toEqual(['Alpha Game', 'Beta Game', 'Zeta Game'])
+    })
+
+    it('handles case-insensitive match across mixed-case names in index', async () => {
+      await db.create(createTestProgram({ name: 'SHOOTING game' }))
+      await db.create(createTestProgram({ name: 'shooting GAME' }))
+      await db.create(createTestProgram({ name: 'Shooting Game' }))
+      await db.create(createTestProgram({ name: 'SHOOTING DEMO' }))
+
+      const results = await db.searchByName('shooting')
+      expect(results).toHaveLength(4)
+    })
+
+    it('preserves full ProgramData fields in index-cursor results', async () => {
+      const code = '10 CLS\n20 PRINT "TEST"'
+      const bg = { format: 'sparse1' as const, data: '0,0,65,1;', width: 28 as const, height: 21 as const }
+      const id = await db.create(createTestProgram({ name: 'Full Record', code, bg }))
+
+      const results = await db.searchByName('Full')
+      expect(results).toHaveLength(1)
+      expect(results[0]).toEqual({
+        version: 1,
+        id,
+        name: 'Full Record',
+        code,
+        bg,
+        createdAt: expect.any(Number),
+        updatedAt: expect.any(Number),
+      })
+    })
+
+    it('returns all programs when query is empty string (index scans all)', async () => {
+      await db.create(createTestProgram({ name: 'A' }))
+      await db.create(createTestProgram({ name: 'B' }))
+      await db.create(createTestProgram({ name: 'C' }))
+
+      const results = await db.searchByName('')
+      expect(results).toHaveLength(3)
+    })
+
+    it('matches substring not just prefix via index cursor', async () => {
+      await db.create(createTestProgram({ name: 'My Awesome Game' }))
+      await db.create(createTestProgram({ name: 'Game Awesome' }))
+      await db.create(createTestProgram({ name: 'Not Related' }))
+
+      // "Awesome" appears as substring in different positions
+      const results = await db.searchByName('Awesome')
+      expect(results).toHaveLength(2)
+    })
+
+    it('handles single-character query with index cursor', async () => {
+      await db.create(createTestProgram({ name: 'A' }))
+      await db.create(createTestProgram({ name: 'B' }))
+      await db.create(createTestProgram({ name: 'BA' }))
+
+      const results = await db.searchByName('A')
+      expect(results).toHaveLength(2)
+    })
   })
 
   // --------------------------------------------------------------------------

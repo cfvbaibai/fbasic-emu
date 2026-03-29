@@ -289,15 +289,45 @@ export class ProgramDB {
 
   /**
    * Search programs by name (case-insensitive substring match).
+   * Uses the IndexedDB `name` index with a cursor to avoid loading
+   * all records into memory — only matching records are fetched.
    * Results are sorted by updatedAt descending.
    *
    * @param query - Search query to match against program names
    * @returns Matching programs
    */
   async searchByName(query: string): Promise<ProgramData[]> {
-    const all = await this.getAll()
+    const db = this.requireOpen()
     const lowerQuery = query.toLowerCase()
-    return all.filter((p) => p.name.toLowerCase().includes(lowerQuery))
+
+    const results = await new Promise<ProgramData[]>((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, 'readonly')
+      const store = tx.objectStore(STORE_NAME)
+      const index = store.index('name')
+      const matches: ProgramData[] = []
+
+      const request = index.openCursor()
+
+      request.onsuccess = () => {
+        const cursor = request.result
+        if (cursor) {
+          const record = cursor.value as ProgramData
+          if (record.name.toLowerCase().includes(lowerQuery)) {
+            matches.push(record)
+          }
+          cursor.continue()
+        } else {
+          resolve(matches)
+        }
+      }
+
+      request.onerror = () => {
+        reject(new ProgramDBError('Search failed', request.error))
+      }
+    })
+
+    // Sort by updatedAt descending (most recent first)
+    return results.sort((a, b) => b.updatedAt - a.updatedAt)
   }
 
   // --- COUNT ---
