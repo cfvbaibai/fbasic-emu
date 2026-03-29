@@ -45,20 +45,20 @@
 450 REM Check for A button (bit 3) - sound effect
 460 IF (T AND 8)=8 THEN GOSUB 600
 470 REM Move sprite position marker
-480 PRINT AT(X,6);"*";
-490 PRINT AT(X-D,6);" ";
+480 LOCATE X,6:PRINT "*";
+490 LOCATE X-D,6:PRINT " ";
 500 X=X+D
 510 IF X>=18 THEN D=-1
 520 IF X<=1 THEN D=1
 530 PAUSE 5
 540 GOTO 420
 550 REM
-560 PRINT AT(0,8);"Goodbye!"
+560 LOCATE 0,8:PRINT "Goodbye!"
 570 END
 580 REM
 590 REM --- Subroutine: Sound Effect (PLAY blocks briefly) ---
 600 REM PLAY is used for short sound effects because
 610 REM we WANT the brief pause for dramatic effect
 620 PLAY "T255O5L16CCC"
-630 PRINT AT(0,7);"SFX!  ";
+630 LOCATE 0,7:PRINT "SFX!  ";
 640 RETURN
