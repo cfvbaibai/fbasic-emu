@@ -3,10 +3,12 @@
  * Manages sprite definitions and states for DEF SPRITE and SPRITE commands
  */
 
+import { SCREEN_DIMENSIONS } from '@/core/constants'
+
 import type { DefSpriteDefinition, SpriteState } from './types'
 
 /**
- * SpriteStateManager - Manages 8 sprite slots (0-7)
+ * SpriteStateManager - Manages sprite slots (0 to SPRITE_COUNT-1)
  * Handles sprite definitions, positions, visibility, and priority
  */
 export class SpriteStateManager {
@@ -14,8 +16,8 @@ export class SpriteStateManager {
   private spriteEnabled = false
 
   constructor() {
-    // Initialize 8 sprite slots
-    for (let i = 0; i < 8; i++) {
+    // Initialize sprite slots
+    for (let i = 0; i < SCREEN_DIMENSIONS.SPRITE_COUNT; i++) {
       this.spriteStates.set(i, {
         spriteNumber: i,
         x: 0,
@@ -117,7 +119,7 @@ export class SpriteStateManager {
   clear(): void {
     this.spriteStates.clear()
     // Reinitialize
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < SCREEN_DIMENSIONS.SPRITE_COUNT; i++) {
       this.spriteStates.set(i, {
         spriteNumber: i,
         x: 0,
