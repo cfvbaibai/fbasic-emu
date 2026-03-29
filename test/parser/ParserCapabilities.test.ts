@@ -7,6 +7,7 @@ import { FBasicParser } from '@/core/parser/FBasicParser'
 
 const STATEMENT_RULE_TO_CAPABILITY: Record<string, string> = {
   beepStatement: 'BEEP',
+  bgplayStatement: 'BGPLAY',
   cgenStatement: 'CGEN',
   cgsetStatement: 'CGSET',
   clearStatement: 'CLEAR',

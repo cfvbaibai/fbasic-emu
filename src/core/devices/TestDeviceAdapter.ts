@@ -206,6 +206,14 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
     return Promise.resolve()
   }
 
+  /** Captured playSoundBackground calls for testing */
+  public playSoundBackgroundCalls: CompiledAudio[] = []
+
+  playSoundBackground?(audio: CompiledAudio): void {
+    this.playSoundBackgroundCalls.push(audio)
+    logDevice.debug('BGPLAY sound, channels:', audio.channels.length)
+  }
+
   /** Captured beep calls for testing */
   public beepCalls: number = 0
 

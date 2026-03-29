@@ -454,6 +454,12 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
     return createPlayCompleteRequest(this.pendingPlayComplete, playId)
   }
 
+  /** Play compiled audio in background (non-blocking). Used by BGPLAY statement. */
+  playSoundBackground(audio: CompiledAudio): void {
+    const executionId = this.screenStateManager.getCurrentExecutionId() ?? 'unknown'
+    postPlaySound(executionId, audio)
+  }
+
   /** Play a beep sound. */
   beep(): void {
     postBeep(this.screenStateManager.getCurrentExecutionId() ?? 'unknown')
