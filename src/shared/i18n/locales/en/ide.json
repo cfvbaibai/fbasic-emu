@@ -269,6 +269,10 @@
       "musicRocknRouge": {
         "name": "Rock'n Rouge (Seiko Matsuda)",
         "description": "Japanese pop song with 3-channel harmony - demonstrates complex PLAY with GOTO loops (from F-BASIC Manual p.37-38)"
+      },
+      "musicBgplayDemo": {
+        "name": "BGPLAY Demo",
+        "description": "Fire-and-forget background music with game loop - demonstrates BGPLAY vs PLAY and non-blocking sound effects"
       }
     }
   },

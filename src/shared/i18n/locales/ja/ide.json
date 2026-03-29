@@ -269,6 +269,10 @@
       "musicRocknRouge": {
         "name": "ロックン・ルージュ（松田聖子）",
         "description": "3チャンネルハーモニー付き日本語ポップス - GOTOループを使った複雑なPLAYをデモ（F-BASICマニュアル p.37-38より）"
+      },
+      "musicBgplayDemo": {
+        "name": "BGPLAY デモ",
+        "description": "バックグラウンド音楽とゲームループ - BGPLAYとPLAYの違いとノンブロッキング効果音をデモ"
       }
     }
   },
