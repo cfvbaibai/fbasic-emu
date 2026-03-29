@@ -190,4 +190,48 @@ describe('InputModal', () => {
     expect(form.exists()).toBe(true)
     wrapper.unmount()
   })
+
+  it('auto-focuses the input field when modal becomes visible', async () => {
+    const focusSpy = vi.spyOn(HTMLElement.prototype, 'focus')
+
+    const wrapper = mount(InputModal, {
+      props: { pendingRequest: null },
+      global: { stubs: { GameInput: gameInputStub, GameButton: gameButtonStub } },
+    })
+
+    expect(wrapper.find('[data-testid="game-input"]').exists()).toBe(false)
+
+    await wrapper.setProps({ pendingRequest: createPendingRequest() })
+    await nextTick()
+    await nextTick()
+
+    const input = wrapper.find('[data-testid="game-input"]').element as HTMLInputElement
+    expect(focusSpy).toHaveBeenCalledWith()
+    expect(focusSpy.mock.instances).toContain(input)
+    focusSpy.mockRestore()
+    wrapper.unmount()
+  })
+
+  it('re-focuses the input field when pendingRequest changes', async () => {
+    const focusSpy = vi.spyOn(HTMLElement.prototype, 'focus')
+
+    const wrapper = mount(InputModal, {
+      props: { pendingRequest: createPendingRequest({ requestId: 'req-1' }) },
+      global: { stubs: { GameInput: gameInputStub, GameButton: gameButtonStub } },
+    })
+    await nextTick()
+    await nextTick()
+    focusSpy.mockClear()
+
+    // Change the request — input should be re-focused
+    await wrapper.setProps({ pendingRequest: createPendingRequest({ requestId: 'req-2' }) })
+    await nextTick()
+    await nextTick()
+
+    const newInput = wrapper.find('[data-testid="game-input"]').element as HTMLInputElement
+    expect(focusSpy).toHaveBeenCalledWith()
+    expect(focusSpy.mock.instances).toContain(newInput)
+    focusSpy.mockRestore()
+    wrapper.unmount()
+  })
 })

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { nextTick, ref, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import type { RequestInputMessage } from '@/core/interfaces'
@@ -15,6 +15,11 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 const inputValue = ref<string | number>('')
+const formRef = useTemplateRef<HTMLFormElement>('formRef')
+
+function focusInput(): void {
+  formRef.value?.querySelector<HTMLInputElement>('input')?.focus()
+}
 
 const submit = () => {
   const req = props.pendingRequest
@@ -34,8 +39,11 @@ const cancel = () => {
 
 watch(
   () => props.pendingRequest,
-  () => {
+  (request) => {
     inputValue.value = ''
+    if (request) {
+      void nextTick(() => focusInput())
+    }
   },
 )
 </script>
@@ -52,7 +60,7 @@ watch(
       <p id="input-modal-prompt" class="input-modal-prompt">
         {{ pendingRequest.prompt }}
       </p>
-      <form class="input-modal-form" @submit.prevent="submit">
+      <form ref="formRef" class="input-modal-form" @submit.prevent="submit">
         <GameInput
           v-model="inputValue"
           type="text"
