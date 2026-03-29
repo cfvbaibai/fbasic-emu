@@ -26,7 +26,7 @@ export function postOutputMessage(
   logFn(`${outputType === 'print' ? 'Print' : outputType} output:`, output)
   self.postMessage({
     type: 'OUTPUT',
-    id: `${outputType}-${Date.now()}`,
+    id: `${outputType}-${crypto.randomUUID()}`,
     timestamp: Date.now(),
     data: { executionId, output, outputType, timestamp: Date.now() },
   })
@@ -76,7 +76,7 @@ export function buildPlaySoundMessage(
   musicString?: string,
   playId?: string
 ) {
-  const id = playId ?? `play-sound-${Date.now()}`
+  const id = playId ?? crypto.randomUUID()
   return {
     type: 'PLAY_SOUND' as const,
     id,
