@@ -168,7 +168,8 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
   bgItems: {
     key: 'bgItems',
     category: 'screen',
-    code: bgItems,
+    bgKey: 'layerBox',
+    code: printableArea,
   },
   bgView: {
     key: 'bgView',
@@ -201,8 +202,7 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
   printableArea: {
     key: 'printableArea',
     category: 'screen',
-    bgKey: 'layerBox',
-    code: printableArea,
+    code: bgItems,
   },
 
   // === SPRITES ===
