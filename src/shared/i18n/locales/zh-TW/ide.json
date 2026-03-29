@@ -269,6 +269,10 @@
       "musicRocknRouge": {
         "name": "Rock'n Rouge（松田聖子）",
         "description": "帶三聲道和聲的日語流行歌曲 - 示範使用 GOTO 迴圈的複雜 PLAY（來自F-BASIC手冊第37-38頁）"
+      },
+      "musicBgplayDemo": {
+        "name": "BGPLAY 示範",
+        "description": "即發即棄的背景音樂與遊戲迴圈 - 示範 BGPLAY 與 PLAY 的區別以及非阻塞音效"
       }
     }
   },

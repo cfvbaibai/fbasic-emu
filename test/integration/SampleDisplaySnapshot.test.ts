@@ -78,6 +78,7 @@ const SNAPSHOT_COVERAGE_OPT_OUTS: SnapshotCoverageOptOuts = {
   musicLoopDemo: 'Audio-focused looping sample; deterministic stop checkpoint pending',
   musicFurElise2Ch: 'Audio-focused sample; display state not primary output',
   musicRocknRouge: 'Audio-focused sample; display state not primary output',
+  musicBgplayDemo: 'Audio-focused sample; display state not primary output',
 }
 
 describe('Sample Display Snapshot Integration', () => {

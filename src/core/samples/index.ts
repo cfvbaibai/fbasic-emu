@@ -53,6 +53,7 @@ import joystick from './programs/interactive/joystick.bas?raw'
 // Interactive
 import spriteInteractive from './programs/interactive/sprite-interactive.bas?raw'
 import musicArpeggio from './programs/music/arpeggio.bas?raw'
+import musicBgplayDemo from './programs/music/bgplay-demo.bas?raw'
 import musicHappyBirthday from './programs/music/happy-birthday.bas?raw'
 import musicJingleBells from './programs/music/jingle-bells.bas?raw'
 import musicLoopDemo from './programs/music/loop-demo.bas?raw'
@@ -368,6 +369,11 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
     key: 'musicRocknRouge',
     category: 'music',
     code: musicRocknRouge,
+  },
+  musicBgplayDemo: {
+    key: 'musicBgplayDemo',
+    category: 'music',
+    code: musicBgplayDemo,
   },
 }
 
