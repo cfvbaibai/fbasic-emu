@@ -59,6 +59,6 @@
 590 REM --- Subroutine: Sound Effect (PLAY blocks briefly) ---
 600 REM PLAY is used for short sound effects because
 610 REM we WANT the brief pause for dramatic effect
-620 PLAY "T255O5L16CCC"
+620 PLAY "T255O5C1C1C1"
 630 LOCATE 0,7:PRINT "SFX!  ";
 640 RETURN
