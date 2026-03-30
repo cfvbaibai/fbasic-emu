@@ -2,7 +2,7 @@
  * Web worker management utilities for BASIC IDE
  */
 
-import { DEFAULTS } from '@/core/constants'
+import { DEFAULTS, ERROR_MESSAGES } from '@/core/constants'
 import type { AnyServiceWorkerMessage, ExecutionResult } from '@/core/interfaces'
 import { logComposable } from '@/shared/logger'
 
@@ -158,7 +158,7 @@ const INPUT_WAIT_TIMEOUT_MS = 5 * 60 * 1000 // 5 minutes
 
 /**
  * Extend the timeout for an execution that is waiting for user input (REQUEST_INPUT).
- * Prevents "Web worker message timeout" while the user fills INPUT/LINPUT prompts.
+ * Prevents WORKER_TIMEOUT error while the user fills INPUT/LINPUT prompts.
  */
 export function extendExecutionTimeout(
   webWorkerManager: WebWorkerManager,
@@ -171,7 +171,7 @@ export function extendExecutionTimeout(
   pending.timeout = setTimeout(() => {
     logComposable.debug('Message timeout (after input wait):', executionId)
     webWorkerManager.pendingMessages.delete(executionId)
-    pending.reject(new Error('Web worker message timeout'))
+    pending.reject(new Error(ERROR_MESSAGES.WORKER_TIMEOUT))
   }, durationMs)
 }
 
@@ -199,7 +199,7 @@ export function sendMessageToWorker(
     const timeout = setTimeout(() => {
       logComposable.debug('Message timeout:', _messageId)
       webWorkerManager.pendingMessages.delete(_messageId)
-      reject(new Error('Web worker message timeout'))
+      reject(new Error(ERROR_MESSAGES.WORKER_TIMEOUT))
     }, timeoutMs)
 
     // Store pending message

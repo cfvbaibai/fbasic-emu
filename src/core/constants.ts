@@ -51,6 +51,11 @@ export const DEFAULTS = {
   },
 } as const
 
+// Error messages (shared between worker and UI layers for type-safe matching)
+export const ERROR_MESSAGES = {
+  WORKER_TIMEOUT: 'Web worker message timeout',
+} as const
+
 // Error types
 export const ERROR_TYPES = {
   SYNTAX: 'SYNTAX',

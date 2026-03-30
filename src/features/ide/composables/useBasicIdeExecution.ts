@@ -3,7 +3,7 @@
  * Depends on state, worker integration, and parseCode from editor.
  */
 
-import { EXECUTION_LIMITS } from '@/core/constants'
+import { ERROR_MESSAGES, EXECUTION_LIMITS } from '@/core/constants'
 import type { BasicVariable } from '@/core/interfaces'
 import { ExecutionError } from '@/features/ide/errors/ExecutionError'
 import i18n from '@/shared/i18n'
@@ -141,7 +141,7 @@ export function useBasicIdeExecution(
       } else {
         const rawMessage = error instanceof Error ? error.message : 'Execution error'
         const message =
-          rawMessage === 'Web worker message timeout'
+          rawMessage === ERROR_MESSAGES.WORKER_TIMEOUT
             ? i18n.global.t('ide.errors.executionTimeout')
             : rawMessage
         state.errors.value = [

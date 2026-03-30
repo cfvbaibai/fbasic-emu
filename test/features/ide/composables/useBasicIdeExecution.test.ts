@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { ref } from 'vue'
 
+import { ERROR_MESSAGES } from '@/core/constants'
 import { useBasicIdeExecution } from '@/features/ide/composables/useBasicIdeExecution'
 import type { BasicIdeState } from '@/features/ide/composables/useBasicIdeState'
 import type { BasicIdeWorkerIntegration } from '@/features/ide/composables/useBasicIdeWorkerIntegration'
@@ -61,7 +62,7 @@ describe('useBasicIdeExecution', () => {
     it('maps "Web worker message timeout" to user-friendly i18n message', async () => {
       const state = createState()
       const worker = createWorker({
-        sendMessageToWorker: vi.fn().mockRejectedValue(new Error('Web worker message timeout')),
+        sendMessageToWorker: vi.fn().mockRejectedValue(new Error(ERROR_MESSAGES.WORKER_TIMEOUT)),
       })
       const parseCode = vi.fn().mockResolvedValue({})
 
@@ -130,7 +131,7 @@ describe('useBasicIdeExecution', () => {
     it('resets isRunning to false after timeout error', async () => {
       const state = createState()
       const worker = createWorker({
-        sendMessageToWorker: vi.fn().mockRejectedValue(new Error('Web worker message timeout')),
+        sendMessageToWorker: vi.fn().mockRejectedValue(new Error(ERROR_MESSAGES.WORKER_TIMEOUT)),
       })
       const parseCode = vi.fn().mockResolvedValue({})
 
