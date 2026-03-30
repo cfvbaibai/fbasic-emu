@@ -1,5 +1,8 @@
 /**
- * Tests for useProgramLibrary composable
+ * Tests for useProgramLibrary composable - CRUD operations
+ *
+ * Covers: listPrograms, getProgram, saveProgram (create/update),
+ * deleteProgram, renameProgram, and integration scenarios.
  *
  * Uses fake-indexeddb to simulate IndexedDB in the test environment.
  */
@@ -56,32 +59,6 @@ describe('useProgramLibrary', () => {
     const library = useProgramLibrary()
     library.$reset()
     await deleteDatabase()
-  })
-
-  // --------------------------------------------------------------------------
-  // Initial state
-  // --------------------------------------------------------------------------
-
-  describe('initial state', () => {
-    it('starts with empty programs list', () => {
-      const library = useProgramLibrary()
-      expect(library.programs.value).toEqual([])
-    })
-
-    it('starts with isLoading false', () => {
-      const library = useProgramLibrary()
-      expect(library.isLoading.value).toBe(false)
-    })
-
-    it('starts with error null', () => {
-      const library = useProgramLibrary()
-      expect(library.error.value).toBeNull()
-    })
-
-    it('starts with isInitialized false', () => {
-      const library = useProgramLibrary()
-      expect(library.isInitialized.value).toBe(false)
-    })
   })
 
   // --------------------------------------------------------------------------
@@ -407,105 +384,6 @@ describe('useProgramLibrary', () => {
 
       await promise
       expect(library.isLoading.value).toBe(false)
-    })
-  })
-
-  // --------------------------------------------------------------------------
-  // $reset
-  // --------------------------------------------------------------------------
-
-  describe('$reset', () => {
-    it('clears all reactive state', async () => {
-      const library = useProgramLibrary()
-      await library.saveProgram(createTestProgram({ name: 'Test' }))
-      expect(library.programs.value).toHaveLength(1)
-
-      library.$reset()
-
-      expect(library.programs.value).toEqual([])
-      expect(library.isLoading.value).toBe(false)
-      expect(library.error.value).toBeNull()
-      expect(library.isInitialized.value).toBe(false)
-    })
-
-    it('allows reuse after reset', async () => {
-      const library = useProgramLibrary()
-      await library.saveProgram(createTestProgram({ name: 'Before Reset' }))
-
-      // Clear the database to simulate a fresh state
-      const { ProgramDB: programDatabase } = await import('@/core/persistence/ProgramDB')
-      let db = new programDatabase()
-      await db.open()
-      await db.clear()
-      db.close()
-
-      library.$reset()
-
-      // Re-seed data
-      db = new programDatabase()
-      await db.open()
-      await db.create(createTestProgram({ name: 'After Reset' }))
-      db.close()
-
-      await library.listPrograms()
-      expect(library.programs.value).toHaveLength(1)
-      expect(library.programs.value[0]?.name).toEqual('After Reset')
-    })
-  })
-
-  // --------------------------------------------------------------------------
-  // Singleton behavior
-  // --------------------------------------------------------------------------
-
-  describe('singleton behavior', () => {
-    it('returns the same state from multiple calls', async () => {
-      const library1 = useProgramLibrary()
-      const library2 = useProgramLibrary()
-
-      await library1.saveProgram(createTestProgram({ name: 'Shared' }))
-
-      // Both should see the same programs list
-      expect(library2.programs.value).toHaveLength(1)
-      expect(library2.programs.value[0]?.name).toEqual('Shared')
-    })
-
-    it('isLoading is shared across instances', async () => {
-      const library1 = useProgramLibrary()
-      const library2 = useProgramLibrary()
-
-      const promise = library1.listPrograms()
-      expect(library2.isLoading.value).toBe(true)
-
-      await promise
-      expect(library2.isLoading.value).toBe(false)
-    })
-  })
-
-  // --------------------------------------------------------------------------
-  // Error handling
-  // --------------------------------------------------------------------------
-
-  describe('error handling', () => {
-    it('stores error on saveProgram failure', async () => {
-      const library = useProgramLibrary()
-      // Save with invalid bg data to test error path indirectly
-      // The simplest way is to $reset mid-operation, but let's test
-      // that error is cleared between calls
-
-      await library.listPrograms()
-      expect(library.error.value).toBeNull()
-    })
-
-    it('clears error at the start of each operation', async () => {
-      const library = useProgramLibrary()
-
-      // Trigger an error
-      await library.renameProgram('ghost-id', 'Nope')
-      expect(library.error.value).toBeDefined()
-
-      // Successful operation should clear the error
-      await library.listPrograms()
-      expect(library.error.value).toBeNull()
     })
   })
 
