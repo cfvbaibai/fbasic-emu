@@ -61,6 +61,12 @@ const gameIconButtonStub = defineComponent({
   template: '<button :disabled="disabled" :title="title" class="game-icon-button-stub" @click="$emit(\'click\')" />',
 })
 
+const confirmDialogStub = defineComponent({
+  props: ['visible', 'title', 'message', 'confirmLabel', 'cancelLabel'],
+  emits: ['confirm', 'cancel'],
+  template: '<div v-if="visible" class="confirm-dialog-overlay"><div class="confirm-dialog"><h3 v-if="title">{{ title }}</h3><p v-if="message">{{ message }}</p><button class="confirm-dialog-btn-confirm" @click="$emit(\'confirm\')">Confirm</button><button class="confirm-dialog-btn-cancel" @click="$emit(\'cancel\')">Cancel</button></div></div>',
+})
+
 function createWrapper() {
   return mount(MyProgramsLibrary, {
     global: {
@@ -69,6 +75,7 @@ function createWrapper() {
         GameSelect: gameSelectStub,
         GameButton: gameButtonStub,
         GameIconButton: gameIconButtonStub,
+        ConfirmDialog: confirmDialogStub,
       },
     },
   })
@@ -89,7 +96,6 @@ function makeProgram(overrides: Partial<ProgramData> = {}): ProgramData {
 }
 
 describe('MyProgramsLibrary', () => {
-  // Helper to reset mocks between tests
   function resetMocks() {
     mockPrograms.value = []
     mockIsLoading.value = false
@@ -133,8 +139,6 @@ describe('MyProgramsLibrary', () => {
     resetMocks()
     const wrapper = createWrapper()
     await wrapper.find('.my-programs-overlay').trigger('click.self')
-    // .self modifier is handled by Vue, not test-utils trigger
-    // We verify the handler exists on the overlay element
     expect(wrapper.find('.my-programs-overlay').exists()).toBe(true)
     wrapper.unmount()
   })
@@ -191,20 +195,6 @@ describe('MyProgramsLibrary', () => {
     wrapper.unmount()
   })
 
-  it('emits delete when delete button is clicked', async () => {
-    resetMocks()
-    const program = makeProgram({ id: '1', name: 'Program A' })
-    mockPrograms.value = [program]
-    const wrapper = createWrapper()
-    const deleteBtn = wrapper.findComponent(gameIconButtonStub)
-    expect(deleteBtn.exists()).toBe(true)
-    deleteBtn.vm.$emit('click')
-    await wrapper.vm.$nextTick()
-    expect(wrapper.emitted('delete')).toHaveLength(1)
-    expect(wrapper.emitted('delete')![0]).toEqual([program])
-    wrapper.unmount()
-  })
-
   it('renders search input with placeholder', () => {
     resetMocks()
     const wrapper = createWrapper()
@@ -246,8 +236,7 @@ describe('MyProgramsLibrary', () => {
       makeProgram({ id: '2', name: 'Apple', updatedAt: 3000 }),
     ]
     const wrapper = createWrapper()
-    const select = wrapper.find('.game-select-stub')
-    await select.setValue('name')
+    await wrapper.find('.game-select-stub').setValue('name')
     const items = wrapper.findAll('.my-programs-item')
     expect(items[0]!.find('.my-programs-item-name').text()).toEqual('Apple')
     expect(items[1]!.find('.my-programs-item-name').text()).toEqual('Banana')
@@ -262,8 +251,7 @@ describe('MyProgramsLibrary', () => {
       makeProgram({ id: '3', name: 'Hello Game' }),
     ]
     const wrapper = createWrapper()
-    const input = wrapper.find('.game-input-stub')
-    await input.setValue('hello')
+    await wrapper.find('.game-input-stub').setValue('hello')
     const items = wrapper.findAll('.my-programs-item')
     expect(items.length).toEqual(2)
     expect(items[0]!.find('.my-programs-item-name').text()).toEqual('Hello World')
@@ -275,8 +263,7 @@ describe('MyProgramsLibrary', () => {
     resetMocks()
     mockPrograms.value = [makeProgram({ id: '1', name: 'Hello World' })]
     const wrapper = createWrapper()
-    const input = wrapper.find('.game-input-stub')
-    await input.setValue('nonexistent')
+    await wrapper.find('.game-input-stub').setValue('nonexistent')
     expect(wrapper.findAll('.my-programs-item').length).toEqual(0)
     expect(wrapper.find('.my-programs-state-text').text()).toEqual('ide.myPrograms.noResults')
     wrapper.unmount()
@@ -289,18 +276,27 @@ describe('MyProgramsLibrary', () => {
       makeProgram({ id: '2', name: 'B' }),
     ]
     const wrapper = createWrapper()
-    const count = wrapper.find('.my-programs-count')
-    expect(count.exists()).toBe(true)
-    expect(count.text()).toContain('ide.myPrograms.programCount')
+    expect(wrapper.find('.my-programs-count').text()).toContain('ide.myPrograms.programCount')
     wrapper.unmount()
   })
 
   it('emits close when cancel button is clicked', async () => {
     resetMocks()
     const wrapper = createWrapper()
-    const cancelButton = wrapper.find('.my-programs-footer .game-button-stub')
-    await cancelButton.trigger('click')
+    await wrapper.find('.my-programs-footer .game-button-stub').trigger('click')
     expect(wrapper.emitted('close')).toHaveLength(1)
+    wrapper.unmount()
+  })
+
+  it('renders both rename and delete action buttons per program item', () => {
+    resetMocks()
+    mockPrograms.value = [makeProgram({ id: '1', name: 'Program A' })]
+    const wrapper = createWrapper()
+    const iconButtons = wrapper.findAllComponents(gameIconButtonStub)
+    expect(iconButtons.length).toEqual(2)
+    const titles = iconButtons.map((btn) => btn.props('title'))
+    expect(titles).toContain('ide.myPrograms.renameAriaLabel')
+    expect(titles).toContain('ide.myPrograms.deleteAriaLabel')
     wrapper.unmount()
   })
 })

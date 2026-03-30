@@ -465,7 +465,11 @@
     "emptyState": "还没有保存的程序。保存一个程序即可在此处查看。",
     "noResults": "没有匹配的程序。",
     "errorState": "加载程序失败。",
+    "renameAriaLabel": "重命名程序",
     "deleteAriaLabel": "删除程序",
+    "deleteConfirmTitle": "删除程序",
+    "deleteConfirmMessage": "确定要删除「{name}」吗？此操作无法撤销。",
+    "deleteConfirmLabel": "删除",
     "programCount": "暂无程序 | {count} 个程序 | {count} 个程序"
   }
 }

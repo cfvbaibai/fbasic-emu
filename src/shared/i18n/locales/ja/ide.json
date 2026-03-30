@@ -465,7 +465,11 @@
     "emptyState": "保存されたプログラムはありません。プログラムを保存するとここに表示されます。",
     "noResults": "検索条件に一致するプログラムはありません。",
     "errorState": "プログラムの読み込みに失敗しました。",
+    "renameAriaLabel": "プログラム名を変更",
     "deleteAriaLabel": "プログラムを削除",
+    "deleteConfirmTitle": "プログラムの削除",
+    "deleteConfirmMessage": "「{name}」を削除してよろしいですか？この操作は元に戻せません。",
+    "deleteConfirmLabel": "削除",
     "programCount": "プログラムなし | {count}件のプログラム | {count}件のプログラム"
   }
 }

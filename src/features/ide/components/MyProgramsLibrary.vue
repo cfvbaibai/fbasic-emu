@@ -1,17 +1,18 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import type { ProgramData } from '@/core/types/program-types'
 import { useProgramLibrary } from '@/features/ide/composables/useProgramLibrary'
-import { GameButton, GameIconButton, GameInput, GameSelect } from '@/shared/components/ui'
+import { ConfirmDialog, GameButton, GameIconButton, GameInput, GameSelect } from '@/shared/components/ui'
 
 /**
  * MyProgramsLibrary component - List view for saved programs with search/sort.
  *
  * Shows all programs from IndexedDB via useProgramLibrary composable.
  * Supports search by name, sort by recently modified or alphabetical,
- * and displays an empty state when no programs are saved.
+ * inline rename, delete with confirmation, and displays an empty state
+ * when no programs are saved.
  */
 
 defineOptions({
@@ -21,7 +22,6 @@ defineOptions({
 const emit = defineEmits<{
   (e: 'close'): void
   (e: 'select', program: ProgramData): void
-  (e: 'delete', program: ProgramData): void
 }>()
 
 const { t } = useI18n()
@@ -30,6 +30,14 @@ const library = useProgramLibrary()
 // Search and sort state
 const searchQuery = ref<string | number>('')
 const sortKey = ref<string | number>('updatedAt')
+
+// Delete confirmation state
+const deleteTarget = ref<ProgramData | null>(null)
+
+// Rename inline edit state
+const editingId = ref<string | null>(null)
+const editingName = ref('')
+const renameInputRef = useTemplateRef<HTMLInputElement>('renameInputRef')
 
 // Sort options for the GameSelect dropdown
 const sortOptions = computed(() => [
@@ -80,11 +88,66 @@ function formatDate(timestamp: number): string {
 
 // Program action handlers
 function handleSelect(program: ProgramData): void {
+  if (editingId.value === program.id) return
   emit('select', program)
 }
 
-function handleDelete(program: ProgramData): void {
-  emit('delete', program)
+// --- Delete ---
+function handleDeleteClick(program: ProgramData): void {
+  deleteTarget.value = program
+}
+
+function handleDeleteConfirm(): void {
+  if (deleteTarget.value) {
+    void library.deleteProgram(deleteTarget.value.id)
+  }
+  deleteTarget.value = null
+}
+
+function handleDeleteCancel(): void {
+  deleteTarget.value = null
+}
+
+// --- Rename ---
+function handleRenameClick(program: ProgramData): void {
+  editingId.value = program.id
+  editingName.value = program.name
+  void nextTick(() => {
+    const input = renameInputRef.value
+    if (input) {
+      // focus/select may not be available in all environments (e.g. JSDOM)
+      input.focus?.()
+      input.select?.()
+    }
+  })
+}
+
+function handleRenameSubmit(): void {
+  const trimmed = editingName.value.trim()
+  if (editingId.value && trimmed) {
+    void library.renameProgram(editingId.value, trimmed)
+  }
+  editingId.value = null
+  editingName.value = ''
+}
+
+function handleRenameCancel(): void {
+  editingId.value = null
+  editingName.value = ''
+}
+
+function handleRenameBlur(): void {
+  handleRenameSubmit()
+}
+
+function handleRenameKeydown(e: KeyboardEvent): void {
+  if (e.key === 'Enter') {
+    e.preventDefault()
+    handleRenameSubmit()
+  } else if (e.key === 'Escape') {
+    e.preventDefault()
+    handleRenameCancel()
+  }
 }
 
 function handleClose(): void {
@@ -154,25 +217,58 @@ function handleClose(): void {
             :key="program.id"
             class="my-programs-item"
           >
-            <button
-              type="button"
-              class="my-programs-item-button"
-              @click="handleSelect(program)"
-            >
-              <span class="my-programs-item-name">{{ program.name }}</span>
-              <span class="my-programs-item-date">{{ formatDate(program.updatedAt) }}</span>
-            </button>
+            <!-- Inline rename mode -->
+            <template v-if="editingId === program.id">
+              <input
+                ref="renameInputRef"
+                v-model="editingName"
+                type="text"
+                class="my-programs-item-rename-input"
+                :maxlength="100"
+                @keydown="handleRenameKeydown"
+                @blur="handleRenameBlur"
+              />
+            </template>
+            <!-- Normal display mode -->
+            <template v-else>
+              <button
+                type="button"
+                class="my-programs-item-button"
+                @click="handleSelect(program)"
+              >
+                <span class="my-programs-item-name">{{ program.name }}</span>
+                <span class="my-programs-item-date">{{ formatDate(program.updatedAt) }}</span>
+              </button>
+            </template>
+            <GameIconButton
+              type="default"
+              icon="mdi:pencil-outline"
+              size="small"
+              :title="t('ide.myPrograms.renameAriaLabel')"
+              class="my-programs-item-action"
+              @click="handleRenameClick(program)"
+            />
             <GameIconButton
               type="danger"
               icon="mdi:delete-outline"
               size="small"
               :title="t('ide.myPrograms.deleteAriaLabel')"
-              class="my-programs-item-delete"
-              @click="handleDelete(program)"
+              class="my-programs-item-action"
+              @click="handleDeleteClick(program)"
             />
           </li>
         </ul>
       </div>
+
+      <!-- Delete confirmation dialog -->
+      <ConfirmDialog
+        :visible="deleteTarget !== null"
+        :title="t('ide.myPrograms.deleteConfirmTitle')"
+        :message="t('ide.myPrograms.deleteConfirmMessage', { name: deleteTarget?.name ?? '' })"
+        :confirm-label="t('ide.myPrograms.deleteConfirmLabel')"
+        @confirm="handleDeleteConfirm"
+        @cancel="handleDeleteCancel"
+      />
 
       <!-- Footer -->
       <div class="my-programs-footer">
@@ -347,13 +443,29 @@ function handleClose(): void {
   flex-shrink: 0;
 }
 
-.my-programs-item-delete {
+.my-programs-item-rename-input {
+  flex: 1;
+  padding: 0.375rem 0.5rem;
+  border: 1px solid var(--base-solid-primary);
+  border-radius: 4px;
+  background: var(--game-surface-bg-start);
+  color: var(--game-text-primary);
+  font-size: 0.9rem;
+  outline: none;
+  min-width: 0;
+}
+
+.my-programs-item-rename-input:focus {
+  box-shadow: 0 0 0 2px var(--base-alpha-primary-30);
+}
+
+.my-programs-item-action {
   opacity: 0;
   transition: opacity 0.15s ease;
   flex-shrink: 0;
 }
 
-.my-programs-item:hover .my-programs-item-delete {
+.my-programs-item:hover .my-programs-item-action {
   opacity: 1;
 }
 
