@@ -33,6 +33,8 @@ vi.mock('@/features/ide/composables/useProgramLibrary', () => ({
     saveProgram: vi.fn(),
     deleteProgram: vi.fn(),
     renameProgram: vi.fn(),
+    importFromFile: vi.fn(),
+    exportToFile: vi.fn(),
     $reset: vi.fn(),
   }),
 }))
