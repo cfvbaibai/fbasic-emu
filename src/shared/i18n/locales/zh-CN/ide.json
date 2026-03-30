@@ -452,5 +452,20 @@
   },
   "errors": {
     "executionTimeout": "执行在5分钟后超时。您的程序可能包含无限循环。"
+  },
+  "myPrograms": {
+    "title": "我的程序",
+    "closeAriaLabel": "关闭",
+    "searchPlaceholder": "搜索程序...",
+    "sort": {
+      "recentlyModified": "最近修改",
+      "alphabetical": "按名称排序"
+    },
+    "loading": "正在加载程序...",
+    "emptyState": "还没有保存的程序。保存一个程序即可在此处查看。",
+    "noResults": "没有匹配的程序。",
+    "errorState": "加载程序失败。",
+    "deleteAriaLabel": "删除程序",
+    "programCount": "暂无程序 | {count} 个程序 | {count} 个程序"
   }
 }

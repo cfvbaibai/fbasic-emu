@@ -452,5 +452,20 @@
   },
   "errors": {
     "executionTimeout": "執行在5分鐘後逾時。您的程式可能包含無限迴圈。"
+  },
+  "myPrograms": {
+    "title": "我的程式",
+    "closeAriaLabel": "關閉",
+    "searchPlaceholder": "搜尋程式...",
+    "sort": {
+      "recentlyModified": "最近修改",
+      "alphabetical": "按名稱排序"
+    },
+    "loading": "正在載入程式...",
+    "emptyState": "還沒有儲存的程式。儲存一個程式即可在此處查看。",
+    "noResults": "沒有符合的程式。",
+    "errorState": "載入程式失敗。",
+    "deleteAriaLabel": "刪除程式",
+    "programCount": "暫無程式 | {count} 個程式 | {count} 個程式"
   }
 }
