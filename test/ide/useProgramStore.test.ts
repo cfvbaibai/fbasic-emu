@@ -20,6 +20,27 @@ vi.mock('@/shared/utils/id', () => ({
   generateSessionId: vi.fn().mockReturnValue('sess-test1234'),
 }))
 
+// Mock useProgramLibrary module
+const mockSaveProgram = vi.fn().mockResolvedValue('library-id-123')
+const mockImportFromFile = vi.fn().mockResolvedValue('library-import-id')
+
+vi.mock('@/features/ide/composables/useProgramLibrary', () => ({
+  useProgramLibrary: () => ({
+    programs: { value: [] },
+    isLoading: { value: false },
+    error: { value: null },
+    isInitialized: { value: false },
+    listPrograms: vi.fn(),
+    getProgram: vi.fn(),
+    saveProgram: mockSaveProgram,
+    deleteProgram: vi.fn(),
+    renameProgram: vi.fn(),
+    importFromFile: mockImportFromFile,
+    exportToFile: vi.fn(),
+    $reset: vi.fn(),
+  }),
+}))
+
 // Clear localStorage before each test
 beforeEach(() => {
   localStorage.clear()
@@ -191,5 +212,98 @@ describe('useProgramStore', () => {
 
     expect(saveJsonFile).toHaveBeenCalled()
     expect(store.isDirty.value).toBe(false)
+  })
+
+  // --------------------------------------------------------------------------
+  // Library integration
+  // --------------------------------------------------------------------------
+
+  describe('library integration', () => {
+    it('should save to library on save()', async () => {
+      const { useProgramStore } = await import('@/features/ide/composables/useProgramStore')
+      const store = useProgramStore()
+
+      const testProgram: ProgramData = {
+        version: 1,
+        id: 'lib-save-test-id',
+        name: 'Library Save Test',
+        code: '',
+        bg: {
+          format: 'sparse1',
+          data: '',
+          width: 28,
+          height: 21,
+        },
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      }
+      store.loadProgram(testProgram)
+
+      await store.save()
+
+      expect(mockSaveProgram).toHaveBeenCalledTimes(1)
+      // Verify saveProgram was called with the program data
+      const savedData = mockSaveProgram.mock.calls[0]![0] as ProgramData
+      expect(savedData.id).toEqual('lib-save-test-id')
+      expect(savedData.name).toEqual('Library Save Test')
+    })
+
+    it('should import to library on open() with valid file', async () => {
+      const { isValidProgramFile, loadJsonFile } = await import('@/shared/utils/fileIO')
+      const { useProgramStore } = await import('@/features/ide/composables/useProgramStore')
+
+      // Mock valid file load
+      const mockFileData = {
+        format: 'family-basic-program',
+        version: 1,
+        program: {
+          version: 1,
+          id: 'file-id',
+          name: 'Opened Program',
+          code: '10 PRINT "OPENED"',
+          bg: { format: 'sparse1', data: '', width: 28, height: 21 },
+          createdAt: 1000,
+          updatedAt: 2000,
+        },
+      }
+      vi.mocked(loadJsonFile).mockResolvedValueOnce(mockFileData)
+      vi.mocked(isValidProgramFile).mockReturnValueOnce(true)
+
+      const store = useProgramStore()
+      const success = await store.open()
+
+      expect(success).toBe(true)
+      expect(mockImportFromFile).toHaveBeenCalledTimes(1)
+      expect(mockImportFromFile).toHaveBeenCalledWith(mockFileData)
+    })
+
+    it('should not import to library when open() is cancelled', async () => {
+      const { loadJsonFile } = await import('@/shared/utils/fileIO')
+      const { useProgramStore } = await import('@/features/ide/composables/useProgramStore')
+
+      // Mock cancelled file picker
+      vi.mocked(loadJsonFile).mockResolvedValueOnce(null)
+
+      const store = useProgramStore()
+      const success = await store.open()
+
+      expect(success).toBe(false)
+      expect(mockImportFromFile).not.toHaveBeenCalled()
+    })
+
+    it('should not import to library when file is invalid', async () => {
+      const { isValidProgramFile, loadJsonFile } = await import('@/shared/utils/fileIO')
+      const { useProgramStore } = await import('@/features/ide/composables/useProgramStore')
+
+      // Mock invalid file
+      vi.mocked(loadJsonFile).mockResolvedValueOnce({ some: 'data' })
+      vi.mocked(isValidProgramFile).mockReturnValueOnce(false)
+
+      const store = useProgramStore()
+      const success = await store.open()
+
+      expect(success).toBe(false)
+      expect(mockImportFromFile).not.toHaveBeenCalled()
+    })
   })
 })

@@ -4,6 +4,9 @@
  * Central state management for the Program Management System.
  * Uses singleton pattern with module-level state (same pattern as useBgEditorState).
  * Auto-persists to localStorage using VueUse's useLocalStorage.
+ *
+ * Integrates with useProgramLibrary so that import/export operations
+ * also update the program library in IndexedDB.
  */
 
 import { useLocalStorage } from '@vueuse/core'
@@ -16,6 +19,8 @@ import { compressBg, decompressBg } from '@/features/bg-editor/utils/bgCompressi
 import { logComposable } from '@/shared/logger'
 import { isValidProgramFile, loadJsonFile, saveJsonFile } from '@/shared/utils/fileIO'
 import { generateProgramId, generateSessionId } from '@/shared/utils/id'
+
+import { useProgramLibrary } from './useProgramLibrary'
 
 // ============================================================================
 // Module-level Singleton State
@@ -108,7 +113,7 @@ function setBg(bg: BgGridData): void {
 
 /**
  * Save the current program to file
- * Persists to localStorage and triggers file download
+ * Persists to localStorage, saves to library, and triggers file download
  */
 async function save(): Promise<void> {
   if (!currentProgram.value) return
@@ -122,6 +127,28 @@ async function save(): Promise<void> {
 
   // Download file
   await saveJsonFile(exportFile, `${currentProgram.value.name}.fbasic.json`)
+
+  // Save to program library (create or update)
+  try {
+    const library = useProgramLibrary()
+    const programId = await library.saveProgram({
+      id: currentProgram.value.id,
+      version: currentProgram.value.version,
+      name: currentProgram.value.name,
+      code: currentProgram.value.code,
+      bg: currentProgram.value.bg,
+    })
+    // Update the current program's id to match the library entry
+    if (currentProgram.value.id !== programId) {
+      currentProgram.value = {
+        ...currentProgram.value,
+        id: programId,
+      }
+    }
+  } catch (err) {
+    // Library save failure should not block the file export
+    logComposable.error('[useProgramStore] Failed to save to library:', err)
+  }
 
   // Mark as saved
   isDirty.value = false
@@ -148,6 +175,7 @@ async function saveAs(name: string): Promise<void> {
 
 /**
  * Open a program from file
+ * Loads into the editor and also adds to the program library
  */
 async function open(): Promise<boolean> {
   try {
@@ -165,6 +193,15 @@ async function open(): Promise<boolean> {
 
     const exportFile = data
     loadProgram(exportFile.program)
+
+    // Also import to the library (non-blocking - failures are logged but don't affect UX)
+    try {
+      const library = useProgramLibrary()
+      await library.importFromFile(data)
+    } catch (err) {
+      logComposable.error('[useProgramStore] Failed to import to library:', err)
+    }
+
     return true
   } catch (error) {
     logComposable.error('[useProgramStore] Failed to open program:', error)

@@ -10,6 +10,8 @@
  * - Saving (creating or updating) a program
  * - Deleting a program
  * - Renaming a program
+ * - Importing programs from .fbasic.json files
+ * - Exporting programs as .fbasic.json files
  *
  * Complementary to useProgramStore which manages the *current* active program
  * in the editor. This composable manages the *library* of saved programs.
@@ -18,8 +20,9 @@
 import { readonly, ref, shallowRef } from 'vue'
 
 import { ProgramDB, ProgramNotFoundError } from '@/core/persistence/ProgramDB'
-import type { ProgramData } from '@/core/types/program-types'
+import type { ProgramData, ProgramExportFile } from '@/core/types/program-types'
 import { logComposable } from '@/shared/logger'
+import { isValidProgramFile, saveJsonFile } from '@/shared/utils/fileIO'
 
 // ============================================================================
 // Singleton State
@@ -197,6 +200,73 @@ async function renameProgram(id: string, newName: string): Promise<void> {
 }
 
 /**
+ * Import a program from a .fbasic.json file into the library.
+ *
+ * Validates the file format and creates a new library entry with a fresh id.
+ * The original id from the file is NOT preserved (to avoid collisions).
+ *
+ * @param data - Parsed JSON data from a .fbasic.json file
+ * @returns The id of the newly created library entry, or null if invalid
+ */
+async function importFromFile(data: unknown): Promise<string | null> {
+  if (!isValidProgramFile(data)) {
+    logComposable.error('[useProgramLibrary] Invalid program file format for import')
+    return null
+  }
+
+  const exportFile = data
+  const { name, code, bg } = exportFile.program
+
+  clearError()
+  isLoading.value = true
+  try {
+    const id = await saveProgram({
+      version: 1,
+      name,
+      code,
+      bg,
+    })
+    return id
+  } catch (err) {
+    setError(err, 'Failed to import program from file')
+    return null
+  } finally {
+    isLoading.value = false
+  }
+}
+
+/**
+ * Export a library program as a .fbasic.json file download.
+ *
+ * @param id - The library program id to export
+ * @throws Error if the program is not found
+ */
+async function exportToFile(id: string): Promise<void> {
+  clearError()
+  isLoading.value = true
+  try {
+    const db = await getDb()
+    const program = await db.getById(id)
+    if (!program) {
+      throw new ProgramNotFoundError(id)
+    }
+
+    const exportFile: ProgramExportFile = {
+      format: 'family-basic-program',
+      version: 1,
+      program,
+    }
+
+    await saveJsonFile(exportFile, `${program.name}.fbasic.json`)
+  } catch (err) {
+    setError(err, `Failed to export program ${id}`)
+    throw err
+  } finally {
+    isLoading.value = false
+  }
+}
+
+/**
  * Close the database connection and reset state.
  * Primarily useful for testing and cleanup.
  */
@@ -242,6 +312,8 @@ export function useProgramLibrary() {
     saveProgram,
     deleteProgram,
     renameProgram,
+    importFromFile,
+    exportToFile,
 
     // Testing / cleanup
     $reset,
