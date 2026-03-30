@@ -419,8 +419,8 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
     handlePlayComplete(this.pendingPlayComplete, message)
   }
 
-  /** Reject all pending input requests. */
-  rejectAllInputRequests(reason: string = 'Execution stopped'): void {
+  /** Reject all pending input and play complete requests. */
+  rejectAllPendingRequests(reason: string = 'Execution stopped'): void {
     rejectAllInput(this.pendingInputRequests, reason)
     rejectAllPlayComplete(this.pendingPlayComplete, reason)
   }
