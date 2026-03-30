@@ -12,8 +12,8 @@ import {
   postPlaySound,
   serializeAudioEvents,
 } from '@/core/devices/DeviceOutputHelpers'
-import type { PlaySoundMessage } from '@/core/interfaces'
 import type { CompiledAudio } from '@/core/sound/types'
+import type { PlaySoundMessage } from '@/core/types/worker-messages'
 
 // Mock logger
 vi.mock('@/shared/logger', () => ({

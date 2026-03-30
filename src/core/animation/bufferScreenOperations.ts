@@ -7,7 +7,7 @@
  * These functions operate on typed array views created from the shared buffer.
  */
 
-import type { ScreenCell } from '@/core/interfaces'
+import type { ScreenCell } from '@/core/types/execution-types'
 import { logCore } from '@/shared/logger'
 import { getCharacterByCode, getCodeByChar } from '@/shared/utils/backgroundLookup'
 

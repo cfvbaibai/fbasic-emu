@@ -2,7 +2,7 @@
 import Konva from 'konva'
 import { computed, onDeactivated, onUnmounted, ref, shallowRef, useTemplateRef, watch } from 'vue'
 
-import type { ScreenCell } from '@/core/interfaces'
+import type { ScreenCell } from '@/core/types/execution-types'
 import { useAnimationWorker } from '@/features/ide/composables/useAnimationWorker'
 import { preInitializeBackgroundTiles, renderBackgroundToCanvas, renderBackgroundToCanvasDirty } from '@/features/ide/composables/useCanvasBackgroundRenderer'
 import { initializeKonvaLayers, type KonvaScreenLayers, renderAllScreenLayers } from '@/features/ide/composables/useKonvaScreenRenderer'

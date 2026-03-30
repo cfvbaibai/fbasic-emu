@@ -1,7 +1,8 @@
 /**
  * Screen-related message handlers for BASIC IDE web worker communication
  */
-import type { AnyServiceWorkerMessage, ScreenCell, ScreenUpdateMessage } from '@/core/interfaces'
+import type { ScreenCell } from '@/core/types/execution-types'
+import type { AnyServiceWorkerMessage, ScreenUpdateMessage } from '@/core/types/worker-messages'
 import { clearBackgroundTileCache } from '@/features/ide/composables/useCanvasBackgroundRenderer'
 import { clearSpriteImageCache } from '@/features/ide/composables/useKonvaSpriteRenderer'
 import { setRuntimePaletteCombination } from '@/shared/data/palette'

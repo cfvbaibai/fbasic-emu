@@ -8,7 +8,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { TestDeviceAdapter } from '@/core/devices/TestDeviceAdapter'
-import type { BasicDeviceAdapter } from '@/core/interfaces'
+import type { BasicDeviceAdapter } from '@/core/types/device-types'
 
 describe('LinputExecutor', () => {
   let interpreter: BasicInterpreter

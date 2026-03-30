@@ -6,10 +6,11 @@
 
 import { DEFAULTS, ERROR_TYPES } from '@/core/constants'
 import { ExpressionEvaluator } from '@/core/evaluation/ExpressionEvaluator'
-import type { BasicDeviceAdapter, ExecutionResult } from '@/core/interfaces'
 import { DataService } from '@/core/services/DataService'
 import { VariableService } from '@/core/services/VariableService'
 import type { ExecutionContext } from '@/core/state/ExecutionContext'
+import type { BasicDeviceAdapter } from '@/core/types/device-types'
+import type { ExecutionResult } from '@/core/types/execution-types'
 
 import { StatementRouter } from './StatementRouter'
 

@@ -8,7 +8,7 @@
  * Schema versioning: uses IDBDatabase versioning to handle future migrations.
  */
 
-import type { ProgramData } from '@/core/interfaces'
+import type { ProgramData } from '@/core/types/program-types'
 
 /** Database and store configuration */
 const DB_NAME = 'fbasic-ide'

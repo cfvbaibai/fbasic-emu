@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import type { BasicVariable } from '@/core/interfaces'
+import type { BasicVariable } from '@/core/types/state-types'
 import { GameIcon, GameTabPane, GameTag } from '@/shared/components/ui'
 
 /**

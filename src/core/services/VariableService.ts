@@ -8,9 +8,9 @@ import type { CstNode } from 'chevrotain'
 import Decimal from 'decimal.js'
 
 import type { ExpressionEvaluator } from '@/core/evaluation/ExpressionEvaluator'
-import type { BasicVariable } from '@/core/interfaces'
 import type { ExecutionContext } from '@/core/state/ExecutionContext'
 import type { BasicArrayValue, BasicScalarValue } from '@/core/types/BasicTypes'
+import type { BasicVariable } from '@/core/types/state-types'
 
 export class VariableService {
   constructor(

@@ -17,8 +17,8 @@
 
 import { readonly, ref, shallowRef } from 'vue'
 
-import type { ProgramData } from '@/core/interfaces'
 import { ProgramDB, ProgramNotFoundError } from '@/core/persistence/ProgramDB'
+import type { ProgramData } from '@/core/types/program-types'
 import { logComposable } from '@/shared/logger'
 
 // ============================================================================

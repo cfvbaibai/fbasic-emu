@@ -1,7 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { MessageHandler, type PendingMessage } from '@/core/devices/MessageHandler'
-import type { AnyServiceWorkerMessage, ExecutionResult } from '@/core/interfaces'
+import type { ExecutionResult } from '@/core/types/execution-types'
+import type { AnyServiceWorkerMessage } from '@/core/types/worker-messages'
 
 function createResultMessage(id: string, data: ResultMessageData): AnyServiceWorkerMessage {
   return {

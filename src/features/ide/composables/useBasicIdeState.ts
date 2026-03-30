@@ -5,10 +5,10 @@
 
 import { type Ref, ref, shallowRef } from 'vue'
 
-import type { BasicVariable } from '@/core/interfaces'
-import type { RequestInputMessage } from '@/core/interfaces'
-import type { ScreenCell } from '@/core/interfaces'
 import type { SpriteState } from '@/core/sprite/types'
+import type { ScreenCell } from '@/core/types/execution-types'
+import type { BasicVariable } from '@/core/types/state-types'
+import type { RequestInputMessage } from '@/core/types/worker-messages'
 
 import type { PendingSpriteAction } from './useBasicIdeMessageHandlers'
 import { initializeScreenBuffer } from './useBasicIdeScreenUtils'

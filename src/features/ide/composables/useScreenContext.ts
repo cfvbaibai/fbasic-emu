@@ -7,8 +7,8 @@ import { inject, type InjectionKey, provide, type Ref } from 'vue'
 
 import type { SharedDisplayViews } from '@/core/animation/sharedDisplayBuffer'
 import type { DecodedScreenState, SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
-import type { ScreenCell } from '@/core/interfaces'
 import type { MovementState, SpriteState } from '@/core/sprite/types'
+import type { ScreenCell } from '@/core/types/execution-types'
 
 /**
  * Screen context: refs and callbacks for the CRT screen and sprites.

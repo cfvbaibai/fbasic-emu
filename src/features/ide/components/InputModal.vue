@@ -2,7 +2,7 @@
 import { nextTick, ref, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import type { RequestInputMessage } from '@/core/interfaces'
+import type { RequestInputMessage } from '@/core/types/worker-messages'
 import { GameButton, GameInput } from '@/shared/components/ui'
 
 const props = defineProps<{

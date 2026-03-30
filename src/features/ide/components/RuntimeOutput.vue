@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import type { BasicVariable } from '@/core/interfaces'
+import type { BasicVariable } from '@/core/types/state-types'
 import { GameTabs } from '@/shared/components/ui'
 
 import DebugTab from './DebugTab.vue'

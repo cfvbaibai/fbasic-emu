@@ -3,8 +3,8 @@ import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import type { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
-import type { ScreenCell } from '@/core/interfaces'
 import type { SpriteState } from '@/core/sprite/types'
+import type { ScreenCell } from '@/core/types/execution-types'
 import { GameBlock, GameTabPane, GameTabs } from '@/shared/components/ui'
 import { COLORS } from '@/shared/data/palette'
 

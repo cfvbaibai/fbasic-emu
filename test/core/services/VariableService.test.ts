@@ -7,10 +7,10 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import type { InterpreterConfig } from '@/core/interfaces'
 import { VariableService } from '@/core/services/VariableService'
 import { ExecutionContext } from '@/core/state/ExecutionContext'
 import type { BasicScalarValue } from '@/core/types/BasicTypes'
+import type { InterpreterConfig } from '@/core/types/execution-types'
 
 function createTestContext(): ExecutionContext {
   const config: InterpreterConfig = {

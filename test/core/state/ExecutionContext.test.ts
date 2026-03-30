@@ -9,8 +9,8 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { ERROR_TYPES } from '@/core/constants'
 import type { ExpandedStatement } from '@/core/execution/statement-expander'
-import type { InterpreterConfig } from '@/core/interfaces'
 import { ExecutionContext } from '@/core/state/ExecutionContext'
+import type { InterpreterConfig } from '@/core/types/execution-types'
 
 function createConfig(overrides: Partial<InterpreterConfig> = {}): InterpreterConfig {
   return {

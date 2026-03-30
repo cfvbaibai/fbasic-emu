@@ -8,22 +8,7 @@
 import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { WebWorkerDeviceAdapter } from '@/core/devices/WebWorkerDeviceAdapter'
-import type {
-  AnyServiceWorkerMessage,
-  ClearDisplayMessage,
-  ErrorMessage,
-  ExecuteMessage,
-  InputValueMessage,
-  OutputMessage,
-  PlaySoundCompleteMessage,
-  ResultMessage,
-  SetBgDataMessage,
-  SetSharedAnimationBufferMessage,
-  SetSharedJoystickBufferMessage,
-  SetSharedKeyboardBufferMessage,
-  StopMessage,
-  StrigEventMessage,
-} from '@/core/interfaces'
+import type { AnyServiceWorkerMessage, ClearDisplayMessage, ErrorMessage, ExecuteMessage, InputValueMessage, OutputMessage, PlaySoundCompleteMessage, ResultMessage, SetBgDataMessage, SetSharedAnimationBufferMessage, SetSharedJoystickBufferMessage, SetSharedKeyboardBufferMessage, StopMessage, StrigEventMessage } from '@/core/types/worker-messages'
 import type { BgGridData } from '@/features/bg-editor/types'
 import { logWorker } from '@/shared/logger'
 

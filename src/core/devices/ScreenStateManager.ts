@@ -4,7 +4,8 @@
  * Manages screen buffer, cursor position, and screen-related operations.
  */
 
-import type { ScreenCell, ScreenUpdateMessage } from '@/core/interfaces'
+import type { ScreenCell } from '@/core/types/execution-types'
+import type { ScreenUpdateMessage } from '@/core/types/worker-messages'
 import { BACKGROUND_PALETTES, SPRITE_PALETTES } from '@/shared/data/palette'
 import { logDevice } from '@/shared/logger'
 

@@ -4,7 +4,7 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import type { ProgramData } from '@/core/interfaces'
+import type { ProgramData } from '@/core/types/program-types'
 import { createEmptyGrid } from '@/features/bg-editor/composables/useBgGrid'
 
 // Mock fileIO module

@@ -4,7 +4,7 @@
  * 10-50x faster than Konva for this use case
  */
 
-import type { ScreenCell } from '@/core/interfaces'
+import type { ScreenCell } from '@/core/types/execution-types'
 import { BACKGROUND_PALETTES, COLORS } from '@/shared/data/palette'
 import { getBackgroundItemByChar, getCharacterByCode } from '@/shared/utils/backgroundLookup'
 

@@ -9,7 +9,7 @@ import {
   handlePlaySoundCompleteMessage,
   rejectAllPlayCompleteRequests,
 } from '@/core/devices/DevicePlayCompleteHelpers'
-import type { PlaySoundCompleteMessage } from '@/core/interfaces'
+import type { PlaySoundCompleteMessage } from '@/core/types/worker-messages'
 
 /** Collected orphan promises that need cleanup to avoid unhandled rejection warnings */
 let orphanCleanups: Array<() => void> = []

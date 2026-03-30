@@ -8,8 +8,8 @@ import 'fake-indexeddb/auto'
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
-import type { ProgramData } from '@/core/interfaces'
 import { ProgramDB } from '@/core/persistence/ProgramDB'
+import type { ProgramData } from '@/core/types/program-types'
 
 // ============================================================================
 // Helpers

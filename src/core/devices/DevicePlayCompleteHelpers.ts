@@ -8,7 +8,7 @@
  * Pattern mirrors DeviceInputRequestHelpers (INPUT_VALUE).
  */
 
-import type { PlaySoundCompleteMessage } from '@/core/interfaces'
+import type { PlaySoundCompleteMessage } from '@/core/types/worker-messages'
 
 // ============================================================================
 // Play Complete State

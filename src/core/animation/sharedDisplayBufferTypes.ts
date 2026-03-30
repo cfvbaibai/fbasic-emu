@@ -5,7 +5,7 @@
  * Extracted from sharedDisplayBufferAccessor.ts for modularity.
  */
 
-import type { ScreenCell } from '@/core/interfaces'
+import type { ScreenCell } from '@/core/types/execution-types'
 
 import type { SyncCommandType } from './sharedDisplayBuffer'
 

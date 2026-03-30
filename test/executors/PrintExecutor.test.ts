@@ -8,9 +8,9 @@ import { beforeEach, describe, expect, it, type MockedFunction, vi } from 'vites
 
 import { ExpressionEvaluator } from '@/core/evaluation/ExpressionEvaluator'
 import { PrintExecutor } from '@/core/execution/executors/PrintExecutor'
-import type { BasicDeviceAdapter } from '@/core/interfaces'
 import { FBasicParser } from '@/core/parser/FBasicParser'
 import { ExecutionContext } from '@/core/state/ExecutionContext'
+import type { BasicDeviceAdapter } from '@/core/types/device-types'
 
 import { parsePrintStatement } from '../test-helpers'
 
