@@ -341,7 +341,49 @@
     "searchPlaceholder": "輸入命令...",
     "searchLabel": "搜尋命令",
     "commandsLabel": "命令",
-    "noMatches": "沒有符合的命令"
+    "noMatches": "沒有符合的命令",
+    "commands": {
+      "runStart": {
+        "title": "執行程式",
+        "description": "執行目前的 BASIC 程式。"
+      },
+      "runStop": {
+        "title": "停止程式",
+        "description": "停止目前正在執行的程式。"
+      },
+      "runRestart": {
+        "title": "重新執行程式",
+        "description": "停止並重新執行目前的程式。"
+      },
+      "runClearOutput": {
+        "title": "清除輸出",
+        "description": "清除輸出、錯誤、變數和螢幕狀態。"
+      },
+      "viewOpenSampleSelector": {
+        "title": "載入範例程式",
+        "description": "開啟範例選擇器。"
+      },
+      "viewOpenLogFilters": {
+        "title": "開啟輸出日誌篩選器",
+        "description": "開啟執行時輸出的日誌級別控制。"
+      },
+      "viewSwitchToCode": {
+        "title": "切換到程式碼編輯器",
+        "description": "顯示 Monaco 程式碼編輯面板。"
+      },
+      "viewSwitchToBgEditor": {
+        "title": "切換到 BG 編輯器",
+        "description": "顯示 BG 編輯面板。"
+      },
+      "inputToggleMode": {
+        "title": "切換輸入模式",
+        "description": "在搖桿和鍵盤輸入模式之間切換。"
+      },
+      "debugToggle": {
+        "title": "切換除錯模式",
+        "description": "啟用或停用執行時除錯輸出。"
+      }
+    }
   },
   "ideOutputPanel": {
     "closeLogLevels": "關閉日誌級別",

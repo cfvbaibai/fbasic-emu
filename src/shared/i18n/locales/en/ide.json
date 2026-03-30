@@ -341,7 +341,49 @@
     "searchPlaceholder": "Type a command...",
     "searchLabel": "Search commands",
     "commandsLabel": "Commands",
-    "noMatches": "No matching commands"
+    "noMatches": "No matching commands",
+    "commands": {
+      "runStart": {
+        "title": "Run Program",
+        "description": "Execute the current BASIC program."
+      },
+      "runStop": {
+        "title": "Stop Program",
+        "description": "Stop the currently running program."
+      },
+      "runRestart": {
+        "title": "Restart Program",
+        "description": "Stop and execute the current program again."
+      },
+      "runClearOutput": {
+        "title": "Clear Output",
+        "description": "Clear output, errors, variables, and screen state."
+      },
+      "viewOpenSampleSelector": {
+        "title": "Load Sample Program",
+        "description": "Open the sample selector."
+      },
+      "viewOpenLogFilters": {
+        "title": "Open Output Log Filters",
+        "description": "Open runtime output log-level controls."
+      },
+      "viewSwitchToCode": {
+        "title": "Switch To Code Editor",
+        "description": "Show the Monaco code editor panel."
+      },
+      "viewSwitchToBgEditor": {
+        "title": "Switch To BG Editor",
+        "description": "Show the BG editor panel."
+      },
+      "inputToggleMode": {
+        "title": "Toggle Input Mode",
+        "description": "Switch between joystick and keyboard input mode."
+      },
+      "debugToggle": {
+        "title": "Toggle Debug Mode",
+        "description": "Enable or disable runtime debug output."
+      }
+    }
   },
   "ideOutputPanel": {
     "closeLogLevels": "Close log levels",
