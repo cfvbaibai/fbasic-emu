@@ -7,9 +7,9 @@
 import { beforeEach, describe, expect, it, type MockedFunction, vi } from 'vitest'
 
 import { BasicInterpreter } from '@/core/BasicInterpreter'
-import type { BasicDeviceAdapter } from '@/core/interfaces'
 import { FBasicParser } from '@/core/parser/FBasicParser'
 import { getSampleCode } from '@/core/samples'
+import type { BasicDeviceAdapter } from '@/core/types/device-types'
 
 describe('Family Basic IDE Demo Program', () => {
   let interpreter: BasicInterpreter

@@ -4,7 +4,8 @@
  * Handles messages from web workers and routes them appropriately.
  */
 
-import type { AnyServiceWorkerMessage, ExecutionResult, OutputMessage } from '@/core/interfaces'
+import type { ExecutionResult } from '@/core/types/execution-types'
+import type { AnyServiceWorkerMessage, OutputMessage } from '@/core/types/worker-messages'
 import { logIdeMessages } from '@/shared/logger'
 
 export interface PendingMessage {

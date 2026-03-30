@@ -7,8 +7,8 @@ import { getSpriteSizeForMoveDefinition } from '@/core/animation/CharacterAnimat
 import { SHARED_DISPLAY_BUFFER_BYTES, SyncCommandType } from '@/core/animation/sharedDisplayBuffer'
 import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
 import { SCREEN_DIMENSIONS } from '@/core/constants'
-import type { BasicDeviceAdapter } from '@/core/interfaces'
 import type { MoveDefinition, MovementState } from '@/core/sprite/types'
+import type { BasicDeviceAdapter } from '@/core/types/device-types'
 import { logWorker } from '@/shared/logger'
 
 const SYNC_ACK_WAIT_TIMEOUT_MS = 16

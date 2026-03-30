@@ -2,10 +2,10 @@
  * Editor: parser, highlighting, parse/validate, sample loading, capabilities.
  */
 
-import type { HighlighterInfo, ParserInfo } from '@/core/interfaces'
 import { FBasicParser } from '@/core/parser/FBasicParser'
 import { getSampleCode, getSampleCodeKeys } from '@/core/samples'
 import { getSampleBgData, hasSampleBgData } from '@/core/samples/sampleBgData'
+import type { HighlighterInfo, ParserInfo } from '@/core/types/execution-types'
 import { createEmptyGrid } from '@/features/bg-editor/composables/useBgGrid'
 import { logComposable } from '@/shared/logger'
 

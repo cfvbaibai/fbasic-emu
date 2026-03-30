@@ -3,7 +3,8 @@
  */
 
 import { DEFAULTS, ERROR_MESSAGES } from '@/core/constants'
-import type { AnyServiceWorkerMessage, ExecutionResult } from '@/core/interfaces'
+import type { ExecutionResult } from '@/core/types/execution-types'
+import type { AnyServiceWorkerMessage } from '@/core/types/worker-messages'
 import { logComposable } from '@/shared/logger'
 
 export interface WebWorkerManager {

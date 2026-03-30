@@ -13,7 +13,7 @@ import {
 } from '@/core/animation/sharedDisplayBuffer'
 import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
 import { TestDeviceAdapter } from '@/core/devices/TestDeviceAdapter'
-import type { ScreenCell } from '@/core/interfaces'
+import type { ScreenCell } from '@/core/types/execution-types'
 
 /**
  * Configuration for shared buffer test adapter

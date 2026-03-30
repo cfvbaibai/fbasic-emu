@@ -3,8 +3,8 @@
  *
  * Use loglevel: log.getLogger('ide-messages').setLevel('debug') in console for verbose logs.
  */
-import type { AnyServiceWorkerMessage, ErrorMessage, ResultMessage } from '@/core/interfaces'
 import type { Note, Rest } from '@/core/sound/types'
+import type { AnyServiceWorkerMessage, ErrorMessage, ResultMessage } from '@/core/types/worker-messages'
 import { ExecutionError } from '@/features/ide/errors/ExecutionError'
 import { logComposable, logIdeMessages } from '@/shared/logger'
 

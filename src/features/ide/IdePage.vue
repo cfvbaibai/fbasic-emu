@@ -4,14 +4,10 @@ import { useI18n } from 'vue-i18n'
 
 import type { SharedDisplayViews } from '@/core/animation/sharedDisplayBuffer'
 import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
-import type {
-  BasicVariable,
-  HighlighterInfo,
-  ParserInfo,
-  RequestInputMessage,
-  ScreenCell,
-} from '@/core/interfaces'
 import type { SpriteState } from '@/core/sprite/types'
+import type { HighlighterInfo, ParserInfo, ScreenCell } from '@/core/types/execution-types'
+import type { BasicVariable } from '@/core/types/state-types'
+import type { RequestInputMessage } from '@/core/types/worker-messages'
 import { GameLayout } from '@/shared/components/ui'
 import { useContainerWidth } from '@/shared/composables/useContainerWidth'
 

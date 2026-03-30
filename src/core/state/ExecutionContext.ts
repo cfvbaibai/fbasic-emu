@@ -8,9 +8,11 @@ import type { AnimationManager } from '@/core/animation/AnimationManager'
 import { ERROR_TYPES } from '@/core/constants'
 import type { SoundService } from '@/core/execution/sound/SoundService'
 import type { ExpandedStatement } from '@/core/execution/statement-expander'
-import type { BasicDeviceAdapter, BasicError, BasicVariable, InterpreterConfig } from '@/core/interfaces'
 import type { SpriteStateManager } from '@/core/sprite/SpriteStateManager'
 import type { BasicArrayValue, BasicScalarValue } from '@/core/types/BasicTypes'
+import type { BasicDeviceAdapter } from '@/core/types/device-types'
+import type { InterpreterConfig } from '@/core/types/execution-types'
+import type { BasicError, BasicVariable } from '@/core/types/state-types'
 import { logInterpreter } from '@/shared/logger'
 
 export interface LoopState {

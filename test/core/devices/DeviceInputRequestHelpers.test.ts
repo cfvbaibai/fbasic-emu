@@ -10,7 +10,7 @@ import {
   handleInputValueMessage,
   rejectAllInputRequests,
 } from '@/core/devices/DeviceInputRequestHelpers'
-import type { InputValueMessage } from '@/core/interfaces'
+import type { InputValueMessage } from '@/core/types/worker-messages'
 
 // Capture postMessage calls
 let capturedMessages: unknown[] = []

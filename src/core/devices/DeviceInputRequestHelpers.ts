@@ -7,7 +7,7 @@
  * Handles: INPUT/LINPUT request/response lifecycle.
  */
 
-import type { InputValueMessage } from '@/core/interfaces'
+import type { InputValueMessage } from '@/core/types/worker-messages'
 
 // ============================================================================
 // Input Request State

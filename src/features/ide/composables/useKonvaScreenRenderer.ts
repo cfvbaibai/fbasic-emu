@@ -6,8 +6,8 @@
 import Konva from 'konva'
 
 import type { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
-import type { ScreenCell } from '@/core/interfaces'
 import type { SpriteState } from '@/core/sprite/types'
+import type { ScreenCell } from '@/core/types/execution-types'
 import { COLORS } from '@/shared/data/palette'
 import { logScreen } from '@/shared/logger'
 

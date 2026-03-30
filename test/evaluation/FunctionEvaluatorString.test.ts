@@ -14,9 +14,9 @@ import { describe, expect, it } from 'vitest'
 
 import { TestDeviceAdapter } from '@/core/devices/TestDeviceAdapter'
 import { FunctionEvaluator } from '@/core/evaluation/FunctionEvaluator'
-import type { BasicDeviceAdapter } from '@/core/interfaces'
 import { parseWithChevrotain } from '@/core/parser/FBasicChevrotainParser'
 import { ExecutionContext } from '@/core/state/ExecutionContext'
+import type { BasicDeviceAdapter } from '@/core/types/device-types'
 
 // ---------------------------------------------------------------------------
 // Helpers

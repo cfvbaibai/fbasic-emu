@@ -2,7 +2,8 @@
  * Web worker integration: manager, message context, init/restart/send, joystick and input events.
  */
 
-import type { AnyServiceWorkerMessage, ExecutionResult } from '@/core/interfaces'
+import type { ExecutionResult } from '@/core/types/execution-types'
+import type { AnyServiceWorkerMessage } from '@/core/types/worker-messages'
 import { logComposable } from '@/shared/logger'
 
 import { handleWorkerMessage, type MessageHandlerContext } from './useBasicIdeMessageHandlers'

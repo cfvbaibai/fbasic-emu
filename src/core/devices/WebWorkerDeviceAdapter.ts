@@ -6,16 +6,11 @@
  */
 
 import type { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
-import type {
-  AnyServiceWorkerMessage,
-  BasicDeviceAdapter,
-  ExecutionResult,
-  InputValueMessage,
-  InterpreterConfig,
-  PlaySoundCompleteMessage,
-} from '@/core/interfaces'
 import type { CompiledAudio } from '@/core/sound/types'
 import type { SpriteState } from '@/core/sprite/types'
+import type { BasicDeviceAdapter } from '@/core/types/device-types'
+import type { ExecutionResult, InterpreterConfig } from '@/core/types/execution-types'
+import type { AnyServiceWorkerMessage, InputValueMessage, PlaySoundCompleteMessage } from '@/core/types/worker-messages'
 import type { BgGridData } from '@/features/bg-editor/types'
 import { logWorker } from '@/shared/logger'
 

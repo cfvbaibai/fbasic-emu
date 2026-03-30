@@ -4,7 +4,7 @@
 
 import type { Ref } from 'vue'
 
-import type { ScreenCell } from '@/core/interfaces'
+import type { ScreenCell } from '@/core/types/execution-types'
 
 /**
  * Initialize screen buffer as full grid for proper reactivity

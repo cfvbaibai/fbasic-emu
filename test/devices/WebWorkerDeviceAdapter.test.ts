@@ -15,7 +15,7 @@ import {
   setStickState,
 } from '@/core/devices/sharedJoystickBuffer'
 import { WebWorkerDeviceAdapter } from '@/core/devices/WebWorkerDeviceAdapter'
-import type { AnyServiceWorkerMessage } from '@/core/interfaces'
+import type { AnyServiceWorkerMessage } from '@/core/types/worker-messages'
 
 // Mock self.postMessage to capture messages
 let capturedMessages: AnyServiceWorkerMessage[] = []

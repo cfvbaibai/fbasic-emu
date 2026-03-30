@@ -16,7 +16,7 @@
  * @see {@link docs/reference/shared-display-buffer.md} for full buffer layout
  */
 
-import type { ScreenCell } from '@/core/interfaces'
+import type { ScreenCell } from '@/core/types/execution-types'
 
 import {
   incrementSequence as incrementSequenceToOps,

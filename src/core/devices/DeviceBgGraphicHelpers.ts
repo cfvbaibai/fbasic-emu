@@ -7,7 +7,7 @@
  * Handles: VIEW command (copy BG GRAPHIC data to background screen).
  */
 
-import type { ScreenCell } from '@/core/interfaces'
+import type { ScreenCell } from '@/core/types/execution-types'
 import type { BgGridData } from '@/features/bg-editor/types'
 
 /**

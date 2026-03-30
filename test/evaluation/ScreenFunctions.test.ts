@@ -5,7 +5,7 @@
 import { beforeEach, describe, expect, it, type MockedFunction, vi } from 'vitest'
 
 import { BasicInterpreter } from '@/core/BasicInterpreter'
-import type { BasicDeviceAdapter } from '@/core/interfaces'
+import type { BasicDeviceAdapter } from '@/core/types/device-types'
 
 describe('CSRLIN, POS, SCR$, BEEP Functions', () => {
   let interpreter: BasicInterpreter

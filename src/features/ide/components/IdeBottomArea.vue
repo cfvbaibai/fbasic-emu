@@ -2,8 +2,8 @@
 import { useTemplateRef } from 'vue'
 
 import type { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
-import type { ScreenCell } from '@/core/interfaces'
 import type { SpriteState } from '@/core/sprite/types'
+import type { ScreenCell } from '@/core/types/execution-types'
 
 import JoystickControl from './JoystickControl.vue'
 import StateInspector from './StateInspector.vue'

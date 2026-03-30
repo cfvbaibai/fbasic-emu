@@ -11,7 +11,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { SHARED_DISPLAY_BUFFER_BYTES } from '@/core/animation/sharedDisplayBuffer'
 import { SyncCommandType } from '@/core/animation/sharedDisplayBuffer'
 import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
-import type { ScreenCell } from '@/core/interfaces'
+import type { ScreenCell } from '@/core/types/execution-types'
 
 function createBuffer(): SharedArrayBuffer {
   return new SharedArrayBuffer(SHARED_DISPLAY_BUFFER_BYTES)

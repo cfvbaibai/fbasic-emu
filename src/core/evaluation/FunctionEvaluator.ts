@@ -7,9 +7,9 @@
 
 import type { CstNode } from 'chevrotain'
 
-import type { BasicDeviceAdapter } from '@/core/interfaces'
 import { getCstNodes, getFirstCstNode, getFirstToken } from '@/core/parser/cst-helpers'
 import type { ExecutionContext } from '@/core/state/ExecutionContext'
+import type { BasicDeviceAdapter } from '@/core/types/device-types'
 
 import { toNumber } from './StringFunctions'
 import {

@@ -9,7 +9,7 @@
 import { useLocalStorage } from '@vueuse/core'
 import { readonly, ref } from 'vue'
 
-import type { ProgramData, ProgramExportFile } from '@/core/interfaces'
+import type { ProgramData, ProgramExportFile } from '@/core/types/program-types'
 import { createEmptyGrid } from '@/features/bg-editor/composables/useBgGrid'
 import type { BgGridData } from '@/features/bg-editor/types'
 import { compressBg, decompressBg } from '@/features/bg-editor/utils/bgCompression'

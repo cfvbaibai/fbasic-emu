@@ -4,7 +4,7 @@
  */
 
 import { ERROR_MESSAGES, EXECUTION_LIMITS } from '@/core/constants'
-import type { BasicVariable } from '@/core/interfaces'
+import type { BasicVariable } from '@/core/types/state-types'
 import { ExecutionError } from '@/features/ide/errors/ExecutionError'
 import i18n from '@/shared/i18n'
 import { logComposable } from '@/shared/logger'

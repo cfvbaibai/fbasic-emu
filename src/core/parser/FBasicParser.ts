@@ -7,7 +7,7 @@
 
 import type { CstNode } from 'chevrotain'
 
-import type { ParserInfo } from '@/core/interfaces'
+import type { ParserInfo } from '@/core/types/execution-types'
 
 import { parseWithChevrotain } from './FBasicChevrotainParser'
 import { normalizeLocationValue } from './normalizeLocationValue'

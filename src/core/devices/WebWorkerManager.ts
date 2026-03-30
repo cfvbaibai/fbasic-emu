@@ -6,14 +6,8 @@
  */
 
 import { DEFAULTS } from '@/core/constants'
-import type {
-  AnyServiceWorkerMessage,
-  ExecuteMessage,
-  ExecutionResult,
-  InterpreterConfig,
-  SetBgDataMessage,
-  StopMessage,
-} from '@/core/interfaces'
+import type { ExecutionResult, InterpreterConfig } from '@/core/types/execution-types'
+import type { AnyServiceWorkerMessage, ExecuteMessage, SetBgDataMessage, StopMessage } from '@/core/types/worker-messages'
 import { logWorker } from '@/shared/logger'
 
 export interface WebWorkerExecutionOptions {

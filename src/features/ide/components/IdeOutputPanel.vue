@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 
-import type { BasicVariable } from '@/core/interfaces'
+import type { BasicVariable } from '@/core/types/state-types'
 import { GameIconButton } from '@/shared/components/ui'
 
 import LogLevelPanel from './LogLevelPanel.vue'

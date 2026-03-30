@@ -5,7 +5,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { copyBgGraphicToScreenBuffer } from '@/core/devices/DeviceBgGraphicHelpers'
-import type { ScreenCell } from '@/core/interfaces'
+import type { ScreenCell } from '@/core/types/execution-types'
 import type { BgCell, ColorPattern } from '@/features/bg-editor/types'
 
 /**

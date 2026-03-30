@@ -10,7 +10,7 @@ import 'fake-indexeddb/auto'
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
-import type { ProgramData } from '@/core/interfaces'
+import type { ProgramData } from '@/core/types/program-types'
 import { useProgramLibrary } from '@/features/ide/composables/useProgramLibrary'
 
 // ============================================================================

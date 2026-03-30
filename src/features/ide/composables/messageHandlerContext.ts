@@ -5,12 +5,9 @@ import type { Ref } from 'vue'
 
 import type { SharedDisplayViews } from '@/core/animation/sharedDisplayBuffer'
 import type { DecodedScreenState } from '@/core/animation/sharedDisplayBufferAccessor'
-import type {
-  AnyServiceWorkerMessage,
-  RequestInputMessage,
-  ScreenCell,
-} from '@/core/interfaces'
 import type { SpriteState } from '@/core/sprite/types'
+import type { ScreenCell } from '@/core/types/execution-types'
+import type { AnyServiceWorkerMessage, RequestInputMessage } from '@/core/types/worker-messages'
 
 import type { WebWorkerManager } from './useBasicIdeWebWorkerUtils'
 

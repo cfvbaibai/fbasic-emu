@@ -6,7 +6,7 @@
  * - RLE format: for grids with >=30% fill (run-length encoding)
  */
 
-import type { CompactBg } from '@/core/interfaces'
+import type { CompactBg } from '@/core/types/program-types'
 import { logCore } from '@/shared/logger'
 
 import { BG_GRID, DEFAULT_BG_CHAR_CODE } from '../constants'

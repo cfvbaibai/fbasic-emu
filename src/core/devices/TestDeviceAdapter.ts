@@ -5,8 +5,8 @@
  * Provides controlled behavior for testing without external dependencies.
  */
 
-import type { BasicDeviceAdapter } from '@/core/interfaces'
 import type { CompiledAudio } from '@/core/sound/types'
+import type { BasicDeviceAdapter } from '@/core/types/device-types'
 import { logDevice } from '@/shared/logger'
 
 import {

@@ -4,7 +4,7 @@
  * Provides file save/load functionality for program management
  */
 
-import type { ProgramExportFile } from '@/core/interfaces'
+import type { ProgramExportFile } from '@/core/types/program-types'
 
 /**
  * Save data as a JSON file download

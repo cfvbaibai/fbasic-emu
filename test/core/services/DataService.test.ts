@@ -9,9 +9,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ERROR_TYPES } from '@/core/constants'
-import type { InterpreterConfig } from '@/core/interfaces'
 import { DataService } from '@/core/services/DataService'
 import { ExecutionContext } from '@/core/state/ExecutionContext'
+import type { InterpreterConfig } from '@/core/types/execution-types'
 
 function createTestContext(config?: Partial<InterpreterConfig>): ExecutionContext {
   return new ExecutionContext({
