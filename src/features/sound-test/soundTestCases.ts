@@ -8,17 +8,21 @@
 import type { SoundTestCase, TestResultRecord } from './soundTestTypes'
 import {
   BASIC_NOTES_TESTS,
+  OCTAVES_TESTS,
+  SHARP_NOTES_TESTS,
+} from './testCasesNotes'
+import {
   COMBINED_TESTS,
   DUTY_CYCLE_TESTS,
   ENVELOPE_TESTS,
-  LENGTH_CODES_TESTS,
   MULTI_CHANNEL_TESTS,
-  OCTAVES_TESTS,
-  RESTS_TESTS,
-  SHARP_NOTES_TESTS,
-  TEMPO_TESTS,
   VOLUME_TESTS,
-} from './testCasesData'
+} from './testCasesTimbre'
+import {
+  LENGTH_CODES_TESTS,
+  RESTS_TESTS,
+  TEMPO_TESTS,
+} from './testCasesTiming'
 
 export type { SoundTestCase,TestResult, TestResultRecord } from './soundTestTypes'
 
