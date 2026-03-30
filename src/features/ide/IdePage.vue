@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, shallowRef, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import type { SharedDisplayViews } from '@/core/animation/sharedDisplayBuffer'
 import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
@@ -36,6 +37,8 @@ import { provideScreenContext } from './composables/useScreenContext'
 defineOptions({
   name: 'IdePage',
 })
+
+const { t } = useI18n()
 
 const isE2ELite =
   typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('e2e') === 'lite'
@@ -203,8 +206,8 @@ async function restartCode() {
 const commandPaletteCommands = computed<CommandPaletteCommand[]>(() => [
   {
     id: 'run.start',
-    title: 'Run Program',
-    description: 'Execute the current BASIC program.',
+    title: t('ide.commandPalette.commands.runStart.title'),
+    description: t('ide.commandPalette.commands.runStart.description'),
     shortcut: 'Ctrl+Enter / Cmd+Enter',
     keywords: ['execute', 'start', 'run'],
     enabled: !isRunning.value,
@@ -214,8 +217,8 @@ const commandPaletteCommands = computed<CommandPaletteCommand[]>(() => [
   },
   {
     id: 'run.stop',
-    title: 'Stop Program',
-    description: 'Stop the currently running program.',
+    title: t('ide.commandPalette.commands.runStop.title'),
+    description: t('ide.commandPalette.commands.runStop.description'),
     shortcut: 'Ctrl+Shift+Enter / Cmd+Shift+Enter',
     keywords: ['halt', 'stop'],
     enabled: isRunning.value,
@@ -223,8 +226,8 @@ const commandPaletteCommands = computed<CommandPaletteCommand[]>(() => [
   },
   {
     id: 'run.restart',
-    title: 'Restart Program',
-    description: 'Stop and execute the current program again.',
+    title: t('ide.commandPalette.commands.runRestart.title'),
+    description: t('ide.commandPalette.commands.runRestart.description'),
     shortcut: 'Ctrl+Shift+R / Cmd+Shift+R',
     keywords: ['restart', 'rerun'],
     execute: () => {
@@ -233,15 +236,15 @@ const commandPaletteCommands = computed<CommandPaletteCommand[]>(() => [
   },
   {
     id: 'run.clearOutput',
-    title: 'Clear Output',
-    description: 'Clear output, errors, variables, and screen state.',
+    title: t('ide.commandPalette.commands.runClearOutput.title'),
+    description: t('ide.commandPalette.commands.runClearOutput.description'),
     keywords: ['clear', 'output', 'screen'],
     execute: clearOutput,
   },
   {
     id: 'view.openSampleSelector',
-    title: 'Load Sample Program',
-    description: 'Open the sample selector.',
+    title: t('ide.commandPalette.commands.viewOpenSampleSelector.title'),
+    description: t('ide.commandPalette.commands.viewOpenSampleSelector.description'),
     keywords: ['sample', 'demo'],
     execute: () => {
       sampleSelectorOpen.value = true
@@ -249,8 +252,8 @@ const commandPaletteCommands = computed<CommandPaletteCommand[]>(() => [
   },
   {
     id: 'view.openLogFilters',
-    title: 'Open Output Log Filters',
-    description: 'Open runtime output log-level controls.',
+    title: t('ide.commandPalette.commands.viewOpenLogFilters.title'),
+    description: t('ide.commandPalette.commands.viewOpenLogFilters.description'),
     keywords: ['output', 'logs', 'filters'],
     execute: () => {
       logLevelPanelOpen.value = true
@@ -258,8 +261,8 @@ const commandPaletteCommands = computed<CommandPaletteCommand[]>(() => [
   },
   {
     id: 'view.switchToCode',
-    title: 'Switch To Code Editor',
-    description: 'Show the Monaco code editor panel.',
+    title: t('ide.commandPalette.commands.viewSwitchToCode.title'),
+    description: t('ide.commandPalette.commands.viewSwitchToCode.description'),
     keywords: ['code', 'editor'],
     execute: () => {
       editorView.value = 'code'
@@ -267,8 +270,8 @@ const commandPaletteCommands = computed<CommandPaletteCommand[]>(() => [
   },
   {
     id: 'view.switchToBgEditor',
-    title: 'Switch To BG Editor',
-    description: 'Show the BG editor panel.',
+    title: t('ide.commandPalette.commands.viewSwitchToBgEditor.title'),
+    description: t('ide.commandPalette.commands.viewSwitchToBgEditor.description'),
     keywords: ['bg', 'background', 'editor'],
     execute: () => {
       editorView.value = 'bg'
@@ -276,16 +279,16 @@ const commandPaletteCommands = computed<CommandPaletteCommand[]>(() => [
   },
   {
     id: 'input.toggleMode',
-    title: 'Toggle Input Mode',
-    description: 'Switch between joystick and keyboard input mode.',
+    title: t('ide.commandPalette.commands.inputToggleMode.title'),
+    description: t('ide.commandPalette.commands.inputToggleMode.description'),
     shortcut: 'F9',
     keywords: ['input', 'keyboard', 'joystick'],
     execute: toggleInputMode,
   },
   {
     id: 'debug.toggle',
-    title: 'Toggle Debug Mode',
-    description: 'Enable or disable runtime debug output.',
+    title: t('ide.commandPalette.commands.debugToggle.title'),
+    description: t('ide.commandPalette.commands.debugToggle.description'),
     keywords: ['debug'],
     execute: toggleDebugMode,
   },

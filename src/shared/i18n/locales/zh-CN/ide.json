@@ -341,7 +341,49 @@
     "searchPlaceholder": "输入命令...",
     "searchLabel": "搜索命令",
     "commandsLabel": "命令",
-    "noMatches": "没有匹配的命令"
+    "noMatches": "没有匹配的命令",
+    "commands": {
+      "runStart": {
+        "title": "运行程序",
+        "description": "执行当前的 BASIC 程序。"
+      },
+      "runStop": {
+        "title": "停止程序",
+        "description": "停止当前正在运行的程序。"
+      },
+      "runRestart": {
+        "title": "重新运行程序",
+        "description": "停止并重新执行当前程序。"
+      },
+      "runClearOutput": {
+        "title": "清除输出",
+        "description": "清除输出、错误、变量和屏幕状态。"
+      },
+      "viewOpenSampleSelector": {
+        "title": "加载示例程序",
+        "description": "打开示例选择器。"
+      },
+      "viewOpenLogFilters": {
+        "title": "打开输出日志筛选器",
+        "description": "打开运行时输出的日志级别控制。"
+      },
+      "viewSwitchToCode": {
+        "title": "切换到代码编辑器",
+        "description": "显示 Monaco 代码编辑面板。"
+      },
+      "viewSwitchToBgEditor": {
+        "title": "切换到 BG 编辑器",
+        "description": "显示 BG 编辑面板。"
+      },
+      "inputToggleMode": {
+        "title": "切换输入模式",
+        "description": "在手柄和键盘输入模式之间切换。"
+      },
+      "debugToggle": {
+        "title": "切换调试模式",
+        "description": "启用或禁用运行时调试输出。"
+      }
+    }
   },
   "ideOutputPanel": {
     "closeLogLevels": "关闭日志级别",

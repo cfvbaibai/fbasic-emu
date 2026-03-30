@@ -341,7 +341,49 @@
     "searchPlaceholder": "コマンドを入力...",
     "searchLabel": "コマンドを検索",
     "commandsLabel": "コマンド",
-    "noMatches": "一致するコマンドがありません"
+    "noMatches": "一致するコマンドがありません",
+    "commands": {
+      "runStart": {
+        "title": "プログラムを実行",
+        "description": "現在のBASICプログラムを実行します。"
+      },
+      "runStop": {
+        "title": "プログラムを停止",
+        "description": "現在実行中のプログラムを停止します。"
+      },
+      "runRestart": {
+        "title": "プログラムを再実行",
+        "description": "現在のプログラムを停止して再度実行します。"
+      },
+      "runClearOutput": {
+        "title": "出力をクリア",
+        "description": "出力、エラー、変数、画面状態をクリアします。"
+      },
+      "viewOpenSampleSelector": {
+        "title": "サンプルプログラムを読み込む",
+        "description": "サンプルセレクターを開きます。"
+      },
+      "viewOpenLogFilters": {
+        "title": "出力ログフィルターを開く",
+        "description": "ランタイム出力のログレベル制御を開きます。"
+      },
+      "viewSwitchToCode": {
+        "title": "コードエディターに切り替え",
+        "description": "Monacoコードエディターパネルを表示します。"
+      },
+      "viewSwitchToBgEditor": {
+        "title": "BGエディターに切り替え",
+        "description": "BGエディターパネルを表示します。"
+      },
+      "inputToggleMode": {
+        "title": "入力モードを切り替え",
+        "description": "ジョイスティックとキーボードの入力モードを切り替えます。"
+      },
+      "debugToggle": {
+        "title": "デバッグモードを切り替え",
+        "description": "ランタイムデバッグ出力の有効/無効を切り替えます。"
+      }
+    }
   },
   "ideOutputPanel": {
     "closeLogLevels": "ログレベルを閉じる",
