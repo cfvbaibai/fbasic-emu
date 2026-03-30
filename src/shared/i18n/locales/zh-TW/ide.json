@@ -465,7 +465,11 @@
     "emptyState": "還沒有儲存的程式。儲存一個程式即可在此處查看。",
     "noResults": "沒有符合的程式。",
     "errorState": "載入程式失敗。",
+    "renameAriaLabel": "重新命名程式",
     "deleteAriaLabel": "刪除程式",
+    "deleteConfirmTitle": "刪除程式",
+    "deleteConfirmMessage": "確定要刪除「{name}」嗎？此操作無法復原。",
+    "deleteConfirmLabel": "刪除",
     "programCount": "暫無程式 | {count} 個程式 | {count} 個程式"
   }
 }

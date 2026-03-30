@@ -465,7 +465,11 @@
     "emptyState": "No saved programs yet. Save a program to see it here.",
     "noResults": "No programs match your search.",
     "errorState": "Failed to load programs.",
+    "renameAriaLabel": "Rename program",
     "deleteAriaLabel": "Delete program",
+    "deleteConfirmTitle": "Delete Program",
+    "deleteConfirmMessage": "Are you sure you want to delete \"{name}\"? This action cannot be undone.",
+    "deleteConfirmLabel": "Delete",
     "programCount": "No programs | {count} program | {count} programs"
   }
 }
