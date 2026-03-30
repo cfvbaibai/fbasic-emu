@@ -35,13 +35,18 @@ function createTestProgram(overrides: Partial<ProgramData> = {}): Omit<ProgramDa
   }
 }
 
-/** Delete the test database between tests to ensure isolation */
+/** Delete the test database to ensure isolation.
+ *  Waits for onsuccess/onerror only (NOT onblocked) so the promise
+ *  resolves only after the database is truly deleted. */
 function deleteDatabase(): Promise<void> {
   return new Promise((resolve) => {
     const request = indexedDB.deleteDatabase('fbasic-ide')
     request.onsuccess = () => resolve()
     request.onerror = () => resolve() // Best effort
-    request.onblocked = () => resolve()
+    // Intentionally do NOT resolve on `onblocked` — that event fires when
+    // other connections are still open, but the deletion will still complete
+    // once they close. Resolving early would let the test proceed while the
+    // database still contains stale data.
   })
 }
 
@@ -51,13 +56,15 @@ function deleteDatabase(): Promise<void> {
 
 describe('useProgramLibrary', () => {
   beforeEach(async () => {
+    // Reset singleton state BEFORE deleting database to ensure all
+    // connections are closed, otherwise deleteDatabase() may get blocked
+    useProgramLibrary().$reset()
     await deleteDatabase()
   })
 
   afterEach(async () => {
     // Reset singleton state between tests
-    const library = useProgramLibrary()
-    library.$reset()
+    useProgramLibrary().$reset()
     await deleteDatabase()
   })
 

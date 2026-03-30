@@ -39,7 +39,6 @@ function deleteDatabase(): Promise<void> {
     const request = indexedDB.deleteDatabase('fbasic-ide')
     request.onsuccess = () => resolve()
     request.onerror = () => resolve() // Best effort
-    request.onblocked = () => resolve()
   })
 }
 
@@ -49,6 +48,8 @@ function deleteDatabase(): Promise<void> {
 
 describe('useProgramLibrary', () => {
   beforeEach(async () => {
+    // Reset singleton before deleting DB so composable's connection is closed
+    useProgramLibrary().$reset()
     await deleteDatabase()
   })
 
