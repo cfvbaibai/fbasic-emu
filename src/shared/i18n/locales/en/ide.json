@@ -452,5 +452,20 @@
   },
   "errors": {
     "executionTimeout": "Execution timed out after 5 minutes. Your program may contain an infinite loop."
+  },
+  "myPrograms": {
+    "title": "My Programs",
+    "closeAriaLabel": "Close",
+    "searchPlaceholder": "Search programs...",
+    "sort": {
+      "recentlyModified": "Recently Modified",
+      "alphabetical": "Alphabetical"
+    },
+    "loading": "Loading programs...",
+    "emptyState": "No saved programs yet. Save a program to see it here.",
+    "noResults": "No programs match your search.",
+    "errorState": "Failed to load programs.",
+    "deleteAriaLabel": "Delete program",
+    "programCount": "No programs | {count} program | {count} programs"
   }
 }

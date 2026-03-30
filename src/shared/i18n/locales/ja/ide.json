@@ -452,5 +452,20 @@
   },
   "errors": {
     "executionTimeout": "実行が5分でタイムアウトしました。プログラムに無限ループが含まれている可能性があります。"
+  },
+  "myPrograms": {
+    "title": "マイプログラム",
+    "closeAriaLabel": "閉じる",
+    "searchPlaceholder": "プログラムを検索...",
+    "sort": {
+      "recentlyModified": "更新順",
+      "alphabetical": "名前順"
+    },
+    "loading": "読み込み中...",
+    "emptyState": "保存されたプログラムはありません。プログラムを保存するとここに表示されます。",
+    "noResults": "検索条件に一致するプログラムはありません。",
+    "errorState": "プログラムの読み込みに失敗しました。",
+    "deleteAriaLabel": "プログラムを削除",
+    "programCount": "プログラムなし | {count}件のプログラム | {count}件のプログラム"
   }
 }
