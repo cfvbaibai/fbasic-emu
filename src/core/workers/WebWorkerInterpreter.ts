@@ -224,7 +224,7 @@ class WebWorkerInterpreter {
     })
     this.isRunning = false
     if (this.webWorkerDeviceAdapter) {
-      this.webWorkerDeviceAdapter.rejectAllInputRequests('Execution stopped')
+      this.webWorkerDeviceAdapter.rejectAllPendingRequests('Execution stopped')
     }
     if (this.interpreter) {
       logWorker.debug('Calling interpreter.stop()')
