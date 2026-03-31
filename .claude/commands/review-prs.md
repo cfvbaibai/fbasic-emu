@@ -2,18 +2,31 @@
 
 Review all open GitHub PRs for the F-BASIC IDE repository following the PR review guide.
 
-## Memory Management
+## References
 
-### Step 0: Check Review History
+- Prerequisites & config: `.claude/commands/_shared/automation-conventions.md`
+- Paths: `.claude/commands/_shared/path-conventions.md`
+- GitHub ops: `.claude/commands/_shared/github-operations.md`
+- Self-improvement: `.claude/commands/_shared/self-improvement-protocol.md`
+- Review guide: `docs/github-pr-review-guide.md`
 
-Before reviewing, check if PRs have already been reviewed and whether they've changed:
+## Phase 1 — Prerequisites
+
+Follow `.claude/commands/_shared/automation-conventions.md` prerequisites.
+
+Read config from `~/.claude/automations/fbasic-ide/config.md` to get `total_runs` for run log numbering.
+
+## Phase 2 — List & Filter PRs
+
+### Step 2a: List Open PRs
 
 ```bash
-# Get PR info including head commit SHA
-gh pr list --state open --json number,title,headRefOid,files
+gh pr list --state open --json number,title,author,files,additions,deletions,labels,headRefOid
 ```
 
-Then check memory file at `~/.claude/projects/C--Users-Tony-code-GitHub-fbasic-ide/memory/MEMORY.md` for previous reviews.
+### Step 2b: Check Review History
+
+Check memory at `~/.claude/projects/C--Users-Tony-code-GitHub-fbasic-ide/memory/MEMORY.md` and `~/.claude/projects/C--Users-Tony-code-GitHub-fbasic-ide/memory/pr-reviews.md` for previous reviews.
 
 **Skip PR if:**
 - Previously reviewed AND
@@ -25,29 +38,7 @@ Then check memory file at `~/.claude/projects/C--Users-Tony-code-GitHub-fbasic-i
 - Previous verdict was REQUEST CHANGES or NEEDS DISCUSSION
 - No previous review found
 
-### Save Review Results to Memory
-
-After each review, update `~/.claude/projects/C--Users-Tony-code-GitHub-fbasic-ide/memory/MEMORY.md` and `~/.claude/projects/C--Users-Tony-code-GitHub-fbasic-ide/memory/pr-reviews.md` with the review result.
-
-## Workflow
-
-### Step 1: List Open PRs
-
-```bash
-gh pr list --state open --json number,title,author,files,additions,deletions,labels,headRefOid
-```
-
-### Step 2: Filter Already-Reviewed PRs
-
-For each PR, check memory (MEMORY.md and pr-reviews.md) for previous reviews.
-
-Compare commit SHAs:
-- **Same SHA + APPROVE** → Skip (no changes)
-- **Same SHA + REQUEST CHANGES/NEEDS DISCUSSION** → Check if author responded
-- **Different SHA** → Re-review needed
-- **Not found** → New PR, needs review
-
-### Step 3: Identify Specialist for Each PR
+### Step 2c: Identify Specialist
 
 Map each PR to the appropriate specialist based on files changed (for review comment attribution):
 
@@ -62,7 +53,9 @@ Map each PR to the appropriate specialist based on files changed (for review com
 | `src/features/sprite-viewer/`, `src/features/bg-editor/`, `src/features/sound-test/` | Tools |
 | Build scripts, package.json, tooling | Tools |
 
-### Step 4: Review Each PR Directly
+If no PRs need review, write run log noting "no PRs to review" and stop.
+
+## Phase 3 — Review PRs
 
 For each PR that needs review, fetch the diff and review it directly (no team agents):
 
@@ -74,14 +67,14 @@ gh pr diff <number>
 For complex PRs or multiple PRs, you MAY use the Agent tool with `subagent_type="general-purpose"` (NOT team_name) to parallelize reviews. Each agent should return its verdict and feedback as text — do NOT use TeamCreate, SendMessage, or team-based features.
 
 **Review checklist:**
-1. Correctness - Does the code do what it claims?
-2. Code quality - Follows conventions (TypeScript strict, import type, no any, files under 500 lines, scoped styles)?
-3. Test coverage - Adequate tests? Use `.toEqual()` not `.toContain()`?
-4. Edge cases - Error handling, boundary conditions?
-5. Potential issues - Breaking changes, side effects?
-6. **TEST INTEGRITY (CRITICAL)** - Were any tests removed, weakened, loosened, or skipped to avoid fixing a real bug? Look for: deleted test cases, loosened assertions (e.g., toEqual→toContain), changed expected values to match wrong output, added skip/todo/pending. If detected, verdict MUST be REQUEST CHANGES.
+1. **Correctness** — Does the code do what it claims?
+2. **Code quality** — Follows conventions (TypeScript strict, import type, no any, files under 500 lines, scoped styles)?
+3. **Test coverage** — Adequate tests? Use `.toEqual()` not `.toContain()`?
+4. **Edge cases** — Error handling, boundary conditions?
+5. **Potential issues** — Breaking changes, side effects?
+6. **TEST INTEGRITY (CRITICAL)** — Were any tests removed, weakened, loosened, or skipped to avoid fixing a real bug? Look for: deleted test cases, loosened assertions (e.g., toEqual→toContain), changed expected values to match wrong output, added skip/todo/pending. If detected, verdict MUST be REQUEST CHANGES.
 
-### Step 5: Post Reviews to GitHub
+## Phase 4 — Post Reviews
 
 **APPROVE:**
 ```bash
@@ -127,9 +120,11 @@ gh pr review <number> --comment --body "## Review: NEEDS DISCUSSION
 🤖 Reviewed by Claude Code ([Specialist] specialist)"
 ```
 
-### Step 6: Create Follow-up Issues for Non-blocking Suggestions
+## Phase 5 — Create Follow-up Issues
 
 **IMPORTANT: Create a GitHub issue for EVERY non-blocking suggestion found during review, regardless of size or perceived importance.** The triage process decides what to work on, not the reviewer. Every suggestion becomes a tracked issue.
+
+**The 20 open issue cap does NOT apply here** — review findings are real observations from actual code and must not be silently dropped. Do not check the issue cap before creating follow-up issues from reviews.
 
 **Always create issues for:**
 - Non-blocking improvement suggestions ("Consider...", "Optional...")
@@ -149,12 +144,13 @@ gh issue create --title "<type>: <concise description>" \
 <Brief description of the issue and what to fix>
 
 ## Source
-From PR #<number> review: https://github.com/cfvbaibai/fbasic-ide/pull/<number>"
+From PR #<number> review: https://github.com/cfvbaibai/fbasic-ide/pull/<number>" \
+  --label "<type>,p3,claude-automation"
 ```
 
 Issue title prefixes: `fix:` for bugs/correctness, `style:` for formatting, `refactor:` for patterns, `docs:` for documentation/samples.
 
-### Step 7: Handle Wrong Requirements
+## Phase 6 — Handle Wrong Requirements
 
 If a PR is based on an incorrect requirement:
 
@@ -165,79 +161,62 @@ gh pr close <number> --comment "## Closing: <reason>
 gh issue close <issue-number> --comment "[Explanation]"
 ```
 
-### Step 8: Save to Memory
+## Phase 7 — Save Review Results
 
-After posting each review, update memory files with the review result.
+After posting each review, update memory files:
 
-## Review Checklist
+- `~/.claude/projects/C--Users-Tony-code-GitHub-fbasic-ide/memory/MEMORY.md` — add review entry to PR review history section
+- `~/.claude/projects/C--Users-Tony-code-GitHub-fbasic-ide/memory/pr-reviews.md` — detailed per-PR review notes
 
-For each PR, verify:
+## Phase 8 — Report
 
-### Code Quality
-- [ ] Follows TypeScript strict mode (no `any`)
-- [ ] Uses `import type` for type-only imports
-- [ ] Files under 500 lines
-- [ ] Vue components use `<script setup lang="ts">`
-- [ ] Scoped styles only (exception: `@/shared/styles/*`)
+Write outputs following `.claude/commands/_shared/path-conventions.md`:
 
-### Test Integrity (CRITICAL)
+**Run log** — `~/.claude/automations/fbasic-ide/memory/runs/YYYY-MM/YYYY-MM-DD-NNN.md`
 
-**RED FLAG: Implementers may escape difficult challenges by loosening or removing tests instead of fixing the actual bug. This is NEVER acceptable.** Always investigate when tests are modified alongside source code.
+**Report** — `~/.claude/automations/fbasic-ide/reports/YYYY-MM/YYYY-MM-DD.md`:
+```markdown
+# PR Review Report — YYYY-MM-DD
 
-- [ ] No tests were removed or weakened to make broken code pass
-- [ ] No assertions were loosened (e.g., `.toEqual()` → `.toContain()`, exact match → partial match, strict equality → loose equality)
-- [ ] No test cases were deleted to hide regressions
-- [ ] No `skip`, `xit`, `xdescribe`, `todo`, or `pending` added to suppress failing tests
-- [ ] No expected values in assertions were changed to match wrong output (instead of fixing the code)
-- [ ] If source code changes, tests must validate the NEW correct behavior — not just avoid failing
-- [ ] When in doubt, check the git blame/history of the test file to see if assertions were recently weakened
+## Reviews Completed
+- #N: <title>
+  Verdict: <APPROVE|REQUEST CHANGES|NEEDS DISCUSSION>
+  Specialist: <team>
+  Link: <PR URL>
+  Notes: <brief reasoning>
 
-**If any of the above are detected, verdict MUST be REQUEST CHANGES regardless of other factors.**
+## Skipped (already reviewed, no changes)
+- #N: <title> — last reviewed <date>, commit <short SHA>
 
-### Testing
-- [ ] Tests use `.toEqual()` for exact matching
-- [ ] Edge cases covered
-- [ ] Error conditions tested
+## Issues Created
+- #N: <title> (Source: PR #M)
 
-### F-BASIC Specific
-- [ ] Parser changes match F-BASIC grammar
-- [ ] Executor changes handle all statement variants
-- [ ] REPL-only commands not allowed as program statements
+## Closed
+- #N: <title> (Reason: <description>)
 
-### Build & Scripts
-- [ ] Cross-platform support (Windows/Unix)
-- [ ] No hardcoded paths
-- [ ] Proper error handling with exit codes
-
-## Output Format
-
-After completing all reviews, provide a summary:
-
+## Summary
+- PRs reviewed: N
+- PRs skipped: N
+- Issues created: N
+- PRs closed: N
 ```
-## PR Review Summary
 
-| PR | Title | Verdict | Link |
-|----|-------|---------|------|
-| #N | Title | ✅ APPROVE / ❌ REQUEST CHANGES / ⚠️ NEEDS DISCUSSION / ⏭️ Skipped | [Link] |
+**Update config** — increment `total_runs`, `total_pr_maintenance`.
 
-### Skipped (No Changes)
-- PR #N - Title (Reviewed: [date], Commit: [short SHA])
-
-### Ready to Merge
-- PR #N - Title
-
-### Requires Changes
-- PR #N - Title (Issue: description)
-
-### Needs Discussion
-- PR #N - Title (Question: description)
-
-### Closed
-- PR #N - Title (Reason: description)
-
-### Issues Created
-- #N - Title (Source: PR #M)
+Print summary to user with PR links. When outputting messages (especially in loop contexts), prefix with Asia/Shanghai timestamp:
 ```
+[YYYY-MM-DD HH:MM:SS CST] <message>
+```
+
+## Phase 9 — Self-Improvement
+
+Follow `.claude/commands/_shared/self-improvement-protocol.md`.
+
+Focus on:
+- Were verdicts accurate? Any false positives/negatives?
+- Were follow-up issues well-scoped and actionable?
+- Did the specialist mapping match the actual PR scope?
+- Were any real issues missed during review?
 
 ## Periodic Execution
 
@@ -252,7 +231,3 @@ This will:
 2. Skip already-reviewed PRs with no changes
 3. Re-review PRs with new commits
 4. Save all results to memory for future runs
-
-## Reference
-
-Full guide: `docs/github-pr-review-guide.md`

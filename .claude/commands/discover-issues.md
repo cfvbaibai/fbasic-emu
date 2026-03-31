@@ -4,14 +4,14 @@ Scan the codebase for problems and create GitHub issues. Follows expanded scope:
 
 ## References
 
-- Prerequisites & config: `_shared/automation-conventions.md`
-- Paths: `_shared/path-conventions.md`
-- GitHub ops: `_shared/github-operations.md`
-- Self-improvement: `_shared/self-improvement-protocol.md`
+- Prerequisites & config: `.claude/commands/_shared/automation-conventions.md`
+- Paths: `.claude/commands/_shared/path-conventions.md`
+- GitHub ops: `.claude/commands/_shared/github-operations.md`
+- Self-improvement: `.claude/commands/_shared/self-improvement-protocol.md`
 
 ## Phase 1 — Prerequisites
 
-Follow `_shared/automation-conventions.md` prerequisites. Sync with origin:
+Follow `.claude/commands/_shared/automation-conventions.md` prerequisites. Sync with origin:
 
 ```bash
 git fetch origin master
@@ -21,7 +21,7 @@ Read config from `~/.claude/automations/fbasic-ide/config.md` to get `total_runs
 
 ## Phase 2 — Open Issue Cap
 
-Follow `_shared/github-operations.md` open issue cap logic. Threshold: 20.
+Follow `.claude/commands/_shared/github-operations.md` open issue cap logic. Threshold: 20.
 
 If cap reached, write run log and report noting "cap reached", update config `total_runs`, and stop.
 
@@ -111,7 +111,7 @@ For each confirmed finding:
 
 ## Phase 5 — Report
 
-Write outputs following `_shared/path-conventions.md`:
+Write outputs following `.claude/commands/_shared/path-conventions.md`:
 
 **Run log** — `~/.claude/automations/fbasic-ide/memory/runs/YYYY-MM/YYYY-MM-DD-NNN.md`
 
@@ -146,7 +146,7 @@ Print summary to user with created issue links. When outputting messages (especi
 
 ## Phase 6 — Self-Improvement
 
-Follow `_shared/self-improvement-protocol.md`.
+Follow `.claude/commands/_shared/self-improvement-protocol.md`.
 
 Focus on:
 - Were scans finding real issues or false positives?

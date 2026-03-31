@@ -4,14 +4,14 @@ Analyze unlabeled open GitHub issues, classify them, and apply priority/type lab
 
 ## References
 
-- Prerequisites & config: `_shared/automation-conventions.md`
-- Paths: `_shared/path-conventions.md`
-- GitHub ops: `_shared/github-operations.md`
-- Self-improvement: `_shared/self-improvement-protocol.md`
+- Prerequisites & config: `.claude/commands/_shared/automation-conventions.md`
+- Paths: `.claude/commands/_shared/path-conventions.md`
+- GitHub ops: `.claude/commands/_shared/github-operations.md`
+- Self-improvement: `.claude/commands/_shared/self-improvement-protocol.md`
 
 ## Phase 1 — Prerequisites
 
-Follow `_shared/automation-conventions.md` prerequisites.
+Follow `.claude/commands/_shared/automation-conventions.md` prerequisites.
 
 Read config from `~/.claude/automations/fbasic-ide/config.md` to get `last_triage_run` for delta detection.
 
@@ -140,7 +140,7 @@ Implements the grammar rule for the BGPLAY statement. No execution semantics." \
 - Each sub-issue must be independently implementable (no cross-step dependencies unless clearly declared)
 - Default to enhancement + p3 unless a sub-issue clearly warrants a different type/priority
 - Do not attempt to estimate implementation order beyond what the implementer suggested
-- The 20 open issue cap (see `_shared/github-operations.md`) does NOT apply to sub-issue creation — decomposing a TOO COMPLEX issue always takes priority over the cap
+- The 20 open issue cap (see `.claude/commands/_shared/github-operations.md`) does NOT apply to sub-issue creation — decomposing a TOO COMPLEX issue always takes priority over the cap
 
 ## Phase 4 — Apply Labels
 
@@ -164,7 +164,7 @@ gh issue edit $NUMBER --add-label "claude-automation"
 
 ## Phase 5 — Report
 
-Write outputs following `_shared/path-conventions.md`:
+Write outputs following `.claude/commands/_shared/path-conventions.md`:
 
 **Run log** — `~/.claude/automations/fbasic-ide/memory/runs/YYYY-MM/YYYY-MM-DD-NNN.md`
 
@@ -216,7 +216,7 @@ Print summary to user with triaged issue links. When outputting messages (especi
 
 ## Phase 6 — Self-Improvement
 
-Follow `_shared/self-improvement-protocol.md`.
+Follow `.claude/commands/_shared/self-improvement-protocol.md`.
 
 Focus on:
 - Were priority assignments accurate? Any P1/P2 that should have been P3 or vice versa?

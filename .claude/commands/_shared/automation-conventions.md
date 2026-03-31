@@ -57,7 +57,7 @@ Every command follows this structure:
 1. **Prerequisites** — auth check, clean tree
 2. **Main Work** — command-specific logic
 3. **Report** — write run log and summary report
-4. **Self-Improvement** — reflect, update command, record improvements (see `_shared/self-improvement-protocol.md`)
+4. **Self-Improvement** — reflect, update command, record improvements (see `.claude/commands/_shared/self-improvement-protocol.md`)
 5. **Context Compact** — run `/compact` to compress accumulated context
 
 ## Context Compact

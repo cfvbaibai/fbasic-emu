@@ -25,11 +25,11 @@ For each problem identified:
 
 Keep the command definition concise — only add what prevents the same problem. Do not add speculative "what-if" handling for things that haven't happened.
 
-**Scope**: Update only the specific command being run. Only modify shared docs (`_shared/`) if the improvement applies to all commands.
+**Scope**: Update only the specific command being run. Only modify shared docs (`.claude/commands/_shared/`) if the improvement applies to all commands.
 
 ## Commit & Push
 
-If the Improve step modified any command definition (`.claude/commands/<name>.md`) or shared doc (`_shared/*.md`):
+If the Improve step modified any command definition (`.claude/commands/<name>.md`) or shared doc (`.claude/commands/_shared/*.md`):
 
 1. Stage only the changed `.claude/commands/` files
 2. Commit with: `chore: improve <command-name> self-improvement — <brief summary>`

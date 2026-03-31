@@ -4,14 +4,14 @@ Autonomous issue implementation. This command orchestrates GitHub/git operations
 
 ## References
 
-- Prerequisites & config: `_shared/automation-conventions.md`
-- Paths: `_shared/path-conventions.md`
-- GitHub ops: `_shared/github-operations.md`
-- Self-improvement: `_shared/self-improvement-protocol.md`
+- Prerequisites & config: `.claude/commands/_shared/automation-conventions.md`
+- Paths: `.claude/commands/_shared/path-conventions.md`
+- GitHub ops: `.claude/commands/_shared/github-operations.md`
+- Self-improvement: `.claude/commands/_shared/self-improvement-protocol.md`
 
 ## Phase 0 — Prerequisites
 
-Follow `_shared/automation-conventions.md` prerequisites.
+Follow `.claude/commands/_shared/automation-conventions.md` prerequisites.
 
 ## Phase 1 — Sync & Scan
 
@@ -293,7 +293,7 @@ Branch stays on remote for CI.
 
 ## Phase 8 — Report
 
-Write memory, run log, and report following `_shared/path-conventions.md`:
+Write memory, run log, and report following `.claude/commands/_shared/path-conventions.md`:
 
 **Issue memory** — `memory/issues/issue-{N}.md`:
 ```markdown
@@ -347,7 +347,7 @@ Print a summary to the user with issue link, PR link, and key details. When outp
 
 ## Phase 9 — Self-Improvement
 
-Follow `_shared/self-improvement-protocol.md`. Focus on:
+Follow `.claude/commands/_shared/self-improvement-protocol.md`. Focus on:
 - Worktree failures or collision handling
 - Wrong issue picked or specialist confusion
 - CI surprises or PR merge issues
