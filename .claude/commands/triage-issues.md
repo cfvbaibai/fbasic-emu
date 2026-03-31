@@ -37,8 +37,10 @@ gh issue list --state open --search "updated:>YYYY-MM-DD" --json number,title,la
 Regardless of label status, scan ALL open issues for "TOO COMPLEX" comments:
 
 ```bash
-gh issue list --state open --json number,title --limit 50 --jq '.[].number' | while read N; do
-  gh issue comment list "$N" --limit 10 --json body --jq '.[].body' | grep -q "TOO COMPLEX" && echo "$N"
+# NOTE: use gh api instead of gh issue comment list (which lacks --limit support in some gh versions)
+REPO=$(gh repo view --json nameWithOwner --jq '.nameWithOwner')
+gh issue list --state open --json number --limit 50 --jq '.[].number' | while read N; do
+  gh api "repos/$REPO/issues/$N/comments?per_page=10" --jq '.[].body' 2>/dev/null | grep -q "TOO COMPLEX" && echo "$N"
 done
 ```
 
