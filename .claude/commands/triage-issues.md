@@ -46,6 +46,24 @@ done
 
 Collect all issue numbers with TOO COMPLEX markers. These need decomposition even if already labeled. Do NOT skip them.
 
+### Quaternary: TOO COMPLEX parent cleanup (always runs)
+For each open issue that was previously decomposed (has closed sub-issues matching "Step N of M for #<parent>"), check if ALL its sub-issues are closed:
+
+```bash
+# For each open issue with TOO COMPLEX, find and check its sub-issues
+PARENT_N=<number>
+gh issue list --state all --search "for #$PARENT_N" --json number,state --limit 20 --jq '.[] | "\(.number) \(.state)"'
+```
+
+If all sub-issues are CLOSED, close the parent with a completion comment:
+
+```bash
+gh issue comment $PARENT_N --body "All sub-issues have been resolved. Closing parent."
+gh issue close $PARENT_N
+```
+
+Note in the report under "Parents Closed (all sub-issues resolved)".
+
 If all open issues have priority labels, none were recently updated, AND none have TOO COMPLEX markers, report "all triaged" and stop.
 
 ## Phase 3 — Analyze & Classify
@@ -122,6 +140,7 @@ Implements the grammar rule for the BGPLAY statement. No execution semantics." \
 - Each sub-issue must be independently implementable (no cross-step dependencies unless clearly declared)
 - Default to enhancement + p3 unless a sub-issue clearly warrants a different type/priority
 - Do not attempt to estimate implementation order beyond what the implementer suggested
+- The 20 open issue cap (see `_shared/github-operations.md`) does NOT apply to sub-issue creation — decomposing a TOO COMPLEX issue always takes priority over the cap
 
 ## Phase 4 — Apply Labels
 
@@ -176,12 +195,16 @@ Write outputs following `_shared/path-conventions.md`:
   - #N+2: <sub-issue title>
   ...
 
+## Parents Closed (all sub-issues resolved)
+- #N: all M sub-issues closed — parent closed with completion comment
+
 ## Summary
 - Issues triaged: N
 - Issues skipped (already labeled): N
 - Potential duplicates: N
 - Issue dependencies found: N
 - Complex issues decomposed: N
+- Parents closed (all sub-issues resolved): N
 ```
 
 **Update config** — increment `total_runs`, `total_issues_triaged`, update `last_triage_run`.
