@@ -33,7 +33,18 @@ Also fetch issues updated since `last_triage_run` (from config). These may need 
 gh issue list --state open --search "updated:>YYYY-MM-DD" --json number,title,labels,body,updatedAt --limit 30
 ```
 
-If all open issues already have priority labels and none were recently updated, report "all triaged" and stop.
+### Tertiary: TOO COMPLEX check (always runs)
+Regardless of label status, scan ALL open issues for "TOO COMPLEX" comments:
+
+```bash
+gh issue list --state open --json number,title --limit 50 --jq '.[].number' | while read N; do
+  gh issue comment list "$N" --limit 10 --json body --jq '.[].body' | grep -q "TOO COMPLEX" && echo "$N"
+done
+```
+
+Collect all issue numbers with TOO COMPLEX markers. These need decomposition even if already labeled. Do NOT skip them.
+
+If all open issues have priority labels, none were recently updated, AND none have TOO COMPLEX markers, report "all triaged" and stop.
 
 ## Phase 3 — Analyze & Classify
 
@@ -83,7 +94,7 @@ gh issue comment $NUMBER --body "This issue depends on #B — it cannot be imple
 Note dependencies in the report under "Issue Dependencies Found".
 
 ### Complex Issue Decomposition
-If an issue has been marked **"TOO COMPLEX"** by the implementer (comment containing "TOO COMPLEX"), decompose it into smaller, independently-implementable sub-issues. This is the **triager's duty**, not the discoverer's.
+For each issue identified in Phase 2's TOO COMPLEX check, decompose it into smaller, independently-implementable sub-issues. This is the **triager's duty**, not the discoverer's. This step runs even for issues that already have priority/type labels.
 
 **Steps:**
 1. Read the implementer's comment to get the suggested split
