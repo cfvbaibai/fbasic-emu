@@ -58,9 +58,16 @@ For each candidate issue, check for dependency comments:
 gh issue comment list $ISSUE_NUM --limit 10 --json body --jq '.[] | .body'
 ```
 
-If the issue has a comment containing "depends on #", extract the referenced issue number and verify it is closed. If the dependency is not yet closed, **skip this issue** — it cannot be implemented until its dependency is resolved.
+**A dependency exists ONLY when a comment explicitly says "depends on #N"** (or "dependency: #N", "blocked by #N"). Extract the referenced issue number and verify it is closed. If the dependency is not yet closed, **skip this issue**.
 
-If all candidate issues are blocked by dependencies, report "no issues to implement" and stop.
+**The following are NOT dependencies** — do NOT skip issues for these:
+- Parent/sub-issue relationships (e.g., "Part of #N", "Sub-issue of #N", GitHub's built-in parent tracking)
+- Casual references (e.g., "Related to #N", "See also #N", "Fixes #N")
+- Any issue number mentioned in the body that is not an explicit dependency statement
+
+Only explicit "depends on #N" / "dependency: #N" / "blocked by #N" phrasing in comments counts as a dependency.
+
+If all candidate issues are blocked by real dependencies, report "no issues to implement" and stop.
 
 ```bash
 gh issue list --state open --search "no:assignee" --json number,title,labels,assignees,body --limit 50
