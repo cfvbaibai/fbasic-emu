@@ -47,7 +47,7 @@ test.describe('built-preview smoke', () => {
     await page.goto('/')
     await page.waitForLoadState('networkidle')
 
-    await expect(page.locator('.features-grid .game-card')).toHaveCount(3, {
+    await expect(page.locator('.hero-cta')).toBeVisible({
       timeout: 30_000,
     })
 

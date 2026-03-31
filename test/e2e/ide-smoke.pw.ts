@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-test('App boots and renders home feature cards', async ({ page }) => {
+test('App boots and renders home hero section', async ({ page }) => {
   const pageErrors: Error[] = []
   page.on('pageerror', (error) => {
     pageErrors.push(error)
@@ -9,7 +9,7 @@ test('App boots and renders home feature cards', async ({ page }) => {
   await page.goto('/')
   await page.waitForLoadState('networkidle')
 
-  await expect(page.locator('.features-grid .game-card')).toHaveCount(3)
+  await expect(page.locator('.hero-cta')).toBeVisible()
   expect(pageErrors, `Unexpected page errors: ${pageErrors.map(err => err.message).join(' | ')}`).toEqual([])
 })
 

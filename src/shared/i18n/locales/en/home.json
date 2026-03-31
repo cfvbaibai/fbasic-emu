@@ -2,7 +2,8 @@
   "hero": {
     "title": "F-BASIC IDE",
     "subtitle": "A modern web-based IDE for F-BASIC programming language",
-    "description": "Experience the authentic F-BASIC development environment with modern web technologies. Write, execute, and debug F-BASIC programs in your browser."
+    "description": "Experience the authentic F-BASIC development environment with modern web technologies. Write, execute, and debug F-BASIC programs in your browser.",
+    "cta": "GET STARTED"
   },
   "features": {
     "title": "Features",
@@ -25,13 +26,5 @@
         "description": "View and explore character sprites with animation controls, palette selection, and display options."
       }
     }
-  },
-  "about": {
-    "title": "About F-BASIC",
-    "content": "F-BASIC (Family BASIC) is a programming language for the Family Computer (Famicom). This IDE provides a complete development environment to write and execute F-BASIC programs with authentic syntax and behavior."
-  },
-  "gettingStarted": {
-    "title": "Getting Started",
-    "content": "Start by exploring the F-BASIC IDE to write your first program. Use the navigation bar above to access all available tools and features."
   }
 }

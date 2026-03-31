@@ -2,7 +2,8 @@
   "hero": {
     "title": "F-BASIC IDE",
     "subtitle": "面向 F-BASIC 程式設計語言的現代 Web IDE",
-    "description": "使用現代 Web 技術體驗真正的 F-BASIC 開發環境。在瀏覽器中編寫、執行和除錯 F-BASIC 程式。"
+    "description": "使用現代 Web 技術體驗真正的 F-BASIC 開發環境。在瀏覽器中編寫、執行和除錯 F-BASIC 程式。",
+    "cta": "開始使用"
   },
   "features": {
     "title": "功能",
@@ -25,13 +26,5 @@
         "description": "檢視和探索角色精靈，具有動畫控制、調色板選擇和顯示選項。"
       }
     }
-  },
-  "about": {
-    "title": "關於 F-BASIC",
-    "content": "F-BASIC (Family BASIC) 是面向 Family Computer (Famicom) 的程式設計語言。此 IDE 提供了一個完整的開發環境，用於編寫和執行具有真實語法和行為的 F-BASIC 程式。"
-  },
-  "gettingStarted": {
-    "title": "開始使用",
-    "content": "首先探索 F-BASIC IDE 來編寫您的第一個程式。使用上方的導覽列存取所有可用工具和功能。"
   }
 }

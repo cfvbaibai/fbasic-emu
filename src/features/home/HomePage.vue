@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
-import { GameBlock, GameCard, GameLayout, GameSection, HeroSection } from '@/shared/components/ui'
+import { GameButton, GameLayout, HeroSection } from '@/shared/components/ui'
 
 /**
  * HomePage component - The home/landing page of the application.
- * Displays feature cards and navigation to different sections.
+ * Displays a hero section with branding and a GET-STARTED CTA button.
  */
 defineOptions({
   name: 'HomePage',
@@ -16,40 +15,8 @@ defineOptions({
 const router = useRouter()
 const { t } = useI18n()
 
-interface FeatureCard {
-  title: string
-  description: string
-  path: string
-  icon: string
-  color: string
-}
-
-const features = computed<FeatureCard[]>(() => [
-  {
-    title: t('home.features.items.ide.title'),
-    description: t('home.features.items.ide.description'),
-    path: '/ide',
-    icon: 'mdi:monitor',
-    color: 'var(--semantic-solid-success)',
-  },
-  {
-    title: t('home.features.items.spriteViewer.title'),
-    description: t('home.features.items.spriteViewer.description'),
-    path: '/character-sprite-viewer',
-    icon: 'mdi:eye',
-    color: 'var(--semantic-solid-info)',
-  },
-  {
-    title: t('home.features.items.imageAnalyzer.title'),
-    description: t('home.features.items.imageAnalyzer.description'),
-    path: '/image-analyzer',
-    icon: 'mdi:image',
-    color: 'var(--semantic-solid-warning)',
-  },
-])
-
-const navigateTo = (path: string) => {
-  router.push(path)
+const goToIde = () => {
+  router.push('/ide')
 }
 </script>
 
@@ -61,35 +28,18 @@ const navigateTo = (path: string) => {
         :subtitle="t('home.hero.subtitle')"
         :description="t('home.hero.description')"
         icon="mdi:monitor"
-      />
-
-      <GameSection :title="t('home.features.title')">
-        <div class="features-grid">
-          <GameCard
-            v-for="feature in features"
-            :key="feature.path"
-            :title="feature.title"
-            :description="feature.description"
-            :icon="feature.icon"
-            :icon-color="feature.color"
-            :action-text="t('home.features.actionText')"
-            @click="navigateTo(feature.path)"
-          />
-        </div>
-      </GameSection>
-
-      <div class="info-section">
-        <GameBlock :title="t('home.about.title')">
-          <span class="content">
-            {{ t('home.about.content') }}
-          </span>
-        </GameBlock>
-        <GameBlock :title="t('home.gettingStarted.title')">
-          <span class="content">
-            {{ t('home.gettingStarted.content') }}
-          </span>
-        </GameBlock>
-      </div>
+      >
+        <GameButton
+          type="primary"
+          size="large"
+          icon="mdi:arrow-right"
+          icon-position="right"
+          class="hero-cta"
+          @click="goToIde"
+        >
+          {{ t('home.hero.cta') }}
+        </GameButton>
+      </HeroSection>
     </div>
   </GameLayout>
 </template>
@@ -102,32 +52,34 @@ const navigateTo = (path: string) => {
   padding: 0 2rem 2rem;
 }
 
-.features-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
-}
-
-.info-section {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
-  margin-top: 4rem;
-}
-
-.info-section .content {
-  color: var(--game-text-secondary);
-  line-height: 1.6;
+.hero-cta {
+  margin-top: 2.5rem;
+  min-width: 220px;
+  font-size: 1.1rem;
+  padding: 1rem 2.5rem;
+  letter-spacing: 2px;
+  font-weight: 700;
+  font-family: var(--game-font-family-heading);
 }
 
 /* Responsive design */
 @media (width <= 768px) {
-  .features-grid {
-    grid-template-columns: 1fr;
-  }
-
   .home-content {
     padding: 0 1.5rem 1.5rem;
+  }
+
+  .hero-cta {
+    min-width: 180px;
+    font-size: 1rem;
+    padding: 0.875rem 2rem;
+  }
+}
+
+@media (width <= 480px) {
+  .hero-cta {
+    min-width: 160px;
+    font-size: 0.9rem;
+    padding: 0.75rem 1.5rem;
   }
 }
 </style>
