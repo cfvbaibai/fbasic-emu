@@ -14,5 +14,7 @@ declare module 'vue-router' {
     parent?: string
     /** Whether this route requires authentication */
     requiresAuth?: boolean
+    /** Whether this route is only visible in debug mode */
+    debug?: boolean
   }
 }

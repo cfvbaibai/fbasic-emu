@@ -53,6 +53,7 @@ const routes: RouteRecordRaw[] = [
       showInNav: true,
       icon: 'mdi:code-tags',
       group: 'tools',
+      debug: true,
     },
   },
 
@@ -68,6 +69,7 @@ const routes: RouteRecordRaw[] = [
       showInNav: true,
       icon: 'mdi:speedometer',
       group: 'testing',
+      debug: true,
     },
   },
   {
@@ -79,6 +81,7 @@ const routes: RouteRecordRaw[] = [
       showInNav: true,
       icon: 'mdi:animation',
       group: 'testing',
+      debug: true,
     },
   },
   {
@@ -90,6 +93,7 @@ const routes: RouteRecordRaw[] = [
       showInNav: true,
       icon: 'mdi:sync',
       group: 'testing',
+      debug: true,
     },
   },
   {
@@ -101,6 +105,7 @@ const routes: RouteRecordRaw[] = [
       showInNav: true,
       icon: 'mdi:test-tube',
       group: 'testing',
+      debug: true,
     },
   },
   {
@@ -112,6 +117,7 @@ const routes: RouteRecordRaw[] = [
       showInNav: true,
       icon: 'mdi:music',
       group: 'testing',
+      debug: true,
     },
   },
 
