@@ -22,5 +22,28 @@
         "description": "View and explore character sprites with animation controls, palette selection, and display options."
       }
     }
+  },
+  "showcase": {
+    "title": "Everything You Need",
+    "subtitle": "From code to pixels to sound \u2014 build complete retro experiences",
+    "items": {
+      "editor": {
+        "title": "BASIC Editor",
+        "description": "Write F-BASIC code with syntax highlighting, auto-completion, and instant execution. The Monaco-powered editor gives you a professional coding experience in your browser.",
+        "code": "10 PRINT \"HELLO WORLD\"\n20 FOR I=1 TO 10\n30 PRINT I;\" * \";\n40 NEXT I\n50 END"
+      },
+      "sprites": {
+        "title": "Sprite & Graphics",
+        "description": "Design and animate sprites directly in the IDE. Place characters on screen, control movement with BASIC commands, and bring your games to life."
+      },
+      "sound": {
+        "title": "Sound & Music",
+        "description": "Compose chiptune music using MML notation. The PLAY command brings authentic 8-bit sound to your programs."
+      },
+      "samples": {
+        "title": "Sample Programs",
+        "description": "Jump right in with pre-built sample programs. Learn F-BASIC by example \u2014 from simple text adventures to sprite-based games."
+      }
+    }
   }
 }
