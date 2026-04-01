@@ -39,7 +39,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/features/sprite-viewer/CharacterSpriteViewerPage.vue'),
     meta: {
       title: 'Sprite Viewer',
-      showInNav: true,
+      showInNav: false,
       icon: 'mdi:eye',
       group: 'tools',
     },

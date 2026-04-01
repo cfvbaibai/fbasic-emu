@@ -471,5 +471,10 @@
     "deleteConfirmMessage": "确定要删除「{name}」吗？此操作无法撤销。",
     "deleteConfirmLabel": "删除",
     "programCount": "暂无程序 | {count} 个程序 | {count} 个程序"
+  },
+  "spriteViewer": {
+    "title": "精灵查看器",
+    "openTitle": "打开精灵查看器",
+    "close": "关闭"
   }
 }

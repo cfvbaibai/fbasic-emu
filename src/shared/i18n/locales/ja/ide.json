@@ -471,5 +471,10 @@
     "deleteConfirmMessage": "「{name}」を削除してよろしいですか？この操作は元に戻せません。",
     "deleteConfirmLabel": "削除",
     "programCount": "プログラムなし | {count}件のプログラム | {count}件のプログラム"
+  },
+  "spriteViewer": {
+    "title": "スプライトビューアー",
+    "openTitle": "スプライトビューアーを開く",
+    "close": "閉じる"
   }
 }
