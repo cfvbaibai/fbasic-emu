@@ -22,5 +22,28 @@
         "description": "查看和探索角色精灵，具有动画控制、调色板选择和显示选项。"
       }
     }
+  },
+  "showcase": {
+    "title": "一切就绪",
+    "subtitle": "从代码到像素到声音 — 构建完整的复古体验",
+    "items": {
+      "editor": {
+        "title": "BASIC 编辑器",
+        "description": "使用语法高亮、自动补全和即时执行编写 F-BASIC 代码。基于 Monaco 的编辑器为您提供专业的浏览器编码体验。",
+        "code": "10 PRINT \"HELLO WORLD\"\n20 FOR I=1 TO 10\n30 PRINT I;\" * \";\n40 NEXT I\n50 END"
+      },
+      "sprites": {
+        "title": "精灵与图形",
+        "description": "直接在 IDE 中设计和动画精灵。使用 BASIC 命令将角色放置在屏幕上，让游戏栩栩如生。"
+      },
+      "sound": {
+        "title": "声音与音乐",
+        "description": "使用 MML 记谱法创作芯片音乐。PLAY 命令为您的程序带来原汁原味的 8 位音效。"
+      },
+      "samples": {
+        "title": "示例程序",
+        "description": "使用预置示例程序快速上手。通过实例学习 F-BASIC — 从简单的文字冒险到精灵游戏。"
+      }
+    }
   }
 }
