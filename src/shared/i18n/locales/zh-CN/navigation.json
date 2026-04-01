@@ -18,10 +18,6 @@
       "name": "精灵查看器",
       "description": "查看角色精灵"
     },
-    "imageAnalyzer": {
-      "name": "图像分析器",
-      "description": "分析图像"
-    },
     "monaco": {
       "name": "Monaco 编辑器",
       "description": "高级代码编辑器"

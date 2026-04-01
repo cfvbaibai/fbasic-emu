@@ -25,7 +25,6 @@ const getItemKey = (routeName: string): string => {
     Home: 'home',
     Ide: 'ide',
     CharacterSpriteViewer: 'spriteViewer',
-    ImageAnalyzer: 'imageAnalyzer',
     MonacoEditor: 'monaco',
     PerformanceDiagnostics: 'performanceDiagnostics',
     KonvaSpriteTest: 'konvaSpriteTest',

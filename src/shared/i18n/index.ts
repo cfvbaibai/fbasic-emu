@@ -9,7 +9,6 @@ import enCommon from './locales/en/common.json'
 import enDiagnostics from './locales/en/diagnostics.json'
 import enHome from './locales/en/home.json'
 import enIde from './locales/en/ide.json'
-import enImageAnalyzer from './locales/en/image-analyzer.json'
 import enKonvaTest from './locales/en/konva-test.json'
 import enMonacoEditor from './locales/en/monaco-editor.json'
 import enNavigation from './locales/en/navigation.json'
@@ -22,7 +21,6 @@ import jaCommon from './locales/ja/common.json'
 import jaDiagnostics from './locales/ja/diagnostics.json'
 import jaHome from './locales/ja/home.json'
 import jaIde from './locales/ja/ide.json'
-import jaImageAnalyzer from './locales/ja/image-analyzer.json'
 import jaKonvaTest from './locales/ja/konva-test.json'
 import jaMonacoEditor from './locales/ja/monaco-editor.json'
 import jaNavigation from './locales/ja/navigation.json'
@@ -35,7 +33,6 @@ import zhCNCommon from './locales/zh-CN/common.json'
 import zhCNDiagnostics from './locales/zh-CN/diagnostics.json'
 import zhCNHome from './locales/zh-CN/home.json'
 import zhCNIde from './locales/zh-CN/ide.json'
-import zhCNImageAnalyzer from './locales/zh-CN/image-analyzer.json'
 import zhCNKonvaTest from './locales/zh-CN/konva-test.json'
 import zhCNMonacoEditor from './locales/zh-CN/monaco-editor.json'
 import zhCNNavigation from './locales/zh-CN/navigation.json'
@@ -48,7 +45,6 @@ import zhTWCommon from './locales/zh-TW/common.json'
 import zhTWDiagnostics from './locales/zh-TW/diagnostics.json'
 import zhTWHome from './locales/zh-TW/home.json'
 import zhTWIde from './locales/zh-TW/ide.json'
-import zhTWImageAnalyzer from './locales/zh-TW/image-analyzer.json'
 import zhTWKonvaTest from './locales/zh-TW/konva-test.json'
 import zhTWMonacoEditor from './locales/zh-TW/monaco-editor.json'
 import zhTWNavigation from './locales/zh-TW/navigation.json'
@@ -90,7 +86,6 @@ const i18n = createI18n<{ message: MessageSchema }, Locale>({
       common: enCommon,
       home: enHome,
       spriteViewer: enSpriteViewer,
-      imageAnalyzer: enImageAnalyzer,
       monacoEditor: enMonacoEditor,
       bgEditor: enBgEditor,
       coi: enCoi,
@@ -105,7 +100,6 @@ const i18n = createI18n<{ message: MessageSchema }, Locale>({
       common: jaCommon,
       home: jaHome,
       spriteViewer: jaSpriteViewer,
-      imageAnalyzer: jaImageAnalyzer,
       monacoEditor: jaMonacoEditor,
       bgEditor: jaBgEditor,
       coi: jaCoi,
@@ -120,7 +114,6 @@ const i18n = createI18n<{ message: MessageSchema }, Locale>({
       common: zhCNCommon,
       home: zhCNHome,
       spriteViewer: zhCNSpriteViewer,
-      imageAnalyzer: zhCNImageAnalyzer,
       monacoEditor: zhCNMonacoEditor,
       bgEditor: zhCNBgEditor,
       coi: zhCNCoi,
@@ -135,7 +128,6 @@ const i18n = createI18n<{ message: MessageSchema }, Locale>({
       common: zhTWCommon,
       home: zhTWHome,
       spriteViewer: zhTWSpriteViewer,
-      imageAnalyzer: zhTWImageAnalyzer,
       monacoEditor: zhTWMonacoEditor,
       bgEditor: zhTWBgEditor,
       coi: zhTWCoi,
