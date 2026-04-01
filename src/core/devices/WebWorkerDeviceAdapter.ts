@@ -2,7 +2,7 @@
  * Web Worker Device Adapter
  *
  * A comprehensive device adapter that handles both device operations and web worker management.
- * Delegates to specialized modules for input handling, output helpers, and message management.
+ * Delegates screen operations to DeviceScreenManager and other concerns to specialized modules.
  */
 
 import type { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
@@ -14,7 +14,6 @@ import type { AnyServiceWorkerMessage, InputValueMessage, PlaySoundCompleteMessa
 import type { BgGridData } from '@/features/bg-editor/types'
 import { logWorker } from '@/shared/logger'
 
-import { copyBgGraphicToScreenBuffer } from './DeviceBgGraphicHelpers'
 import {
   consumeStrigEvent,
   createStickTypematicState,
@@ -30,16 +29,19 @@ import {
   handleInputValueMessage as handleInputValue,
   rejectAllInputRequests as rejectAllInput,
 } from './DeviceInputRequestHelpers'
-import { postBeep, postOutputMessage, postPlaySound, postPlaySoundBackground } from './DeviceOutputHelpers'
-import { createPlayCompleteRequest, handlePlaySoundCompleteMessage as handlePlayComplete, rejectAllPlayCompleteRequests as rejectAllPlayComplete } from './DevicePlayCompleteHelpers'
+import { postBeep, postPlaySound, postPlaySoundBackground } from './DeviceOutputHelpers'
+import {
+  createPlayCompleteRequest,
+  handlePlaySoundCompleteMessage as handlePlayComplete,
+  rejectAllPlayCompleteRequests as rejectAllPlayComplete,
+} from './DevicePlayCompleteHelpers'
+import { DeviceScreenManager } from './DeviceScreenManager'
 import {
   getSpritePosition as getSpritePositionFromHelper,
   postSpriteStates,
   type SpritePositionCache,
 } from './DeviceSpritePositionHelpers'
 import { MessageHandler } from './MessageHandler'
-import { ScreenStateManager } from './ScreenStateManager'
-import { ScreenUpdateBatcher } from './ScreenUpdateBatcher'
 import {
   createViewsFromJoystickBuffer,
   type JoystickBufferView,
@@ -55,7 +57,6 @@ export type { WebWorkerExecutionOptions }
 export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   // === DEVICE STATE ===
   private strigClickBuffer: Map<number, number[]> = new Map()
-  private sharedDisplayAccessor: SharedDisplayBufferAccessor | null = null
   /** Shared joystick buffer view. Set when receiving SET_SHARED_JOYSTICK_BUFFER. */
   private sharedJoystickView: JoystickBufferView | null = null
   /** Shared keyboard buffer view for INKEY$. Set when receiving SET_SHARED_KEYBOARD_BUFFER. */
@@ -63,13 +64,11 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   /** Last POSITION per sprite; getSpritePosition returns it so MOVE uses it (not buffer 0,0). */
   private lastPositionBySprite: SpritePositionCache = new Map()
   private isEnabled = true
-  /** BG GRAPHIC data for VIEW command. Set via SET_BG_DATA message from main thread. */
-  private bgGridData: BgGridData | null = null
   // === STICK REPEAT CONTROL (typematic-style) ===
   private stickTypematicState: StickTypematicState = createStickTypematicState()
   // === MANAGERS ===
   private webWorkerManager: WebWorkerManager
-  private screenStateManager: ScreenStateManager
+  private readonly screenManager: DeviceScreenManager
   private messageHandler: MessageHandler
   // === INPUT REQUEST (worker only: INPUT/LINPUT) ===
   private pendingInputRequests: Map<
@@ -78,17 +77,11 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   > = new Map()
   // === PLAY COMPLETE (worker only: sync PLAY) ===
   private pendingPlayComplete: Map<string, { resolve: () => void; reject: (err: Error) => void }> = new Map()
-  // === SCREEN UPDATE BATCHING ===
-  private readonly screenUpdateBatcher: ScreenUpdateBatcher
 
   constructor() {
     this.webWorkerManager = new WebWorkerManager()
-    this.screenStateManager = new ScreenStateManager()
+    this.screenManager = new DeviceScreenManager()
     this.messageHandler = new MessageHandler(this.webWorkerManager.getPendingMessages())
-    this.screenUpdateBatcher = new ScreenUpdateBatcher(() => {
-      this.syncScreenStateToShared()
-      this.postScreenChanged()
-    })
     this.setupMessageListener()
   }
 
@@ -219,15 +212,21 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
     pushStrigEvent(this.strigClickBuffer, this.isEnabled, joystickId, state)
   }
 
+  /** Consume a STRIG event from the click buffer. */
+  consumeStrigState(joystickId: number): number {
+    return consumeStrigEvent(this.strigClickBuffer, joystickId)
+  }
+
   // === SPRITE POSITION QUERY ===
 
   /** Set shared display buffer accessor. */
   setSharedDisplayBufferAccessor(accessor: SharedDisplayBufferAccessor): void {
-    this.sharedDisplayAccessor = accessor
+    this.screenManager.setSharedDisplayBufferAccessor(accessor)
   }
 
   getSpritePosition(actionNumber: number): { x: number; y: number } | null {
-    return getSpritePositionFromHelper(this.sharedDisplayAccessor, this.lastPositionBySprite, actionNumber)
+    const accessor = this.screenManager.getSharedDisplayAccessor()
+    return getSpritePositionFromHelper(accessor, this.lastPositionBySprite, actionNumber)
   }
 
   setSpritePosition(actionNumber: number, x: number, y: number): void {
@@ -249,143 +248,73 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
     postSpriteStates(spriteStates, spriteEnabled)
   }
 
-  // === BG GRAPHIC METHODS (VIEW command) ===
-
-  /** Set BG grid data for VIEW command. */
-  setBgGridData(data: BgGridData): void {
-    this.bgGridData = data
-  }
-
-  /** Copy BG GRAPHIC to Background Screen (per F-BASIC Manual page 36). */
-  copyBgGraphicToBackground(): void {
-    if (!this.bgGridData) return
-    copyBgGraphicToScreenBuffer(this.bgGridData, this.screenStateManager.getScreenBuffer())
-    this.syncScreenStateToShared()
-    this.postScreenChanged()
-  }
-
-  // === SCREEN SYNC ===
-
-  private syncScreenStateToShared(): void {
-    const accessor = this.sharedDisplayAccessor
-    if (!accessor) return
-    const manager = this.screenStateManager
-    if (!manager) return
-    const buffer = manager.getScreenBuffer()
-    if (buffer == null) {
-      logWorker.warn('[WebWorkerDeviceAdapter] syncScreenStateToShared: getScreenBuffer() returned null/undefined, skipping')
-      return
-    }
-    const { x: cursorX, y: cursorY } = manager.getCursorPosition()
-    const { bgPalette, spritePalette } = manager.getPalette()
-    accessor.writeScreenState(
-      buffer, cursorX, cursorY, bgPalette, spritePalette,
-      manager.getBackdropColor(), manager.getCgenMode()
-    )
-    accessor.incrementSequence()
-  }
-
-  private postScreenChanged(): void {
-    self.postMessage({
-      type: 'SCREEN_CHANGED',
-      id: `screen-changed-${Date.now()}`,
-      timestamp: Date.now(),
-    })
-  }
-
-  /** Consume a STRIG event from the click buffer. */
-  consumeStrigState(joystickId: number): number {
-    return consumeStrigEvent(this.strigClickBuffer, joystickId)
-  }
-
-  // === TEXT OUTPUT METHODS ===
+  // === SCREEN OPERATIONS (delegated to DeviceScreenManager) ===
 
   printOutput(output: string): void {
-    postOutputMessage(this.screenStateManager.getCurrentExecutionId() ?? 'unknown', output, 'print')
-    for (const char of output) {
-      this.screenStateManager.writeCharacter(char)
-    }
-    this.screenUpdateBatcher.schedule()
+    this.screenManager.printOutput(output)
   }
 
   debugOutput(output: string): void {
-    postOutputMessage(this.screenStateManager.getCurrentExecutionId() ?? 'unknown', output, 'debug')
+    this.screenManager.debugOutput(output)
   }
 
   errorOutput(output: string): void {
-    postOutputMessage(this.screenStateManager.getCurrentExecutionId() ?? 'unknown', output, 'error')
+    this.screenManager.errorOutput(output)
   }
 
   clearScreen(): void {
-    this.screenStateManager.initializeScreen()
-    this.syncScreenStateToShared()
-    this.postScreenChanged()
-    this.cancelPendingScreenUpdate()
+    this.screenManager.clearScreen()
   }
 
   setCursorPosition(x: number, y: number): void {
-    this.screenStateManager.setCursorPosition(x, y)
-    this.syncScreenStateToShared()
-    this.postScreenChanged()
+    this.screenManager.setCursorPosition(x, y)
   }
 
   getCursorPosition(): { x: number; y: number } {
-    return this.screenStateManager.getCursorPosition()
+    return this.screenManager.getCursorPosition()
   }
 
   getScreenCell(x: number, y: number, colorSwitch = 0): string | number {
-    return this.screenStateManager.getScreenCell(x, y, colorSwitch)
+    return this.screenManager.getScreenCell(x, y, colorSwitch)
   }
 
   setColorPattern(x: number, y: number, pattern: number): void {
-    this.screenStateManager.setColorPattern(x, y, pattern)
-    this.syncScreenStateToShared()
-    this.postScreenChanged()
+    this.screenManager.setColorPattern(x, y, pattern)
   }
 
   setColorPalette(bgPalette: number, spritePalette: number): void {
-    this.screenStateManager.setColorPalette(bgPalette, spritePalette)
-    this.syncScreenStateToShared()
-    this.postScreenChanged()
+    this.screenManager.setColorPalette(bgPalette, spritePalette)
   }
 
   setPaletteCombination(
     target: 'B' | 'S', combination: number,
     c1: number, c2: number, c3: number, c4: number
   ): void {
-    const { paletteIndex, colors } = this.screenStateManager.setPaletteCombination(
-      target, combination, [c1, c2, c3, c4]
-    )
-    self.postMessage({
-      type: 'SCREEN_UPDATE',
-      id: `screen-palette-combination-${Date.now()}`,
-      timestamp: Date.now(),
-      data: {
-        executionId: this.screenStateManager.getCurrentExecutionId() ?? 'unknown',
-        updateType: 'palette-combination',
-        paletteTarget: target,
-        paletteIndex,
-        paletteCombination: combination,
-        paletteColors: colors,
-        timestamp: Date.now(),
-      },
-    })
+    this.screenManager.setPaletteCombination(target, combination, c1, c2, c3, c4)
   }
 
   setBackdropColor(colorCode: number): void {
-    this.screenStateManager.setBackdropColor(colorCode)
-    this.syncScreenStateToShared()
-    this.postScreenChanged()
+    this.screenManager.setBackdropColor(colorCode)
   }
 
   setCharacterGeneratorMode(mode: number): void {
-    this.screenStateManager.setCharacterGeneratorMode(mode)
-    this.syncScreenStateToShared()
-    this.postScreenChanged()
+    this.screenManager.setCharacterGeneratorMode(mode)
   }
 
   getCharacterGeneratorMode(): number {
-    return this.screenStateManager.getCgenMode()
+    return this.screenManager.getCharacterGeneratorMode()
+  }
+
+  // === BG GRAPHIC METHODS (VIEW command) ===
+
+  /** Set BG grid data for VIEW command. */
+  setBgGridData(data: BgGridData): void {
+    this.screenManager.setBgGridData(data)
+  }
+
+  /** Copy BG GRAPHIC to Background Screen (per F-BASIC Manual page 36). */
+  copyBgGraphicToBackground(): void {
+    this.screenManager.copyBgGraphicToBackground()
   }
 
   // === INPUT REQUEST ===
@@ -397,7 +326,7 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
   ): Promise<string[]> {
     return createInputRequest(
       this.pendingInputRequests,
-      this.screenStateManager.getCurrentExecutionId() ?? 'unknown',
+      this.screenManager.getCurrentExecutionId() ?? 'unknown',
       prompt,
       options?.variableCount ?? 1,
       options?.isLinput ?? false
@@ -427,34 +356,26 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
 
   /** Set the current execution ID. */
   setCurrentExecutionId(executionId: string | null): void {
-    this.screenStateManager.setCurrentExecutionId(executionId)
+    this.screenManager.setCurrentExecutionId(executionId)
     resetStickTypematicState(this.stickTypematicState)
-    if (executionId) {
-      this.screenStateManager.initializeScreen()
-      this.syncScreenStateToShared()
-      this.postScreenChanged()
-      this.cancelPendingScreenUpdate()
-    } else {
-      this.screenUpdateBatcher.flush()
-    }
   }
 
   // === SOUND METHODS (delegated to DeviceOutputHelpers) ===
 
   /** Play compiled audio synchronously. Blocks until PLAY_SOUND_COMPLETE is received. */
   playSound(audio: CompiledAudio): Promise<void> {
-    const playId = postPlaySound(this.screenStateManager.getCurrentExecutionId() ?? 'unknown', audio)
+    const playId = postPlaySound(this.screenManager.getCurrentExecutionId() ?? 'unknown', audio)
     return createPlayCompleteRequest(this.pendingPlayComplete, playId)
   }
 
   /** Play compiled audio in background (non-blocking). Used by BGPLAY statement. */
   playSoundBackground(audio: CompiledAudio): void {
-    postPlaySoundBackground(this.screenStateManager.getCurrentExecutionId() ?? 'unknown', audio)
+    postPlaySoundBackground(this.screenManager.getCurrentExecutionId() ?? 'unknown', audio)
   }
 
   /** Play a beep sound. */
   beep(): void {
-    postBeep(this.screenStateManager.getCurrentExecutionId() ?? 'unknown')
+    postBeep(this.screenManager.getCurrentExecutionId() ?? 'unknown')
   }
 
   // === PRIVATE METHODS ===
@@ -487,6 +408,6 @@ export class WebWorkerDeviceAdapter implements BasicDeviceAdapter {
 
   /** Cancel any pending screen update. */
   cancelPendingScreenUpdate(): void {
-    this.screenUpdateBatcher.cancel()
+    this.screenManager.cancelPendingScreenUpdate()
   }
 }
