@@ -5,6 +5,9 @@
     "tools": "开发工具",
     "testing": "测试与诊断"
   },
+  "debug": {
+    "toggleTitle": "切换调试模式 — 显示开发/测试页面"
+  },
   "items": {
     "home": {
       "name": "首页",
@@ -37,6 +40,10 @@
     "printVsSpritesTest": {
       "name": "PRINT 测试",
       "description": "PRINT 对比精灵测试"
+    },
+    "soundTest": {
+      "name": "声音测试",
+      "description": "声音系统测试"
     }
   }
 }

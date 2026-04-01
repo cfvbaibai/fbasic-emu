@@ -1,4 +1,4 @@
-import { computed } from 'vue'
+import { computed, type Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { RouteRecordNormalized } from 'vue-router'
 import { useRouter } from 'vue-router'
@@ -30,6 +30,7 @@ const getItemKey = (routeName: string): string => {
     KonvaSpriteTest: 'konvaSpriteTest',
     PositionSyncLoadTest: 'positionSyncLoadTest',
     PrintVsSpritesTest: 'printVsSpritesTest',
+    SoundTest: 'soundTest',
   }
   return nameMap[routeName] ?? routeName.toLowerCase()
 }
@@ -39,8 +40,10 @@ const getItemKey = (routeName: string): string => {
  *
  * Filters routes with `meta.showInNav === true` and groups them
  * by `meta.group` (main, tools, testing).
+ *
+ * Routes with `meta.debug === true` are only included when `isDebugEnabled` is true.
  */
-export function useNavigationRoutes() {
+export function useNavigationRoutes(isDebugEnabled: Ref<boolean>) {
   const { t } = useI18n()
   const router = useRouter()
 
@@ -50,6 +53,13 @@ export function useNavigationRoutes() {
     router
       .getRoutes()
       .filter((r: RouteRecordNormalized) => r.meta.showInNav === true)
+      .filter((r: RouteRecordNormalized) => {
+        // Hide debug-only routes when debug mode is off
+        if (r.meta.debug === true && !isDebugEnabled.value) {
+          return false
+        }
+        return true
+      })
       .forEach((r: RouteRecordNormalized) => {
         const group = (r.meta.group as 'main' | 'tools' | 'testing') ?? 'main'
         const itemKey = getItemKey(String(r.name))

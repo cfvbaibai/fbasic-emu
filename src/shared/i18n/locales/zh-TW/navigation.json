@@ -5,6 +5,9 @@
     "tools": "開發工具",
     "testing": "測試與診斷"
   },
+  "debug": {
+    "toggleTitle": "切換除錯模式 — 顯示開發/測試頁面"
+  },
   "items": {
     "home": {
       "name": "首頁",
@@ -37,6 +40,10 @@
     "printVsSpritesTest": {
       "name": "PRINT 測試",
       "description": "PRINT 對比精靈測試"
+    },
+    "soundTest": {
+      "name": "聲音測試",
+      "description": "聲音系統測試"
     }
   }
 }

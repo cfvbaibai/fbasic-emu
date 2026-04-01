@@ -5,6 +5,9 @@
     "tools": "開発ツール",
     "testing": "テスト＆診断"
   },
+  "debug": {
+    "toggleTitle": "デバッグモード切替 — 開発/テストページを表示"
+  },
   "items": {
     "home": {
       "name": "ホーム",
@@ -37,6 +40,10 @@
     "printVsSpritesTest": {
       "name": "PRINTテスト",
       "description": "PRINT対スプライトテスト"
+    },
+    "soundTest": {
+      "name": "サウンドテスト",
+      "description": "サウンドシステムテスト"
     }
   }
 }

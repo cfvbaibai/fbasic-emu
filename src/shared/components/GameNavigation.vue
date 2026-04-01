@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 
 import { buildInfo } from '@/buildInfo'
+import { useDebugMode } from '@/shared/composables/useDebugMode'
 import { useLocale } from '@/shared/composables/useLocale'
 import { useSkin } from '@/shared/composables/useSkin'
 
@@ -27,7 +28,8 @@ defineOptions({
 const { t } = useI18n()
 const { currentSkin, setSkin, availableSkins } = useSkin()
 const { currentLocale, setLocale, availableLocales } = useLocale()
-const { groupedRoutes } = useNavigationRoutes()
+const { isDebugEnabled, toggleDebugMode } = useDebugMode()
+const { groupedRoutes } = useNavigationRoutes(isDebugEnabled)
 
 const route = useRoute()
 const router = useRouter()
@@ -190,6 +192,13 @@ const handleLocaleChange = (localeValue: string | number) => {
         </div>
       </div>
       <div class="nav-controls">
+        <button
+          :class="['debug-toggle', { active: isDebugEnabled }]"
+          :title="t('navigation.debug.toggleTitle')"
+          @click="toggleDebugMode"
+        >
+          <GameIcon :icon="isDebugEnabled ? 'mdi:bug' : 'mdi:bug-outline'" size="small" />
+        </button>
         <div class="build-number" title="Build number - increments on each build and hot reload">
           #{{ buildInfo.buildNumber }}
         </div>
@@ -270,6 +279,32 @@ const handleLocaleChange = (localeValue: string | number) => {
   border: 1px solid var(--game-surface-border);
   border-radius: 4px;
   white-space: nowrap;
+}
+
+.debug-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: var(--base-alpha-gray-100-10);
+  border: 1px solid var(--game-surface-border);
+  border-radius: 4px;
+  color: var(--game-text-tertiary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.debug-toggle:hover {
+  border-color: var(--base-solid-primary);
+  color: var(--game-text-secondary);
+}
+
+.debug-toggle.active {
+  color: var(--base-solid-primary);
+  border-color: var(--base-solid-primary);
+  background: var(--base-alpha-gray-100-10);
 }
 
 /* Nav button styles */

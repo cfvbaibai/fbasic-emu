@@ -5,6 +5,9 @@
     "tools": "Development Tools",
     "testing": "Testing & Diagnostics"
   },
+  "debug": {
+    "toggleTitle": "Toggle debug mode — show dev/test pages"
+  },
   "items": {
     "home": {
       "name": "Home",
@@ -37,6 +40,10 @@
     "printVsSpritesTest": {
       "name": "PRINT Test",
       "description": "PRINT vs Sprites Test"
+    },
+    "soundTest": {
+      "name": "Sound Test",
+      "description": "Sound System Test"
     }
   }
 }
