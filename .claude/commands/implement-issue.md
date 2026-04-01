@@ -151,10 +151,11 @@ This worktree contains a fresh checkout of origin/master. All implementation mus
 After implementation, run targeted tests for the files you changed:
   cd ${WT_PATH} && pnpm install --frozen-lockfile && pnpm -s test:run -- <relevant-test-paths>
 
-Also always run type-check and eslint with --fix on changed files to catch and auto-fix errors before committing:
+Also always run type-check and eslint on changed files to catch errors before committing:
   cd ${WT_PATH} && pnpm -s type-check
   cd ${WT_PATH} && pnpm exec eslint --fix <changed-files> && git diff --exit-code  # fail if fix changed files (need to amend)
-  cd ${WT_PATH} && pnpm exec eslint --fix <changed-files> && git diff --exit-code  # fail if fix changed files (need to amend)
+  cd ${WT_PATH} && pnpm exec eslint <changed-files>  # catch non-fixable errors (max-len, etc.)
+Note: eslint --fix does NOT fix max-len — always do a final eslint pass without --fix to catch line length violations.
 
 Do NOT run full lint/test/build unless the change scope warrants it. Do NOT commit — I will handle the commit and PR.
 
