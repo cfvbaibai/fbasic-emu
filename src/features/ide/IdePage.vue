@@ -15,6 +15,7 @@ import CommandPalette from './components/CommandPalette.vue'
 import IdeBottomArea from './components/IdeBottomArea.vue'
 import IdeEditorPanel from './components/IdeEditorPanel.vue'
 import IdeOutputPanel from './components/IdeOutputPanel.vue'
+import IdeSpriteViewerPanel from './components/IdeSpriteViewerPanel.vue'
 import InputModal from './components/InputModal.vue'
 import SampleSelector from './components/SampleSelector.vue'
 import {
@@ -133,6 +134,7 @@ const sampleSelectorOpen = shallowRef(false)
 const commandPaletteOpen = shallowRef(false)
 const editorView = shallowRef<'code' | 'bg'>('code')
 const logLevelPanelOpen = shallowRef(false)
+const spriteViewerOpen = shallowRef(false)
 
 // Responsive toolbar - observe editor panel which expands with screen
 const editorPanelRef = useTemplateRef<HTMLDivElement>('editorPanelRef')
@@ -379,6 +381,7 @@ function toggleInputMode() {
             @clear="clearOutput"
             @toggle-debug="toggleDebugMode"
             @open-sample-selector="sampleSelectorOpen = true"
+            @open-sprite-viewer="spriteViewerOpen = true"
           />
         </div>
 
@@ -432,6 +435,12 @@ function toggleInputMode() {
           :commands="commandPaletteCommands"
           @close="closeCommandPalette"
           @execute="handleExecuteCommandFromPalette"
+        />
+
+        <!-- Sprite Viewer Side Panel -->
+        <IdeSpriteViewerPanel
+          v-if="spriteViewerOpen"
+          @close="spriteViewerOpen = false"
         />
       </Teleport>
     </div>

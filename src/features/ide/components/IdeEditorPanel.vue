@@ -30,6 +30,7 @@ const emit = defineEmits<{
   (e: 'clear'): void
   (e: 'toggleDebug'): void
   (e: 'openSampleSelector'): void
+  (e: 'openSpriteViewer'): void
 }>()
 
 const MonacoCodeEditor = defineAsyncComponent({
@@ -104,6 +105,13 @@ const useLiteEditor = computed(() => {
             {{ t('ide.samples.load') }}
           </GameButton>
         </template>
+        <GameIconButton
+          type="default"
+          icon="mdi:eye"
+          size="small"
+          :title="t('ide.spriteViewer.openTitle')"
+          @click="emit('openSpriteViewer')"
+        />
         <IdeControls
           :is-running="props.isRunning"
           :can-run="props.canRun"

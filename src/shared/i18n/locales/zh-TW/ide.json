@@ -471,5 +471,10 @@
     "deleteConfirmMessage": "確定要刪除「{name}」嗎？此操作無法復原。",
     "deleteConfirmLabel": "刪除",
     "programCount": "暫無程式 | {count} 個程式 | {count} 個程式"
+  },
+  "spriteViewer": {
+    "title": "精靈檢視器",
+    "openTitle": "開啟精靈檢視器",
+    "close": "關閉"
   }
 }
