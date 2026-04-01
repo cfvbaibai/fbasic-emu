@@ -45,17 +45,6 @@ const routes: RouteRecordRaw[] = [
     },
   },
   {
-    path: '/image-analyzer',
-    name: 'ImageAnalyzer',
-    component: () => import('@/features/image-analyzer/ImageAnalyzerPage.vue'),
-    meta: {
-      title: 'Image Analyzer',
-      showInNav: true,
-      icon: 'mdi:image',
-      group: 'tools',
-    },
-  },
-  {
     path: '/monaco',
     name: 'MonacoEditor',
     component: () => import('@/features/monaco-editor/MonacoEditorPage.vue'),

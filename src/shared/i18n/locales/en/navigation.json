@@ -18,10 +18,6 @@
       "name": "Sprite Viewer",
       "description": "View Character Sprites"
     },
-    "imageAnalyzer": {
-      "name": "Image Analyzer",
-      "description": "Analyze Images"
-    },
     "monaco": {
       "name": "Monaco Editor",
       "description": "Advanced Code Editor"

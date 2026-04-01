@@ -17,10 +17,6 @@
         "title": "Monaco 编辑器",
         "description": "具有 IntelliSense、语法高亮和专业开发功能的高级代码编辑器。"
       },
-      "imageAnalyzer": {
-        "title": "图像分析器",
-        "description": "分析并检查图像文件，提供详细的像素信息和调色板提取。"
-      },
       "spriteViewer": {
         "title": "精灵查看器",
         "description": "查看和探索角色精灵，具有动画控制、调色板选择和显示选项。"

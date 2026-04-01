@@ -43,7 +43,7 @@ logComposable.setDefaultLevel(defaultLevel)
 export const logInterpreter = log.getLogger('interpreter')
 logInterpreter.setDefaultLevel(defaultLevel)
 
-/** Core utilities (sharedDisplayBuffer, CharacterAnimationBuilder, DataService, MessageHandler, image-analyzer). */
+/** Core utilities (sharedDisplayBuffer, CharacterAnimationBuilder, DataService, MessageHandler). */
 export const logCore = log.getLogger('core')
 logCore.setDefaultLevel(defaultLevel)
 

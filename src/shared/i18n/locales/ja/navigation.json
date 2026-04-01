@@ -18,10 +18,6 @@
       "name": "スプライトビューア",
       "description": "キャラクタースプライトを表示"
     },
-    "imageAnalyzer": {
-      "name": "画像アナライザー",
-      "description": "画像を分析"
-    },
     "monaco": {
       "name": "Monacoエディタ",
       "description": "高度なコードエディタ"

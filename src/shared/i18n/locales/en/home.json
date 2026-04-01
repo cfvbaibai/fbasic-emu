@@ -17,10 +17,6 @@
         "title": "Monaco Editor",
         "description": "Advanced code editor with IntelliSense, syntax highlighting, and professional development features."
       },
-      "imageAnalyzer": {
-        "title": "Image Analyzer",
-        "description": "Analyze and inspect image files with detailed pixel information and color palette extraction."
-      },
       "spriteViewer": {
         "title": "Sprite Viewer",
         "description": "View and explore character sprites with animation controls, palette selection, and display options."

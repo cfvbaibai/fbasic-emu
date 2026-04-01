@@ -17,10 +17,6 @@
         "title": "Monaco 編輯器",
         "description": "具有 IntelliSense、語法高亮和專業開發功能的進階程式碼編輯器。"
       },
-      "imageAnalyzer": {
-        "title": "影像分析器",
-        "description": "分析並檢查影像檔案，提供詳細的像素資訊和調色板提取。"
-      },
       "spriteViewer": {
         "title": "精靈檢視器",
         "description": "檢視和探索角色精靈，具有動畫控制、調色板選擇和顯示選項。"
