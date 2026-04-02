@@ -3,6 +3,7 @@ import './shared/styles/fonts'
 import './shared/styles/theme.css'
 import './shared/styles/utilities.css'
 import './shared/styles/skins/index.css'
+import './shared/styles/retro-home.css'
 
 import { createApp } from 'vue'
 import VueKonva from 'vue-konva'
