@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref, useTemplateRef } from 'vue'
+import { nextTick, onMounted, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import type { ProgramData } from '@/core/types/program-types'
+import { useLibraryFilter } from '@/features/ide/composables/useLibraryFilter'
 import { useProgramLibrary } from '@/features/ide/composables/useProgramLibrary'
 import { ConfirmDialog, GameButton, GameIconButton, GameInput, GameSelect } from '@/shared/components/ui'
 
@@ -27,9 +28,15 @@ const emit = defineEmits<{
 const { t } = useI18n()
 const library = useProgramLibrary()
 
-// Search and sort state
-const searchQuery = ref<string | number>('')
-const sortKey = ref<string | number>('updatedAt')
+// Filter/sort logic delegated to composable
+const {
+  searchQuery,
+  sortKey,
+  sortOptions,
+  displayedPrograms,
+  hasNoResults,
+  isEmpty,
+} = useLibraryFilter(library.programs, library.isInitialized)
 
 // Delete confirmation state
 const deleteTarget = ref<ProgramData | null>(null)
@@ -39,46 +46,9 @@ const editingId = ref<string | null>(null)
 const editingName = ref('')
 const renameInputRef = useTemplateRef<HTMLInputElement>('renameInputRef')
 
-// Sort options for the GameSelect dropdown
-const sortOptions = computed(() => [
-  { label: t('ide.myPrograms.sort.recentlyModified'), value: 'updatedAt' as const },
-  { label: t('ide.myPrograms.sort.alphabetical'), value: 'name' as const },
-])
-
 // Load programs on mount
 onMounted(() => {
   void library.listPrograms()
-})
-
-// Filtered and sorted programs
-const displayedPrograms = computed(() => {
-  let result = [...library.programs.value]
-
-  // Filter by search query
-  const query = String(searchQuery.value).trim().toLowerCase()
-  if (query) {
-    result = result.filter((p) => p.name.toLowerCase().includes(query))
-  }
-
-  // Sort
-  const sort = sortKey.value as 'updatedAt' | 'name'
-  result.sort((a, b) => {
-    if (sort === 'updatedAt') {
-      return b.updatedAt - a.updatedAt
-    }
-    return a.name.localeCompare(b.name)
-  })
-
-  return result
-})
-
-// Whether the "no results" state is from filtering (vs truly empty library)
-const hasNoResults = computed(() => {
-  return String(searchQuery.value).trim() !== '' && displayedPrograms.value.length === 0
-})
-
-const isEmpty = computed(() => {
-  return library.isInitialized.value && library.programs.value.length === 0 && !String(searchQuery.value).trim()
 })
 
 // Format timestamp to locale string
