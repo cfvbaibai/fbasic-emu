@@ -1,0 +1,274 @@
+/**
+ * Navigation bar styles for GameNavigation.vue.
+ * All selectors are scoped under game-navigation-specific class names.
+ */
+
+.game-navigation {
+  border-bottom: 1px solid var(--game-nav-border);
+  flex-shrink: 0;
+  z-index: 1000;
+}
+
+.nav-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.nav-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font: 700 1.5rem var(--game-font-family-heading);
+  color: var(--base-solid-primary);
+  text-shadow: 0 0 10px var(--game-accent-glow), 0 2px 4px var(--base-alpha-gray-00-80);
+  letter-spacing: 2px;
+  white-space: nowrap;
+}
+
+.title-icon {
+  font-size: 1.75rem;
+  filter: drop-shadow(0 0 8px var(--game-accent-glow));
+}
+
+.nav-items {
+  display: flex;
+  gap: 0.375rem;
+  flex: 1;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.nav-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-left: 1rem;
+  flex-shrink: 0;
+}
+
+.build-number {
+  font-family: var(--game-font-family-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--game-text-tertiary);
+  padding: 0.25rem 0.5rem;
+  background: var(--base-alpha-gray-100-10);
+  border: 1px solid var(--game-surface-border);
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.debug-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: var(--base-alpha-gray-100-10);
+  border: 1px solid var(--game-surface-border);
+  border-radius: 4px;
+  color: var(--game-text-tertiary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.debug-toggle:hover {
+  border-color: var(--base-solid-primary);
+  color: var(--game-text-secondary);
+}
+
+.debug-toggle.active {
+  color: var(--base-solid-primary);
+  border-color: var(--base-solid-primary);
+  background: var(--base-alpha-gray-100-10);
+}
+
+/* Nav button styles */
+.nav-button {
+  position: relative;
+  background: var(--game-surface-bg-gradient);
+  border: 2px solid var(--game-surface-border);
+  border-radius: 8px;
+  padding: 0.5rem 0.875rem;
+  color: var(--game-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+  box-shadow:
+    0 2px 4px var(--base-alpha-gray-00-30),
+    inset 0 1px 0 var(--base-alpha-gray-100-10);
+}
+
+.nav-button:hover {
+  background: var(--game-surface-bg-hover-gradient);
+  border-color: var(--base-solid-primary);
+  color: var(--game-text-primary);
+  transform: translateY(-2px);
+  box-shadow:
+    0 4px 8px var(--game-accent-glow),
+    0 2px 4px var(--base-alpha-gray-00-40),
+    inset 0 1px 0 var(--base-alpha-gray-100-10);
+}
+
+.nav-button.active {
+  background: linear-gradient(
+    135deg,
+    var(--base-solid-primary) 0%,
+    var(--base-solid-primary) 100%
+  );
+  border-color: var(--base-solid-primary);
+  color: var(--game-text-contrast);
+  font-weight: 700;
+  box-shadow:
+    var(--game-shadow-glow),
+    0 4px 8px var(--base-alpha-gray-00-40),
+    inset 0 1px 0 var(--base-alpha-gray-100-30);
+}
+
+.nav-button.active::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--base-solid-gray-00);
+  border-radius: 8px 0 0 8px;
+  box-shadow: 0 0 8px var(--base-alpha-gray-00-50);
+}
+
+.nav-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.nav-button.active .nav-icon {
+  color: var(--game-text-contrast);
+  filter: drop-shadow(0 0 4px var(--base-alpha-gray-00-30));
+}
+
+.nav-button:hover .nav-icon {
+  transform: scale(1.1);
+}
+
+.nav-button-content {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.nav-button-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.nav-button-desc {
+  display: none;
+}
+
+.nav-button-grouped {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.8rem;
+}
+
+.nav-button-grouped .nav-button-name {
+  font-size: 0.8rem;
+}
+
+/* Nav group styles */
+.nav-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.nav-group-header {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.875rem;
+  background: var(--game-surface-bg-gradient);
+  border: 2px solid var(--game-surface-border);
+  border-radius: 8px;
+  color: var(--game-text-tertiary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  box-shadow:
+    0 2px 4px var(--base-alpha-gray-00-30),
+    inset 0 1px 0 var(--base-alpha-gray-100-10);
+}
+
+.nav-group-header:hover {
+  background: var(--base-alpha-gray-100-10);
+  border-color: var(--base-solid-primary);
+  color: var(--game-text-secondary);
+}
+
+.nav-group-icon {
+  font-size: 0.875rem;
+  transition: transform 0.2s ease;
+}
+
+.nav-group-dropdown {
+  position: fixed;
+  min-width: 250px;
+  max-width: 320px;
+  background: var(--game-surface-bg-gradient);
+  border: 2px solid var(--game-surface-border);
+  border-radius: 8px;
+  padding: 0.5rem;
+  box-shadow:
+    0 4px 12px var(--base-alpha-gray-00-40),
+    0 0 8px var(--game-accent-glow);
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
+  transition: all 0.2s ease;
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.nav-group-dropdown.expanded {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* Responsive design */
+/* stylelint-disable declaration-block-single-line-max-declarations */
+@media (width <= 768px) {
+  .nav-container { flex-direction: column; gap: 1rem; padding: 1rem; }
+  .nav-title { font-size: 1.25rem; }
+  .nav-items { width: 100%; flex-direction: column; justify-content: center; }
+  .nav-button { width: 100%; min-width: auto; padding: 0.5rem 0.875rem; }
+  .nav-button-content { align-items: center; text-align: center; }
+  .nav-group, .nav-group-header { width: 100%; }
+
+  .nav-group-dropdown {
+    position: fixed; left: 1rem !important; right: 1rem;
+    width: auto; min-width: auto; max-width: none;
+  }
+  .nav-controls { width: 100%; margin: 0.5rem 0 0; justify-content: center; gap: 0.5rem; }
+}
+
+@media (width <= 480px) {
+  .nav-items { flex-direction: column; }
+  .nav-button { width: 100%; min-width: unset; }
+}
+/* stylelint-enable declaration-block-single-line-max-declarations */
