@@ -75,15 +75,7 @@
   color: var(--base-solid-primary);
 }
 
-.showcase-item-icon-editor {
-  background: linear-gradient(
-    135deg,
-    var(--base-solid-primary-10),
-    var(--base-solid-primary-20)
-  );
-  border-color: var(--base-solid-primary);
-}
-
+.showcase-item-icon-editor,
 .showcase-item-icon-sprites {
   background: linear-gradient(
     135deg,
