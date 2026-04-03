@@ -2,8 +2,8 @@
  * Showcase Section Styles
  *
  * Styles for the home page feature showcase section,
- * including the asymmetric grid layout, code window,
- * and feature card styling.
+ * including a uniform 2x2 grid of feature cards
+ * and a full-width code preview banner.
  */
 
 /* ===== Showcase Section ===== */
@@ -40,37 +40,12 @@
   line-height: 1.5;
 }
 
-/* ===== Showcase Grid ===== */
+/* ===== Showcase Grid — Uniform 2x2 ===== */
 
 .showcase-grid {
   display: grid;
-  grid-template-columns: 1.4fr 1fr;
-  grid-template-rows: auto auto;
+  grid-template-columns: 1fr 1fr;
   gap: 1.5rem;
-}
-
-.showcase-spotlight {
-  grid-column: 1;
-  grid-row: 1;
-}
-
-.showcase-side {
-  grid-column: 2;
-  grid-row: 1;
-}
-
-.showcase-row-item {
-  grid-column: auto;
-  grid-row: 2;
-}
-
-/* Last row items split evenly */
-.showcase-row-item:nth-child(3) {
-  grid-column: 1;
-}
-
-.showcase-row-item:nth-child(4) {
-  grid-column: 2;
 }
 
 .showcase-item {
@@ -78,40 +53,117 @@
   overflow: hidden;
 }
 
-/* ===== Spotlight (Editor) ===== */
+/* ===== Feature Card Inner Layout ===== */
 
-.spotlight-content {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
+.showcase-item-inner {
   padding: 2rem;
-}
-
-.spotlight-text {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  height: 100%;
 }
 
-.spotlight-icon {
-  width: 64px;
-  height: 64px;
+.showcase-item-icon {
+  width: 56px;
+  height: 56px;
   border-radius: 12px;
-  background: var(--game-surface-bg-accent-gradient);
-  border: 2px solid var(--base-solid-primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 20px var(--base-alpha-primary-30);
+  margin-bottom: 1.25rem;
+  border: 2px solid transparent;
+  box-shadow: 0 0 16px var(--base-alpha-primary-20);
   color: var(--base-solid-primary);
-  margin-bottom: 0.5rem;
+}
+
+.showcase-item-icon-editor {
+  background: linear-gradient(
+    135deg,
+    var(--base-solid-primary-10),
+    var(--base-solid-primary-20)
+  );
+  border-color: var(--base-solid-primary);
+}
+
+.showcase-item-icon-sprites {
+  background: linear-gradient(
+    135deg,
+    var(--base-solid-primary-10),
+    var(--base-solid-primary-20)
+  );
+  border-color: var(--base-solid-primary);
+}
+
+.showcase-item-icon-sound {
+  background: linear-gradient(
+    135deg,
+    var(--semantic-alpha-warning-10),
+    var(--semantic-alpha-warning-20)
+  );
+  border-color: var(--semantic-solid-warning);
+  color: var(--semantic-solid-warning);
+  box-shadow: 0 0 16px var(--semantic-alpha-warning-20);
+}
+
+.showcase-item-icon-samples {
+  background: linear-gradient(
+    135deg,
+    var(--semantic-alpha-success-10),
+    var(--semantic-alpha-success-20)
+  );
+  border-color: var(--semantic-solid-success);
+  color: var(--semantic-solid-success);
+  box-shadow: 0 0 16px var(--semantic-alpha-success-20);
+}
+
+/* ===== Shared Item Styles ===== */
+
+.showcase-item-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  font-family: var(--game-font-family-heading);
+  margin: 0 0 0.75rem;
+  text-shadow: 0 0 8px var(--game-accent-glow);
+}
+
+/* Light theme: use accent color, no glow */
+.light-theme .showcase-item-title {
+  color: var(--base-solid-primary);
+  text-shadow: none;
+}
+
+.showcase-item-desc {
+  font-size: 0.9rem;
+  color: var(--game-text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ===== Code Banner — Full-Width Preview ===== */
+
+.showcase-code-banner {
+  margin-top: 1.5rem;
+  padding: 0;
+  overflow: hidden;
+}
+
+.code-banner-content {
+  padding: 1.5rem 2rem 2rem;
+}
+
+.code-banner-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--game-font-family-heading);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--game-text-tertiary);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
 }
 
 /* ===== Code Window ===== */
-
-.spotlight-code {
-  flex: 1;
-}
 
 .code-window {
   background: var(--base-solid-gray-00);
@@ -174,91 +226,6 @@
   background: transparent;
 }
 
-/* ===== Side Item (Sprites) ===== */
-
-.showcase-item-inner {
-  padding: 2rem;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.showcase-side .showcase-item-inner {
-  justify-content: center;
-}
-
-.showcase-item-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 1.25rem;
-  border: 2px solid transparent;
-  box-shadow: 0 0 16px var(--base-alpha-primary-20);
-  color: var(--base-solid-primary);
-}
-
-.showcase-item-icon-sprites {
-  background: linear-gradient(135deg, var(--base-solid-primary-10), var(--base-solid-primary-20));
-  border-color: var(--base-solid-primary);
-}
-
-.showcase-item-icon-sound {
-  width: 48px;
-  height: 48px;
-  background: linear-gradient(135deg, var(--semantic-alpha-warning-10), var(--semantic-alpha-warning-20));
-  border-color: var(--semantic-solid-warning);
-  color: var(--semantic-solid-warning);
-  box-shadow: 0 0 16px var(--semantic-alpha-warning-20);
-}
-
-.showcase-item-icon-samples {
-  width: 48px;
-  height: 48px;
-  background: linear-gradient(135deg, var(--semantic-alpha-success-10), var(--semantic-alpha-success-20));
-  border-color: var(--semantic-solid-success);
-  color: var(--semantic-solid-success);
-  box-shadow: 0 0 16px var(--semantic-alpha-success-20);
-}
-
-/* ===== Row Items (Sound, Samples) ===== */
-
-.showcase-row-item .showcase-item-inner {
-  flex-direction: row;
-  align-items: flex-start;
-  gap: 1.25rem;
-}
-
-.showcase-row-item .showcase-item-body {
-  flex: 1;
-  min-width: 0;
-}
-
-/* ===== Shared Item Styles ===== */
-
-.showcase-item-title {
-  font-size: 1.3rem;
-  font-weight: 700;
-  font-family: var(--game-font-family-heading);
-  margin: 0 0 0.75rem;
-  text-shadow: 0 0 8px var(--game-accent-glow);
-}
-
-/* Light theme: use accent color, no glow */
-.light-theme .showcase-item-title {
-  color: var(--base-solid-primary);
-  text-shadow: none;
-}
-
-.showcase-item-desc {
-  font-size: 0.9rem;
-  color: var(--game-text-secondary);
-  line-height: 1.6;
-  margin: 0;
-}
-
 /* ===== Responsive Design ===== */
 
 @media (width <= 768px) {
@@ -266,23 +233,16 @@
     grid-template-columns: 1fr;
   }
 
-  .showcase-spotlight,
-  .showcase-side,
-  .showcase-row-item:nth-child(3),
-  .showcase-row-item:nth-child(4) {
-    grid-column: 1;
-  }
-
-  .spotlight-content {
-    padding: 1.5rem;
-  }
-
   .showcase-title {
     font-size: 1.8rem;
   }
 
-  .showcase-row-item .showcase-item-inner {
-    flex-direction: column;
+  .showcase-item-inner {
+    padding: 1.5rem;
+  }
+
+  .code-banner-content {
+    padding: 1.25rem 1.5rem 1.5rem;
   }
 }
 
@@ -295,12 +255,11 @@
     font-size: 1rem;
   }
 
-  .spotlight-content {
-    gap: 1.5rem;
+  .showcase-item-inner {
     padding: 1.25rem;
   }
 
-  .showcase-item-inner {
-    padding: 1.25rem;
+  .code-banner-content {
+    padding: 1rem 1.25rem 1.25rem;
   }
 }

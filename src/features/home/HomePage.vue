@@ -62,32 +62,19 @@ const goToIde = () => {
           </div>
 
           <div class="showcase-grid">
-            <!-- Editor Spotlight - Large featured highlight -->
+            <!-- Editor -->
             <GameBlock
               title=""
               :hide-header="true"
               :no-hover-effect="true"
-              class="showcase-spotlight showcase-item"
+              class="showcase-item"
             >
-              <div class="spotlight-content">
-                <div class="spotlight-text">
-                  <div class="spotlight-icon">
-                    <GameIcon icon="mdi:code-braces" :size="36" />
-                  </div>
-                  <h3 class="showcase-item-title">{{ t('home.showcase.items.editor.title') }}</h3>
-                  <p class="showcase-item-desc">{{ t('home.showcase.items.editor.description') }}</p>
+              <div class="showcase-item-inner">
+                <div class="showcase-item-icon showcase-item-icon-editor">
+                  <GameIcon icon="mdi:code-braces" :size="32" />
                 </div>
-                <div class="spotlight-code">
-                  <div class="code-window">
-                    <div class="code-window-bar">
-                      <span class="code-dot code-dot-red"></span>
-                      <span class="code-dot code-dot-yellow"></span>
-                      <span class="code-dot code-dot-green"></span>
-                      <span class="code-window-title">HELLO.BAS</span>
-                    </div>
-                    <pre class="code-block"><code>{{ t('home.showcase.items.editor.code') }}</code></pre>
-                  </div>
-                </div>
+                <h3 class="showcase-item-title">{{ t('home.showcase.items.editor.title') }}</h3>
+                <p class="showcase-item-desc">{{ t('home.showcase.items.editor.description') }}</p>
               </div>
             </GameBlock>
 
@@ -96,7 +83,7 @@ const goToIde = () => {
               title=""
               :hide-header="true"
               :no-hover-effect="true"
-              class="showcase-side showcase-item"
+              class="showcase-item"
             >
               <div class="showcase-item-inner">
                 <div class="showcase-item-icon showcase-item-icon-sprites">
@@ -112,16 +99,14 @@ const goToIde = () => {
               title=""
               :hide-header="true"
               :no-hover-effect="true"
-              class="showcase-row-item showcase-item"
+              class="showcase-item"
             >
               <div class="showcase-item-inner">
                 <div class="showcase-item-icon showcase-item-icon-sound">
-                  <GameIcon icon="mdi:music-note" :size="28" />
+                  <GameIcon icon="mdi:music-note" :size="32" />
                 </div>
-                <div class="showcase-item-body">
-                  <h3 class="showcase-item-title">{{ t('home.showcase.items.sound.title') }}</h3>
-                  <p class="showcase-item-desc">{{ t('home.showcase.items.sound.description') }}</p>
-                </div>
+                <h3 class="showcase-item-title">{{ t('home.showcase.items.sound.title') }}</h3>
+                <p class="showcase-item-desc">{{ t('home.showcase.items.sound.description') }}</p>
               </div>
             </GameBlock>
 
@@ -130,19 +115,41 @@ const goToIde = () => {
               title=""
               :hide-header="true"
               :no-hover-effect="true"
-              class="showcase-row-item showcase-item"
+              class="showcase-item"
             >
               <div class="showcase-item-inner">
                 <div class="showcase-item-icon showcase-item-icon-samples">
-                  <GameIcon icon="mdi:gamepad-variant" :size="28" />
+                  <GameIcon icon="mdi:gamepad-variant" :size="32" />
                 </div>
-                <div class="showcase-item-body">
-                  <h3 class="showcase-item-title">{{ t('home.showcase.items.samples.title') }}</h3>
-                  <p class="showcase-item-desc">{{ t('home.showcase.items.samples.description') }}</p>
-                </div>
+                <h3 class="showcase-item-title">{{ t('home.showcase.items.samples.title') }}</h3>
+                <p class="showcase-item-desc">{{ t('home.showcase.items.samples.description') }}</p>
               </div>
             </GameBlock>
           </div>
+
+          <!-- Code Banner — full-width F-BASIC code preview -->
+          <GameBlock
+            title=""
+            :hide-header="true"
+            :no-hover-effect="true"
+            class="showcase-code-banner"
+          >
+            <div class="code-banner-content">
+              <div class="code-banner-label">
+                <GameIcon icon="mdi:code-braces" :size="18" />
+                <span>{{ t('home.showcase.items.editor.title') }}</span>
+              </div>
+              <div class="code-window">
+                <div class="code-window-bar">
+                  <span class="code-dot code-dot-red"></span>
+                  <span class="code-dot code-dot-yellow"></span>
+                  <span class="code-dot code-dot-green"></span>
+                  <span class="code-window-title">HELLO.BAS</span>
+                </div>
+                <pre class="code-block"><code>{{ t('home.showcase.items.editor.code') }}</code></pre>
+              </div>
+            </div>
+          </GameBlock>
         </section>
       </div>
     </div>
