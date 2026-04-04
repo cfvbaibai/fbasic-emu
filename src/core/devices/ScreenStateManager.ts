@@ -9,6 +9,16 @@ import type { ScreenUpdateMessage } from '@/core/types/worker-messages'
 import { BACKGROUND_PALETTES, SPRITE_PALETTES } from '@/shared/data/palette'
 import { logDevice } from '@/shared/logger'
 
+import {
+  createBackdropUpdateMessage,
+  createCgenUpdateMessage,
+  createClearUpdateMessage,
+  createColorUpdateMessage,
+  createCursorUpdateMessage,
+  createFullUpdateMessage,
+  createPaletteUpdateMessage,
+} from './ScreenUpdateMessageFactory'
+
 export class ScreenStateManager {
   private screenBuffer: ScreenCell[][] = []
   private cursorX = 0
@@ -40,25 +50,10 @@ export class ScreenStateManager {
    */
   resetState(): void {
     this.initializeScreen()
-    this.bgPalette = 1
-    this.spritePalette = 1
-    this.backdropColor = 0
-    this.cgenMode = 2
-    // Reset palettes to original data (undo PALET modifications)
-    for (let i = 0; i < this.backgroundPalettes.length; i++) {
-      for (let j = 0; j < this.backgroundPalettes[i]!.length; j++) {
-        this.backgroundPalettes[i]![j] = [...BACKGROUND_PALETTES[i]![j]!] as [number, number, number, number]
-      }
-    }
-    for (let i = 0; i < this.spritePalettes.length; i++) {
-      for (let j = 0; j < this.spritePalettes[i]!.length; j++) {
-        this.spritePalettes[i]![j] = [...SPRITE_PALETTES[i]![j]!] as [number, number, number, number]
-      }
-    }
   }
 
   /**
-   * Initialize the screen buffer
+   * Initialize the screen buffer and reset all screen state to defaults.
    */
   initializeScreen(): void {
     // Initialize empty 28×24 grid
@@ -72,6 +67,34 @@ export class ScreenStateManager {
     }
     this.cursorX = 0
     this.cursorY = 0
+    // Reset BG/screen state to defaults so stale data does not persist
+    this.bgPalette = 1
+    this.spritePalette = 1
+    this.backdropColor = 0
+    this.cgenMode = 2
+    // Reset palette combinations to original data
+    this.resetPalettes()
+  }
+
+  /**
+   * Reset palette combination arrays to original palette data.
+   * Mutates in-place because the arrays are readonly references.
+   */
+  private resetPalettes(): void {
+    for (let i = 0; i < this.backgroundPalettes.length; i++) {
+      const source = BACKGROUND_PALETTES[i]!
+      const target = this.backgroundPalettes[i]!
+      for (let j = 0; j < source.length; j++) {
+        target[j] = [...source[j]!] as [number, number, number, number]
+      }
+    }
+    for (let i = 0; i < this.spritePalettes.length; i++) {
+      const source = SPRITE_PALETTES[i]!
+      const target = this.spritePalettes[i]!
+      for (let j = 0; j < source.length; j++) {
+        target[j] = [...source[j]!] as [number, number, number, number]
+      }
+    }
   }
 
   /**
@@ -368,125 +391,49 @@ export class ScreenStateManager {
    */
   createFullScreenUpdateMessage(): ScreenUpdateMessage {
     const self = this as ScreenStateManager | undefined
-    const buffer = self?.screenBuffer ?? []
-    const cursorX = self?.cursorX ?? 0
-    const cursorY = self?.cursorY ?? 0
-    const executionId = self?.currentExecutionId ?? 'unknown'
-    return {
-      type: 'SCREEN_UPDATE',
-      id: `screen-full-${Date.now()}`,
-      timestamp: Date.now(),
-      data: {
-        executionId,
-        updateType: 'full',
-        screenBuffer: buffer,
-        cursorX,
-        cursorY,
-        timestamp: Date.now(),
-      },
-    }
+    return createFullUpdateMessage(
+      self?.currentExecutionId ?? 'unknown',
+      self?.screenBuffer ?? [],
+      self?.cursorX ?? 0,
+      self?.cursorY ?? 0,
+    )
   }
 
-  /**
-   * Create a cursor update message
-   */
+  /** Create a cursor update message */
   createCursorUpdateMessage(): ScreenUpdateMessage {
-    return {
-      type: 'SCREEN_UPDATE',
-      id: `screen-cursor-${Date.now()}`,
-      timestamp: Date.now(),
-      data: {
-        executionId: this.currentExecutionId ?? 'unknown',
-        updateType: 'cursor',
-        cursorX: this.cursorX,
-        cursorY: this.cursorY,
-        timestamp: Date.now(),
-      },
-    }
+    return createCursorUpdateMessage(
+      this.currentExecutionId ?? 'unknown',
+      this.cursorX,
+      this.cursorY,
+    )
   }
 
-  /**
-   * Create a clear screen update message
-   */
+  /** Create a clear screen update message */
   createClearScreenUpdateMessage(): ScreenUpdateMessage {
-    return {
-      type: 'SCREEN_UPDATE',
-      id: `screen-clear-${Date.now()}`,
-      timestamp: Date.now(),
-      data: {
-        executionId: this.currentExecutionId ?? 'unknown',
-        updateType: 'clear',
-        timestamp: Date.now(),
-      },
-    }
+    return createClearUpdateMessage(this.currentExecutionId ?? 'unknown')
   }
 
-  /**
-   * Create a color pattern update message
-   */
+  /** Create a color pattern update message */
   createColorUpdateMessage(cellsToUpdate: Array<{ x: number; y: number; pattern: number }>): ScreenUpdateMessage {
-    return {
-      type: 'SCREEN_UPDATE',
-      id: `screen-color-${Date.now()}`,
-      timestamp: Date.now(),
-      data: {
-        executionId: this.currentExecutionId ?? 'unknown',
-        updateType: 'color',
-        colorUpdates: cellsToUpdate,
-        timestamp: Date.now(),
-      },
-    }
+    return createColorUpdateMessage(this.currentExecutionId ?? 'unknown', cellsToUpdate)
   }
 
-  /**
-   * Create a palette update message
-   */
+  /** Create a palette update message */
   createPaletteUpdateMessage(): ScreenUpdateMessage {
-    return {
-      type: 'SCREEN_UPDATE',
-      id: `screen-palette-${Date.now()}`,
-      timestamp: Date.now(),
-      data: {
-        executionId: this.currentExecutionId ?? 'unknown',
-        updateType: 'palette',
-        bgPalette: this.bgPalette,
-        spritePalette: this.spritePalette,
-        timestamp: Date.now(),
-      },
-    }
+    return createPaletteUpdateMessage(
+      this.currentExecutionId ?? 'unknown',
+      this.bgPalette,
+      this.spritePalette,
+    )
   }
 
-  /**
-   * Create a backdrop color update message
-   */
+  /** Create a backdrop color update message */
   createBackdropUpdateMessage(): ScreenUpdateMessage {
-    return {
-      type: 'SCREEN_UPDATE',
-      id: `screen-backdrop-${Date.now()}`,
-      timestamp: Date.now(),
-      data: {
-        executionId: this.currentExecutionId ?? 'unknown',
-        updateType: 'backdrop',
-        backdropColor: this.backdropColor,
-        timestamp: Date.now(),
-      },
-    }
+    return createBackdropUpdateMessage(this.currentExecutionId ?? 'unknown', this.backdropColor)
   }
 
-  /**
-   * Create a CGEN mode update message
-   */
+  /** Create a CGEN mode update message */
   createCgenUpdateMessage(): ScreenUpdateMessage {
-    return {
-      type: 'SCREEN_UPDATE',
-      id: `screen-cgen-${Date.now()}`,
-      timestamp: Date.now(),
-      data: {
-        executionId: this.currentExecutionId ?? 'unknown',
-        updateType: 'cgen',
-        cgenMode: this.cgenMode,
-        timestamp: Date.now(),
-      },
-    }
+    return createCgenUpdateMessage(this.currentExecutionId ?? 'unknown', this.cgenMode)
   }
 }
