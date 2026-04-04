@@ -34,6 +34,30 @@ export class ScreenStateManager {
   }
 
   /**
+   * Reset all screen state to defaults for a new execution.
+   * Called when a new RUN starts to clear BG data, palettes, and other
+   * state that would otherwise persist from a previous run.
+   */
+  resetState(): void {
+    this.initializeScreen()
+    this.bgPalette = 1
+    this.spritePalette = 1
+    this.backdropColor = 0
+    this.cgenMode = 2
+    // Reset palettes to original data (undo PALET modifications)
+    for (let i = 0; i < this.backgroundPalettes.length; i++) {
+      for (let j = 0; j < this.backgroundPalettes[i]!.length; j++) {
+        this.backgroundPalettes[i]![j] = [...BACKGROUND_PALETTES[i]![j]!] as [number, number, number, number]
+      }
+    }
+    for (let i = 0; i < this.spritePalettes.length; i++) {
+      for (let j = 0; j < this.spritePalettes[i]!.length; j++) {
+        this.spritePalettes[i]![j] = [...SPRITE_PALETTES[i]![j]!] as [number, number, number, number]
+      }
+    }
+  }
+
+  /**
    * Initialize the screen buffer
    */
   initializeScreen(): void {

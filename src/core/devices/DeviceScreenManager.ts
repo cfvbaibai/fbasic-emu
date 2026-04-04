@@ -51,7 +51,8 @@ export class DeviceScreenManager {
   setCurrentExecutionId(executionId: string | null): void {
     this.screenStateManager.setCurrentExecutionId(executionId)
     if (executionId) {
-      this.screenStateManager.initializeScreen()
+      this.screenStateManager.resetState()
+      this.bgGridData = null
       this.syncScreenStateToShared()
       this.postScreenChanged()
       this.cancelPendingScreenUpdate()
