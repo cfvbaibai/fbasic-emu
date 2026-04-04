@@ -31,7 +31,7 @@ const { t } = useI18n()
 .palette-container {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--sprite-color-box-gap, 8px);
   max-width: 100%;
   overflow-x: auto;
   padding: 8px 0;
@@ -40,12 +40,12 @@ const { t } = useI18n()
 .palette-row {
   display: grid;
   grid-template-columns: repeat(16, 1fr);
-  gap: 8px;
+  gap: var(--sprite-color-box-gap, 8px);
   min-width: fit-content;
 }
 
 .palette-color-wrapper {
-  width: 60px;
-  height: 60px;
+  width: var(--sprite-color-box-size, 60px);
+  height: var(--sprite-color-box-size, 60px);
 }
 </style>

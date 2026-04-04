@@ -88,7 +88,7 @@ const backgroundColorValue = computed(() => color.value)
 }
 
 .color-box-code {
-  font-size: 0.875rem;
+  font-size: var(--sprite-color-box-font-size, 0.875rem);
   font-weight: 600;
   color: var(--base-solid-gray-100);
   text-shadow: 1px 1px 2px var(--base-alpha-gray-00-80);

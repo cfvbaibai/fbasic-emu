@@ -33,7 +33,6 @@ const selectOptions = computed(() => {
       @update:model-value="store.setSelectedIndex(Number($event))"
       :options="selectOptions"
       :placeholder="t('spriteViewer.controls.placeholder')"
-      style="width: 300px"
     />
   </div>
 </template>

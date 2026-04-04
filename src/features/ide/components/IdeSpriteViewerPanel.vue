@@ -131,5 +131,15 @@ function closePanel() {
   flex-direction: column;
   gap: 1rem;
   padding: 1rem;
+
+  /* Compact-mode custom properties for child components */
+  --sprite-color-box-size: 26px;
+  --sprite-color-box-font-size: 0.6rem;
+  --sprite-color-box-gap: 4px;
+  --sprite-palette-min-width: 100%;
+  --sprite-palette-group-padding: 0.75rem;
+  --sprite-combination-min-width: 140px;
+  --sprite-combination-wrapper-min-width: 32px;
+  --sprite-combination-wrapper-height: 32px;
 }
 </style>
