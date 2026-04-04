@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, useTemplateRef } from 'vue'
+import { onMounted, onUnmounted, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import ColorPaletteDisplay from '@/features/sprite-viewer/components/ColorPaletteDisplay.vue'
@@ -12,7 +12,7 @@ import { GameIconButton } from '@/shared/components/ui'
 import GameIcon from '@/shared/components/ui/GameIcon.vue'
 
 /**
- * IdeSpriteViewerPanel - Slide-out side panel for viewing character sprites.
+ * IdeSpriteViewerPanel - Full-screen modal overlay for viewing character sprites.
  * Embeds the sprite viewer components within the IDE context.
  */
 defineOptions({
@@ -91,19 +91,22 @@ function closePanel() {
   inset: 0;
   z-index: 1100;
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
+  align-items: center;
   background: var(--base-alpha-gray-00-60);
   backdrop-filter: blur(2px);
 }
 
 .sprite-viewer-panel {
-  width: min(520px, 90vw);
-  height: 100%;
+  width: 90vw;
+  height: 85vh;
+  max-width: 1400px;
   display: flex;
   flex-direction: column;
-  border-left: 2px solid var(--game-surface-border);
+  border: 2px solid var(--game-surface-border);
+  border-radius: 8px;
   background: var(--game-surface-bg-gradient);
-  box-shadow: -4px 0 16px var(--base-alpha-gray-00-40);
+  box-shadow: 0 8px 32px var(--base-alpha-gray-00-40);
 }
 
 .sprite-viewer-header {
@@ -131,15 +134,5 @@ function closePanel() {
   flex-direction: column;
   gap: 1rem;
   padding: 1rem;
-
-  /* Compact-mode custom properties for child components */
-  --sprite-color-box-size: 26px;
-  --sprite-color-box-font-size: 0.6rem;
-  --sprite-color-box-gap: 4px;
-  --sprite-palette-min-width: 100%;
-  --sprite-palette-group-padding: 0.75rem;
-  --sprite-combination-min-width: 140px;
-  --sprite-combination-wrapper-min-width: 32px;
-  --sprite-combination-wrapper-height: 32px;
 }
 </style>
