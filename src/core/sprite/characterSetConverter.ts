@@ -8,6 +8,7 @@
  */
 
 import type { Tile } from '@/shared/data/types'
+import { getCodeByChar } from '@/shared/utils/backgroundLookup'
 import { getBgTilesByCodes, getSpriteTilesByCodes } from '@/shared/utils/spriteLookup'
 
 /**
@@ -30,8 +31,11 @@ export function convertCharacterSetToTiles(characterSet: number[] | string, size
   // Convert to character codes
   let charCodes: number[]
   if (typeof characterSet === 'string') {
-    // String: convert each character to its character code
-    charCodes = Array.from(characterSet).map(char => char.charCodeAt(0))
+    // String: convert each character to its F-BASIC character code
+    // Use reverse lookup (getCodeByChar) to map Unicode chars back to F-BASIC codes.
+    // CHR$() maps F-BASIC codes to Unicode chars (e.g., code 91 -> '「' U+300C),
+    // so charCodeAt(0) would return 12300 instead of 91.
+    charCodes = stringToCharCodes(characterSet)
   } else {
     charCodes = characterSet
   }
@@ -59,15 +63,25 @@ export function convertCharacterSetToTiles(characterSet: number[] | string, size
 }
 
 /**
+ * Convert a Unicode character to its F-BASIC character code.
+ * Uses reverse lookup via getCodeByChar to handle F-BASIC-specific mappings
+ * (e.g., code 91 maps to '「' U+300C, not ASCII '[').
+ * Falls back to charCodeAt(0) for standard ASCII characters not in the lookup table.
+ */
+function charToFBasicCode(char: string): number {
+  return getCodeByChar(char) ?? char.charCodeAt(0)
+}
+
+/**
  * Convert character string to character codes
  * Useful for parsing string literals from BASIC
  *
  * @param str - String (with or without quotes)
- * @returns Array of character codes
+ * @returns Array of F-BASIC character codes (0-255)
  */
 export function stringToCharCodes(str: string): number[] {
   // Remove quotes if present
   const cleanStr = str.startsWith('"') && str.endsWith('"') ? str.slice(1, -1) : str
 
-  return Array.from(cleanStr).map(char => char.charCodeAt(0))
+  return Array.from(cleanStr).map(charToFBasicCode)
 }
