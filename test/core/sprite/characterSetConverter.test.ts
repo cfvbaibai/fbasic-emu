@@ -110,5 +110,25 @@ describe('characterSetConverter', () => {
     it('should handle only quotes (empty quoted string)', () => {
       expect(stringToCharCodes('""')).toEqual([])
     })
+
+    it('should reverse-map F-BASIC characters to codes (code 91 = "「")', () => {
+      // CHR$(91) returns '「' (U+300C), not '['. stringToCharCodes must map
+      // it back to F-BASIC code 91, not Unicode code point 12300.
+      expect(stringToCharCodes('「')).toEqual([91])
+    })
+
+    it('should handle mixed ASCII and F-BASIC-mapped characters', () => {
+      // CHR$(88)+CHR$(89)+CHR$(90)+CHR$(91) = "XYZ「"
+      // Should map to F-BASIC codes [88, 89, 90, 91], not [88, 89, 90, 12300]
+      expect(stringToCharCodes('XYZ「')).toEqual([88, 89, 90, 91])
+    })
+
+    it('should handle yen sign (code 92 = "¥")', () => {
+      expect(stringToCharCodes('¥')).toEqual([92])
+    })
+
+    it('should handle right corner bracket (code 93 = "」")', () => {
+      expect(stringToCharCodes('」')).toEqual([93])
+    })
   })
 })
