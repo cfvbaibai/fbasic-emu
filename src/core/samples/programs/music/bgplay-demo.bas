@@ -13,12 +13,12 @@
 130 REM
 140 PRINT "1) PLAY (blocks):"
 150 PRINT "  Playing... (wait for it)";
-160 PLAY "T120O3C5E5G5O4C5"
+160 PLAY "T2O3C5E5G5O4C5"
 170 PRINT " Done!"
 180 PRINT ""
 190 PRINT "2) BGPLAY (fire-and-forget):"
 200 PRINT "  Music started!";
-210 BGPLAY "T120O3C5E5G5O4C5"
+210 BGPLAY "T2O3C5E5G5O4C5"
 220 PRINT " But I can print right away!"
 230 PAUSE 30
 240 REM Wait for background music to finish before continuing
@@ -34,7 +34,7 @@
 340 PRINT ""
 350 REM
 360 REM Start background music (simple melody)
-370 BGPLAY "T100O2C10E10G10O3C10O2B10G10E10C10"
+370 BGPLAY "T2O2C9E9G9O3C9O2B9G9E9C9"
 380 REM
 390 REM Game loop - sprite bounces left and right
 400 X=5
@@ -59,6 +59,6 @@
 590 REM --- Subroutine: Sound Effect (PLAY blocks briefly) ---
 600 REM PLAY is used for short sound effects because
 610 REM we WANT the brief pause for dramatic effect
-620 PLAY "T255O5C1C1C1"
+620 PLAY "T1O5C1C1C1"
 630 LOCATE 0,7:PRINT "SFX!  ";
 640 RETURN
