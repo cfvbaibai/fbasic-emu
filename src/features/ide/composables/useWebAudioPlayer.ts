@@ -3,6 +3,10 @@
  *
  * Handles 3-channel polyphonic playback with duty cycle, envelope, and volume.
  * Based on POC implementation in docs/poc/play-command-poc.html.
+ *
+ * All note scheduling uses Web Audio API's built-in timing (ctx.currentTime)
+ * rather than setTimeout, so playback continues correctly even when the
+ * browser tab is in the background.
  */
 
 import { ref } from 'vue'
@@ -36,10 +40,6 @@ function getEnvelopeDecayMs(envelopeValue: number): number {
   return baseMs * envelopeDecayFactor
 }
 
-/**
- * Web Audio API player for F-BASIC PLAY command
- * Handles 3-channel polyphonic playback with duty cycle, envelope, volume
- */
 /** Total duration (ms) of a channel's events (notes + rests) */
 function getChannelDurationMs(channelEvents: Array<Note | Rest>): number {
   return channelEvents.reduce((sum, e) => sum + e.duration, 0)
@@ -57,8 +57,22 @@ export function useWebAudioPlayer() {
   /** Queue for sequential PLAY: next melody starts after current finishes */
   const playQueue: Array<Array<Array<Note | Rest>>> = []
   let isPlaying = false
-  /** Track pending timeout IDs for cleanup */
+  /** Track pending timeout IDs for completion callbacks */
   const pendingTimeouts = new Set<ReturnType<typeof setTimeout>>()
+  /** Track scheduled oscillators for cleanup */
+  const scheduledOscillators = new Set<OscillatorNode>()
+  /** Visibility change handler reference for cleanup */
+  let visibilityHandler: (() => void) | null = null
+
+  /**
+   * Resume AudioContext if suspended.
+   * Called during initialization and on visibility changes.
+   */
+  function resumeContext(): void {
+    if (audioContext.value?.state === 'suspended') {
+      void audioContext.value.resume()
+    }
+  }
 
   /**
    * Initialize AudioContext (requires user gesture)
@@ -72,13 +86,28 @@ export function useWebAudioPlayer() {
       if (contextClass) {
         audioContext.value = new contextClass()
         isInitialized.value = true
+        setupVisibilityHandler()
       }
     }
 
     // Resume if suspended (autoplay policy)
-    if (audioContext.value?.state === 'suspended') {
-      void audioContext.value.resume()
+    resumeContext()
+  }
+
+  /**
+   * Set up visibility change handler to resume AudioContext
+   * when the tab becomes visible again after being hidden.
+   * Browsers suspend AudioContext when a tab goes inactive.
+   */
+  function setupVisibilityHandler(): void {
+    if (visibilityHandler) return // Already registered
+
+    visibilityHandler = () => {
+      if (document.visibilityState === 'visible') {
+        resumeContext()
+      }
     }
+    document.addEventListener('visibilitychange', visibilityHandler)
   }
 
   /**
@@ -109,9 +138,10 @@ export function useWebAudioPlayer() {
   }
 
   /**
-   * Play a single note
+   * Schedule a single note at a specific AudioContext time offset.
+   * Uses Web Audio API scheduling which is immune to tab throttling.
    */
-  function playNote(note: Note): void {
+  function scheduleNote(note: Note, startTimeSeconds: number): void {
     if (!audioContext.value) {
       initialize()
       if (!audioContext.value) return
@@ -140,59 +170,63 @@ export function useWebAudioPlayer() {
     const volume = note.envelope === 0 ? note.volumeOrLength / 15 : 1.0
 
     // Apply envelope if M1
-    const now = ctx.currentTime
-    const duration = note.duration / 1000 // ms → seconds
+    const duration = note.duration / 1000 // ms -> seconds
 
     if (note.envelope === 1) {
       // M1: Envelope decay mode (NES APU hardware behavior)
       // The period becomes V + 1 quarter frames (240Hz clock)
-      // Total decay time = 15 × (V + 1) / 240 seconds
+      // Total decay time = 15 x (V + 1) / 240 seconds
       // Volume values are linear, decaying from 15 to 0
       const envelopeDecayMs = getEnvelopeDecayMs(note.volumeOrLength)
       const decayTime = Math.min(envelopeDecayMs / 1000, duration)
 
-      gainNode.gain.setValueAtTime(volume, now)
-      gainNode.gain.linearRampToValueAtTime(0, now + decayTime)
+      gainNode.gain.setValueAtTime(volume, startTimeSeconds)
+      gainNode.gain.linearRampToValueAtTime(0, startTimeSeconds + decayTime)
     } else {
       // M0: Constant volume
-      gainNode.gain.setValueAtTime(volume, now)
+      gainNode.gain.setValueAtTime(volume, startTimeSeconds)
     }
 
-    // Schedule playback
-    oscillator.start(now)
-    oscillator.stop(now + duration)
+    // Schedule playback using Web Audio time (not setTimeout)
+    oscillator.start(startTimeSeconds)
+    oscillator.stop(startTimeSeconds + duration)
+
+    // Track for cleanup; auto-remove when finished
+    scheduledOscillators.add(oscillator)
+    oscillator.onended = () => {
+      scheduledOscillators.delete(oscillator)
+    }
   }
 
   /**
-   * Play multiple channels simultaneously (polyphonic)
+   * Play multiple channels simultaneously (polyphonic).
+   * Schedules all notes using Web Audio API time offsets
+   * instead of setTimeout, so playback works in background tabs.
    */
   function playMusic(channels: Array<Array<Note | Rest>>): void {
     // Initialize audio context on first use
     if (!isInitialized.value) {
       initialize()
     }
+    if (!audioContext.value) return
 
-    // Schedule all notes across all channels
+    const ctx = audioContext.value
+    const baseTime = ctx.currentTime
+
+    // Schedule all notes across all channels using Web Audio time
     channels.forEach((channelEvents) => {
-      let timeOffset = 0
+      let timeOffsetSeconds = 0
 
       channelEvents.forEach((event) => {
         if ('frequency' in event) {
-          // It's a Note - schedule playback
+          // It's a Note - schedule at baseTime + offset
           const note = event
-
-          // Schedule note to start at timeOffset (track for cleanup)
-          const timeoutId = setTimeout(() => {
-            pendingTimeouts.delete(timeoutId)
-            playNote(note)
-          }, timeOffset)
-          pendingTimeouts.add(timeoutId)
-
-          timeOffset += note.duration
+          scheduleNote(note, baseTime + timeOffsetSeconds)
+          timeOffsetSeconds += note.duration / 1000
         } else {
           // It's a Rest - just add to time offset
           const rest = event
-          timeOffset += rest.duration
+          timeOffsetSeconds += rest.duration / 1000
         }
       })
     })
@@ -244,6 +278,17 @@ export function useWebAudioPlayer() {
     }
     pendingTimeouts.clear()
 
+    // Stop all scheduled oscillators
+    for (const oscillator of scheduledOscillators) {
+      try {
+        oscillator.stop()
+        oscillator.disconnect()
+      } catch {
+        // Oscillator may have already stopped
+      }
+    }
+    scheduledOscillators.clear()
+
     playQueue.length = 0
     isPlaying = false
     if (audioContext.value) {
@@ -251,6 +296,12 @@ export function useWebAudioPlayer() {
       void audioContext.value.close()
       audioContext.value = null
       isInitialized.value = false
+    }
+
+    // Remove visibility handler
+    if (visibilityHandler) {
+      document.removeEventListener('visibilitychange', visibilityHandler)
+      visibilityHandler = null
     }
   }
 
