@@ -1,7 +1,7 @@
 import { useIntervalFn, useTimeoutFn } from '@vueuse/core'
 import { onDeactivated, onUnmounted, ref, shallowRef } from 'vue'
 
-import { type JoystickBufferView, setStickState } from '@/core/devices'
+import { getStickState, type JoystickBufferView, setStickState } from '@/core/devices'
 import { logComposable } from '@/shared/logger'
 
 interface UseJoystickEventsOptions {
@@ -82,18 +82,19 @@ export function useJoystickEvents(options: UseJoystickEventsOptions = {}) {
     const stickValue = directionMap[direction] ?? 0
 
     // Write STICK state to shared joystick buffer (zero-copy)
-    // STICK requires sharedJoystickView - no fallback
+    // OR in the new direction bit to support simultaneous multi-direction presses
     const view = getSharedJoystickView()
     if (!view) {
       throw new Error(
         'Shared joystick buffer is required for STICK input. Ensure sharedJoystickBuffer is set in JoystickControl.'
       )
     }
-    setStickState(view, joystickId, stickValue)
-    // logComposable.debug('Writing stick state to shared buffer:', { joystickId, direction, stickValue })
+    const currentStick = getStickState(view, joystickId)
+    const newState = currentStick | stickValue
+    setStickState(view, joystickId, newState)
 
     // Update local state for display
-    onStickStateChange?.(joystickId, stickValue)
+    onStickStateChange?.(joystickId, newState)
 
     // Keep the STICK cell flashing while button is held
     flashingCells.value[`stick-${joystickId}`] = true
@@ -113,8 +114,9 @@ export function useJoystickEvents(options: UseJoystickEventsOptions = {}) {
           'Shared joystick buffer is required for STICK input. Ensure sharedJoystickBuffer is set in JoystickControl.'
         )
       }
-      setStickState(view, joystickId, stickValue)
-      // logComposable.debug('Repeating stick state to shared buffer:', { joystickId, direction, stickValue })
+      // Re-apply OR to keep this direction active alongside any other held directions
+      const currentRepeat = getStickState(view, joystickId)
+      setStickState(view, joystickId, currentRepeat | stickValue)
     }, dpadRepeatInterval)
     heldDpadButtons.value[buttonKey] = pause
   }
@@ -139,11 +141,21 @@ export function useJoystickEvents(options: UseJoystickEventsOptions = {}) {
           'Shared joystick buffer is required for STICK input. Ensure sharedJoystickBuffer is set in JoystickControl.'
         )
       }
-      setStickState(view, joystickId, 0)
-      logComposable.debug('Writing stick release to shared buffer:', { joystickId, direction, stickValue: 0 })
+      // AND out only the released direction bit to preserve other held directions
+      const directionMap: Record<string, number> = {
+        up: 8,
+        down: 4,
+        left: 2,
+        right: 1,
+      }
+      const releasedBit = directionMap[direction] ?? 0
+      const currentStick = getStickState(view, joystickId)
+      const newState = currentStick & ~releasedBit
+      setStickState(view, joystickId, newState)
+      logComposable.debug('Writing stick release to shared buffer:', { joystickId, direction, newState })
 
       // Update local state for display
-      onStickStateChange?.(joystickId, 0)
+      onStickStateChange?.(joystickId, newState)
     }
 
     // Check if any D-pad buttons for this joystick are still being held
@@ -210,12 +222,16 @@ export function useJoystickEvents(options: UseJoystickEventsOptions = {}) {
     flashCell(`strig-${joystickId}`)
 
     // Set up timer to reset this button and recalculate combined value
+    // Note: Do NOT push a new STRIG consume event on auto-release.
+    // The initial combined event is what the BASIC program consumes.
+    // Auto-release only updates local UI state and clears the pressed flag
+    // so that a subsequent button press generates a fresh event.
     const { start } = useTimeoutFn(() => {
       // Remove this button from pressed set
       pressedActionButtons.value.delete(buttonKey)
       heldButtons.value[buttonKey] = false
 
-      // Recalculate and send new combined value (0 if no buttons pressed)
+      // Recalculate combined value for local display only (0 if no buttons pressed)
       let newCombinedValue = 0
       for (const pressedKey of pressedActionButtons.value) {
         if (pressedKey.startsWith(`${joystickId}-`)) {
@@ -224,10 +240,7 @@ export function useJoystickEvents(options: UseJoystickEventsOptions = {}) {
         }
       }
 
-      // Send updated STRIG value
-      if (sendStrigEvent) {
-        sendStrigEvent(joystickId, newCombinedValue)
-      }
+      // Update local display state only (no new consume event pushed)
       onStrigStateChange?.(joystickId, newCombinedValue)
     }, 300) // Hold for 300ms to allow simultaneous detection
     start()
