@@ -13,15 +13,15 @@
 110 SPRITE 0, 120, 100
 120 PRINT "Sprite placed at (120,100)"
 130 PRINT "Now moving right..."
-140 PAUSE 60
+140 PAUSE 150
 150 REM Define movement: sprite 0, direction 2 (right),
-160 REM speed 3, distance 60 dots, priority 0, color 0
-170 DEF MOVE(0)=SPRITE(0,2,3,60,0,0)
+160 REM speed 3, distance 120 dots, priority 0, color 0
+170 DEF MOVE(0)=SPRITE(0,2,3,120,0,0)
 180 MOVE 0
-190 PAUSE 40
+190 PAUSE 100
 200 CUT 0
 210 PRINT "Stopped at X="; XPOS(0)
-220 PAUSE 40
+220 PAUSE 100
 230 ERA 0
 240 PRINT "Sprite erased. Done!"
 250 END
