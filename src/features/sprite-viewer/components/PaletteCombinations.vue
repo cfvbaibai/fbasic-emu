@@ -93,16 +93,22 @@ const getBackgroundPaletteTitle = (index: number) => {
 }
 
 .palettes-container-sprite {
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(var(--sprite-palette-min-width, 300px), 1fr)
+  );
 }
 
 .palettes-container-bg {
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(var(--sprite-palette-min-width, 300px), 1fr)
+  );
 }
 
 .palette-group {
   background: var(--game-surface-bg-inset-gradient);
-  padding: 1.5rem;
+  padding: var(--sprite-palette-group-padding, 1.5rem);
   border-radius: 8px;
   border: 2px solid var(--game-surface-border);
   box-shadow: var(--game-shadow-inset);
@@ -119,7 +125,10 @@ const getBackgroundPaletteTitle = (index: number) => {
 
 .color-combinations {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(var(--sprite-combination-min-width, 200px), 1fr)
+  );
   gap: 1rem;
 }
 
@@ -146,7 +155,7 @@ const getBackgroundPaletteTitle = (index: number) => {
 
 .combination-color-wrapper {
   flex: 1;
-  min-width: 50px;
-  height: 50px;
+  min-width: var(--sprite-combination-wrapper-min-width, 50px);
+  height: var(--sprite-combination-wrapper-height, 50px);
 }
 </style>
