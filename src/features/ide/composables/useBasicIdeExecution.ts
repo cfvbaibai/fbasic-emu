@@ -180,6 +180,11 @@ export function useBasicIdeExecution(
     state.screenBuffer.value = initializeScreenBuffer()
     state.cursorX.value = 0
     state.cursorY.value = 0
+    // Reset BG/screen state to defaults so stale palettes, backdrop, and cgen do not persist
+    state.bgPalette.value = 1
+    state.spritePalette.value = 1
+    state.backdropColor.value = 0
+    state.cgenMode.value = 2
     // Clear BG items (above), SPRITEs (DEF SPRITE + display)
     state.spriteStates.value = []
     // Do NOT clear spriteEnabled - SPRITE ON/OFF state should persist (Clear only clears display)
