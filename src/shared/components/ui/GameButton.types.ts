@@ -19,6 +19,8 @@ export interface GameButtonProps {
   iconPosition?: 'left' | 'right'
   /** Whether the button is selected (for toggle variant) */
   selected?: boolean
+  /** Optional test selector forwarded to the native button element */
+  dataTestid?: string
 }
 
 export interface GameButtonEmits {
