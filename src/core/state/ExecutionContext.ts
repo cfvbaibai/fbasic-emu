@@ -30,6 +30,7 @@ export class ExecutionContext {
   public variables: Map<string, BasicVariable> = new Map()
   public isRunning = false
   public shouldStop = false
+  public externallyStopped = false
   public currentStatementIndex = 0
   public statements: ExpandedStatement[] = [] // Expanded statements (flat list)
   public labelMap: Map<number, number[]> = new Map() // Line number -> statement indices
@@ -67,6 +68,7 @@ export class ExecutionContext {
     this.variables.clear()
     this.isRunning = false
     this.shouldStop = false
+    this.externallyStopped = false
     this.currentStatementIndex = 0
     this.statements = []
     this.labelMap.clear()

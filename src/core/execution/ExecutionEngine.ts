@@ -124,8 +124,9 @@ export class ExecutionEngine {
       // Execution completed
       this.context.isRunning = false
 
-      // Check for unclosed FOR loops
-      if (this.context.loopStack.length > 0) {
+      // Check for unclosed FOR loops (only when program finished naturally,
+      // not when stopped externally — external stop may interrupt a loop in progress)
+      if (this.context.loopStack.length > 0 && !this.context.externallyStopped) {
         this.context.addError({
           line: 0,
           message: 'Missing NEXT statement for FOR loop',
@@ -169,10 +170,11 @@ export class ExecutionEngine {
   }
 
   /**
-   * Stop execution
+   * Stop execution (called externally, e.g., user presses Stop button)
    */
   stop(): void {
     this.context.shouldStop = true
+    this.context.externallyStopped = true
     this.context.isRunning = false
   }
 
