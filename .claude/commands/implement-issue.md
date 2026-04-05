@@ -36,6 +36,8 @@ gh pr list --json number,title,state,headRefName,baseRefName,mergeable,statusChe
 2. **Failing CI**: Any PR with failing check runs → `/lead` investigate and fix in worktree, push, report
 3. **Changes requested**: Any PR with review state `CHANGES_REQUESTED` or comments containing "REQUEST CHANGES" / "Request Change" → `/lead` address concerns in worktree, push, report
 
+**File size after conflict resolution**: After resolving merge conflicts, check all changed files with `wc -l`. If any file exceeds 500 lines, you MUST do real structural refactoring following `docs/file-splitting-guide.md` — decompose by responsibility, extract cohesive modules. **Cosmetic tricks are forbidden**: do NOT condense JSDoc comments, remove blank lines, or compress formatting to save lines. These are not refactoring — they degrade readability without improving code structure.
+
 **Important**: Before pushing any PR maintenance fix, always rebase the PR branch onto latest `origin/master`. CI runs on the merge commit, so the branch must be up-to-date with master to avoid phantom failures.
 
 If any PR was handled above, **stop here**. Write PR memory, run log, and report. Do not start new issue work.
@@ -162,6 +164,8 @@ Do NOT run full lint/test/build unless the change scope warrants it. Do NOT comm
 When creating new `.ts` files outside `src/`, `test/`, or `scripts/` (e.g., at the project root), also update `tsconfig.json` include array if the file is not already covered by existing glob patterns.
 
 When changing Vue component structure (removing/renaming CSS classes, changing DOM hierarchy), grep ALL E2E test files for affected selectors (e.g., old class names like `.features-grid`, component test IDs) and update them. E2E test breakage from UI changes is the most common CI failure — catch it before pushing.
+
+**File size constraint**: MAX 500 lines per file. After implementation, check all changed files with `wc -l`. If any exceeds 500 lines, you MUST do real structural refactoring following `docs/file-splitting-guide.md` — diagnose why the file grew, then decompose by responsibility into cohesive modules. **Cosmetic tricks are strictly forbidden**: do NOT condense JSDoc comments, remove blank lines, compress formatting, or make any change whose sole purpose is reducing line count without improving code structure. If a file needs splitting, split it properly.
 
 When done, report back: (1) root cause, (2) files changed, (3) test results.
 ```
