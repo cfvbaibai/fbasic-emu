@@ -12,6 +12,7 @@ import {
   type SharedDisplayViews,
 } from '@/core/animation/sharedDisplayBuffer'
 import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
+import { copyBgGraphicToScreenBuffer } from '@/core/devices/DeviceBgGraphicHelpers'
 import { TestDeviceAdapter } from '@/core/devices/TestDeviceAdapter'
 import type { ScreenCell } from '@/core/types/execution-types'
 
@@ -228,6 +229,20 @@ export class SharedBufferTestAdapter extends TestDeviceAdapter {
     super.setBackdropColor(colorCode)
     this.backdropColor = Math.max(0, Math.min(60, colorCode))
     this.syncToDisplayBuffer()
+  }
+
+  /**
+   * Apply seeded BG GRAPHIC data to the screen buffer.
+   * If seedBgData() was called before execution, VIEW command will
+   * copy the BG tile grid into the internal screen buffer.
+   */
+  override copyBgGraphicToBackground(): void {
+    super.copyBgGraphicToBackground!()
+    const bgData = this.getSeededBgData()
+    if (bgData) {
+      copyBgGraphicToScreenBuffer(bgData, this.screenBuffer)
+      this.syncToDisplayBuffer()
+    }
   }
 
   override setCharacterGeneratorMode(mode: number): void {

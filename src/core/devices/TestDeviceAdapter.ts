@@ -7,6 +7,7 @@
 
 import type { CompiledAudio } from '@/core/sound/types'
 import type { BasicDeviceAdapter } from '@/core/types/device-types'
+import type { BgGridData } from '@/features/bg-editor/types'
 import { logDevice } from '@/shared/logger'
 
 import {
@@ -227,9 +228,19 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
   /** Count of copyBgGraphicToBackground calls for testing */
   public copyBgGraphicToBackgroundCalls = 0
 
+  /** Seeded BG grid data for VIEW command testing. Null until seedBgData() is called. */
+  private seededBgData: BgGridData | null = null
+
   copyBgGraphicToBackground?(): void {
     this.copyBgGraphicToBackgroundCalls++
     logDevice.debug('Copy BG GRAPHIC to Background Screen called')
+  }
+
+  /**
+   * Get the seeded BG grid data, or null if no data has been seeded.
+   */
+  getSeededBgData(): BgGridData | null {
+    return this.seededBgData
   }
 
   // === TEXT OUTPUT METHODS ===
@@ -360,6 +371,17 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
   }
 
   /**
+   * Seed BG tile grid data for VIEW command testing.
+   * Allows programmatically loading BG data before execution without UI interaction.
+   * Subclasses with screen buffers (e.g. SharedBufferTestAdapter) override
+   * copyBgGraphicToBackground() to apply this data to the buffer.
+   */
+  seedBgData(bgTiles: BgGridData): void {
+    this.seededBgData = bgTiles
+    logDevice.debug('BG data seeded:', { rows: bgTiles.length })
+  }
+
+  /**
    * Clear all captured outputs
    */
   clearOutputs(): void {
@@ -384,6 +406,7 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
     this.clearOutputs()
     this.clearJoystickState()
     this.spritePositions.clear()
+    this.seededBgData = null
   }
 
   /**
