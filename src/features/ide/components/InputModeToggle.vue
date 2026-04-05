@@ -51,6 +51,7 @@ function selectKeyboard() {
         size="small"
         :title="t('ide.inputModeToggle.joystickTitle')"
         :selected="props.modelValue === 'joystick'"
+        data-testid="ide-joystick-button"
         @click="selectJoystick"
       />
       <GameIconButton
@@ -60,6 +61,7 @@ function selectKeyboard() {
         size="small"
         :title="t('ide.inputModeToggle.keyboardTitle')"
         :selected="props.modelValue === 'keyboard'"
+        data-testid="ide-keyboard-button"
         @click="selectKeyboard"
       />
     </template>
@@ -70,6 +72,7 @@ function selectKeyboard() {
         icon="mdi:gamepad-variant"
         size="small"
         :selected="props.modelValue === 'joystick'"
+        data-testid="ide-joystick-button"
         @click="selectJoystick"
       >
         {{ t('ide.inputModeToggle.joystick') }}
@@ -80,6 +83,7 @@ function selectKeyboard() {
         icon="mdi:keyboard"
         size="small"
         :selected="props.modelValue === 'keyboard'"
+        data-testid="ide-keyboard-button"
         @click="selectKeyboard"
       >
         {{ t('ide.inputModeToggle.keyboard') }}

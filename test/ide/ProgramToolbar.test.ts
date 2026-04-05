@@ -59,9 +59,9 @@ describe('ProgramToolbar', () => {
     expect(wrapper.find('.confirm-dialog-overlay').exists()).toBe(false)
 
     // Click the New button
-    const buttons = wrapper.findAll('button')
-    expect(buttons.length).toBeGreaterThanOrEqual(1)
-    await buttons[0]!.trigger('click')
+    const newButton = wrapper.find('[data-testid="ide-new-button"]')
+    expect(newButton.exists()).toBe(true)
+    await newButton.trigger('click')
 
     // Confirm dialog should now be visible
     expect(wrapper.find('.confirm-dialog-overlay').exists()).toBe(true)
@@ -78,9 +78,9 @@ describe('ProgramToolbar', () => {
     })
 
     // Click the New button
-    const buttons = wrapper.findAll('button')
-    expect(buttons.length).toBeGreaterThanOrEqual(1)
-    await buttons[0]!.trigger('click')
+    const newButton = wrapper.find('[data-testid="ide-new-button"]')
+    expect(newButton.exists()).toBe(true)
+    await newButton.trigger('click')
 
     // No confirm dialog should appear
     expect(wrapper.find('.confirm-dialog-overlay').exists()).toBe(false)
@@ -97,8 +97,8 @@ describe('ProgramToolbar', () => {
     })
 
     // Click the New button to show dialog
-    const buttons = wrapper.findAll('button')
-    await buttons[0]!.trigger('click')
+    const newButton = wrapper.find('[data-testid="ide-new-button"]')
+    await newButton.trigger('click')
 
     // Click confirm button in dialog
     const confirmBtn = wrapper.find('.confirm-dialog-btn-confirm')
@@ -119,8 +119,8 @@ describe('ProgramToolbar', () => {
     })
 
     // Click the New button to show dialog
-    const buttons = wrapper.findAll('button')
-    await buttons[0]!.trigger('click')
+    const newButton = wrapper.find('[data-testid="ide-new-button"]')
+    await newButton.trigger('click')
 
     // Click cancel button in dialog
     const cancelBtn = wrapper.find('.confirm-dialog-btn-cancel')
@@ -141,8 +141,8 @@ describe('ProgramToolbar', () => {
     })
 
     // Trigger the dialog
-    const buttons = wrapper.findAll('button')
-    await buttons[0]!.trigger('click')
+    const newButton = wrapper.find('[data-testid="ide-new-button"]')
+    await newButton.trigger('click')
 
     const overlay = wrapper.find('.confirm-dialog-overlay')
     expect(overlay.attributes('role')).toEqual('dialog')
@@ -167,12 +167,13 @@ describe('ProgramToolbar', () => {
       })
 
       // Click Import (Open) button
-      const buttons = wrapper.findAll('button')
-      await buttons[1]!.trigger('click')
+      const openButton = wrapper.find('[data-testid="ide-open-button"]')
+      await openButton.trigger('click')
       await wrapper.vm.$nextTick()
 
       // New button should be disabled during file operation
-      expect(buttons[0]!.attributes('disabled')).toBeDefined()
+      const newButton = wrapper.find('[data-testid="ide-new-button"]')
+      expect(newButton.attributes('disabled')).toBeDefined()
 
       // Resolve the pending operation
       resolveOpen()
@@ -194,12 +195,13 @@ describe('ProgramToolbar', () => {
       })
 
       // Click Export (Save) button
-      const buttons = wrapper.findAll('button')
-      await buttons[2]!.trigger('click')
+      const saveButton = wrapper.find('[data-testid="ide-save-button"]')
+      await saveButton.trigger('click')
       await wrapper.vm.$nextTick()
 
       // New button should be disabled during file operation
-      expect(buttons[0]!.attributes('disabled')).toBeDefined()
+      const newButton = wrapper.find('[data-testid="ide-new-button"]')
+      expect(newButton.attributes('disabled')).toBeDefined()
 
       // Resolve the pending operation
       resolveSave()
@@ -219,8 +221,8 @@ describe('ProgramToolbar', () => {
       })
 
       // Click Import button
-      const buttons = wrapper.findAll('button')
-      await buttons[1]!.trigger('click')
+      const openButton = wrapper.find('[data-testid="ide-open-button"]')
+      await openButton.trigger('click')
       await wrapper.vm.$nextTick()
 
       // Error message should be displayed
@@ -239,8 +241,8 @@ describe('ProgramToolbar', () => {
       })
 
       // Click Import button
-      const buttons = wrapper.findAll('button')
-      await buttons[1]!.trigger('click')
+      const openButton = wrapper.find('[data-testid="ide-open-button"]')
+      await openButton.trigger('click')
       await wrapper.vm.$nextTick()
 
       // Error message should be displayed
@@ -258,8 +260,8 @@ describe('ProgramToolbar', () => {
       })
 
       // Click Export (Save) button
-      const buttons = wrapper.findAll('button')
-      await buttons[2]!.trigger('click')
+      const saveButton = wrapper.find('[data-testid="ide-save-button"]')
+      await saveButton.trigger('click')
       await wrapper.vm.$nextTick()
 
       // Error message should be displayed
@@ -278,8 +280,8 @@ describe('ProgramToolbar', () => {
       })
 
       // Click Import button to trigger error
-      const buttons = wrapper.findAll('button')
-      await buttons[1]!.trigger('click')
+      const openButton = wrapper.find('[data-testid="ide-open-button"]')
+      await openButton.trigger('click')
       await wrapper.vm.$nextTick()
 
       // Error message should be visible
@@ -304,8 +306,8 @@ describe('ProgramToolbar', () => {
       })
 
       // Click Import button
-      const buttons = wrapper.findAll('button')
-      await buttons[1]!.trigger('click')
+      const openButton = wrapper.find('[data-testid="ide-open-button"]')
+      await openButton.trigger('click')
       await wrapper.vm.$nextTick()
 
       // No error message should be displayed

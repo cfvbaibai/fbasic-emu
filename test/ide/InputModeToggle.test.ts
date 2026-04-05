@@ -12,12 +12,12 @@ vi.mock('vue-i18n', () => ({
 
 const gameButtonStub = defineComponent({
   props: ['variant', 'type', 'icon', 'size', 'selected'],
-  template: '<button :data-icon="icon" :data-selected="selected" :data-variant="variant"><slot /></button>',
+  template: '<button :data-icon="icon" :data-selected="selected" :data-variant="variant" :data-testid="$attrs[\'data-testid\']"><slot /></button>',
 })
 
 const gameIconButtonStub = defineComponent({
   props: ['variant', 'type', 'icon', 'size', 'title', 'selected'],
-  template: '<button :data-icon="icon" :data-selected="selected" :title="title" :data-variant="variant" />',
+  template: '<button :data-icon="icon" :data-selected="selected" :title="title" :data-variant="variant" :data-testid="$attrs[\'data-testid\']" />',
 })
 
 describe('InputModeToggle', () => {
@@ -126,6 +126,32 @@ describe('InputModeToggle', () => {
 
     const buttons = wrapper.findAll('button')
     expect(buttons.length).toEqual(2)
+    wrapper.unmount()
+  })
+
+  it('adds data-testid to buttons in compact mode', () => {
+    const wrapper = mount(InputModeToggle, {
+      props: { modelValue: 'joystick', isCompact: true },
+      global: {
+        stubs: { GameButton: gameButtonStub, GameIconButton: gameIconButtonStub },
+      },
+    })
+
+    expect(wrapper.find('[data-testid="ide-joystick-button"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="ide-keyboard-button"]').exists()).toBe(true)
+    wrapper.unmount()
+  })
+
+  it('adds data-testid to buttons in non-compact mode', () => {
+    const wrapper = mount(InputModeToggle, {
+      props: { modelValue: 'joystick', isCompact: false },
+      global: {
+        stubs: { GameButton: gameButtonStub, GameIconButton: gameIconButtonStub },
+      },
+    })
+
+    expect(wrapper.find('[data-testid="ide-joystick-button"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="ide-keyboard-button"]').exists()).toBe(true)
     wrapper.unmount()
   })
 })

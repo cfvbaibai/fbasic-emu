@@ -65,6 +65,7 @@ const getIconSize = computed(() => {
   <button
     :class="['bg-game-surface', 'border-game-surface', 'text-game-secondary', buttonClasses]"
     :disabled="disabled || loading"
+    :data-testid="props.dataTestid"
     @click="handleClick"
     type="button"
   >

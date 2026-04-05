@@ -194,6 +194,7 @@ onUnmounted(() => {
           size="small"
           :disabled="isFileOperationPending"
           :title="`${t('ide.toolbar.new')} (Ctrl+N)`"
+          data-testid="ide-new-button"
           @click="handleNew"
         />
         <GameIconButton
@@ -202,6 +203,7 @@ onUnmounted(() => {
           size="small"
           :loading="isFileOperationPending"
           :title="`${t('ide.toolbar.import')} (Ctrl+O)`"
+          data-testid="ide-open-button"
           @click="handleOpen"
         />
         <GameIconButton
@@ -210,6 +212,7 @@ onUnmounted(() => {
           size="small"
           :loading="isFileOperationPending"
           :title="`${t('ide.toolbar.export')} (Ctrl+S)`"
+          data-testid="ide-save-button"
           @click="handleSave"
         />
       </template>
@@ -219,6 +222,7 @@ onUnmounted(() => {
           icon="mdi:file-plus"
           size="small"
           :disabled="isFileOperationPending"
+          data-testid="ide-new-button"
           @click="handleNew"
         >
           {{ t('ide.toolbar.new') }}
@@ -228,6 +232,7 @@ onUnmounted(() => {
           icon="mdi:import"
           size="small"
           :loading="isFileOperationPending"
+          data-testid="ide-open-button"
           @click="handleOpen"
         >
           {{ t('ide.toolbar.import') }}
@@ -237,6 +242,7 @@ onUnmounted(() => {
           icon="mdi:export"
           size="small"
           :loading="isFileOperationPending"
+          data-testid="ide-save-button"
           @click="handleSave"
         >
           {{ t('ide.toolbar.export') }}

@@ -150,8 +150,8 @@ describe('IdeControls', () => {
       },
     })
 
-    const buttons = wrapper.findAll('button')
-    await buttons[2]!.trigger('click') // clear button (3rd button)
+    const clearButton = wrapper.find('[data-testid="ide-clear-button"]')
+    await clearButton.trigger('click')
 
     expect(wrapper.emitted('clear')).toHaveLength(1)
     wrapper.unmount()
@@ -168,8 +168,8 @@ describe('IdeControls', () => {
       },
     })
 
-    const buttons = wrapper.findAll('button')
-    await buttons[3]!.trigger('click') // debug toggle button
+    const debugButton = wrapper.find('[data-testid="ide-debug-toggle-button"]')
+    await debugButton.trigger('click')
 
     expect(wrapper.emitted('toggleDebug')).toHaveLength(1)
     wrapper.unmount()
@@ -186,8 +186,7 @@ describe('IdeControls', () => {
       },
     })
 
-    const buttons = wrapper.findAll('button')
-    const debugButton = buttons[3]!
+    const debugButton = wrapper.find('[data-testid="ide-debug-toggle-button"]')
     expect(debugButton.attributes('data-selected')).toEqual('true')
     wrapper.unmount()
   })

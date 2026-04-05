@@ -145,6 +145,7 @@ const handleInputModeChange = (value: InputMode) => {
       icon="mdi:delete"
       size="small"
       :title="t('ide.controls.clear')"
+      data-testid="ide-clear-button"
       @click="handleClear"
     />
 
@@ -155,6 +156,7 @@ const handleInputModeChange = (value: InputMode) => {
       size="small"
       :selected="debugMode"
       :title="t('ide.controls.debug')"
+      data-testid="ide-debug-toggle-button"
       @click="handleDebugToggle"
     />
   </div>
