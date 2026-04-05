@@ -44,7 +44,6 @@
     "gaming": "ジョイスティックテスト",
     "complex": "複雑",
     "comprehensive": "完全デモ",
-    "allChars": "全文字",
     "spriteTest": "スプライトテスト",
     "moveTest": "移動テスト",
     "testMoveControl": "移動制御テスト",
@@ -113,10 +112,6 @@
       "screenFill": {
         "name": "画面フィルテスト",
         "description": "50行で画面を埋める - 基本的な画面出力テスト"
-      },
-      "allChars": {
-        "name": "全文字表示",
-        "description": "CHR$(0)からCHR$(255)まで全て表示"
       },
       "bgItems": {
         "name": "BGキャラクタ表示",

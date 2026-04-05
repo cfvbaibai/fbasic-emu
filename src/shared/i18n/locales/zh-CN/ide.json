@@ -44,7 +44,6 @@
     "gaming": "手柄测试",
     "complex": "复杂",
     "comprehensive": "完整演示",
-    "allChars": "所有字符",
     "spriteTest": "Sprite测试",
     "moveTest": "移动测试",
     "testMoveControl": "移动控制测试",
@@ -113,10 +112,6 @@
       "screenFill": {
         "name": "屏幕填充测试",
         "description": "用50行填充屏幕 - 基本屏幕输出测试"
-      },
-      "allChars": {
-        "name": "所有字符",
-        "description": "打印 CHR$(0) 到 CHR$(255) 所有字符"
       },
       "bgItems": {
         "name": "BG 字符显示",

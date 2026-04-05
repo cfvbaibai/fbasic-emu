@@ -66,7 +66,6 @@ import musicRocknRouge from './programs/music/rockn-rouge.bas?raw'
 import musicScale from './programs/music/scale.bas?raw'
 import musicThreeChannel from './programs/music/three-channel.bas?raw'
 import musicTwinkle from './programs/music/twinkle.bas?raw'
-import allChars from './programs/screen/all-chars.bas?raw'
 import bgItems from './programs/screen/bg-items.bas?raw'
 import bgPlatform from './programs/screen/bg-platform.bas?raw'
 import bgTitle from './programs/screen/bg-title.bas?raw'
@@ -159,11 +158,6 @@ export const SAMPLE_CODES: Record<string, SampleCode> = {
     key: 'screenFill',
     category: 'screen',
     code: screenFill,
-  },
-  allChars: {
-    key: 'allChars',
-    category: 'screen',
-    code: allChars,
   },
   bgItems: {
     key: 'bgItems',
