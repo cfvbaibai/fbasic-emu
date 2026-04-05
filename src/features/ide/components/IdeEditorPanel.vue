@@ -92,6 +92,7 @@ const useLiteEditor = computed(() => {
             icon="mdi:folder-open"
             size="small"
             :title="t('ide.samples.load')"
+            data-testid="ide-sample-selector-button"
             @click="emit('openSampleSelector')"
           />
         </template>
@@ -100,6 +101,7 @@ const useLiteEditor = computed(() => {
             type="default"
             icon="mdi:folder-open"
             size="small"
+            data-testid="ide-sample-selector-button"
             @click="emit('openSampleSelector')"
           >
             {{ t('ide.samples.load') }}
@@ -110,6 +112,7 @@ const useLiteEditor = computed(() => {
           icon="mdi:eye"
           size="small"
           :title="t('ide.spriteViewer.openTitle')"
+          data-testid="ide-sprite-viewer-button"
           @click="emit('openSpriteViewer')"
         />
         <IdeControls
