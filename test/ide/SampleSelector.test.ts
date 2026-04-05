@@ -115,6 +115,14 @@ describe('SampleSelector', () => {
     wrapper.unmount()
   })
 
+  it('renders data-sample-key attribute on sample cards', () => {
+    const wrapper = mountComponent()
+
+    const card = wrapper.find('.sample-card')
+    expect(card.attributes('data-sample-key')).toEqual('basic')
+    wrapper.unmount()
+  })
+
   it('emits select event when sample card is clicked', async () => {
     const wrapper = mountComponent()
 

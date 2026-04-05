@@ -108,6 +108,7 @@ const categoryColors: Record<string, string> = {
           v-for="sample in samplesInCategory"
           :key="sample.key"
           class="sample-card"
+          :data-sample-key="sample.key"
           @click="emit('select', sample.key)"
         >
           <div class="sample-card-header">
