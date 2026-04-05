@@ -16,6 +16,8 @@ import {
   DEFAULT_BACKGROUND_PALETTES,
   DEFAULT_SPRITE_PALETTES,
 } from './TestDeviceAdapterHelpers'
+import type { ScheduledInputDelivery, ScheduledInputEvent } from './TestDeviceInputScheduler'
+import { TestDeviceInputScheduler } from './TestDeviceInputScheduler'
 
 export class TestDeviceAdapter implements BasicDeviceAdapter {
   // === JOYSTICK STATE ===
@@ -60,6 +62,14 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
   // === INPUT (for INPUT/LINPUT executor tests) ===
   /** Queue of responses for requestInput; each call pops the next. Default: ['0'] if empty. */
   public inputResponseQueue: string[][] = []
+
+  // === INPUT TIMELINE SCHEDULING ===
+  /** Scheduler delegates frame tracking and event delivery. */
+  private readonly inputScheduler: TestDeviceInputScheduler = new TestDeviceInputScheduler({
+    setStickState: (player, direction) => this.setStickState(player, direction),
+    pushStrigState: (player, button) => this.pushStrigState(player, button),
+    setInkeyState: (keyChar) => this.setInkeyStateForTest(keyChar),
+  })
 
   constructor() {
     logDevice.debug('TestDeviceAdapter created')
@@ -162,6 +172,49 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
     }
     // Otherwise return current state
     return this.inkeyState
+  }
+
+  // === INPUT TIMELINE SCHEDULING ===
+  // Delegates to TestDeviceInputScheduler. See that class for full API docs.
+
+  getCurrentFrame(): number {
+    return this.inputScheduler.getCurrentFrame()
+  }
+
+  scheduleInput(event: ScheduledInputEvent): void {
+    this.inputScheduler.scheduleInput(event)
+  }
+
+  scheduleInputs(events: ScheduledInputEvent[]): void {
+    this.inputScheduler.scheduleInputs(events)
+  }
+
+  advanceFrame(): ScheduledInputDelivery {
+    return this.inputScheduler.advanceFrame()
+  }
+
+  setCurrentFrame(frame: number): void {
+    this.inputScheduler.setCurrentFrame(frame)
+  }
+
+  deliverScheduledEvents(): ScheduledInputDelivery {
+    return this.inputScheduler.deliverScheduledEvents()
+  }
+
+  clearScheduledInputs(): void {
+    this.inputScheduler.clearScheduledInputs()
+  }
+
+  getScheduledInputCount(): number {
+    return this.inputScheduler.getScheduledInputCount()
+  }
+
+  getScheduledInputs(): ScheduledInputEvent[] {
+    return this.inputScheduler.getScheduledInputs()
+  }
+
+  get deliveryLog(): ScheduledInputDelivery[] {
+    return this.inputScheduler.getDeliveryLog()
   }
 
   // === SPRITE POSITION QUERY ===
@@ -407,6 +460,7 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
     this.clearJoystickState()
     this.spritePositions.clear()
     this.seededBgData = null
+    this.inputScheduler.reset()
   }
 
   /**

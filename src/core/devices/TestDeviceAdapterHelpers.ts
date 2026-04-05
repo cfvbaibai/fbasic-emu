@@ -4,7 +4,8 @@
  * Standalone functions that operate on TestDeviceAdapter state.
  * Extracted from TestDeviceAdapter.ts for modularity and testability.
  *
- * Handles: Output aggregation, output querying, and state reset.
+ * Handles: Output aggregation, output querying, palette combination,
+ * and default palette data.
  */
 
 // ============================================================================
