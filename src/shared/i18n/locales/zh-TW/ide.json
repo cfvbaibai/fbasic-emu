@@ -44,7 +44,6 @@
     "gaming": "搖桿測試",
     "complex": "複雜",
     "comprehensive": "完整示範",
-    "allChars": "所有字元",
     "spriteTest": "Sprite測試",
     "moveTest": "移動測試",
     "testMoveControl": "移動控制測試",
@@ -113,10 +112,6 @@
       "screenFill": {
         "name": "螢幕填充測試",
         "description": "用50行填滿螢幕 - 基本螢幕輸出測試"
-      },
-      "allChars": {
-        "name": "所有字元",
-        "description": "列印 CHR$(0) 到 CHR$(255) 所有字元"
       },
       "bgItems": {
         "name": "BG 字元顯示",

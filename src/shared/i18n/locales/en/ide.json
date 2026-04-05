@@ -56,7 +56,6 @@
       "comprehensive": "Full Demo",
       "music": "Music"
     },
-    "allChars": "All Chars",
     "spriteTest": "Sprite Test",
     "moveTest": "Move Test",
     "testMoveControl": "Move Control Test",
@@ -113,10 +112,6 @@
       "screenFill": {
         "name": "Screen Fill Test",
         "description": "Fill screen with 50 lines - basic screen output test"
-      },
-      "allChars": {
-        "name": "All Characters",
-        "description": "Print all CHR$(0) to CHR$(255)"
       },
       "bgItems": {
         "name": "BG Items Display",

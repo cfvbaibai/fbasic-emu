@@ -40,7 +40,6 @@ const SNAPSHOT_COVERAGE_OPT_OUTS: SnapshotCoverageOptOuts = {
   subroutines: 'Console-output focused; display fixture not a useful signal',
   dataRead: 'Console-output focused; display fixture not a useful signal',
   arrays: 'Console-output focused; display fixture not a useful signal',
-  allChars: 'Large matrix snapshot baseline not yet curated',
   bgItems: 'High-surface BG tile fixture baseline not yet curated',
   bgView: 'BG fixture baseline pending',
   bgViewTitle: 'BG fixture baseline pending',
