@@ -13,6 +13,13 @@ declare global {
       getWorkerUrl?: (workerId: string, label: string) => string
       getWorker?: (workerId: string, label: string) => Worker
     }
+    /** DEV-only API for headless test code injection. Undefined in production builds. */
+    __fbasicIDE?: {
+      loadCode: (code: string) => void
+      run: () => Promise<void>
+      stop: () => void
+      respondToInput: (value: string) => void
+    }
   }
 }
 

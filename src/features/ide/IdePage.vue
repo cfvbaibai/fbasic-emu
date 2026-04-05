@@ -25,6 +25,7 @@ import {
 } from './composables/commandPalette'
 import { useBasicIde as useBasicIdeEnhanced } from './composables/useBasicIdeEnhanced'
 import type { InputMode } from './composables/useBasicIdeState'
+import { useDevApi } from './composables/useDevApi'
 import { provideScreenContext } from './composables/useScreenContext'
 
 /**
@@ -128,6 +129,15 @@ const registerScheduleRender = basicIde?.registerScheduleRender ?? (() => {})
 const pendingInputRequest = basicIde?.pendingInputRequest ?? ref<RequestInputMessage['data'] | null>(null)
 const respondToInputRequest =
   basicIde?.respondToInputRequest ?? ((_requestId: string, _values: string[], _cancelled: boolean) => {})
+
+// Expose DEV-only global API for headless test code injection
+useDevApi({
+  code,
+  runCode,
+  stopCode,
+  pendingInputRequest,
+  respondToInputRequest,
+})
 
 // UI state
 const sampleSelectorOpen = shallowRef(false)
