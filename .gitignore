@@ -108,3 +108,4 @@ test-results/
 
 # Installed skill packages
 *.skill
+.mcp.json
