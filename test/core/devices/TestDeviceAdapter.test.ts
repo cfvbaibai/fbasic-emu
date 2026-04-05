@@ -1,16 +1,14 @@
 /**
- * Unit tests for TestDeviceAdapter and TestDeviceAdapterHelpers
+ * Unit tests for TestDeviceAdapter
+ *
+ * Note: TestDeviceAdapterHelpers has its own dedicated test file at
+ * TestDeviceAdapterHelpers.test.ts with comprehensive coverage.
  */
 
 import { describe, expect, it, vi } from 'vitest'
 
 import { TestDeviceAdapter } from '@/core/devices/TestDeviceAdapter'
-import {
-  aggregateAllOutputs,
-  applyPaletteCombination,
-  DEFAULT_BACKGROUND_PALETTES,
-  DEFAULT_SPRITE_PALETTES,
-} from '@/core/devices/TestDeviceAdapterHelpers'
+import type { BgGridData } from '@/features/bg-editor/types'
 
 // Mock logger
 vi.mock('@/shared/logger', () => ({
@@ -21,139 +19,6 @@ vi.mock('@/shared/logger', () => ({
     info: vi.fn(),
   },
 }))
-
-// ============================================================================
-// TestDeviceAdapterHelpers
-// ============================================================================
-
-describe('TestDeviceAdapterHelpers', () => {
-  // ---------------------------------------------------------------------------
-  // aggregateAllOutputs
-  // ---------------------------------------------------------------------------
-  describe('aggregateAllOutputs', () => {
-    it('should return empty string when no outputs', () => {
-      expect(aggregateAllOutputs([], [], [])).toBe('')
-    })
-
-    it('should concatenate print outputs', () => {
-      expect(aggregateAllOutputs(['Hello\n', 'World\n'], [], [])).toBe('Hello\nWorld\n')
-    })
-
-    it('should prefix debug outputs with "DEBUG: "', () => {
-      expect(aggregateAllOutputs([], ['info\n'], [])).toBe('DEBUG: info\n')
-    })
-
-    it('should prefix error outputs with "RUNTIME: "', () => {
-      expect(aggregateAllOutputs([], [], ['fail\n'])).toBe('RUNTIME: fail\n')
-    })
-
-    it('should interleave print, debug, error outputs in order', () => {
-      const result = aggregateAllOutputs(['print1\n'], ['debug1\n'], ['error1\n'])
-      expect(result).toBe('print1\nDEBUG: debug1\nRUNTIME: error1\n')
-    })
-
-    it('should concatenate outputs without newlines directly', () => {
-      expect(aggregateAllOutputs(['Hello', 'World'], [], [])).toBe('HelloWorld')
-    })
-
-    it('should handle mixed newline/non-newline outputs', () => {
-      const result = aggregateAllOutputs(['A\n', 'B', 'C\n'], [], [])
-      expect(result).toBe('A\nBC\n')
-    })
-  })
-
-  // ---------------------------------------------------------------------------
-  // applyPaletteCombination
-  // ---------------------------------------------------------------------------
-  describe('applyPaletteCombination', () => {
-    it('should update background palette at correct index', () => {
-      const bgPalettes = DEFAULT_BACKGROUND_PALETTES.map(p => p.map(c => [...c] as [number, number, number, number]))
-      const spritePalettes = DEFAULT_SPRITE_PALETTES.map(p => p.map(c => [...c] as [number, number, number, number]))
-      const colors: [number, number, number, number] = [0xFF, 0xFF, 0xFF, 0xFF]
-
-      const result = applyPaletteCombination('B', 2, colors, 1, 0, bgPalettes, spritePalettes)
-
-      expect(result).toEqual({
-        target: 'B',
-        paletteIndex: 1,
-        combination: 2,
-        colors: [0xFF, 0xFF, 0xFF, 0xFF],
-      })
-      expect(bgPalettes[1]![2]).toEqual([0xFF, 0xFF, 0xFF, 0xFF])
-    })
-
-    it('should update sprite palette at correct index', () => {
-      const bgPalettes = DEFAULT_BACKGROUND_PALETTES.map(p => p.map(c => [...c] as [number, number, number, number]))
-      const spritePalettes = DEFAULT_SPRITE_PALETTES.map(p => p.map(c => [...c] as [number, number, number, number]))
-      const colors: [number, number, number, number] = [0xAA, 0xBB, 0xCC, 0xDD]
-
-      const result = applyPaletteCombination('S', 0, colors, 0, 2, bgPalettes, spritePalettes)
-
-      expect(result).toEqual({
-        target: 'S',
-        paletteIndex: 2,
-        combination: 0,
-        colors: [0xAA, 0xBB, 0xCC, 0xDD],
-      })
-      expect(spritePalettes[2]![0]).toEqual([0xAA, 0xBB, 0xCC, 0xDD])
-    })
-
-    it('should clamp bg palette index to valid range', () => {
-      const bgPalettes = DEFAULT_BACKGROUND_PALETTES.map(p => p.map(c => [...c] as [number, number, number, number]))
-      const spritePalettes = DEFAULT_SPRITE_PALETTES.map(p => p.map(c => [...c] as [number, number, number, number]))
-      const colors: [number, number, number, number] = [1, 2, 3, 4]
-
-      // bgPalette out of range high -> clamped to 1
-      const result = applyPaletteCombination('B', 0, colors, 99, 0, bgPalettes, spritePalettes)
-      expect(result.paletteIndex).toBe(1)
-
-      // bgPalette out of range low -> clamped to 0
-      const result2 = applyPaletteCombination('B', 0, colors, -1, 0, bgPalettes, spritePalettes)
-      expect(result2.paletteIndex).toBe(0)
-    })
-
-    it('should clamp sprite palette index to valid range', () => {
-      const bgPalettes = DEFAULT_BACKGROUND_PALETTES.map(p => p.map(c => [...c] as [number, number, number, number]))
-      const spritePalettes = DEFAULT_SPRITE_PALETTES.map(p => p.map(c => [...c] as [number, number, number, number]))
-      const colors: [number, number, number, number] = [1, 2, 3, 4]
-
-      // spritePalette out of range high -> clamped to 2
-      const result = applyPaletteCombination('S', 0, colors, 0, 99, bgPalettes, spritePalettes)
-      expect(result.paletteIndex).toBe(2)
-
-      // spritePalette out of range low -> clamped to 0
-      const result2 = applyPaletteCombination('S', 0, colors, 0, -1, bgPalettes, spritePalettes)
-      expect(result2.paletteIndex).toBe(0)
-    })
-  })
-
-  // ---------------------------------------------------------------------------
-  // Default palette constants
-  // ---------------------------------------------------------------------------
-  describe('DEFAULT_BACKGROUND_PALETTES', () => {
-    it('should have 2 palettes with 4 combinations each', () => {
-      expect(DEFAULT_BACKGROUND_PALETTES.length).toBe(2)
-      for (const palette of DEFAULT_BACKGROUND_PALETTES) {
-        expect(palette.length).toBe(4)
-        for (const combo of palette) {
-          expect(combo.length).toBe(4)
-        }
-      }
-    })
-  })
-
-  describe('DEFAULT_SPRITE_PALETTES', () => {
-    it('should have 3 palettes with 4 combinations each', () => {
-      expect(DEFAULT_SPRITE_PALETTES.length).toBe(3)
-      for (const palette of DEFAULT_SPRITE_PALETTES) {
-        expect(palette.length).toBe(4)
-        for (const combo of palette) {
-          expect(combo.length).toBe(4)
-        }
-      }
-    })
-  })
-})
 
 // ============================================================================
 // TestDeviceAdapter
@@ -377,6 +242,39 @@ describe('TestDeviceAdapter', () => {
       adapter.copyBgGraphicToBackground!()
       adapter.copyBgGraphicToBackground!()
       expect(adapter.copyBgGraphicToBackgroundCalls).toBe(2)
+    })
+
+    it('should return null when no BG data has been seeded', () => {
+      const adapter = createAdapter()
+      expect(adapter.getSeededBgData()).toBeNull()
+    })
+
+    it('should store seeded BG data via seedBgData', () => {
+      const adapter = createAdapter()
+      const bgData: BgGridData = [
+        [{ charCode: 65, colorPattern: 1 }, { charCode: 66, colorPattern: 2 }],
+        [{ charCode: 67, colorPattern: 0 }],
+      ]
+      adapter.seedBgData(bgData)
+      expect(adapter.getSeededBgData()).toEqual(bgData)
+    })
+
+    it('should replace previously seeded BG data on subsequent calls', () => {
+      const adapter = createAdapter()
+      const firstData: BgGridData = [[{ charCode: 65, colorPattern: 0 }]]
+      const secondData: BgGridData = [[{ charCode: 90, colorPattern: 3 }]]
+      adapter.seedBgData(firstData)
+      adapter.seedBgData(secondData)
+      expect(adapter.getSeededBgData()).toEqual(secondData)
+    })
+
+    it('should clear seeded BG data on reset', () => {
+      const adapter = createAdapter()
+      const bgData: BgGridData = [[{ charCode: 65, colorPattern: 0 }]]
+      adapter.seedBgData(bgData)
+      expect(adapter.getSeededBgData()).not.toBeNull()
+      adapter.reset()
+      expect(adapter.getSeededBgData()).toBeNull()
     })
   })
 
