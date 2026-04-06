@@ -44,6 +44,11 @@ Search Vue SFC templates (`src/features/`) and composables for:
 - Hardcoded English in `placeholder`, `title`, `aria-label`, `aria-description` attributes
 - String literals in `alert()`, `confirm()`, `console.warn()` calls in Vue files
 
+**Exclude from findings**:
+- Runtime/dynamic values displayed via `{{ variable }}` (e.g., `{{ errorMessage }}`, `{{ pendingRequest.prompt }}`) — these are not hardcoded strings
+- Strings already wrapped in `t()` with fallback values (e.g., `t('key', 'fallback')`) — this is correct i18n usage
+- Diagnostic/debug tool labels not shown to end users
+
 Cross-reference existing open issues to avoid duplicates. Check if the file already has i18n imports — if not, it's a stronger signal.
 
 ### 3b. Code Quality Patterns
@@ -80,7 +85,7 @@ Use these deeper analysis techniques to find issues beyond surface pattern match
 |---------|--------------|
 | 0 | **Sample program quality** — Read `.bas` files in `src/core/samples/programs/`, evaluate whether they effectively demonstrate their target F-BASIC feature. Check: PAUSE/timing durations (too short to perceive?), visual output clarity, user feedback, completeness of use cases, educational value. Focus on samples visible in the SampleSelector. |
 | 1 | **Edge case coverage** — Check if recent code changes handle boundary conditions (empty arrays, undefined values, max buffer sizes, overflow in arithmetic) |
-| 2 | **Cross-module consistency** — Verify that related modules agree on interfaces (e.g., executor expectations match device adapter capabilities, parser output matches executor input shapes) |
+| 2 | **Cross-module consistency** — Verify that related modules agree on interfaces (e.g., executor expectations match device adapter capabilities, parser output matches executor input shapes). **Important**: Read interface definitions to distinguish required methods (no `?`) from optional methods (`?`) before flagging inconsistencies — calling a required method without an existence check is correct behavior. |
 | 3 | **Enrich existing issues** — Review the top 3 open issues and check if recent commits have partially addressed them. Add progress comments or close if resolved. |
 | 4 | **UX quality review** — Scan Vue components and composables for usability issues that static analysis misses: confusing flows, missing loading states, poor error messages, inconsistent behavior, unclear labels, inaccessible features |
 
