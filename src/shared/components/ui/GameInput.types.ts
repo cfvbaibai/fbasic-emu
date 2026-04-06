@@ -15,6 +15,8 @@ export interface GameInputProps {
   size?: 'small' | 'medium' | 'large'
   /** Whether the input has a clear button */
   clearable?: boolean
+  /** Optional test selector forwarded to the native input element */
+  dataTestid?: string
 }
 
 export interface GameInputEmits {

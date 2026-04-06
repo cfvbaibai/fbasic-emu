@@ -20,6 +20,7 @@ import type { GameInputEmits, GameInputProps } from './GameInput.types'
  */
 defineOptions({
   name: 'GameInput',
+  inheritAttrs: false,
 })
 
 const props = withDefaults(defineProps<GameInputProps>(), {
@@ -78,6 +79,7 @@ const inputClasses = computed(() => {
       :value="modelValue"
       :placeholder="placeholder"
       :disabled="disabled"
+      :data-testid="props.dataTestid"
       @input="handleInput"
       @focus="handleFocus"
       @blur="handleBlur"
