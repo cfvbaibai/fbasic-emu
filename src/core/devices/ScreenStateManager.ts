@@ -19,6 +19,17 @@ import {
   createPaletteUpdateMessage,
 } from './ScreenUpdateMessageFactory'
 
+type PaletteCombinationEntry = {
+  paletteIndex: number
+  combination: number
+  colors: [number, number, number, number]
+}
+
+export type PaletteCombinationSnapshot = {
+  background: PaletteCombinationEntry[]
+  sprite: PaletteCombinationEntry[]
+}
+
 export class ScreenStateManager {
   private screenBuffer: ScreenCell[][] = []
   private cursorX = 0
@@ -322,6 +333,35 @@ export class ScreenStateManager {
    */
   getPalette(): { bgPalette: number; spritePalette: number } {
     return { bgPalette: this.bgPalette, spritePalette: this.spritePalette }
+  }
+
+  /**
+   * Get all background and sprite palette combination data.
+   * Used by DeviceScreenManager to send palette-combination reset messages
+   * to the main thread when a new execution starts.
+   */
+  getAllPaletteCombinations(): PaletteCombinationSnapshot {
+    type Entry = { paletteIndex: number; combination: number; colors: [number, number, number, number] }
+
+    const background: Entry[] = []
+    for (let i = 0; i < this.backgroundPalettes.length; i++) {
+      const palette = this.backgroundPalettes[i]!
+      for (let j = 0; j < palette.length; j++) {
+        const colors = [...palette[j]!] as [number, number, number, number]
+        background.push({ paletteIndex: i, combination: j, colors })
+      }
+    }
+
+    const sprite: Entry[] = []
+    for (let i = 0; i < this.spritePalettes.length; i++) {
+      const palette = this.spritePalettes[i]!
+      for (let j = 0; j < palette.length; j++) {
+        const colors = [...palette[j]!] as [number, number, number, number]
+        sprite.push({ paletteIndex: i, combination: j, colors })
+      }
+    }
+
+    return { background, sprite }
   }
 
   /**

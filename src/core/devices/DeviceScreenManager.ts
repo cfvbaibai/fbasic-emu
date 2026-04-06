@@ -56,6 +56,9 @@ export class DeviceScreenManager {
       this.syncScreenStateToShared()
       this.postScreenChanged()
       this.cancelPendingScreenUpdate()
+      // Send palette-combination reset messages so the main thread's
+      // BACKGROUND_PALETTES and SPRITE_PALETTES are also restored to defaults.
+      this.postPaletteCombinationResetMessages()
     } else {
       this.screenUpdateBatcher.flush()
     }
@@ -211,6 +214,46 @@ export class DeviceScreenManager {
       type: 'SCREEN_CHANGED',
       id: `screen-changed-${Date.now()}`,
       timestamp: Date.now(),
+    })
+  }
+
+  /**
+   * Send palette-combination SCREEN_UPDATE messages to reset the main thread's
+   * BACKGROUND_PALETTES and SPRITE_PALETTES to their original values.
+   * Called after resetState() to keep the worker as the single source of truth.
+   */
+  private postPaletteCombinationResetMessages(): void {
+    const executionId = this.screenStateManager.getCurrentExecutionId() ?? 'unknown'
+    const { background, sprite } = this.screenStateManager.getAllPaletteCombinations()
+
+    for (const entry of background) {
+      this.postSinglePaletteCombinationMessage(executionId, 'B', entry.paletteIndex, entry.combination, entry.colors)
+    }
+    for (const entry of sprite) {
+      this.postSinglePaletteCombinationMessage(executionId, 'S', entry.paletteIndex, entry.combination, entry.colors)
+    }
+  }
+
+  private postSinglePaletteCombinationMessage(
+    executionId: string,
+    target: 'B' | 'S',
+    paletteIndex: number,
+    combination: number,
+    colors: [number, number, number, number],
+  ): void {
+    self.postMessage({
+      type: 'SCREEN_UPDATE',
+      id: `screen-palette-combination-reset-${Date.now()}-${target}${paletteIndex}-${combination}`,
+      timestamp: Date.now(),
+      data: {
+        executionId,
+        updateType: 'palette-combination',
+        paletteTarget: target,
+        paletteIndex,
+        paletteCombination: combination,
+        paletteColors: colors,
+        timestamp: Date.now(),
+      },
     })
   }
 }
