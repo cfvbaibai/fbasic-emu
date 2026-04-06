@@ -52,6 +52,7 @@ watch(
   <div
     v-if="pendingRequest"
     class="input-modal-overlay"
+    data-testid="input-modal"
     role="dialog"
     aria-modal="true"
     aria-labelledby="input-modal-prompt"
@@ -64,6 +65,7 @@ watch(
         <GameInput
           v-model="inputValue"
           type="text"
+          data-testid="input-modal-field"
           :placeholder="
             pendingRequest.isLinput
               ? t('ide.inputModal.linputPlaceholder')
@@ -72,7 +74,7 @@ watch(
           class="input-modal-field"
         />
         <div class="input-modal-actions">
-          <GameButton type="primary" size="medium" @click="submit">
+          <GameButton type="primary" size="medium" data-testid="input-modal-submit" @click="submit">
             {{ t('ide.input.submit') }}
           </GameButton>
           <GameButton type="default" size="medium" @click="cancel">

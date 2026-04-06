@@ -11,14 +11,14 @@ vi.mock('vue-i18n', () => ({
 }))
 
 const gameInputStub = defineComponent({
-  props: ['modelValue', 'type', 'placeholder'],
+  props: ['modelValue', 'type', 'placeholder', 'dataTestid'],
   emits: ['update:modelValue'],
-  template: '<input :value="modelValue" :type="type" :placeholder="placeholder" @input="$emit(\'update:modelValue\', $event.target.value)" data-testid="game-input" />',
+  template: '<input :value="modelValue" :type="type" :placeholder="placeholder" :data-testid="dataTestid" @input="$emit(\'update:modelValue\', $event.target.value)" />',
 })
 
 const gameButtonStub = defineComponent({
-  props: ['type', 'size'],
-  template: '<button :data-type="type" :data-size="size"><slot /></button>',
+  props: ['type', 'size', 'dataTestid'],
+  template: '<button :data-type="type" :data-size="size" :data-testid="dataTestid"><slot /></button>',
 })
 
 function createPendingRequest(overrides: Partial<{
@@ -55,7 +55,7 @@ describe('InputModal', () => {
 
     expect(wrapper.find('.input-modal-overlay').exists()).toBe(true)
     expect(wrapper.find('.input-modal-prompt').text()).toEqual('?')
-    expect(wrapper.find('[data-testid="game-input"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="input-modal-field"]').exists()).toBe(true)
     wrapper.unmount()
   })
 
@@ -65,7 +65,7 @@ describe('InputModal', () => {
       global: { stubs: { GameInput: gameInputStub, GameButton: gameButtonStub } },
     })
 
-    const input = wrapper.find('[data-testid="game-input"]')
+    const input = wrapper.find('[data-testid="input-modal-field"]')
     expect(input.attributes('placeholder')).toEqual('ide.inputModal.inputPlaceholder')
     wrapper.unmount()
   })
@@ -76,7 +76,7 @@ describe('InputModal', () => {
       global: { stubs: { GameInput: gameInputStub, GameButton: gameButtonStub } },
     })
 
-    const input = wrapper.find('[data-testid="game-input"]')
+    const input = wrapper.find('[data-testid="input-modal-field"]')
     expect(input.attributes('placeholder')).toEqual('ide.inputModal.linputPlaceholder')
     wrapper.unmount()
   })
@@ -88,7 +88,7 @@ describe('InputModal', () => {
       global: { stubs: { GameInput: gameInputStub, GameButton: gameButtonStub } },
     })
 
-    await wrapper.find('[data-testid="game-input"]').setValue('hello, world')
+    await wrapper.find('[data-testid="input-modal-field"]').setValue('hello, world')
     const buttons = wrapper.findAll('button')
     await buttons[0]!.trigger('click') // Submit button
 
@@ -108,7 +108,7 @@ describe('InputModal', () => {
       global: { stubs: { GameInput: gameInputStub, GameButton: gameButtonStub } },
     })
 
-    await wrapper.find('[data-testid="game-input"]').setValue('hello, world')
+    await wrapper.find('[data-testid="input-modal-field"]').setValue('hello, world')
     const buttons = wrapper.findAll('button')
     await buttons[0]!.trigger('click') // Submit button
 
@@ -157,13 +157,13 @@ describe('InputModal', () => {
       global: { stubs: { GameInput: gameInputStub, GameButton: gameButtonStub } },
     })
 
-    await wrapper.find('[data-testid="game-input"]').setValue('typed value')
-    expect((wrapper.find('[data-testid="game-input"]').element as HTMLInputElement).value).toEqual('typed value')
+    await wrapper.find('[data-testid="input-modal-field"]').setValue('typed value')
+    expect((wrapper.find('[data-testid="input-modal-field"]').element as HTMLInputElement).value).toEqual('typed value')
 
     await wrapper.setProps({ pendingRequest: createPendingRequest({ requestId: 'req-2' }) })
     await nextTick()
 
-    expect((wrapper.find('[data-testid="game-input"]').element as HTMLInputElement).value).toEqual('')
+    expect((wrapper.find('[data-testid="input-modal-field"]').element as HTMLInputElement).value).toEqual('')
     wrapper.unmount()
   })
 
@@ -177,6 +177,18 @@ describe('InputModal', () => {
     expect(overlay.attributes('role')).toEqual('dialog')
     expect(overlay.attributes('aria-modal')).toEqual('true')
     expect(overlay.attributes('aria-labelledby')).toEqual('input-modal-prompt')
+    wrapper.unmount()
+  })
+
+  it('has data-testid attributes for E2E testing', () => {
+    const wrapper = mount(InputModal, {
+      props: { pendingRequest: createPendingRequest() },
+      global: { stubs: { GameInput: gameInputStub, GameButton: gameButtonStub } },
+    })
+
+    expect(wrapper.find('[data-testid="input-modal"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="input-modal-field"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="input-modal-submit"]').exists()).toBe(true)
     wrapper.unmount()
   })
 
@@ -199,13 +211,13 @@ describe('InputModal', () => {
       global: { stubs: { GameInput: gameInputStub, GameButton: gameButtonStub } },
     })
 
-    expect(wrapper.find('[data-testid="game-input"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="input-modal-field"]').exists()).toBe(false)
 
     await wrapper.setProps({ pendingRequest: createPendingRequest() })
     await nextTick()
     await nextTick()
 
-    const input = wrapper.find('[data-testid="game-input"]').element as HTMLInputElement
+    const input = wrapper.find('[data-testid="input-modal-field"]').element as HTMLInputElement
     expect(focusSpy).toHaveBeenCalledWith()
     expect(focusSpy.mock.instances).toContain(input)
     focusSpy.mockRestore()
@@ -228,7 +240,7 @@ describe('InputModal', () => {
     await nextTick()
     await nextTick()
 
-    const newInput = wrapper.find('[data-testid="game-input"]').element as HTMLInputElement
+    const newInput = wrapper.find('[data-testid="input-modal-field"]').element as HTMLInputElement
     expect(focusSpy).toHaveBeenCalledWith()
     expect(focusSpy.mock.instances).toContain(newInput)
     focusSpy.mockRestore()
