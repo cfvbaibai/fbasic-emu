@@ -206,9 +206,10 @@ export function executeGoto(
 
 ## Testing
 
-- **Location**: `test/executors/`, `test/evaluation/`
-- **Pattern**: Mock device adapter, verify calls
-- **Use**: Test helpers from `test/test-helpers.ts`
+- **Unit tests**: `test/executors/`, `test/evaluation/` — mock device adapter, verify calls
+- **Program tests**: `test/program/` — headless full-program tests via Vitest harness
+- **Pattern**: Test helpers from `test/test-helpers.ts`
+- **See**: `docs/testing-strategy.md` for split-of-concern boundaries and ownership
 
 ### Test Template
 ```typescript

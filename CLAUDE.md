@@ -75,6 +75,7 @@ Use `/commit` command. Format: `feat:`, `fix:`, `refactor:`, `chore:`, `docs:`
 - `docs/roadmap.md` - Active work planning
 - `docs/debugging-best-practices.md` - **Read before investigating bugs**
 - `docs/file-splitting-guide.md` - **Read before splitting files over 500 lines**
+- `docs/testing-strategy.md` - **Read before writing tests** — defines split-of-concern between headless Vitest and Playwright E2E
 
 ## AI Temp Files
 All AI-generated temporary scripts/files should be placed in .ai-temp/ and not committed.

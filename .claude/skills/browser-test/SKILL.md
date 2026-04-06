@@ -89,5 +89,6 @@ browser_console_messages with level:
 
 ## References
 
+- **Testing strategy**: `docs/testing-strategy.md` — this skill owns IDE UI testing only, not program logic
 - [playwright-mcp.md](references/playwright-mcp.md) - Detailed Playwright patterns
 - [chrome-devtools-mcp.md](references/chrome-devtools-mcp.md) - Chrome DevTools patterns

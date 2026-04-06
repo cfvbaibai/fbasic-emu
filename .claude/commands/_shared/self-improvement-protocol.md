@@ -50,3 +50,22 @@ Append to `~/.claude/automations/fbasic-ide/memory/improvements.md`:
 - **Fix applied**: <what changed in the command>
 - **Phase affected**: <which phase>
 ```
+
+## Coverage Tracking (discover-issues only)
+
+When running discover-issues, track program test coverage trends:
+
+1. Count sample `.bas` files in `src/core/samples/programs/` (total programs)
+2. Count test files in `test/program/` (tested programs)
+3. Calculate coverage percentage: `(tested / total) * 100`
+4. Append to `~/.claude/automations/fbasic-ide/memory/program-test-coverage.md`:
+
+```markdown
+## YYYY-MM-DD (Run #N)
+- Total programs: X
+- Tested programs: Y
+- Coverage: Z%
+- Untested programs: <list of untested sample keys>
+```
+
+Use this data to identify trends and prioritize test gap issues.

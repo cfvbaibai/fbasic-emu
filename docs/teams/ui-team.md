@@ -269,9 +269,9 @@ defineEmits<Emits>()
 
 ## Testing
 
-- **Location**: `test/components/`
-- **Framework**: Vitest + Vue Test Utils
-- **Pattern**: Test user interaction and state changes
+- **Component tests**: `test/components/` — Vitest + Vue Test Utils, user interaction and state changes
+- **E2E tests**: `test/e2e/` — Playwright, IDE UI chrome only (buttons, modals, sample selector)
+- **See**: `docs/testing-strategy.md` for split-of-concern boundaries — UI team owns Playwright E2E, not program logic
 
 ### Test Template
 ```typescript

@@ -125,6 +125,7 @@ const StringLiteral = createToken({ name: "StringLiteral", pattern: /"[^"]*"/ })
 - **Pattern**: Test both valid and invalid syntax
 - **Verify**: CST structure matches expected
 - **Always**: Check `result.errors` array
+- **See**: `docs/testing-strategy.md` for split-of-concern boundaries
 
 ### Test Template
 ```typescript

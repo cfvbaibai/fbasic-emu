@@ -347,9 +347,10 @@ function renderFrame() {
 
 ## Testing
 
-- **Location**: `test/animation/*`, `test/sprite/*`
-- **Pattern**: Test state updates, buffer writes, command logic
+- **Unit tests**: `test/animation/*`, `test/sprite/*` — state updates, buffer writes, command logic
+- **Program tests**: `test/program/` — headless full-program tests for sprite/BG/animation features
 - **Mock**: SharedArrayBuffer when needed
+- **See**: `docs/testing-strategy.md` for split-of-concern boundaries and ownership
 
 ### Test Template
 ```typescript

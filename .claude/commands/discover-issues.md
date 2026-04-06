@@ -61,9 +61,18 @@ Search for:
 
 ### 3c. Test Coverage Gaps
 
-For `src/core/` modules (parser, execution, evaluation, state, animation, sprite, devices, sound):
+**Source file tests** — For `src/core/` modules (parser, execution, evaluation, state, animation, sprite, devices, sound):
 - List source files that lack corresponding test files in `test/`
 - Prioritize: executor files, parser files, device adapters
+
+**Program tests** — For sample programs in `src/core/samples/programs/`:
+- List `.bas` files that lack corresponding tests in `test/program/`
+- Categorize findings:
+  - **Fully testable** — non-interactive programs, should have a test now
+  - **Partially testable** — can verify initial screen output, interactive parts deferred
+  - **Blocked** — requires input timeline or other missing infrastructure
+- Report coverage: `X/Y programs tested`
+- See `docs/testing-strategy.md` for testing layer boundaries
 
 ### 3d. Recent Commit Analysis
 
@@ -108,6 +117,26 @@ For each confirmed finding:
 2. Write a clear body with context, affected files, and suggested approach
 3. Assign priority label (most discovery findings are P3 unless they indicate user-facing breakage)
 4. Create via `gh issue create` with labels: type + priority + `claude-automation`
+
+**Testing issue template** — When creating test gap issues, include:
+```
+## Type
+- [ ] Unit test gap
+- [ ] Program test gap
+- [ ] UI/E2E test gap
+
+## Scope
+Source file / Sample program / UI component: <path>
+Testing layer: Runtime | Platform | IDE
+
+## What's Missing
+<specific test case or scenario not covered>
+
+## Approach
+<how to test it — which harness, what to assert>
+```
+
+See `docs/testing-strategy.md` for testing layer boundaries.
 
 **Constraints**:
 - Max **3 issues per run** — prioritize by impact
@@ -158,3 +187,4 @@ Focus on:
 - Were there areas we missed that should be added?
 - Was the rotation focus effective or should it change?
 - Did we create good issue titles and bodies?
+- **Program test coverage**: Track coverage trends in `~/.claude/automations/fbasic-ide/memory/program-test-coverage.md` (see self-improvement protocol)
