@@ -165,7 +165,18 @@ When creating new `.ts` files outside `src/`, `test/`, or `scripts/` (e.g., at t
 
 When changing Vue component structure (removing/renaming CSS classes, changing DOM hierarchy), grep ALL E2E test files for affected selectors (e.g., old class names like `.features-grid`, component test IDs) and update them. E2E test breakage from UI changes is the most common CI failure — catch it before pushing.
 
-**File size constraint**: MAX 500 lines per file. After implementation, check all changed files with `wc -l`. If any exceeds 500 lines, you MUST do real structural refactoring following `docs/file-splitting-guide.md` — diagnose why the file grew, then decompose by responsibility into cohesive modules. **Cosmetic tricks are strictly forbidden**: do NOT condense JSDoc comments, remove blank lines, compress formatting, or make any change whose sole purpose is reducing line count without improving code structure. If a file needs splitting, split it properly.
+**File size constraint**: MAX 500 lines per file. After implementation, check all changed files with `wc -l`. If any exceeds 500 lines, you MUST do real structural refactoring following `docs/file-splitting-guide.md` — diagnose why the file grew, then decompose by responsibility into cohesive modules. If a file needs splitting, split it properly.
+
+**Cosmetic tricks are strictly forbidden.** The following are NEVER acceptable as "refactoring":
+- Removing blank lines between functions/blocks
+- Condensing JSDoc comments or removing documentation
+- Joining multi-line statements into single lines
+- Removing trailing commas or reformatting for line density
+- Collapsing `if/else` blocks into ternaries just to save lines
+- Moving code to a `*Helpers.ts` dump file without identifying a clear responsibility
+- Any change whose ONLY effect is reducing line count without improving structure
+
+**If a file exceeds 500 lines, the ONLY acceptable response is structural decomposition**: identify the mixed responsibilities, create focused modules with clear domain purpose, and distribute the code by responsibility. Read `docs/file-splitting-guide.md` for examples of correct vs incorrect splits.
 
 When done, report back: (1) root cause, (2) files changed, (3) test results.
 ```
@@ -173,6 +184,26 @@ When done, report back: (1) root cause, (2) files changed, (3) test results.
 When the sub-agent returns, **proceed to Phase 5** without outputting a summary or stopping.
 
 ## Phase 5 — Commit & PR
+
+### Pre-commit Validation
+
+Before committing, run these checks in the worktree:
+
+```bash
+cd "$WT_PATH"
+
+# 1. File size check — reject if any changed file exceeds 500 lines
+git diff --name-only --diff-filter=ACMR origin/master | xargs wc -l | sort -rn | head -20
+
+# 2. Cosmetic trick detection — check diff for line-saving tricks
+git diff origin/master -- ':(exclude)*.snap' | grep -E '^\-' | grep -v '^\-\-\-' | grep -vE '(import|export|function|class|interface|type |const |return|if |for |while |switch |case )' | head -40
+```
+
+If any file exceeds 500 lines, **STOP**. Send the sub-agent back to do real structural refactoring. Do NOT proceed to commit.
+
+If the diff shows removed blank lines, removed comments, or condensed formatting that doesn't correspond to actual logic changes, **STOP**. This indicates cosmetic tricks were used. Send the sub-agent back to undo them and do real refactoring instead.
+
+### Commit & Push
 
 ```bash
 cd "$WT_PATH"
@@ -369,3 +400,4 @@ Follow `.claude/commands/_shared/self-improvement-protocol.md`. Focus on:
 - **Stop after one issue** — handle one issue per run
 - **PR title must include issue number** and use closing keyword `Closes #N`
 - **Systematic CI debugging** — follow the 4-phase debugging process for CI failures (root cause → pattern analysis → hypothesis → implement); no guess-and-fix
+- **No cosmetic line-saving** — if a file exceeds 500 lines, do REAL structural refactoring (decompose by responsibility), never cosmetic tricks (remove blank lines, condense comments, compress formatting). The pre-commit validation in Phase 5 will reject cosmetic changes.
