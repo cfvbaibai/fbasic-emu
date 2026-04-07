@@ -6,9 +6,9 @@
 import { ERROR_MESSAGES, EXECUTION_LIMITS } from '@/core/constants'
 import type { BasicVariable } from '@/core/types/state-types'
 import { ExecutionError } from '@/features/ide/errors/ExecutionError'
+import { resetRuntimePalettes } from '@/shared/data/palette'
 import i18n from '@/shared/i18n'
 import { logComposable } from '@/shared/logger'
-import { resetRuntimePalettes } from '@/shared/data/palette'
 
 import { formatArrayForDisplay } from './useBasicIdeFormatting'
 import { stopAudioPlayback } from './useBasicIdeMessageHandlers'

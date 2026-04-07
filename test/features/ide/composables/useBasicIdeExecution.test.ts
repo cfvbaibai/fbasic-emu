@@ -5,14 +5,14 @@ import { ERROR_MESSAGES } from '@/core/constants'
 import { useBasicIdeExecution } from '@/features/ide/composables/useBasicIdeExecution'
 import type { BasicIdeState } from '@/features/ide/composables/useBasicIdeState'
 import type { BasicIdeWorkerIntegration } from '@/features/ide/composables/useBasicIdeWorkerIntegration'
-import i18n from '@/shared/i18n'
 import {
   BACKGROUND_PALETTES,
   ORIGINAL_BACKGROUND_PALETTES,
   ORIGINAL_SPRITE_PALETTES,
-  SPRITE_PALETTES,
   setRuntimePaletteCombination,
+  SPRITE_PALETTES,
 } from '@/shared/data/palette'
+import i18n from '@/shared/i18n'
 
 function createState(): BasicIdeState {
   return {
@@ -65,6 +65,11 @@ function createWorker(overrides?: Partial<BasicIdeWorkerIntegration>): BasicIdeW
 }
 
 describe('useBasicIdeExecution', () => {
+  /** Deep-clone palette arrays (mutable or deeply-readonly) for snapshot comparison. */
+  function clonePalettes(palettes: Iterable<Iterable<readonly number[]>>): number[][][] {
+    return [...palettes].map(p => [...p].map(c => [...c]))
+  }
+
   describe('timeout error message', () => {
     it('maps "Web worker message timeout" to user-friendly i18n message', async () => {
       const state = createState()
@@ -151,11 +156,6 @@ describe('useBasicIdeExecution', () => {
   })
 
   describe('clearOutput resets runtime palettes (issue #435)', () => {
-    /** Deep-clone palette arrays for snapshot comparison. */
-    function clonePalettes(palettes: readonly (readonly number[])[][]): number[][][] {
-      return palettes.map(p => p.map(c => [...c]))
-    }
-
     let savedBg: number[][][]
     let savedSprite: number[][][]
 
@@ -232,11 +232,6 @@ describe('useBasicIdeExecution', () => {
   })
 
   describe('runCode resets runtime palettes (issue #435)', () => {
-    /** Deep-clone palette arrays for snapshot comparison. */
-    function clonePalettes(palettes: readonly (readonly number[])[][]): number[][][] {
-      return palettes.map(p => p.map(c => [...c]))
-    }
-
     let savedBg: number[][][]
     let savedSprite: number[][][]
 
