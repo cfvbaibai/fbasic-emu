@@ -6,7 +6,7 @@
 
 import type { ScreenCell } from '@/core/types/execution-types'
 import type { ScreenUpdateMessage } from '@/core/types/worker-messages'
-import { BACKGROUND_PALETTES, SPRITE_PALETTES } from '@/shared/data/palette'
+import { ORIGINAL_BACKGROUND_PALETTES, ORIGINAL_SPRITE_PALETTES } from '@/shared/data/palette'
 import { logDevice } from '@/shared/logger'
 
 import {
@@ -36,10 +36,10 @@ export class ScreenStateManager {
   private cursorY = 0
   private bgPalette = 1 // Default background palette (0-1)
   private spritePalette = 1 // Default sprite palette (0-2)
-  private readonly backgroundPalettes = BACKGROUND_PALETTES.map(palette =>
+  private readonly backgroundPalettes = ORIGINAL_BACKGROUND_PALETTES.map(palette =>
     palette.map(combination => [...combination] as [number, number, number, number])
   ) as [[number, number, number, number][], [number, number, number, number][]]
-  private readonly spritePalettes = SPRITE_PALETTES.map(palette =>
+  private readonly spritePalettes = ORIGINAL_SPRITE_PALETTES.map(palette =>
     palette.map(combination => [...combination] as [number, number, number, number])
   ) as [
     [number, number, number, number][],
@@ -89,18 +89,20 @@ export class ScreenStateManager {
 
   /**
    * Reset palette combination arrays to original palette data.
-   * Mutates in-place because the arrays are readonly references.
+   * Uses ORIGINAL_* constants (immutable) rather than the mutable
+   * BACKGROUND_PALETTES/SPRITE_PALETTES which may have been corrupted
+   * by setRuntimePaletteCombination() on the main thread.
    */
   private resetPalettes(): void {
     for (let i = 0; i < this.backgroundPalettes.length; i++) {
-      const source = BACKGROUND_PALETTES[i]!
+      const source = ORIGINAL_BACKGROUND_PALETTES[i]!
       const target = this.backgroundPalettes[i]!
       for (let j = 0; j < source.length; j++) {
         target[j] = [...source[j]!] as [number, number, number, number]
       }
     }
     for (let i = 0; i < this.spritePalettes.length; i++) {
-      const source = SPRITE_PALETTES[i]!
+      const source = ORIGINAL_SPRITE_PALETTES[i]!
       const target = this.spritePalettes[i]!
       for (let j = 0; j < source.length; j++) {
         target[j] = [...source[j]!] as [number, number, number, number]
