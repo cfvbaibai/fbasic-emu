@@ -178,7 +178,9 @@ When changing Vue component structure (removing/renaming CSS classes, changing D
 
 **If a file exceeds 500 lines, the ONLY acceptable response is structural decomposition**: identify the mixed responsibilities, create focused modules with clear domain purpose, and distribute the code by responsibility. Read `docs/file-splitting-guide.md` for examples of correct vs incorrect splits.
 
-When done, report back: (1) root cause, (2) files changed, (3) test results.
+**Bug fix test coverage**: When fixing a bug, add or update test cases that cover the bug scenario. A fix without a regression test is incomplete — the bug could silently reappear. Write a test that reproduces the bug (would fail before the fix) and verifies the fix (passes after). If existing tests already cover the scenario, verify they do and note it.
+
+When done, report back: (1) root cause, (2) files changed, (3) test results, (4) what test covers the bug.
 ```
 
 When the sub-agent returns, **proceed to Phase 5** without outputting a summary or stopping.
