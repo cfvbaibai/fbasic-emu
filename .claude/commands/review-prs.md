@@ -88,6 +88,11 @@ gh pr review <number> --comment --body "## Review: APPROVE
 - [Finding 1]
 - [Finding 2]
 
+### Minor
+[Every non-blocking observation MUST be listed here. Each item will become a GitHub issue in Phase 5. If none, write "(none)".]
+- [Observation 1]
+- [Observation 2]
+
 🤖 Reviewed by Claude Code ([Specialist] specialist)"
 ```
 
@@ -117,10 +122,17 @@ gh pr review <number> --comment --body "## Review: NEEDS DISCUSSION
 ### Context
 [Explanation of why discussion is needed]
 
+### Minor
+[Every non-blocking observation MUST be listed here. Each item will become a GitHub issue in Phase 5. If none, write "(none)".]
+- [Observation 1]
+- [Observation 2]
+
 🤖 Reviewed by Claude Code ([Specialist] specialist)"
 ```
 
 ## Phase 5 — Create Follow-up Issues
+
+**Before starting Phase 5, re-read each posted review and extract every item from the `### Minor` section. Each item MUST become a GitHub issue unless an existing issue already covers the exact same suggestion.** If a review has "### Minor\n(none)", skip it.
 
 **IMPORTANT: Create a GitHub issue for EVERY non-blocking suggestion found during review, regardless of size or perceived importance.** The triage process decides what to work on, not the reviewer. Every suggestion becomes a tracked issue.
 
