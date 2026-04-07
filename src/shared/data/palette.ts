@@ -74,6 +74,47 @@ type Palette = [ColorCombination, ColorCombination, ColorCombination, ColorCombi
 export type ColorCombination = [number, number, number, number]
 export type PaletteTarget = 'B' | 'S'
 
+// Immutable original palette data — never mutated.
+// Used as source-of-truth for resetRuntimePalettes() and
+// ScreenStateManager.resetPalettes() so that resets always
+// restore the correct default values even after setRuntimePaletteCombination()
+// has mutated the runtime BACKGROUND_PALETTES / SPRITE_PALETTES arrays.
+export const ORIGINAL_SPRITE_PALETTES = [
+  [
+    [0x00, 0x36, 0x16, 0x02] as ColorCombination,
+    [0x00, 0x27, 0x30, 0x19] as ColorCombination,
+    [0x00, 0x35, 0x25, 0x17] as ColorCombination,
+    [0x00, 0x30, 0x27, 0x16] as ColorCombination,
+  ],
+  [
+    [0x00, 0x30, 0x16, 0x01] as ColorCombination,
+    [0x00, 0x10, 0x00, 0x01] as ColorCombination,
+    [0x00, 0x30, 0x29, 0x09] as ColorCombination,
+    [0x00, 0x30, 0x16, 0x07] as ColorCombination,
+  ],
+  [
+    [0x00, 0x30, 0x26, 0x12] as ColorCombination,
+    [0x00, 0x30, 0x15, 0x12] as ColorCombination,
+    [0x00, 0x30, 0x12, 0x16] as ColorCombination,
+    [0x00, 0x30, 0x26, 0x19] as ColorCombination,
+  ],
+] as const
+
+export const ORIGINAL_BACKGROUND_PALETTES = [
+  [
+    [0x00, 0x2c, 0x15, 0x07] as ColorCombination,
+    [0x00, 0x27, 0x21, 0x12] as ColorCombination,
+    [0x00, 0x29, 0x36, 0x17] as ColorCombination,
+    [0x00, 0x30, 0x26, 0x07] as ColorCombination,
+  ],
+  [
+    [0x00, 0x30, 0x21, 0x02] as ColorCombination,
+    [0x00, 0x30, 0x27, 0x18] as ColorCombination,
+    [0x00, 0x30, 0x27, 0x16] as ColorCombination,
+    [0x00, 0x29, 0x36, 0x17] as ColorCombination,
+  ],
+] as const
+
 export const SPRITE_PALETTES: [Palette, Palette, Palette] = [
   [
     [0x00, 0x36, 0x16, 0x02],
@@ -137,5 +178,29 @@ export function setRuntimePaletteCombination(
   const palette = SPRITE_PALETTES[idx]
   if (palette) {
     palette[clampedCombination] = clampedColors
+  }
+}
+
+/**
+ * Restore BACKGROUND_PALETTES and SPRITE_PALETTES to their original values.
+ * Used by the main thread when a new program starts to clear stale palette
+ * state from the previous run.
+ */
+export function resetRuntimePalettes(): void {
+  for (let i = 0; i < ORIGINAL_BACKGROUND_PALETTES.length; i++) {
+    const source = ORIGINAL_BACKGROUND_PALETTES[i]!
+    const target = BACKGROUND_PALETTES[i]!
+    for (let j = 0; j < source.length; j++) {
+      const s = source[j]!
+      target[j] = [s[0], s[1], s[2], s[3]]
+    }
+  }
+  for (let i = 0; i < ORIGINAL_SPRITE_PALETTES.length; i++) {
+    const source = ORIGINAL_SPRITE_PALETTES[i]!
+    const target = SPRITE_PALETTES[i]!
+    for (let j = 0; j < source.length; j++) {
+      const s = source[j]!
+      target[j] = [s[0], s[1], s[2], s[3]]
+    }
   }
 }
