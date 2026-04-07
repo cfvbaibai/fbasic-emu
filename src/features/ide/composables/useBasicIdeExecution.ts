@@ -8,6 +8,7 @@ import type { BasicVariable } from '@/core/types/state-types'
 import { ExecutionError } from '@/features/ide/errors/ExecutionError'
 import i18n from '@/shared/i18n'
 import { logComposable } from '@/shared/logger'
+import { resetRuntimePalettes } from '@/shared/data/palette'
 
 import { formatArrayForDisplay } from './useBasicIdeFormatting'
 import { stopAudioPlayback } from './useBasicIdeMessageHandlers'
@@ -52,6 +53,16 @@ export function useBasicIdeExecution(
     state.errors.value = []
     state.variables.value = {}
     state.debugOutput.value = ''
+
+    // Reset palette state so mutations from the previous program do not
+    // persist into this run (issue #435). Module-level color arrays:
+    resetRuntimePalettes()
+    // Reactive state (bgPalette, cgenMode, etc.) — the worker does not send
+    // initial palette values at the start of execution, so we must reset here.
+    state.bgPalette.value = 1
+    state.spritePalette.value = 1
+    state.backdropColor.value = 0
+    state.cgenMode.value = 2
 
     try {
       await worker.initializeWebWorker()
@@ -172,6 +183,10 @@ export function useBasicIdeExecution(
   const clearOutput = () => {
     // Stop any playing audio (uses shared audio player from message handlers)
     stopAudioPlayback()
+
+    // Reset module-level palette arrays so mutated PALETB/PALETS state from
+    // the previous program does not persist into the next run (issue #435).
+    resetRuntimePalettes()
 
     state.output.value = []
     state.errors.value = []
