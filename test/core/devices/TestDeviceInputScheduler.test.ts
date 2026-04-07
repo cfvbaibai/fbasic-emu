@@ -350,7 +350,7 @@ describe('TestDeviceInputScheduler', () => {
 })
 
 // ============================================================================
-// Integration: scheduling through TestDeviceAdapter
+// Integration: scheduling through TestDeviceAdapter.inputScheduler
 // ============================================================================
 
 describe('TestDeviceAdapter scheduling integration', () => {
@@ -360,38 +360,38 @@ describe('TestDeviceAdapter scheduling integration', () => {
 
   it('should start at frame 0', () => {
     const adapter = createAdapter()
-    expect(adapter.getCurrentFrame()).toBe(0)
+    expect(adapter.inputScheduler.getCurrentFrame()).toBe(0)
   })
 
-  it('should deliver stick event through adapter delegation', () => {
+  it('should deliver stick event through adapter.inputScheduler', () => {
     const adapter = createAdapter()
-    adapter.scheduleInput({ atFrame: 1, stick: { player: 0, direction: 8 } })
-    adapter.advanceFrame()
+    adapter.inputScheduler.scheduleInput({ atFrame: 1, stick: { player: 0, direction: 8 } })
+    adapter.inputScheduler.advanceFrame()
     expect(adapter.getStickState(0)).toBe(8)
   })
 
-  it('should deliver strig event through adapter delegation', () => {
+  it('should deliver strig event through adapter.inputScheduler', () => {
     const adapter = createAdapter()
-    adapter.scheduleInput({ atFrame: 1, strig: { player: 0, button: 1 } })
-    adapter.advanceFrame()
+    adapter.inputScheduler.scheduleInput({ atFrame: 1, strig: { player: 0, button: 1 } })
+    adapter.inputScheduler.advanceFrame()
     expect(adapter.consumeStrigState(0)).toBe(1)
   })
 
-  it('should deliver key event through adapter delegation', () => {
+  it('should deliver key event through adapter.inputScheduler', () => {
     const adapter = createAdapter()
-    adapter.scheduleInput({ atFrame: 1, key: 'A' })
-    adapter.advanceFrame()
+    adapter.inputScheduler.scheduleInput({ atFrame: 1, key: 'A' })
+    adapter.inputScheduler.advanceFrame()
     expect(adapter.getInkeyState()).toBe('A')
   })
 
   it('should reset scheduling state on adapter reset()', () => {
     const adapter = createAdapter()
-    adapter.scheduleInput({ atFrame: 1, stick: { player: 0, direction: 8 } })
-    adapter.advanceFrame()
+    adapter.inputScheduler.scheduleInput({ atFrame: 1, stick: { player: 0, direction: 8 } })
+    adapter.inputScheduler.advanceFrame()
 
     adapter.reset()
-    expect(adapter.getCurrentFrame()).toBe(0)
-    expect(adapter.getScheduledInputCount()).toBe(0)
-    expect(adapter.deliveryLog).toEqual([])
+    expect(adapter.inputScheduler.getCurrentFrame()).toBe(0)
+    expect(adapter.inputScheduler.getScheduledInputCount()).toBe(0)
+    expect(adapter.inputScheduler.getDeliveryLog()).toEqual([])
   })
 })
