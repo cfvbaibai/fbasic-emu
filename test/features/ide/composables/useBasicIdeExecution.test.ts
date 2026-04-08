@@ -322,6 +322,60 @@ describe('useBasicIdeExecution', () => {
     })
   })
 
+  describe('clearOutput resets palette reactive state (issue #444)', () => {
+    it('should reset bgPalette to default when clearOutput is called', () => {
+      const state = createState()
+      // Simulate a screen sample that changed bgPalette via CGEN command
+      state.bgPalette.value = 0
+      const worker = createWorker()
+      const parseCode = vi.fn().mockResolvedValue({})
+      const { clearOutput } = useBasicIdeExecution(state, worker, parseCode)
+
+      clearOutput()
+
+      expect(state.bgPalette.value).toEqual(1)
+    })
+
+    it('should reset cgenMode to default when clearOutput is called', () => {
+      const state = createState()
+      // Simulate a screen sample that changed cgenMode via CGEN command
+      state.cgenMode.value = 0
+      const worker = createWorker()
+      const parseCode = vi.fn().mockResolvedValue({})
+      const { clearOutput } = useBasicIdeExecution(state, worker, parseCode)
+
+      clearOutput()
+
+      expect(state.cgenMode.value).toEqual(2)
+    })
+
+    it('should reset backdropColor to default when clearOutput is called', () => {
+      const state = createState()
+      // Simulate a screen sample that set a non-zero backdrop color
+      state.backdropColor.value = 1
+      const worker = createWorker()
+      const parseCode = vi.fn().mockResolvedValue({})
+      const { clearOutput } = useBasicIdeExecution(state, worker, parseCode)
+
+      clearOutput()
+
+      expect(state.backdropColor.value).toEqual(0)
+    })
+
+    it('should reset spritePalette to default when clearOutput is called', () => {
+      const state = createState()
+      // Simulate a screen sample that changed sprite palette index
+      state.spritePalette.value = 2
+      const worker = createWorker()
+      const parseCode = vi.fn().mockResolvedValue({})
+      const { clearOutput } = useBasicIdeExecution(state, worker, parseCode)
+
+      clearOutput()
+
+      expect(state.spritePalette.value).toEqual(1)
+    })
+  })
+
   describe('runCode resets palette reactive state (issue #435)', () => {
     it('should reset bgPalette to default when runCode is called', async () => {
       const state = createState()
