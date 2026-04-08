@@ -66,13 +66,34 @@ gh pr diff <number>
 
 For complex PRs or multiple PRs, you MAY use the Agent tool with `subagent_type="general-purpose"` (NOT team_name) to parallelize reviews. Each agent should return its verdict and feedback as text — do NOT use TeamCreate, SendMessage, or team-based features.
 
-**Review checklist:**
+### Step 3a — Blocking Analysis (determines verdict)
+
+Evaluate whether the PR is safe to merge. This step determines the verdict.
+
+**Checklist:**
 1. **Correctness** — Does the code do what it claims?
 2. **Code quality** — Follows conventions (TypeScript strict, import type, no any, files under 500 lines, scoped styles)?
 3. **Test coverage** — Adequate tests? Use `.toEqual()` not `.toContain()`?
 4. **Edge cases** — Error handling, boundary conditions?
 5. **Potential issues** — Breaking changes, side effects?
 6. **TEST INTEGRITY (CRITICAL)** — Were any tests removed, weakened, loosened, or skipped to avoid fixing a real bug? Look for: deleted test cases, loosened assertions (e.g., toEqual→toContain), changed expected values to match wrong output, added skip/todo/pending. If detected, verdict MUST be REQUEST CHANGES.
+
+**Output:** Verdict (APPROVE / REQUEST CHANGES / NEEDS DISCUSSION) + key findings for review body.
+
+### Step 3b — Non-Blocking Analysis (MANDATORY — feeds Phase 5)
+
+This step is **always executed**, even if the verdict is APPROVE. It is a separate, dedicated scan for improvement opportunities. Do NOT skip this step. Do NOT write "(none)" without actively searching.
+
+**Scan categories (check each one):**
+1. **Magic numbers** — Hardcoded values that should be named constants (e.g., default palette values duplicated across files)
+2. **Code duplication** — Logic, helpers, or setup/teardown blocks repeated across functions or test files
+3. **Inconsistent patterns** — Mixed styles within the same PR (e.g., regex vs literal assertions, different timeout strategies)
+4. **Missing test coverage** — Smoke-only tests without assertions, untested code paths, interactive programs only testing exit paths
+5. **Potential improvements** — Opportunities for refactoring, better abstractions, or clearer naming
+
+**Output:** A list of non-blocking observations. Each observation MUST become a GitHub issue in Phase 5.
+
+**Rule:** If the scan produces zero observations for a non-trivial PR (>20 lines changed or >2 files), re-examine the diff — you likely missed something.
 
 ## Phase 4 — Post Reviews
 
@@ -89,7 +110,7 @@ gh pr review <number> --comment --body "## Review: APPROVE
 - [Finding 2]
 
 ### Minor
-[Every non-blocking observation MUST be listed here. Each item will become a GitHub issue in Phase 5. If none, write "(none)".]
+[Every non-blocking observation from Step 3b MUST be listed here. Each item will become a GitHub issue in Phase 5.]
 - [Observation 1]
 - [Observation 2]
 
@@ -123,7 +144,7 @@ gh pr review <number> --comment --body "## Review: NEEDS DISCUSSION
 [Explanation of why discussion is needed]
 
 ### Minor
-[Every non-blocking observation MUST be listed here. Each item will become a GitHub issue in Phase 5. If none, write "(none)".]
+[Every non-blocking observation from Step 3b MUST be listed here. Each item will become a GitHub issue in Phase 5.]
 - [Observation 1]
 - [Observation 2]
 
@@ -132,7 +153,7 @@ gh pr review <number> --comment --body "## Review: NEEDS DISCUSSION
 
 ## Phase 5 — Create Follow-up Issues
 
-**Before starting Phase 5, re-read each posted review and extract every item from the `### Minor` section. Each item MUST become a GitHub issue unless an existing issue already covers the exact same suggestion.** If a review has "### Minor\n(none)", skip it.
+**This phase is fed by Step 3b (Non-Blocking Analysis).** Re-read each posted review's `### Minor` section and create a GitHub issue for every item listed.
 
 **IMPORTANT: Create a GitHub issue for EVERY non-blocking suggestion found during review, regardless of size or perceived importance.** The triage process decides what to work on, not the reviewer. Every suggestion becomes a tracked issue.
 
