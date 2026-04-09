@@ -74,48 +74,15 @@ type Palette = [ColorCombination, ColorCombination, ColorCombination, ColorCombi
 export type ColorCombination = [number, number, number, number]
 export type PaletteTarget = 'B' | 'S'
 
-// Immutable original palette data — never mutated.
-// Used as source-of-truth for resetRuntimePalettes() and
-// ScreenStateManager.resetPalettes() so that resets always
-// restore the correct default values even after setRuntimePaletteCombination()
-// has mutated the runtime BACKGROUND_PALETTES / SPRITE_PALETTES arrays.
-export const ORIGINAL_SPRITE_PALETTES = [
-  [
-    [0x00, 0x36, 0x16, 0x02] as ColorCombination,
-    [0x00, 0x27, 0x30, 0x19] as ColorCombination,
-    [0x00, 0x35, 0x25, 0x17] as ColorCombination,
-    [0x00, 0x30, 0x27, 0x16] as ColorCombination,
-  ],
-  [
-    [0x00, 0x30, 0x16, 0x01] as ColorCombination,
-    [0x00, 0x10, 0x00, 0x01] as ColorCombination,
-    [0x00, 0x30, 0x29, 0x09] as ColorCombination,
-    [0x00, 0x30, 0x16, 0x07] as ColorCombination,
-  ],
-  [
-    [0x00, 0x30, 0x26, 0x12] as ColorCombination,
-    [0x00, 0x30, 0x15, 0x12] as ColorCombination,
-    [0x00, 0x30, 0x12, 0x16] as ColorCombination,
-    [0x00, 0x30, 0x26, 0x19] as ColorCombination,
-  ],
-] as const
+// ---------------------------------------------------------------------------
+// Single source of truth for palette data.
+// All palette arrays (immutable originals and mutable runtime) are derived
+// from these raw definitions, eliminating the risk of the originals drifting
+// from the runtime defaults when palette values are updated.
+// ---------------------------------------------------------------------------
 
-export const ORIGINAL_BACKGROUND_PALETTES = [
-  [
-    [0x00, 0x2c, 0x15, 0x07] as ColorCombination,
-    [0x00, 0x27, 0x21, 0x12] as ColorCombination,
-    [0x00, 0x29, 0x36, 0x17] as ColorCombination,
-    [0x00, 0x30, 0x26, 0x07] as ColorCombination,
-  ],
-  [
-    [0x00, 0x30, 0x21, 0x02] as ColorCombination,
-    [0x00, 0x30, 0x27, 0x18] as ColorCombination,
-    [0x00, 0x30, 0x27, 0x16] as ColorCombination,
-    [0x00, 0x29, 0x36, 0x17] as ColorCombination,
-  ],
-] as const
-
-export const SPRITE_PALETTES: [Palette, Palette, Palette] = [
+/** Raw sprite palette definitions — single source of truth. */
+const RAW_SPRITE_PALETTES = [
   [
     [0x00, 0x36, 0x16, 0x02],
     [0x00, 0x27, 0x30, 0x19],
@@ -134,9 +101,10 @@ export const SPRITE_PALETTES: [Palette, Palette, Palette] = [
     [0x00, 0x30, 0x12, 0x16],
     [0x00, 0x30, 0x26, 0x19],
   ],
-]
+] as const
 
-export const BACKGROUND_PALETTES: [Palette, Palette] = [
+/** Raw background palette definitions — single source of truth. */
+const RAW_BACKGROUND_PALETTES = [
   [
     [0x00, 0x2c, 0x15, 0x07],
     [0x00, 0x27, 0x21, 0x12],
@@ -149,7 +117,40 @@ export const BACKGROUND_PALETTES: [Palette, Palette] = [
     [0x00, 0x30, 0x27, 0x16],
     [0x00, 0x29, 0x36, 0x17],
   ],
-]
+] as const
+
+// ---------------------------------------------------------------------------
+// Deep-clone helper — produces mutable arrays from raw const data.
+// The `as unknown` cast is needed because `as const` produces deeply-nested
+// readonly tuple types that are not assignable to mutable array types.
+// ---------------------------------------------------------------------------
+
+function cloneAsMutable(raw: unknown): number[][][] {
+  return (raw as number[][][]).map(palette =>
+    palette.map(combination => [...combination])
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Immutable originals — never mutated.
+// Used as source-of-truth for resetRuntimePalettes() and
+// ScreenStateManager.resetPalettes() so that resets always restore the correct
+// default values even after setRuntimePaletteCombination() has mutated the
+// runtime BACKGROUND_PALETTES / SPRITE_PALETTES arrays.
+// ---------------------------------------------------------------------------
+
+export const ORIGINAL_SPRITE_PALETTES = RAW_SPRITE_PALETTES
+export const ORIGINAL_BACKGROUND_PALETTES = RAW_BACKGROUND_PALETTES
+
+// ---------------------------------------------------------------------------
+// Mutable runtime arrays — mutated in place by setRuntimePaletteCombination().
+// ---------------------------------------------------------------------------
+
+export const SPRITE_PALETTES: [Palette, Palette, Palette] =
+  cloneAsMutable(RAW_SPRITE_PALETTES) as [Palette, Palette, Palette]
+
+export const BACKGROUND_PALETTES: [Palette, Palette] =
+  cloneAsMutable(RAW_BACKGROUND_PALETTES) as [Palette, Palette]
 
 export function setRuntimePaletteCombination(
   target: PaletteTarget,
