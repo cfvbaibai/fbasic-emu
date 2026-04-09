@@ -4,6 +4,7 @@
  * Manages screen buffer, cursor position, and screen-related operations.
  */
 
+import { PALETTE_DEFAULTS } from '@/core/constants'
 import type { ScreenCell } from '@/core/types/execution-types'
 import type { ScreenUpdateMessage } from '@/core/types/worker-messages'
 import { ORIGINAL_BACKGROUND_PALETTES, ORIGINAL_SPRITE_PALETTES } from '@/shared/data/palette'
@@ -34,8 +35,8 @@ export class ScreenStateManager {
   private screenBuffer: ScreenCell[][] = []
   private cursorX = 0
   private cursorY = 0
-  private bgPalette = 1 // Default background palette (0-1)
-  private spritePalette = 1 // Default sprite palette (0-2)
+  private bgPalette: number = PALETTE_DEFAULTS.BG_PALETTE
+  private spritePalette: number = PALETTE_DEFAULTS.SPRITE_PALETTE
   private readonly backgroundPalettes = ORIGINAL_BACKGROUND_PALETTES.map(palette =>
     palette.map(combination => [...combination] as [number, number, number, number])
   ) as [[number, number, number, number][], [number, number, number, number][]]
@@ -46,8 +47,8 @@ export class ScreenStateManager {
     [number, number, number, number][],
     [number, number, number, number][],
   ]
-  private backdropColor = 0 // Default backdrop color code (0-60, 0 = black)
-  private cgenMode = 2 // Default character generator mode (0-3): B on BG, A on sprite
+  private backdropColor: number = PALETTE_DEFAULTS.BACKDROP_COLOR
+  private cgenMode: number = PALETTE_DEFAULTS.CGEN_MODE
   private currentExecutionId: string | null = null
 
   constructor() {
@@ -79,10 +80,10 @@ export class ScreenStateManager {
     this.cursorX = 0
     this.cursorY = 0
     // Reset BG/screen state to defaults so stale data does not persist
-    this.bgPalette = 1
-    this.spritePalette = 1
-    this.backdropColor = 0
-    this.cgenMode = 2
+    this.bgPalette = PALETTE_DEFAULTS.BG_PALETTE
+    this.spritePalette = PALETTE_DEFAULTS.SPRITE_PALETTE
+    this.backdropColor = PALETTE_DEFAULTS.BACKDROP_COLOR
+    this.cgenMode = PALETTE_DEFAULTS.CGEN_MODE
     // Reset palette combinations to original data
     this.resetPalettes()
   }
