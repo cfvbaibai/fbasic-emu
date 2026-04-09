@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 
 import type { SharedDisplayViews } from '@/core/animation/sharedDisplayBuffer'
 import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
+import { PALETTE_DEFAULTS } from '@/core/constants'
 import type { SpriteState } from '@/core/sprite/types'
 import type { HighlighterInfo, ParserInfo, ScreenCell } from '@/core/types/execution-types'
 import type { BasicVariable } from '@/core/types/state-types'
@@ -55,10 +56,10 @@ const debugMode = basicIde?.debugMode ?? ref(false)
 const screenBuffer = basicIde?.screenBuffer ?? ref<ScreenCell[][]>([])
 const cursorX = basicIde?.cursorX ?? ref(0)
 const cursorY = basicIde?.cursorY ?? ref(0)
-const bgPalette = basicIde?.bgPalette ?? ref(1)
-const backdropColor = basicIde?.backdropColor ?? ref(0)
-const spritePalette = basicIde?.spritePalette ?? ref(1)
-const cgenMode = basicIde?.cgenMode ?? ref(2)
+const bgPalette = basicIde?.bgPalette ?? ref(PALETTE_DEFAULTS.BG_PALETTE)
+const backdropColor = basicIde?.backdropColor ?? ref(PALETTE_DEFAULTS.BACKDROP_COLOR)
+const spritePalette = basicIde?.spritePalette ?? ref(PALETTE_DEFAULTS.SPRITE_PALETTE)
+const cgenMode = basicIde?.cgenMode ?? ref(PALETTE_DEFAULTS.CGEN_MODE)
 const spriteStates = basicIde?.spriteStates ?? ref<SpriteState[]>([])
 const spriteEnabled = basicIde?.spriteEnabled ?? ref(true)
 const movementPositionsFromBuffer =

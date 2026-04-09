@@ -195,6 +195,18 @@ export const SCREEN_DIMENSIONS = {
   SPRITE_COUNT: 8,
 } as const
 
+// Palette default values (used by ScreenStateManager, IDE composables, and IdePage)
+export const PALETTE_DEFAULTS = {
+  /** Default background palette index (0-1) */
+  BG_PALETTE: 1,
+  /** Default sprite palette index (0-2) */
+  SPRITE_PALETTE: 1,
+  /** Default backdrop color code (0-60, 0 = black) */
+  BACKDROP_COLOR: 0,
+  /** Default character-generator mode (0-3): B on BG, A on sprite */
+  CGEN_MODE: 2,
+} as const
+
 // Color patterns and codes
 export const COLOR_PATTERNS = {
   MIN: 0, // Minimum color pattern number
