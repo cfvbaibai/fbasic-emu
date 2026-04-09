@@ -9,6 +9,7 @@ import {
   BACKGROUND_PALETTES,
   ORIGINAL_BACKGROUND_PALETTES,
   ORIGINAL_SPRITE_PALETTES,
+  resetRuntimePalettes,
   setRuntimePaletteCombination,
   SPRITE_PALETTES,
 } from '@/shared/data/palette'
@@ -155,7 +156,7 @@ describe('useBasicIdeExecution', () => {
     })
   })
 
-  describe('clearOutput resets runtime palettes (issue #435)', () => {
+  describe('palette data reset (issue #435)', () => {
     let savedBg: number[][][]
     let savedSprite: number[][][]
 
@@ -166,159 +167,126 @@ describe('useBasicIdeExecution', () => {
 
     afterEach(() => {
       // Restore palettes to prevent cross-test contamination
-      for (let i = 0; i < BACKGROUND_PALETTES.length; i++) {
-        for (let j = 0; j < BACKGROUND_PALETTES[i]!.length; j++) {
-          const s = ORIGINAL_BACKGROUND_PALETTES[i]![j]!
-          BACKGROUND_PALETTES[i]![j] = [s[0], s[1], s[2], s[3]]
-        }
-      }
-      for (let i = 0; i < SPRITE_PALETTES.length; i++) {
-        for (let j = 0; j < SPRITE_PALETTES[i]!.length; j++) {
-          const s = ORIGINAL_SPRITE_PALETTES[i]![j]!
-          SPRITE_PALETTES[i]![j] = [s[0], s[1], s[2], s[3]]
-        }
-      }
+      resetRuntimePalettes()
     })
 
-    it('should restore BACKGROUND_PALETTES when clearOutput is called', () => {
-      const state = createState()
-      const worker = createWorker()
-      const parseCode = vi.fn().mockResolvedValue({})
-      const { clearOutput } = useBasicIdeExecution(state, worker, parseCode)
+    describe('clearOutput resets runtime palettes', () => {
+      it('should restore BACKGROUND_PALETTES when clearOutput is called', () => {
+        const state = createState()
+        const worker = createWorker()
+        const parseCode = vi.fn().mockResolvedValue({})
+        const { clearOutput } = useBasicIdeExecution(state, worker, parseCode)
 
-      // Simulate a previous program mutating palettes (e.g. PALETB command)
-      setRuntimePaletteCombination('B', 0, 0, [0x01, 0x02, 0x03, 0x04])
-      setRuntimePaletteCombination('B', 1, 2, [0x10, 0x20, 0x30, 0x40])
-      expect(BACKGROUND_PALETTES[0][0]).toEqual([0x01, 0x02, 0x03, 0x04])
+        // Simulate a previous program mutating palettes (e.g. PALETB command)
+        setRuntimePaletteCombination('B', 0, 0, [0x01, 0x02, 0x03, 0x04])
+        setRuntimePaletteCombination('B', 1, 2, [0x10, 0x20, 0x30, 0x40])
+        expect(BACKGROUND_PALETTES[0][0]).toEqual([0x01, 0x02, 0x03, 0x04])
 
-      clearOutput()
+        clearOutput()
 
-      expect(clonePalettes(BACKGROUND_PALETTES)).toEqual(savedBg)
-    })
-
-    it('should restore SPRITE_PALETTES when clearOutput is called', () => {
-      const state = createState()
-      const worker = createWorker()
-      const parseCode = vi.fn().mockResolvedValue({})
-      const { clearOutput } = useBasicIdeExecution(state, worker, parseCode)
-
-      setRuntimePaletteCombination('S', 0, 0, [0x21, 0x22, 0x23, 0x24])
-      setRuntimePaletteCombination('S', 2, 3, [0x3C, 0x3C, 0x3C, 0x3C])
-      expect(SPRITE_PALETTES[0][0]).toEqual([0x21, 0x22, 0x23, 0x24])
-
-      clearOutput()
-
-      expect(clonePalettes(SPRITE_PALETTES)).toEqual(savedSprite)
-    })
-
-    it('should restore all palettes after extensive mutations', () => {
-      const state = createState()
-      const worker = createWorker()
-      const parseCode = vi.fn().mockResolvedValue({})
-      const { clearOutput } = useBasicIdeExecution(state, worker, parseCode)
-
-      // Simulate heavy palette mutations from a complex program
-      setRuntimePaletteCombination('B', 0, 0, [1, 0, 0, 0])
-      setRuntimePaletteCombination('B', 0, 1, [0x21, 0x22, 0x23, 0x24])
-      setRuntimePaletteCombination('B', 1, 0, [5, 5, 5, 5])
-      setRuntimePaletteCombination('S', 0, 0, [0x30, 0x31, 0x32, 0x33])
-      setRuntimePaletteCombination('S', 2, 3, [0x3C, 0x3C, 0x3C, 0x3C])
-
-      clearOutput()
-
-      expect(clonePalettes(BACKGROUND_PALETTES)).toEqual(savedBg)
-      expect(clonePalettes(SPRITE_PALETTES)).toEqual(savedSprite)
-    })
-  })
-
-  describe('runCode resets runtime palettes (issue #435)', () => {
-    let savedBg: number[][][]
-    let savedSprite: number[][][]
-
-    beforeEach(() => {
-      savedBg = clonePalettes(ORIGINAL_BACKGROUND_PALETTES)
-      savedSprite = clonePalettes(ORIGINAL_SPRITE_PALETTES)
-    })
-
-    afterEach(() => {
-      // Restore palettes to prevent cross-test contamination
-      for (let i = 0; i < BACKGROUND_PALETTES.length; i++) {
-        for (let j = 0; j < BACKGROUND_PALETTES[i]!.length; j++) {
-          const s = ORIGINAL_BACKGROUND_PALETTES[i]![j]!
-          BACKGROUND_PALETTES[i]![j] = [s[0], s[1], s[2], s[3]]
-        }
-      }
-      for (let i = 0; i < SPRITE_PALETTES.length; i++) {
-        for (let j = 0; j < SPRITE_PALETTES[i]!.length; j++) {
-          const s = ORIGINAL_SPRITE_PALETTES[i]![j]!
-          SPRITE_PALETTES[i]![j] = [s[0], s[1], s[2], s[3]]
-        }
-      }
-    })
-
-    it('should restore BACKGROUND_PALETTES when runCode is called', async () => {
-      const state = createState()
-      const worker = createWorker({
-        sendMessageToWorker: vi.fn().mockResolvedValue({
-          errors: [],
-          variables: {},
-        }),
+        expect(clonePalettes(BACKGROUND_PALETTES)).toEqual(savedBg)
       })
-      const parseCode = vi.fn().mockResolvedValue({})
-      const { runCode } = useBasicIdeExecution(state, worker, parseCode)
 
-      // Simulate a previous program mutating palettes (e.g. PALETB command)
-      setRuntimePaletteCombination('B', 0, 0, [0x01, 0x02, 0x03, 0x04])
-      setRuntimePaletteCombination('B', 1, 2, [0x10, 0x20, 0x30, 0x40])
-      expect(BACKGROUND_PALETTES[0][0]).toEqual([0x01, 0x02, 0x03, 0x04])
+      it('should restore SPRITE_PALETTES when clearOutput is called', () => {
+        const state = createState()
+        const worker = createWorker()
+        const parseCode = vi.fn().mockResolvedValue({})
+        const { clearOutput } = useBasicIdeExecution(state, worker, parseCode)
 
-      await runCode()
+        setRuntimePaletteCombination('S', 0, 0, [0x21, 0x22, 0x23, 0x24])
+        setRuntimePaletteCombination('S', 2, 3, [0x3C, 0x3C, 0x3C, 0x3C])
+        expect(SPRITE_PALETTES[0][0]).toEqual([0x21, 0x22, 0x23, 0x24])
 
-      expect(clonePalettes(BACKGROUND_PALETTES)).toEqual(savedBg)
+        clearOutput()
+
+        expect(clonePalettes(SPRITE_PALETTES)).toEqual(savedSprite)
+      })
+
+      it('should restore all palettes after extensive mutations', () => {
+        const state = createState()
+        const worker = createWorker()
+        const parseCode = vi.fn().mockResolvedValue({})
+        const { clearOutput } = useBasicIdeExecution(state, worker, parseCode)
+
+        // Simulate heavy palette mutations from a complex program
+        setRuntimePaletteCombination('B', 0, 0, [1, 0, 0, 0])
+        setRuntimePaletteCombination('B', 0, 1, [0x21, 0x22, 0x23, 0x24])
+        setRuntimePaletteCombination('B', 1, 0, [5, 5, 5, 5])
+        setRuntimePaletteCombination('S', 0, 0, [0x30, 0x31, 0x32, 0x33])
+        setRuntimePaletteCombination('S', 2, 3, [0x3C, 0x3C, 0x3C, 0x3C])
+
+        clearOutput()
+
+        expect(clonePalettes(BACKGROUND_PALETTES)).toEqual(savedBg)
+        expect(clonePalettes(SPRITE_PALETTES)).toEqual(savedSprite)
+      })
     })
 
-    it('should restore SPRITE_PALETTES when runCode is called', async () => {
-      const state = createState()
-      const worker = createWorker({
-        sendMessageToWorker: vi.fn().mockResolvedValue({
-          errors: [],
-          variables: {},
-        }),
+    describe('runCode resets runtime palettes', () => {
+      it('should restore BACKGROUND_PALETTES when runCode is called', async () => {
+        const state = createState()
+        const worker = createWorker({
+          sendMessageToWorker: vi.fn().mockResolvedValue({
+            errors: [],
+            variables: {},
+          }),
+        })
+        const parseCode = vi.fn().mockResolvedValue({})
+        const { runCode } = useBasicIdeExecution(state, worker, parseCode)
+
+        // Simulate a previous program mutating palettes (e.g. PALETB command)
+        setRuntimePaletteCombination('B', 0, 0, [0x01, 0x02, 0x03, 0x04])
+        setRuntimePaletteCombination('B', 1, 2, [0x10, 0x20, 0x30, 0x40])
+        expect(BACKGROUND_PALETTES[0][0]).toEqual([0x01, 0x02, 0x03, 0x04])
+
+        await runCode()
+
+        expect(clonePalettes(BACKGROUND_PALETTES)).toEqual(savedBg)
       })
-      const parseCode = vi.fn().mockResolvedValue({})
-      const { runCode } = useBasicIdeExecution(state, worker, parseCode)
 
-      setRuntimePaletteCombination('S', 0, 0, [0x21, 0x22, 0x23, 0x24])
-      setRuntimePaletteCombination('S', 2, 3, [0x3C, 0x3C, 0x3C, 0x3C])
-      expect(SPRITE_PALETTES[0][0]).toEqual([0x21, 0x22, 0x23, 0x24])
+      it('should restore SPRITE_PALETTES when runCode is called', async () => {
+        const state = createState()
+        const worker = createWorker({
+          sendMessageToWorker: vi.fn().mockResolvedValue({
+            errors: [],
+            variables: {},
+          }),
+        })
+        const parseCode = vi.fn().mockResolvedValue({})
+        const { runCode } = useBasicIdeExecution(state, worker, parseCode)
 
-      await runCode()
+        setRuntimePaletteCombination('S', 0, 0, [0x21, 0x22, 0x23, 0x24])
+        setRuntimePaletteCombination('S', 2, 3, [0x3C, 0x3C, 0x3C, 0x3C])
+        expect(SPRITE_PALETTES[0][0]).toEqual([0x21, 0x22, 0x23, 0x24])
 
-      expect(clonePalettes(SPRITE_PALETTES)).toEqual(savedSprite)
-    })
+        await runCode()
 
-    it('should restore all palettes when runCode is called after extensive mutations', async () => {
-      const state = createState()
-      const worker = createWorker({
-        sendMessageToWorker: vi.fn().mockResolvedValue({
-          errors: [],
-          variables: {},
-        }),
+        expect(clonePalettes(SPRITE_PALETTES)).toEqual(savedSprite)
       })
-      const parseCode = vi.fn().mockResolvedValue({})
-      const { runCode } = useBasicIdeExecution(state, worker, parseCode)
 
-      // Simulate heavy palette mutations from a complex program
-      setRuntimePaletteCombination('B', 0, 0, [1, 0, 0, 0])
-      setRuntimePaletteCombination('B', 0, 1, [0x21, 0x22, 0x23, 0x24])
-      setRuntimePaletteCombination('B', 1, 0, [5, 5, 5, 5])
-      setRuntimePaletteCombination('S', 0, 0, [0x30, 0x31, 0x32, 0x33])
-      setRuntimePaletteCombination('S', 2, 3, [0x3C, 0x3C, 0x3C, 0x3C])
+      it('should restore all palettes when runCode is called after extensive mutations', async () => {
+        const state = createState()
+        const worker = createWorker({
+          sendMessageToWorker: vi.fn().mockResolvedValue({
+            errors: [],
+            variables: {},
+          }),
+        })
+        const parseCode = vi.fn().mockResolvedValue({})
+        const { runCode } = useBasicIdeExecution(state, worker, parseCode)
 
-      await runCode()
+        // Simulate heavy palette mutations from a complex program
+        setRuntimePaletteCombination('B', 0, 0, [1, 0, 0, 0])
+        setRuntimePaletteCombination('B', 0, 1, [0x21, 0x22, 0x23, 0x24])
+        setRuntimePaletteCombination('B', 1, 0, [5, 5, 5, 5])
+        setRuntimePaletteCombination('S', 0, 0, [0x30, 0x31, 0x32, 0x33])
+        setRuntimePaletteCombination('S', 2, 3, [0x3C, 0x3C, 0x3C, 0x3C])
 
-      expect(clonePalettes(BACKGROUND_PALETTES)).toEqual(savedBg)
-      expect(clonePalettes(SPRITE_PALETTES)).toEqual(savedSprite)
+        await runCode()
+
+        expect(clonePalettes(BACKGROUND_PALETTES)).toEqual(savedBg)
+        expect(clonePalettes(SPRITE_PALETTES)).toEqual(savedSprite)
+      })
     })
   })
 
