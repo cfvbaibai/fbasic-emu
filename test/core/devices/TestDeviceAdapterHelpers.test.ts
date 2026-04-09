@@ -410,11 +410,11 @@ describe('DEFAULT_BACKGROUND_PALETTES', () => {
   })
 
   it('should have specific known values for first palette first combination', () => {
-    expect(DEFAULT_BACKGROUND_PALETTES[0]![0]).toEqual([0x00, 0x2c, 0x15, 0x07])
+    expect(DEFAULT_BACKGROUND_PALETTES[0][0]).toEqual([0x00, 0x2c, 0x15, 0x07])
   })
 
   it('should have specific known values for second palette last combination', () => {
-    expect(DEFAULT_BACKGROUND_PALETTES[1]![3]).toEqual([0x00, 0x29, 0x36, 0x17])
+    expect(DEFAULT_BACKGROUND_PALETTES[1][3]).toEqual([0x00, 0x29, 0x36, 0x17])
   })
 
   it('should have all color values in valid 0x00-0x36 range', () => {
@@ -453,11 +453,11 @@ describe('DEFAULT_SPRITE_PALETTES', () => {
   })
 
   it('should have specific known values for first palette first combination', () => {
-    expect(DEFAULT_SPRITE_PALETTES[0]![0]).toEqual([0x00, 0x36, 0x16, 0x02])
+    expect(DEFAULT_SPRITE_PALETTES[0][0]).toEqual([0x00, 0x36, 0x16, 0x02])
   })
 
   it('should have specific known values for third palette last combination', () => {
-    expect(DEFAULT_SPRITE_PALETTES[2]![3]).toEqual([0x00, 0x30, 0x26, 0x19])
+    expect(DEFAULT_SPRITE_PALETTES[2][3]).toEqual([0x00, 0x30, 0x26, 0x19])
   })
 
   it('should have all color values in valid 0x00-0x36 range', () => {
