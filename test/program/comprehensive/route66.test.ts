@@ -1,6 +1,6 @@
 import { describe, it } from 'vitest'
 
-import { TestProgram } from '../../integration/TestProgram'
+import { DEFAULT_STABLE_OPTIONS, EXTENDED_STABLE_TIMEOUT_MS, TestProgram } from '../../integration/TestProgram'
 
 describe('route66 program', () => {
   // Driving game with STICK/STRIG controls and sprite-based cars.
@@ -11,7 +11,7 @@ describe('route66 program', () => {
     const tp = TestProgram.fromSample('route66', { maxIterations: 50000 })
 
     await tp.run({
-      stableOptions: { stablePolls: 3, intervalMs: 20, timeoutMs: 5000 },
+      stableOptions: { ...DEFAULT_STABLE_OPTIONS, timeoutMs: EXTENDED_STABLE_TIMEOUT_MS },
     })
 
     // Verify screen shows HUD elements from GOSUB 500 display routine

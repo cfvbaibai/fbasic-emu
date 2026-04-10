@@ -1,6 +1,6 @@
 import { describe, it } from 'vitest'
 
-import { DEFAULT_STABLE_OPTIONS, TestProgram } from '../../integration/TestProgram'
+import { DEFAULT_STABLE_OPTIONS, EXTENDED_STABLE_TIMEOUT_MS, TestProgram } from '../../integration/TestProgram'
 
 describe('bgplay-demo program', () => {
   // BGPLAY + PAUSE 30 in part 1, then CLS and interactive game loop with STRIG exit.
@@ -10,7 +10,7 @@ describe('bgplay-demo program', () => {
     // Queue START button press (bit 0) to exit the Part 2 game loop
     tp.pushStrigState(0, 1)
 
-    await tp.run({ stableOptions: { ...DEFAULT_STABLE_OPTIONS, timeoutMs: 5000 } })
+    await tp.run({ stableOptions: { ...DEFAULT_STABLE_OPTIONS, timeoutMs: EXTENDED_STABLE_TIMEOUT_MS } })
 
     tp.expectSuccess()
     // After Part 2 CLS, screen shows game loop header

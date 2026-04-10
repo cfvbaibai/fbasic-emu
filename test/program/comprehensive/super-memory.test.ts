@@ -1,6 +1,6 @@
 import { describe, it } from 'vitest'
 
-import { TestProgram } from '../../integration/TestProgram'
+import { DEFAULT_STABLE_OPTIONS, EXTENDED_STABLE_TIMEOUT_MS, TestProgram } from '../../integration/TestProgram'
 
 describe('super-memory program', () => {
   // Simon-like memory game: shows a growing sequence of colors, player repeats via INKEY$.
@@ -11,7 +11,7 @@ describe('super-memory program', () => {
     const tp = TestProgram.fromSample('superMemory')
 
     await tp.run({
-      stableOptions: { stablePolls: 3, intervalMs: 20, timeoutMs: 5000 },
+      stableOptions: { ...DEFAULT_STABLE_OPTIONS, timeoutMs: EXTENDED_STABLE_TIMEOUT_MS },
     })
 
     // Verify the game board was drawn — "YOU" prompt appears at line 230

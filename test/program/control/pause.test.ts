@@ -1,6 +1,6 @@
 import { describe, it } from 'vitest'
 
-import { DEFAULT_STABLE_OPTIONS, TestProgram } from '../../integration/TestProgram'
+import { DEFAULT_STABLE_OPTIONS, EXTENDED_STABLE_TIMEOUT_MS, TestProgram } from '../../integration/TestProgram'
 
 describe('pause program', () => {
   // PAUSE uses real setTimeout — total ~11s of delays, needs extended timeout
@@ -10,7 +10,7 @@ describe('pause program', () => {
     // PAUSE 0 blocks waiting for keypress — queue one to unblock
     tp.queueInkey('A')
 
-    await tp.run({ stableOptions: { ...DEFAULT_STABLE_OPTIONS, timeoutMs: 5000 } })
+    await tp.run({ stableOptions: { ...DEFAULT_STABLE_OPTIONS, timeoutMs: EXTENDED_STABLE_TIMEOUT_MS } })
 
     tp.expectSuccess()
     // CLS at line 30 clears screen
