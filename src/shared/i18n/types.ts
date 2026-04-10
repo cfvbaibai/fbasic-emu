@@ -12,7 +12,6 @@ import type enDiagnostics from './locales/en/diagnostics.json'
 import type enHome from './locales/en/home.json'
 import type enIde from './locales/en/ide.json'
 import type enKonvaTest from './locales/en/konva-test.json'
-import type enMonacoEditor from './locales/en/monaco-editor.json'
 import type enNavigation from './locales/en/navigation.json'
 import type enSoundTest from './locales/en/sound-test.json'
 import type enSpriteViewer from './locales/en/sprite-viewer.json'
@@ -25,7 +24,6 @@ export type MessageSchema = {
   common: typeof enCommon
   home: typeof enHome
   spriteViewer: typeof enSpriteViewer
-  monacoEditor: typeof enMonacoEditor
   bgEditor: typeof enBgEditor
   coi: typeof enCoi
   soundTest: typeof enSoundTest
