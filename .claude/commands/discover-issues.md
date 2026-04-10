@@ -27,15 +27,9 @@ If cap reached, write run log and report noting "cap reached", update config `to
 
 ## Phase 3 — Multi-Angle Scan
 
-Use `total_runs` modulo to rotate focus areas. Every run does a **baseline scan** of the most common patterns, then rotates deeper analysis:
+Use `total_runs` modulo to rotate focus areas. Every run does a **baseline scan** (3a–3d), then one **focus area** (3e) for deeper analysis.
 
-| Run % 3 | Primary focus (deeper analysis) |
-|---------|---------------------------------|
-| 0 | Hardcoded strings / i18n gaps |
-| 1 | Test coverage gaps |
-| 2 | Code quality patterns |
-
-Every run also performs these lighter scans:
+Every run also performs these lighter baseline scans:
 
 ### 3a. Hardcoded Strings / i18n Gaps
 
@@ -86,19 +80,19 @@ git log origin/master --oneline -20
 git diff origin/master~20..origin/master --stat
 ```
 
-### 3e. Deep Analysis (rotates with primary focus)
+### 3e. Focus Area (rotates per run)
 
-Use these deeper analysis techniques to find issues beyond surface pattern matching. Rotate one per run based on `total_runs % 5`:
+Use `total_runs % 5` to select one focus area for deeper analysis beyond the baseline scans:
 
-| Run % 5 | Deep analysis |
-|---------|--------------|
-| 0 | **Sample program quality** — Read `.bas` files in `src/core/samples/programs/`, evaluate whether they effectively demonstrate their target F-BASIC feature. Check: PAUSE/timing durations (too short to perceive?), visual output clarity, user feedback, completeness of use cases, educational value. Focus on samples visible in the SampleSelector. |
-| 1 | **Edge case coverage** — Check if recent code changes handle boundary conditions (empty arrays, undefined values, max buffer sizes, overflow in arithmetic) |
-| 2 | **Cross-module consistency** — Verify that related modules agree on interfaces (e.g., executor expectations match device adapter capabilities, parser output matches executor input shapes). **Important**: Read interface definitions to distinguish required methods (no `?`) from optional methods (`?`) before flagging inconsistencies — calling a required method without an existence check is correct behavior. |
-| 3 | **Enrich existing issues** — Review the top 3 open issues and check if recent commits have partially addressed them. Add progress comments or close if resolved. |
-| 4 | **UX quality review** — Scan Vue components and composables for usability issues that static analysis misses: confusing flows, missing loading states, poor error messages, inconsistent behavior, unclear labels, inaccessible features |
+| Run % 5 | Focus area | Description |
+|---------|-----------|-------------|
+| 0 | **Hardcoded strings / i18n** | Deep scan of all Vue files (templates + script) for untranslated strings. Check locale files for missing keys referenced in code. Read `.bas` sample files for hardcoded Japanese strings that should be localized. |
+| 1 | **Test coverage** | Analyze assertion quality in existing tests, not just file existence. Check for untested code paths in recent changes. Evaluate program test coverage trends. |
+| 2 | **Code quality** | Check for patterns beyond surface TODO/any: unused imports, inconsistent error handling, dead code paths, files approaching 500-line limit. |
+| 3 | **Existing issue health** | Review top 3 open issues. Check if recent commits partially addressed them. Add progress comments or close if resolved. |
+| 4 | **UX quality** | Scan Vue components and composables for usability issues that static analysis misses: confusing flows, missing loading states, poor error messages, inconsistent behavior, unclear labels, inaccessible features. |
 
-**Agent verification requirements**: When using deep analysis agents, instruct them to: (1) read actual file content before making claims, (2) distinguish concrete user-facing problems from subjective quality opinions, (3) cross-reference existing open issues before proposing new findings.
+**Agent verification requirements**: When using focus area agents, instruct them to: (1) read actual file content before making claims, (2) distinguish concrete user-facing problems from subjective quality opinions, (3) cross-reference existing open issues before proposing new findings.
 
 ### 3f. Existing Issue Cross-Reference
 
@@ -108,6 +102,17 @@ gh issue list --state open --json number,title --limit 50
 ```
 
 Check if the same problem is already tracked. If so, skip or add a comment to the existing issue instead.
+
+### 3g. Review Gap Audit
+
+Check recently merged PRs for non-blocking observations in review comments that were never filed as GitHub issues:
+
+1. List recently merged PRs: `gh pr list --state merged --limit 10 --json number,title`
+2. For each, fetch review comments: `gh pr view <number> --json reviews`
+3. Extract `### Minor` observations from review bodies
+4. Cross-reference against existing open issues
+5. Verify unfilled findings are still valid in the current codebase
+6. Create issues for valid gaps (same format as Phase 4)
 
 ## Phase 4 — Create Issues
 
@@ -171,7 +176,7 @@ Write outputs following `.claude/commands/_shared/path-conventions.md`:
 - <anything noteworthy about this run>
 ```
 
-**Update config** — increment `total_runs`, `total_issues_discovered`.
+**Update config** — increment `total_runs`, `total_issues_created`.
 
 Print summary to user with created issue links. When outputting messages (especially in loop contexts), prefix with Asia/Shanghai timestamp:
 ```
@@ -187,4 +192,19 @@ Focus on:
 - Were there areas we missed that should be added?
 - Was the rotation focus effective or should it change?
 - Did we create good issue titles and bodies?
-- **Program test coverage**: Track coverage trends in `~/.claude/automations/fbasic-ide/memory/program-test-coverage.md` (see self-improvement protocol)
+
+### Program Test Coverage Tracking
+
+After every run, track program test coverage trends:
+
+1. Count sample `.bas` files in `src/core/samples/programs/` (total programs)
+2. Count test files in `test/program/` (tested programs)
+3. Calculate coverage percentage: `(tested / total) * 100`
+4. Append to `~/.claude/automations/fbasic-ide/memory/program-test-coverage.md`:
+```markdown
+## YYYY-MM-DD (Run #N)
+- Total programs: X
+- Tested programs: Y
+- Coverage: Z%
+- Untested programs: <list of untested sample keys>
+```

@@ -24,7 +24,7 @@ Schema:
 - last_triage_run: YYYY-MM-DDTHH:MM:SSZ
 - total_runs: N
 - total_issues_implemented: N
-- total_issues_discovered: N
+- total_issues_created: N
 - total_issues_triaged: N
 - total_pr_maintenance: N
 - active_worktrees: []  # list of worktree paths currently in use
@@ -40,9 +40,9 @@ When outputting messages (especially in loop contexts), always include a timesta
 [YYYY-MM-DD HH:MM:SS CST] <message>
 ```
 
-Example bash for getting Shanghai time:
+Get Shanghai time via the cst-time skill script (works on all platforms including Windows Git Bash):
 ```bash
-TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S %Z'
+python3 ~/.claude/skills/cst-time/scripts/cst_time.py
 ```
 
 This applies to:
