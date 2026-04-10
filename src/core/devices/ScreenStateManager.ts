@@ -344,9 +344,7 @@ export class ScreenStateManager {
    * to the main thread when a new execution starts.
    */
   getAllPaletteCombinations(): PaletteCombinationSnapshot {
-    type Entry = { paletteIndex: number; combination: number; colors: [number, number, number, number] }
-
-    const background: Entry[] = []
+    const background: PaletteCombinationEntry[] = []
     for (let i = 0; i < this.backgroundPalettes.length; i++) {
       const palette = this.backgroundPalettes[i]!
       for (let j = 0; j < palette.length; j++) {
@@ -355,7 +353,7 @@ export class ScreenStateManager {
       }
     }
 
-    const sprite: Entry[] = []
+    const sprite: PaletteCombinationEntry[] = []
     for (let i = 0; i < this.spritePalettes.length; i++) {
       const palette = this.spritePalettes[i]!
       for (let j = 0; j < palette.length; j++) {
