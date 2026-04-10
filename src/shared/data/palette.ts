@@ -125,7 +125,10 @@ const RAW_BACKGROUND_PALETTES = [
 // and returns fully mutable `number[][][]` for runtime mutation.
 // ---------------------------------------------------------------------------
 
-function cloneAsMutable<T extends ReadonlyArray<ReadonlyArray<ReadonlyArray<number>>>>(
+/** Deeply-readonly palette data: array of palettes, each an array of color combinations. */
+export type ReadonlyPaletteData = ReadonlyArray<ReadonlyArray<ReadonlyArray<number>>>
+
+function cloneAsMutable<T extends ReadonlyPaletteData>(
   raw: T
 ): number[][][] {
   return raw.map(palette =>
