@@ -386,7 +386,7 @@
   },
   "stateInspector": {
     "title": "状態インスペクタ",
-    "tabPalettes": "パレット",
+    "tabPalettes": "PALETTE",
     "tabSprite": "SPRITE",
     "tabMove": "MOVE",
     "tabBg": "BG",
