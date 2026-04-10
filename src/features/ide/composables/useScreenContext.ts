@@ -41,6 +41,8 @@ export interface ScreenContextValue {
   sharedJoystickBuffer: Ref<SharedArrayBuffer | undefined>
   setDecodedScreenState: (decoded: DecodedScreenState) => void
   registerScheduleRender: (fn: () => void) => void
+  /** Register callback to invalidate last-rendered background buffer for full redraw. */
+  registerInvalidateBackgroundBuffer?: (fn: () => void) => void
   /** Callback to update inspector MOVE tab data (called by animation loop every frame). */
   updateInspectorMoveSlots?: () => void
 }

@@ -22,7 +22,7 @@ function restorePalettes(target: RuntimePalettes, snapshot: PaletteSnapshot): vo
   })
 }
 
-function createContext(scheduleRender: () => void): MessageHandlerContext {
+function createContext(scheduleRender: () => void, invalidateBackgroundBuffer?: () => void): MessageHandlerContext {
   return {
     output: ref([]),
     errors: ref([]),
@@ -35,6 +35,7 @@ function createContext(scheduleRender: () => void): MessageHandlerContext {
       pendingMessages: new Map(),
     } as MessageHandlerContext['webWorkerManager'],
     scheduleRender,
+    invalidateBackgroundBuffer,
   }
 }
 
@@ -101,6 +102,33 @@ describe('useBasicIdeMessageHandlers palette combination updates', () => {
     )
 
     expect(SPRITE_PALETTES[2][3]).toEqual([1, 2, 3, 4])
+    expect(scheduleRender).toHaveBeenCalledTimes(1)
+  })
+
+  it('invalidates background buffer on palette-combination update (regression #489)', () => {
+    const scheduleRender = vi.fn()
+    const invalidateBackgroundBuffer = vi.fn()
+    const context = createContext(scheduleRender, invalidateBackgroundBuffer)
+
+    handleScreenUpdateMessage(
+      {
+        type: 'SCREEN_UPDATE',
+        id: 'test-invalidate-bg',
+        timestamp: Date.now(),
+        data: {
+          executionId: 'exec-3',
+          updateType: 'palette-combination',
+          paletteTarget: 'B',
+          paletteIndex: 0,
+          paletteCombination: 1,
+          paletteColors: [10, 20, 30, 40],
+          timestamp: Date.now(),
+        },
+      } as never,
+      context
+    )
+
+    expect(invalidateBackgroundBuffer).toHaveBeenCalledTimes(1)
     expect(scheduleRender).toHaveBeenCalledTimes(1)
   })
 })

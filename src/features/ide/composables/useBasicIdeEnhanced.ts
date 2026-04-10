@@ -149,5 +149,6 @@ export function useBasicIde() {
     sharedJoystickBuffer: screen.sharedJoystickBuffer,
     setDecodedScreenState: screen.setDecodedScreenState,
     registerScheduleRender: screen.registerScheduleRender,
+    registerInvalidateBackgroundBuffer: screen.registerInvalidateBackgroundBuffer,
   }
 }
