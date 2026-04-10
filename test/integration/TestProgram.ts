@@ -87,7 +87,11 @@ const DEFAULT_OPTIONS: Required<TestProgramOptions> = {
   suppressOkPrompt: true,
 }
 
-const DEFAULT_STABLE_OPTIONS: WaitForStableOptions = {
+/**
+ * Shared stable-wait defaults for headless program tests.
+ * Spread-override as needed: `{ ...DEFAULT_STABLE_OPTIONS, timeoutMs: 10000 }`
+ */
+export const DEFAULT_STABLE_OPTIONS: WaitForStableOptions = {
   stablePolls: 3,
   intervalMs: 20,
   timeoutMs: 1000,

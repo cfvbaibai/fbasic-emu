@@ -1,13 +1,13 @@
 import { describe, it } from 'vitest'
 
-import { TestProgram } from '../../integration/TestProgram'
+import { DEFAULT_STABLE_OPTIONS, TestProgram } from '../../integration/TestProgram'
 
 describe('play-demo program', () => {
   // PLAY + PAUSE 30 sections — total ~3s of PAUSE delays
   it('runs successfully and produces expected output', async () => {
     const tp = TestProgram.fromSample('musicPlayDemo')
 
-    await tp.run({ stableOptions: { stablePolls: 3, intervalMs: 20, timeoutMs: 5000 } })
+    await tp.run({ stableOptions: { ...DEFAULT_STABLE_OPTIONS, timeoutMs: 5000 } })
 
     tp.expectSuccess()
     tp.expectRowText(0, '=== PLAY DEMO ===')
