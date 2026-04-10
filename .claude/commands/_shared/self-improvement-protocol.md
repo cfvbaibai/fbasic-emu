@@ -41,7 +41,7 @@ If no command definitions were modified, skip this step.
 
 ## Record
 
-Append to `~/.claude/automations/fbasic-ide/memory/improvements.md`:
+Append to `.automation/memory/improvements.md`:
 
 ```markdown
 ## YYYY-MM-DD

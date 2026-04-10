@@ -13,7 +13,7 @@ If prerequisites fail, report the specific blocker and stop immediately.
 
 ## Config
 
-Location: `~/.claude/automations/fbasic-ide/config.md`
+Location: `.automation/config.md`
 
 Schema:
 
@@ -66,7 +66,7 @@ After every iteration (all 4 phases above complete), run `/compact` to compress 
 
 ## Run Log
 
-Location: `~/.claude/automations/fbasic-ide/memory/runs/YYYY-MM/YYYY-MM-DD-NNN.md`
+Location: `.automation/memory/runs/YYYY-MM/YYYY-MM-DD-NNN.md`
 
 Increment NNN for same-day runs. Template:
 
@@ -81,6 +81,6 @@ Increment NNN for same-day runs. Template:
 
 ## Report
 
-Location: `~/.claude/automations/fbasic-ide/reports/YYYY-MM/YYYY-MM-DD.md`
+Location: `.automation/reports/YYYY-MM/YYYY-MM-DD.md`
 
 Each command has its own report schema. Use the date only (not NNN) — append if the file already exists from another command type the same day.

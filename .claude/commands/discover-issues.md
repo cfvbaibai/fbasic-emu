@@ -17,7 +17,7 @@ Follow `.claude/commands/_shared/automation-conventions.md` prerequisites. Sync 
 git fetch origin master
 ```
 
-Read config from `~/.claude/automations/fbasic-ide/config.md` to get `total_runs` for rotation logic.
+Read config from `.automation/config.md` to get `total_runs` for rotation logic.
 
 ## Phase 2 — Open Issue Cap
 
@@ -152,9 +152,9 @@ See `docs/testing-strategy.md` for testing layer boundaries.
 
 Write outputs following `.claude/commands/_shared/path-conventions.md`:
 
-**Run log** — `~/.claude/automations/fbasic-ide/memory/runs/YYYY-MM/YYYY-MM-DD-NNN.md`
+**Run log** — `.automation/memory/runs/YYYY-MM/YYYY-MM-DD-NNN.md`
 
-**Report** — `~/.claude/automations/fbasic-ide/reports/YYYY-MM/YYYY-MM-DD.md`:
+**Report** — `.automation/reports/YYYY-MM/YYYY-MM-DD.md`:
 ```markdown
 # Issue Discovery Report — YYYY-MM-DD
 
@@ -200,7 +200,7 @@ After every run, track program test coverage trends:
 1. Count sample `.bas` files in `src/core/samples/programs/` (total programs)
 2. Count test files in `test/program/` (tested programs)
 3. Calculate coverage percentage: `(tested / total) * 100`
-4. Append to `~/.claude/automations/fbasic-ide/memory/program-test-coverage.md`:
+4. Append to `.automation/memory/program-test-coverage.md`:
 ```markdown
 ## YYYY-MM-DD (Run #N)
 - Total programs: X

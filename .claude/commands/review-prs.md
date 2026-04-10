@@ -14,7 +14,7 @@ Review all open GitHub PRs for the F-BASIC IDE repository following the PR revie
 
 Follow `.claude/commands/_shared/automation-conventions.md` prerequisites.
 
-Read config from `~/.claude/automations/fbasic-ide/config.md` to get `total_runs` for run log numbering.
+Read config from `.automation/config.md` to get `total_runs` for run log numbering.
 
 ## Phase 2 — List & Filter PRs
 
@@ -249,9 +249,9 @@ After posting each review, update memory files:
 
 Write outputs following `.claude/commands/_shared/path-conventions.md`:
 
-**Run log** — `~/.claude/automations/fbasic-ide/memory/runs/YYYY-MM/YYYY-MM-DD-NNN.md`
+**Run log** — `.automation/memory/runs/YYYY-MM/YYYY-MM-DD-NNN.md`
 
-**Report** — `~/.claude/automations/fbasic-ide/reports/YYYY-MM/YYYY-MM-DD.md`:
+**Report** — `.automation/reports/YYYY-MM/YYYY-MM-DD.md`:
 ```markdown
 # PR Review Report — YYYY-MM-DD
 

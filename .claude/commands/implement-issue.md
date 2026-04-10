@@ -81,7 +81,7 @@ Select the **highest-priority unassigned** issue:
 - Prefer issues with `P1` or `P2` labels
 - Among same priority, prefer bugs over enhancements
 - Among same priority and type, **prefer lower issue numbers** (older issues have been waiting longer)
-- Scan `~/.claude/automations/fbasic-ide/memory/issues/` for existing `issue-*.md` files to avoid re-picking
+- Scan `.automation/memory/issues/` for existing `issue-*.md` files to avoid re-picking
 
 If all remaining open issues are too complex for the pipeline (multi-module features requiring architectural decisions), post a `## TOO COMPLEX` comment with suggested sub-issue splits. Then report "no issues to implement" and stop.
 
@@ -119,7 +119,7 @@ Create a worktree under the automation directory:
 BRANCH="fix/issue-${ISSUE_NUM}-$(echo "$ISSUE_TITLE" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | cut -c1-40)"
 
 # Worktree path — single folder named by issue ID
-WT_PATH="$HOME/.claude/automations/fbasic-ide/worktrees/${ISSUE_NUM}"
+WT_PATH="${PWD}/.automation/worktrees/${ISSUE_NUM}"
 
 # Clean up stale worktree entry if directory doesn't exist
 if [ ! -d "$WT_PATH" ]; then

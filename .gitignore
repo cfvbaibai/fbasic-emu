@@ -96,12 +96,8 @@ build-number.json
 playwright-report/
 test-results/
 
-# Generated automation run artifacts (reports, latest snapshots, run logs)
+# Automation run artifacts (config, reports, memory, worktrees)
 .automation/
-.automation/**
-!.automation/
-!.automation/.gitkeep
-!.automation/README.md
 
 # AI temp scripts/files
 .ai-temp/

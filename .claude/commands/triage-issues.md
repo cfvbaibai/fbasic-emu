@@ -13,7 +13,7 @@ Analyze unlabeled open GitHub issues, classify them, and apply priority/type lab
 
 Follow `.claude/commands/_shared/automation-conventions.md` prerequisites.
 
-Read config from `~/.claude/automations/fbasic-ide/config.md` to get `last_triage_run` for delta detection.
+Read config from `.automation/config.md` to get `last_triage_run` for delta detection.
 
 ## Phase 2 — Fetch Issues Needing Triage
 
@@ -166,9 +166,9 @@ gh issue edit $NUMBER --add-label "claude-automation"
 
 Write outputs following `.claude/commands/_shared/path-conventions.md`:
 
-**Run log** — `~/.claude/automations/fbasic-ide/memory/runs/YYYY-MM/YYYY-MM-DD-NNN.md`
+**Run log** — `.automation/memory/runs/YYYY-MM/YYYY-MM-DD-NNN.md`
 
-**Report** — `~/.claude/automations/fbasic-ide/reports/YYYY-MM/YYYY-MM-DD.md`:
+**Report** — `.automation/reports/YYYY-MM/YYYY-MM-DD.md`:
 ```markdown
 # Issue Triage Report — YYYY-MM-DD
 

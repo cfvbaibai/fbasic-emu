@@ -1,11 +1,11 @@
 # Path Conventions
 
-All automation paths are relative to: `~/.claude/automations/fbasic-ide/`
+All automation paths are relative to: `.automation/`
 
 ## Directory Structure
 
 ```
-~/.claude/automations/fbasic-ide/
+.automation/
 ├── config.md                    # Shared config (run counts, last sync, etc.)
 ├── memory/
 │   ├── issues/
@@ -36,7 +36,7 @@ All automation paths are relative to: `~/.claude/automations/fbasic-ide/`
 ## Config Path
 
 ```
-~/.claude/automations/fbasic-ide/config.md
+.automation/config.md
 ```
 
 Always read config at the start of each run to get `last_sync_commit`, `last_triage_run`, etc.
