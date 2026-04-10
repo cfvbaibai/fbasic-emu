@@ -282,7 +282,9 @@ export class TestProgram {
    * Assert text content of a specific row in the display snapshot.
    *
    * @param row - Row index (0-based)
-   * @param expected - Expected text (partial match via RegExp or exact match)
+   * @param expected - Expected text. Use string for exact substring match,
+   *   RegExp when output has variable-width spacing (e.g. PRINT "X";N where
+   *   N is a number with sign-char padding).
    */
   expectRowText(row: number, expected: string | RegExp): void {
     if (!this.lastResult?.snapshot) {

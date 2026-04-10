@@ -11,7 +11,8 @@ describe('twinkle program', () => {
     tp.expectSuccess()
     tp.expectRowText(0, 'TWINKLE TWINKLE LITTLE STAR')
     tp.expectRowText(1, '===========================')
-    // PRINT "Verse ";V produces "VERSE " + V with space padding
+    // RegExp: PRINT "Verse ";V concatenates string + number (with sign-char space),
+    // producing variable-width spacing like "VERSE  2" — use \s+ to be resilient.
     tp.expectRowText(3, /VERSE\s+2/)
     tp.expectRowText(5, 'SONG COMPLETE!')
   })
