@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { TestProgram } from '../../integration/TestProgram'
+import { DEFAULT_STABLE_OPTIONS, EXTENDED_STABLE_TIMEOUT_MS, TestProgram } from '../../integration/TestProgram'
 
 describe('knight program', () => {
   // Two-player knight's tour game using STICK/STRIG for piece placement.
@@ -12,7 +12,7 @@ describe('knight program', () => {
     const tp = TestProgram.fromSample('knight', { maxIterations: 50000 })
 
     const result = await tp.run({
-      stableOptions: { stablePolls: 3, intervalMs: 20, timeoutMs: 5000 },
+      stableOptions: { ...DEFAULT_STABLE_OPTIONS, timeoutMs: EXTENDED_STABLE_TIMEOUT_MS },
     })
 
     // Verify no parse errors — the program starts executing correctly

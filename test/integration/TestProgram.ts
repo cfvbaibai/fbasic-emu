@@ -88,8 +88,14 @@ const DEFAULT_OPTIONS: Required<TestProgramOptions> = {
 }
 
 /**
+ * Extended timeout for programs with long PAUSE/play durations (5s vs default 1s).
+ * Use with spread-override: `{ ...DEFAULT_STABLE_OPTIONS, timeoutMs: EXTENDED_STABLE_TIMEOUT_MS }`
+ */
+export const EXTENDED_STABLE_TIMEOUT_MS = 5000
+
+/**
  * Shared stable-wait defaults for headless program tests.
- * Spread-override as needed: `{ ...DEFAULT_STABLE_OPTIONS, timeoutMs: 10000 }`
+ * Spread-override as needed: `{ ...DEFAULT_STABLE_OPTIONS, timeoutMs: EXTENDED_STABLE_TIMEOUT_MS }`
  */
 export const DEFAULT_STABLE_OPTIONS: WaitForStableOptions = {
   stablePolls: 3,

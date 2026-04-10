@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { TestProgram } from '../../integration/TestProgram'
+import { DEFAULT_STABLE_OPTIONS, EXTENDED_STABLE_TIMEOUT_MS, TestProgram } from '../../integration/TestProgram'
 
 describe('scr-sample program', () => {
   // Sprite-based shooting gallery using DEF MOVE, POSITION, MOVE for automated sprites
@@ -13,7 +13,7 @@ describe('scr-sample program', () => {
     const tp = TestProgram.fromSample('scrSample')
 
     const result = await tp.run({
-      stableOptions: { stablePolls: 3, intervalMs: 20, timeoutMs: 5000 },
+      stableOptions: { ...DEFAULT_STABLE_OPTIONS, timeoutMs: EXTENDED_STABLE_TIMEOUT_MS },
     })
 
     // Verify no parse errors — the program starts executing correctly

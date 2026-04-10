@@ -1,6 +1,6 @@
 import { describe, it } from 'vitest'
 
-import { TestProgram } from '../../integration/TestProgram'
+import { DEFAULT_STABLE_OPTIONS, EXTENDED_STABLE_TIMEOUT_MS, TestProgram } from '../../integration/TestProgram'
 
 describe('sprite-table-b program', () => {
   // Interactive program with STICK/STRIG game loop — push START (T=1) to exit
@@ -9,7 +9,7 @@ describe('sprite-table-b program', () => {
     // T=1 triggers line 450: "IF T=1 THEN 450" to exit the game loop
     tp.pushStrigState(0, 1)
 
-    await tp.run({ stableOptions: { stablePolls: 3, intervalMs: 20, timeoutMs: 5000 } })
+    await tp.run({ stableOptions: { ...DEFAULT_STABLE_OPTIONS, timeoutMs: EXTENDED_STABLE_TIMEOUT_MS } })
 
     tp.expectSuccess()
     tp.expectRowText(0, '=== SPRITE TABLE B TEST ===')

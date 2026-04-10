@@ -1,6 +1,6 @@
 import { describe, it } from 'vitest'
 
-import { TestProgram } from '../../integration/TestProgram'
+import { DEFAULT_STABLE_OPTIONS, EXTENDED_STABLE_TIMEOUT_MS, TestProgram } from '../../integration/TestProgram'
 
 describe('shooting program', () => {
   // Gallery shooter with 8 moving sprites (DEF MOVE), STICK(0) for aiming,
@@ -12,7 +12,7 @@ describe('shooting program', () => {
     const tp = TestProgram.fromSample('shooting')
 
     await tp.run({
-      stableOptions: { stablePolls: 3, intervalMs: 20, timeoutMs: 5000 },
+      stableOptions: { ...DEFAULT_STABLE_OPTIONS, timeoutMs: EXTENDED_STABLE_TIMEOUT_MS },
     })
 
     // Verify screen shows score from line 30

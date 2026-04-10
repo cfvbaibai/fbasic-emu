@@ -1,6 +1,6 @@
 import { describe, it } from 'vitest'
 
-import { TestProgram } from '../../integration/TestProgram'
+import { DEFAULT_STABLE_OPTIONS, EXTENDED_STABLE_TIMEOUT_MS, TestProgram } from '../../integration/TestProgram'
 
 describe('type-master program', () => {
   // Typing game: PAUSE 100 (~1.2s) countdown, then INKEY$ loop for character matching.
@@ -13,7 +13,7 @@ describe('type-master program', () => {
     tp.queueInkey('N')
 
     await tp.run({
-      stableOptions: { stablePolls: 3, intervalMs: 20, timeoutMs: 5000 },
+      stableOptions: { ...DEFAULT_STABLE_OPTIONS, timeoutMs: EXTENDED_STABLE_TIMEOUT_MS },
     })
 
     // Countdown numbers printed at LOCATE 2,5: FOR I=9 TO 0 STEP -1

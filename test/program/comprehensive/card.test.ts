@@ -1,6 +1,6 @@
 import { describe, it } from 'vitest'
 
-import { TestProgram } from '../../integration/TestProgram'
+import { DEFAULT_STABLE_OPTIONS, EXTENDED_STABLE_TIMEOUT_MS, TestProgram } from '../../integration/TestProgram'
 
 describe('card program', () => {
   // Two-player memory card matching game using STICK/STRIG for cursor and card flipping.
@@ -10,7 +10,7 @@ describe('card program', () => {
     const tp = TestProgram.fromSample('card', { maxIterations: 50000 })
 
     await tp.run({
-      stableOptions: { stablePolls: 3, intervalMs: 20, timeoutMs: 5000 },
+      stableOptions: { ...DEFAULT_STABLE_OPTIONS, timeoutMs: EXTENDED_STABLE_TIMEOUT_MS },
     })
 
     // "LEFT" and "RIGHT" labels at LOCATE 25,9 and LOCATE 25,12
