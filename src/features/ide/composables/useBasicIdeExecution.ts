@@ -3,7 +3,7 @@
  * Depends on state, worker integration, and parseCode from editor.
  */
 
-import { ERROR_MESSAGES, EXECUTION_LIMITS, PALETTE_DEFAULTS } from '@/core/constants'
+import { ERROR_MESSAGES, EXECUTION_LIMITS, resetPaletteState } from '@/core/constants'
 import type { BasicVariable } from '@/core/types/state-types'
 import { ExecutionError } from '@/features/ide/errors/ExecutionError'
 import { resetRuntimePalettes } from '@/shared/data/palette'
@@ -59,10 +59,12 @@ export function useBasicIdeExecution(
     resetRuntimePalettes()
     // Reactive state (bgPalette, cgenMode, etc.) — the worker does not send
     // initial palette values at the start of execution, so we must reset here.
-    state.bgPalette.value = PALETTE_DEFAULTS.BG_PALETTE
-    state.spritePalette.value = PALETTE_DEFAULTS.SPRITE_PALETTE
-    state.backdropColor.value = PALETTE_DEFAULTS.BACKDROP_COLOR
-    state.cgenMode.value = PALETTE_DEFAULTS.CGEN_MODE
+    resetPaletteState((d) => {
+      state.bgPalette.value = d.BG_PALETTE
+      state.spritePalette.value = d.SPRITE_PALETTE
+      state.backdropColor.value = d.BACKDROP_COLOR
+      state.cgenMode.value = d.CGEN_MODE
+    })
 
     try {
       await worker.initializeWebWorker()
@@ -196,10 +198,12 @@ export function useBasicIdeExecution(
     state.cursorX.value = 0
     state.cursorY.value = 0
     // Reset BG/screen state to defaults so stale palettes, backdrop, and cgen do not persist
-    state.bgPalette.value = PALETTE_DEFAULTS.BG_PALETTE
-    state.spritePalette.value = PALETTE_DEFAULTS.SPRITE_PALETTE
-    state.backdropColor.value = PALETTE_DEFAULTS.BACKDROP_COLOR
-    state.cgenMode.value = PALETTE_DEFAULTS.CGEN_MODE
+    resetPaletteState((d) => {
+      state.bgPalette.value = d.BG_PALETTE
+      state.spritePalette.value = d.SPRITE_PALETTE
+      state.backdropColor.value = d.BACKDROP_COLOR
+      state.cgenMode.value = d.CGEN_MODE
+    })
     // Clear BG items (above), SPRITEs (DEF SPRITE + display)
     state.spriteStates.value = []
     // Do NOT clear spriteEnabled - SPRITE ON/OFF state should persist (Clear only clears display)
