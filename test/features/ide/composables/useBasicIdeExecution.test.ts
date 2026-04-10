@@ -290,131 +290,50 @@ describe('useBasicIdeExecution', () => {
     })
   })
 
+  /** Palette reactive refs that should be reset by clearOutput/runCode. */
+  const PALETTE_REFS = [
+    { key: 'bgPalette', nonDefault: 0, expected: 1, label: 'bgPalette' },
+    { key: 'cgenMode', nonDefault: 0, expected: 2, label: 'cgenMode' },
+    { key: 'backdropColor', nonDefault: 1, expected: 0, label: 'backdropColor' },
+    { key: 'spritePalette', nonDefault: 2, expected: 1, label: 'spritePalette' },
+  ] as const
+
   describe('clearOutput resets palette reactive state (issue #444)', () => {
-    it('should reset bgPalette to default when clearOutput is called', () => {
-      const state = createState()
-      // Simulate a screen sample that changed bgPalette via CGEN command
-      state.bgPalette.value = 0
-      const worker = createWorker()
-      const parseCode = vi.fn().mockResolvedValue({})
-      const { clearOutput } = useBasicIdeExecution(state, worker, parseCode)
+    it.each(PALETTE_REFS)(
+      'should reset $label to default when clearOutput is called',
+      ({ key, nonDefault, expected }) => {
+        const state = createState()
+        state[key].value = nonDefault
+        const worker = createWorker()
+        const parseCode = vi.fn().mockResolvedValue({})
+        const { clearOutput } = useBasicIdeExecution(state, worker, parseCode)
 
-      clearOutput()
+        clearOutput()
 
-      expect(state.bgPalette.value).toEqual(1)
-    })
-
-    it('should reset cgenMode to default when clearOutput is called', () => {
-      const state = createState()
-      // Simulate a screen sample that changed cgenMode via CGEN command
-      state.cgenMode.value = 0
-      const worker = createWorker()
-      const parseCode = vi.fn().mockResolvedValue({})
-      const { clearOutput } = useBasicIdeExecution(state, worker, parseCode)
-
-      clearOutput()
-
-      expect(state.cgenMode.value).toEqual(2)
-    })
-
-    it('should reset backdropColor to default when clearOutput is called', () => {
-      const state = createState()
-      // Simulate a screen sample that set a non-zero backdrop color
-      state.backdropColor.value = 1
-      const worker = createWorker()
-      const parseCode = vi.fn().mockResolvedValue({})
-      const { clearOutput } = useBasicIdeExecution(state, worker, parseCode)
-
-      clearOutput()
-
-      expect(state.backdropColor.value).toEqual(0)
-    })
-
-    it('should reset spritePalette to default when clearOutput is called', () => {
-      const state = createState()
-      // Simulate a screen sample that changed sprite palette index
-      state.spritePalette.value = 2
-      const worker = createWorker()
-      const parseCode = vi.fn().mockResolvedValue({})
-      const { clearOutput } = useBasicIdeExecution(state, worker, parseCode)
-
-      clearOutput()
-
-      expect(state.spritePalette.value).toEqual(1)
-    })
+        expect(state[key].value).toEqual(expected)
+      },
+    )
   })
 
   describe('runCode resets palette reactive state (issue #435)', () => {
-    it('should reset bgPalette to default when runCode is called', async () => {
-      const state = createState()
-      // Simulate a screen sample that changed bgPalette via CGEN command
-      state.bgPalette.value = 0
-      const worker = createWorker({
-        sendMessageToWorker: vi.fn().mockResolvedValue({
-          errors: [],
-          variables: {},
-        }),
-      })
-      const parseCode = vi.fn().mockResolvedValue({})
-      const { runCode } = useBasicIdeExecution(state, worker, parseCode)
+    it.each(PALETTE_REFS)(
+      'should reset $label to default when runCode is called',
+      async ({ key, nonDefault, expected }) => {
+        const state = createState()
+        state[key].value = nonDefault
+        const worker = createWorker({
+          sendMessageToWorker: vi.fn().mockResolvedValue({
+            errors: [],
+            variables: {},
+          }),
+        })
+        const parseCode = vi.fn().mockResolvedValue({})
+        const { runCode } = useBasicIdeExecution(state, worker, parseCode)
 
-      await runCode()
+        await runCode()
 
-      expect(state.bgPalette.value).toEqual(1)
-    })
-
-    it('should reset cgenMode to default when runCode is called', async () => {
-      const state = createState()
-      // Simulate a screen sample that changed cgenMode via CGEN command
-      state.cgenMode.value = 0
-      const worker = createWorker({
-        sendMessageToWorker: vi.fn().mockResolvedValue({
-          errors: [],
-          variables: {},
-        }),
-      })
-      const parseCode = vi.fn().mockResolvedValue({})
-      const { runCode } = useBasicIdeExecution(state, worker, parseCode)
-
-      await runCode()
-
-      expect(state.cgenMode.value).toEqual(2)
-    })
-
-    it('should reset backdropColor to default when runCode is called', async () => {
-      const state = createState()
-      // Simulate a screen sample that set a non-zero backdrop color
-      state.backdropColor.value = 1
-      const worker = createWorker({
-        sendMessageToWorker: vi.fn().mockResolvedValue({
-          errors: [],
-          variables: {},
-        }),
-      })
-      const parseCode = vi.fn().mockResolvedValue({})
-      const { runCode } = useBasicIdeExecution(state, worker, parseCode)
-
-      await runCode()
-
-      expect(state.backdropColor.value).toEqual(0)
-    })
-
-    it('should reset spritePalette to default when runCode is called', async () => {
-      const state = createState()
-      // Simulate a screen sample that changed sprite palette index
-      state.spritePalette.value = 2
-      const worker = createWorker({
-        sendMessageToWorker: vi.fn().mockResolvedValue({
-          errors: [],
-          variables: {},
-        }),
-      })
-      const parseCode = vi.fn().mockResolvedValue({})
-      const { runCode } = useBasicIdeExecution(state, worker, parseCode)
-
-      await runCode()
-
-      expect(state.spritePalette.value).toEqual(1)
-    })
+        expect(state[key].value).toEqual(expected)
+      },
+    )
   })
 })
