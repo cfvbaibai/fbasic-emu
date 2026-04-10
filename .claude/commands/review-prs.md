@@ -53,7 +53,51 @@ Map each PR to the appropriate specialist based on files changed (for review com
 | `src/features/sprite-viewer/`, `src/features/bg-editor/`, `src/features/sound-test/` | Tools |
 | Build scripts, package.json, tooling | Tools |
 
-If no PRs need review, write run log noting "no PRs to review" and stop.
+If no PRs need review AND no audit was requested, write run log noting "no PRs to review" and stop.
+
+### Step 2d — Audit Recently Merged PRs (when ARGUMENTS contain "audit")
+
+When the command is invoked with an argument containing "audit" (e.g., `/review-prs audit recently reviewed PRs`), perform a retroactive audit of recently merged PRs to find non-blocking observations that were missed during review and not filed as GitHub issues.
+
+**Scope:** Audit the last ~30 merged PRs (adjust based on recency — cover the current review session's PRs).
+
+**Process:**
+
+1. List recently merged PRs:
+   ```bash
+   gh pr list --state merged --limit 30 --json number,title,mergedAt
+   ```
+
+2. Fetch review comments for each PR:
+   ```bash
+   gh pr view <number> --json reviews --jq '.reviews[] | " reviewer: \(.author.login) state: \(.state) body: \(.body)"'
+   ```
+
+3. Extract all `### Minor` observations from each review body.
+
+4. Cross-reference each observation against existing GitHub issues:
+   ```bash
+   gh issue list --state all --limit 100 --json number,title
+   ```
+
+5. For each observation NOT covered by an existing issue, verify it's still valid in the current codebase (files may have changed since the PR merged).
+
+6. Create GitHub issues for valid missed findings (same format as Phase 5).
+
+**Skip filing when:**
+- An existing GitHub issue already covers the exact same suggestion
+- The finding is invalid or no longer applicable (code changed, file removed, etc.)
+- The finding was explicitly noted as "not actionable" or "acceptable" in the review
+
+**PRs with no review comments** (e.g., merged without formal review) should also have their diffs checked for non-blocking findings.
+
+**Output:** Append audit section to the report with:
+- PRs audited: N
+- Findings extracted: N
+- Already tracked: N
+- Invalid/no longer applicable: N
+- Missed (issues created): N
+- Too minor to file: N
 
 ## Phase 3 — Review PRs
 
@@ -232,6 +276,14 @@ Write outputs following `.claude/commands/_shared/path-conventions.md`:
 - PRs skipped: N
 - Issues created: N
 - PRs closed: N
+
+## Audit (if run)
+- PRs audited: N
+- Findings extracted: N
+- Already tracked: N
+- Invalid/no longer applicable: N
+- Missed (issues created): N
+- Too minor to file: N
 ```
 
 **Update config** — increment `total_runs`, `total_pr_maintenance`.
@@ -250,6 +302,7 @@ Focus on:
 - Were follow-up issues well-scoped and actionable?
 - Did the specialist mapping match the actual PR scope?
 - Were any real issues missed during review?
+- When audit was run, what percentage of findings were already tracked? (target: >90%)
 
 ## Periodic Execution
 
