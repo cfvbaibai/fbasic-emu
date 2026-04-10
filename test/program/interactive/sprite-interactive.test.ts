@@ -25,5 +25,13 @@ describe('sprite-interactive program', () => {
 
     // CLS was called at program start (line 10)
     expect(tp.getAdapter().getClearScreenCallCount()).toBeGreaterThanOrEqual(1)
+
+    // Sprite 0 started at PX=150 and increments by 2 each movement cycle
+    // (STICK direction=1 → right). With 500 iterations, the sprite must have
+    // advanced well beyond the initial X position.
+    const spriteState = tp.getSpriteState(0)
+    expect(spriteState).not.toBeNull()
+    expect(spriteState!.visible).toBe(true)
+    expect(spriteState!.x).toBeGreaterThan(150)
   })
 })
