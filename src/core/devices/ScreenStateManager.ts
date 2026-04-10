@@ -4,7 +4,7 @@
  * Manages screen buffer, cursor position, and screen-related operations.
  */
 
-import { PALETTE_DEFAULTS } from '@/core/constants'
+import { PALETTE_DEFAULTS, resetPaletteState } from '@/core/constants'
 import type { ScreenCell } from '@/core/types/execution-types'
 import type { ScreenUpdateMessage } from '@/core/types/worker-messages'
 import { ORIGINAL_BACKGROUND_PALETTES, ORIGINAL_SPRITE_PALETTES } from '@/shared/data/palette'
@@ -80,10 +80,12 @@ export class ScreenStateManager {
     this.cursorX = 0
     this.cursorY = 0
     // Reset BG/screen state to defaults so stale data does not persist
-    this.bgPalette = PALETTE_DEFAULTS.BG_PALETTE
-    this.spritePalette = PALETTE_DEFAULTS.SPRITE_PALETTE
-    this.backdropColor = PALETTE_DEFAULTS.BACKDROP_COLOR
-    this.cgenMode = PALETTE_DEFAULTS.CGEN_MODE
+    resetPaletteState((d) => {
+      this.bgPalette = d.BG_PALETTE
+      this.spritePalette = d.SPRITE_PALETTE
+      this.backdropColor = d.BACKDROP_COLOR
+      this.cgenMode = d.CGEN_MODE
+    })
     // Reset palette combinations to original data
     this.resetPalettes()
   }

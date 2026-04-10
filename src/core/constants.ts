@@ -207,6 +207,18 @@ export const PALETTE_DEFAULTS = {
   CGEN_MODE: 2,
 } as const
 
+/**
+ * Reset palette-related state fields to their default values.
+ * Accepts a setter callback to support both direct field assignment
+ * (e.g. ScreenStateManager private fields) and reactive ref assignment
+ * (e.g. Vue .value refs in useBasicIdeExecution).
+ */
+export function resetPaletteState(
+  setter: (defaults: typeof PALETTE_DEFAULTS) => void
+): void {
+  setter(PALETTE_DEFAULTS)
+}
+
 // Color patterns and codes
 export const COLOR_PATTERNS = {
   MIN: 0, // Minimum color pattern number
