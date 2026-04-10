@@ -234,6 +234,10 @@ function handlePaletteCombinationUpdate(context: MessageHandlerContext, update: 
     )
     clearBackgroundTileCache()
     clearSpriteImageCache()
+    // Invalidate last-rendered buffer so dirty renderer does a full redraw.
+    // PALETB changes palette data without modifying the screen buffer,
+    // so without this the dirty renderer would skip all cells (no buffer change detected).
+    context.invalidateBackgroundBuffer?.()
     context.scheduleRender?.()
     logComposable.debug('Updated runtime palette combination:', {
       target: update.paletteTarget,

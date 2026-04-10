@@ -49,6 +49,8 @@ export interface MessageHandlerContext {
   scheduleRender?: () => void
   /** Coalesced version: at most one schedule per frame. Prefer this for SCREEN_CHANGED to avoid main-thread flood. */
   scheduleRenderForScreenChanged?: () => void
+  /** Invalidate last-rendered background buffer so next render does a full redraw (e.g. after palette change). */
+  invalidateBackgroundBuffer?: () => void
   /** Called by Screen.vue after decoding shared buffer to update refs (screenBuffer, cursorX, etc.). */
   setDecodedScreenState?: (decoded: DecodedScreenState) => void
   /** Pending INPUT/LINPUT request from worker; set when REQUEST_INPUT is received, cleared on submit/cancel. */

@@ -127,6 +127,7 @@ const sharedDisplayViews: SharedDisplayViews = basicIde?.sharedDisplayViews ?? {
 const sharedJoystickBuffer = basicIde?.sharedJoystickBuffer ?? ({} as SharedArrayBuffer)
 const setDecodedScreenState = basicIde?.setDecodedScreenState ?? (() => {})
 const registerScheduleRender = basicIde?.registerScheduleRender ?? (() => {})
+const registerInvalidateBackgroundBuffer = basicIde?.registerInvalidateBackgroundBuffer ?? (() => {})
 const pendingInputRequest = basicIde?.pendingInputRequest ?? ref<RequestInputMessage['data'] | null>(null)
 const respondToInputRequest =
   basicIde?.respondToInputRequest ?? ((_requestId: string, _values: string[], _cancelled: boolean) => {})
@@ -175,6 +176,7 @@ if (!isE2ELite && sharedDisplayViews && sharedDisplayBufferAccessor && sharedAni
     sharedJoystickBuffer: ref(sharedJoystickBuffer),
     setDecodedScreenState,
     registerScheduleRender,
+    registerInvalidateBackgroundBuffer,
     // Callback for animation loop to update inspector MOVE tab data
     updateInspectorMoveSlots: () => bottomAreaRef.value?.updateMoveSlotsData(),
   })

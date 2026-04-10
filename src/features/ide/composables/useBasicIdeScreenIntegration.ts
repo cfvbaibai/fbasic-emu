@@ -32,7 +32,11 @@ export interface BasicIdeScreenIntegration {
   sharedKeyboardBuffer: SharedArrayBuffer
   sharedKeyboardBufferView: KeyboardBufferView
   registerScheduleRender: (fn: () => void) => void
+  /** Register callback from Screen.vue to invalidate last-rendered background buffer. */
+  registerInvalidateBackgroundBuffer: (fn: () => void) => void
   setDecodedScreenState: (decoded: DecodedScreenState) => void
+  /** Invalidate last-rendered background buffer so next render does a full redraw. */
+  invalidateBackgroundBuffer: () => void
   /** Called by message handlers when SCREEN_CHANGED is received. */
   scheduleRender: () => void
   /** Coalesced: at most one scheduleRender per frame. Use for SCREEN_CHANGED to avoid main-thread flood. */
@@ -62,6 +66,12 @@ export function useBasicIdeScreenIntegration(state: BasicIdeState): BasicIdeScre
   const registerScheduleRender = (fn: () => void) => {
     scheduleScreenRenderRef.value = fn
   }
+
+  const invalidateBackgroundBufferRef = ref<(() => void) | null>(null)
+  const registerInvalidateBackgroundBuffer = (fn: () => void) => {
+    invalidateBackgroundBufferRef.value = fn
+  }
+  const invalidateBackgroundBuffer = () => invalidateBackgroundBufferRef.value?.()
 
   const setDecodedScreenState = (decoded: DecodedScreenState) => {
     state.screenBuffer.value = decoded.buffer
@@ -155,7 +165,9 @@ export function useBasicIdeScreenIntegration(state: BasicIdeState): BasicIdeScre
     sharedKeyboardBuffer,
     sharedKeyboardBufferView,
     registerScheduleRender,
+    registerInvalidateBackgroundBuffer,
     setDecodedScreenState,
+    invalidateBackgroundBuffer,
     scheduleRender,
     scheduleRenderForScreenChanged,
     clearDisplayToSharedBuffer,

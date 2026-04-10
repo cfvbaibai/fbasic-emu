@@ -338,6 +338,17 @@ watch(
   { immediate: true }
 )
 
+// Register buffer invalidation callback for palette changes (PALETB etc.)
+// Nullifying lastBackgroundBufferRef forces the dirty renderer to do a full redraw
+// since renderBackgroundToCanvasDirty falls back to full render when lastBuffer is null.
+watch(
+  () => ctx.registerInvalidateBackgroundBuffer,
+  fn => {
+    if (fn) fn(() => { lastBackgroundBufferRef.value = null })
+  },
+  { immediate: true }
+)
+
 // Watch screenBuffer and render when it changes (PRINT). Use full when movements > nodes.
 // When using shared buffer, SCREEN_CHANGED triggers scheduleRender; this watch still runs for ref updates.
 watch(
