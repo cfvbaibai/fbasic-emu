@@ -121,12 +121,14 @@ const RAW_BACKGROUND_PALETTES = [
 
 // ---------------------------------------------------------------------------
 // Deep-clone helper — produces mutable arrays from raw const data.
-// The `as unknown` cast is needed because `as const` produces deeply-nested
-// readonly tuple types that are not assignable to mutable array types.
+// Accepts deeply-readonly tuple/array types (from `as const` assertions)
+// and returns fully mutable `number[][][]` for runtime mutation.
 // ---------------------------------------------------------------------------
 
-function cloneAsMutable(raw: unknown): number[][][] {
-  return (raw as number[][][]).map(palette =>
+function cloneAsMutable<T extends ReadonlyArray<ReadonlyArray<ReadonlyArray<number>>>>(
+  raw: T
+): number[][][] {
+  return raw.map(palette =>
     palette.map(combination => [...combination])
   )
 }
