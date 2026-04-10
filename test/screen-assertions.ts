@@ -21,8 +21,8 @@ import type { DecodedScreenState } from '@/core/animation/sharedDisplayBufferAcc
 import type { BgCell, BgGridData } from '@/features/bg-editor/types'
 
 // Re-export snapshot type so consumers can use a single import
-export type { DisplaySnapshotV1 } from './integration/displaySnapshotTestUtils'
 import type { DisplaySnapshotV1 } from './integration/displaySnapshotTestUtils'
+export type { DisplaySnapshotV1 }
 
 // ============================================================================
 // Unified screen source types
