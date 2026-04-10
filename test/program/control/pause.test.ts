@@ -7,9 +7,6 @@ describe('pause program', () => {
   it('runs successfully and produces expected output', async () => {
     const tp = TestProgram.fromSample('pause')
 
-    // PAUSE 0 blocks waiting for keypress — queue one to unblock
-    tp.queueInkey('A')
-
     await tp.run({ stableOptions: { ...DEFAULT_STABLE_OPTIONS, timeoutMs: EXTENDED_STABLE_TIMEOUT_MS } })
 
     tp.expectSuccess()
@@ -27,13 +24,9 @@ describe('pause program', () => {
     tp.expectRowText(8, '=== SHORT PAUSE ===')
     tp.expectRowText(9, 'QUICK DOTS...')
     tp.expectRowText(10, '.....')
-    // Wait for keypress section: PAUSE 0 unblocked by queueInkey
-    tp.expectRowText(11, '=== WAIT FOR KEYPRESS ===')
-    tp.expectRowText(12, 'PAUSE 0 WAITS FOR A KEY...')
-    tp.expectRowText(13, 'YOU PRESSED A KEY!')
     // Long pause section: PAUSE 250 (~3s)
-    tp.expectRowText(14, '=== LONG PAUSE ===')
-    tp.expectRowText(15, 'WAITING 3 SECONDS...')
-    tp.expectRowText(16, 'DONE!')
+    tp.expectRowText(11, '=== LONG PAUSE ===')
+    tp.expectRowText(12, 'WAITING 3 SECONDS...')
+    tp.expectRowText(13, 'DONE!')
   }, 20_000)
 })

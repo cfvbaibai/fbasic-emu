@@ -100,8 +100,8 @@ describe('Pause Demo Program', () => {
       // Verify all statements are parsed
       const statements = result.cst?.children.statement
       expect(Array.isArray(statements)).toBe(true)
-      // Current pause.bas has 33 lines (10-330)
-      expect(statements?.length).toBe(33)
+      // Current pause.bas has 27 lines (keypress section removed)
+      expect(statements?.length).toBe(27)
     })
 
     it('should parse PAUSE statements correctly', async () => {
@@ -125,16 +125,15 @@ describe('Pause Demo Program', () => {
     it('should execute the complete pause demo program', async () => {
       const { durations } = await executeWithCapturedTimeouts(pauseDemoCode)
 
-      // Current pause.bas has:
-      // 5x PAUSE 80 + 1x PAUSE 50 + 5x PAUSE 30 + 1x PAUSE 50 + 1x PAUSE 50 + 1x PAUSE 250 = 14 pauses
-      // PAUSE 0 has durationMs = 0 so it is filtered out (> 1 check)
-      expect(durations).toHaveLength(14)
+      // Current pause.bas has (keypress section removed):
+      // 5x PAUSE 80 + 1x PAUSE 50 + 5x PAUSE 30 + 1x PAUSE 50 + 1x PAUSE 250 = 13 pauses
+      expect(durations).toHaveLength(13)
 
       // PAUSE 80: (80 * 33.33) / 2.75 = 969.45ms each (5 of these)
       expect(durations.filter((d) => Math.abs(d - 969.45) < 1)).toHaveLength(5)
 
-      // PAUSE 50: (50 * 33.33) / 2.75 = 606.06ms each (3 of these)
-      expect(durations.filter((d) => Math.abs(d - 606.06) < 1)).toHaveLength(3)
+      // PAUSE 50: (50 * 33.33) / 2.75 = 606.06ms each (2 of these)
+      expect(durations.filter((d) => Math.abs(d - 606.06) < 1)).toHaveLength(2)
 
       // PAUSE 30: (30 * 33.33) / 2.75 = 363.63ms each (5 of these)
       expect(durations.filter((d) => Math.abs(d - 363.63) < 1)).toHaveLength(5)
@@ -166,15 +165,10 @@ describe('Pause Demo Program', () => {
       expect(calls[12]).toBe('.')
       expect(calls[13]).toBe('.')
 
-      // Wait for keypress section
-      expect(calls[14]).toBe('=== WAIT FOR KEYPRESS ===')
-      expect(calls[15]).toBe('PAUSE 0 waits for a key...')
-      expect(calls[16]).toBe('You pressed a key!')
-
       // Long pause section
-      expect(calls[17]).toBe('=== LONG PAUSE ===')
-      expect(calls[18]).toBe('Waiting 3 seconds...')
-      expect(calls[19]).toBe('Done!')
+      expect(calls[14]).toBe('=== LONG PAUSE ===')
+      expect(calls[15]).toBe('Waiting 3 seconds...')
+      expect(calls[16]).toBe('Done!')
 
       // OK prompt after successful execution
       expect(calls[calls.length - 1]).toBe('OK')
