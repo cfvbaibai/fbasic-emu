@@ -21,10 +21,6 @@
       "name": "スプライトビューア",
       "description": "キャラクタースプライトを表示"
     },
-    "monaco": {
-      "name": "Monacoエディタ",
-      "description": "高度なコードエディタ"
-    },
     "performanceDiagnostics": {
       "name": "パフォーマンス",
       "description": "パフォーマンス診断"

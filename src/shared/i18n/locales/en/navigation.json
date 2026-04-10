@@ -21,10 +21,6 @@
       "name": "Sprite Viewer",
       "description": "View Character Sprites"
     },
-    "monaco": {
-      "name": "Monaco Editor",
-      "description": "Advanced Code Editor"
-    },
     "performanceDiagnostics": {
       "name": "Performance",
       "description": "Performance Diagnostics"

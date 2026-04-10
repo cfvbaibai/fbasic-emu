@@ -10,7 +10,6 @@ import enDiagnostics from './locales/en/diagnostics.json'
 import enHome from './locales/en/home.json'
 import enIde from './locales/en/ide.json'
 import enKonvaTest from './locales/en/konva-test.json'
-import enMonacoEditor from './locales/en/monaco-editor.json'
 import enNavigation from './locales/en/navigation.json'
 import enSoundTest from './locales/en/sound-test.json'
 import enSpriteViewer from './locales/en/sprite-viewer.json'
@@ -22,7 +21,6 @@ import jaDiagnostics from './locales/ja/diagnostics.json'
 import jaHome from './locales/ja/home.json'
 import jaIde from './locales/ja/ide.json'
 import jaKonvaTest from './locales/ja/konva-test.json'
-import jaMonacoEditor from './locales/ja/monaco-editor.json'
 import jaNavigation from './locales/ja/navigation.json'
 import jaSoundTest from './locales/ja/sound-test.json'
 import jaSpriteViewer from './locales/ja/sprite-viewer.json'
@@ -34,7 +32,6 @@ import zhCNDiagnostics from './locales/zh-CN/diagnostics.json'
 import zhCNHome from './locales/zh-CN/home.json'
 import zhCNIde from './locales/zh-CN/ide.json'
 import zhCNKonvaTest from './locales/zh-CN/konva-test.json'
-import zhCNMonacoEditor from './locales/zh-CN/monaco-editor.json'
 import zhCNNavigation from './locales/zh-CN/navigation.json'
 import zhCNSoundTest from './locales/zh-CN/sound-test.json'
 import zhCNSpriteViewer from './locales/zh-CN/sprite-viewer.json'
@@ -46,7 +43,6 @@ import zhTWDiagnostics from './locales/zh-TW/diagnostics.json'
 import zhTWHome from './locales/zh-TW/home.json'
 import zhTWIde from './locales/zh-TW/ide.json'
 import zhTWKonvaTest from './locales/zh-TW/konva-test.json'
-import zhTWMonacoEditor from './locales/zh-TW/monaco-editor.json'
 import zhTWNavigation from './locales/zh-TW/navigation.json'
 import zhTWSoundTest from './locales/zh-TW/sound-test.json'
 import zhTWSpriteViewer from './locales/zh-TW/sprite-viewer.json'
@@ -86,7 +82,6 @@ const i18n = createI18n<{ message: MessageSchema }, Locale>({
       common: enCommon,
       home: enHome,
       spriteViewer: enSpriteViewer,
-      monacoEditor: enMonacoEditor,
       bgEditor: enBgEditor,
       coi: enCoi,
       soundTest: enSoundTest,
@@ -100,7 +95,6 @@ const i18n = createI18n<{ message: MessageSchema }, Locale>({
       common: jaCommon,
       home: jaHome,
       spriteViewer: jaSpriteViewer,
-      monacoEditor: jaMonacoEditor,
       bgEditor: jaBgEditor,
       coi: jaCoi,
       soundTest: jaSoundTest,
@@ -114,7 +108,6 @@ const i18n = createI18n<{ message: MessageSchema }, Locale>({
       common: zhCNCommon,
       home: zhCNHome,
       spriteViewer: zhCNSpriteViewer,
-      monacoEditor: zhCNMonacoEditor,
       bgEditor: zhCNBgEditor,
       coi: zhCNCoi,
       soundTest: zhCNSoundTest,
@@ -128,7 +121,6 @@ const i18n = createI18n<{ message: MessageSchema }, Locale>({
       common: zhTWCommon,
       home: zhTWHome,
       spriteViewer: zhTWSpriteViewer,
-      monacoEditor: zhTWMonacoEditor,
       bgEditor: zhTWBgEditor,
       coi: zhTWCoi,
       soundTest: zhTWSoundTest,

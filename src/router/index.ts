@@ -44,19 +44,6 @@ const routes: RouteRecordRaw[] = [
       group: 'tools',
     },
   },
-  {
-    path: '/monaco',
-    name: 'MonacoEditor',
-    component: () => import('@/features/monaco-editor/MonacoEditorPage.vue'),
-    meta: {
-      title: 'Monaco Editor',
-      showInNav: true,
-      icon: 'mdi:code-tags',
-      group: 'tools',
-      debug: true,
-    },
-  },
-
   // ============================================
   // Testing & Diagnostics
   // ============================================
