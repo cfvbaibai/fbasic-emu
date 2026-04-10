@@ -24,14 +24,8 @@ describe('sprite-control program', () => {
     tp.expectRowText(14, 'DIRECTION 8: UP-LEFT')
 
     // Verify coordinate output on odd rows (1, 3, 5, ..., 15)
-    tp.expectRowText(1, 'X=')
-    tp.expectRowText(3, 'X=')
-    tp.expectRowText(5, 'X=')
-    tp.expectRowText(7, 'X=')
-    tp.expectRowText(9, 'X=')
-    tp.expectRowText(11, 'X=')
-    tp.expectRowText(13, 'X=')
-    tp.expectRowText(15, 'X=')
+    const COORDINATE_ROWS = [1, 3, 5, 7, 9, 11, 13, 15] as const
+    COORDINATE_ROWS.forEach(row => tp.expectRowText(row, 'X='))
 
     // Verify final completion message
     tp.expectRowText(16, 'ALL 8 DIRECTIONS DONE!')
