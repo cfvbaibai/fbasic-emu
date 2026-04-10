@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ref } from 'vue'
 
-import { ERROR_MESSAGES } from '@/core/constants'
+import { ERROR_MESSAGES, PALETTE_DEFAULTS } from '@/core/constants'
 import { useBasicIdeExecution } from '@/features/ide/composables/useBasicIdeExecution'
 import type { BasicIdeState } from '@/features/ide/composables/useBasicIdeState'
 import type { BasicIdeWorkerIntegration } from '@/features/ide/composables/useBasicIdeWorkerIntegration'
@@ -292,10 +292,10 @@ describe('useBasicIdeExecution', () => {
 
   /** Palette reactive refs that should be reset by clearOutput/runCode. */
   const PALETTE_REFS = [
-    { key: 'bgPalette', nonDefault: 0, expected: 1, label: 'bgPalette' },
-    { key: 'cgenMode', nonDefault: 0, expected: 2, label: 'cgenMode' },
-    { key: 'backdropColor', nonDefault: 1, expected: 0, label: 'backdropColor' },
-    { key: 'spritePalette', nonDefault: 2, expected: 1, label: 'spritePalette' },
+    { key: 'bgPalette', nonDefault: 0, expected: PALETTE_DEFAULTS.BG_PALETTE, label: 'bgPalette' },
+    { key: 'cgenMode', nonDefault: 0, expected: PALETTE_DEFAULTS.CGEN_MODE, label: 'cgenMode' },
+    { key: 'backdropColor', nonDefault: 1, expected: PALETTE_DEFAULTS.BACKDROP_COLOR, label: 'backdropColor' },
+    { key: 'spritePalette', nonDefault: 2, expected: PALETTE_DEFAULTS.SPRITE_PALETTE, label: 'spritePalette' },
   ] as const
 
   describe('clearOutput resets palette reactive state (issue #444)', () => {
