@@ -19,13 +19,7 @@
 190 NEXT
 200 PRINT ""
 210 PAUSE 50
-220 REM === Wait for Keypress ===
-230 PRINT "=== WAIT FOR KEYPRESS ==="
-240 PRINT "PAUSE 0 waits for a key..."
-250 PAUSE 0
-260 PRINT "You pressed a key!"
-270 PAUSE 50
-280 REM === Long Pause Demo ===
+220 REM === Long Pause Demo ===
 290 PRINT "=== LONG PAUSE ==="
 300 PRINT "Waiting 3 seconds..."
 310 PAUSE 250
