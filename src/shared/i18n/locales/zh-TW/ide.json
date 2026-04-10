@@ -386,7 +386,7 @@
   },
   "stateInspector": {
     "title": "狀態檢查",
-    "tabPalettes": "PALETTE",
+    "tabPalette": "PALETTE",
     "tabSprite": "SPRITE",
     "tabMove": "MOVE",
     "tabBg": "BG",

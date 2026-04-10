@@ -112,7 +112,7 @@ defineExpose({
   <GameBlock :title="t('ide.stateInspector.title')" title-icon="mdi:eye" :hide-header="true" class="state-inspector">
     <div class="inspector-content">
       <GameTabs v-model="activeTab" type="border-card" class="inspector-tabs">
-        <GameTabPane name="palettes" :label="t('ide.stateInspector.tabPalettes')">
+        <GameTabPane name="palettes" :label="t('ide.stateInspector.tabPalette')">
           <div class="tab-pane horizontal palettes-tab">
             <div class="palettes-row">
               <ActivePaletteDisplay :bg-palette="bgPalette" :sprite-palette="spritePalette" />
