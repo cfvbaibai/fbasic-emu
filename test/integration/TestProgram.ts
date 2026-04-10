@@ -246,6 +246,7 @@ export class TestProgram {
       sharedDisplayBuffer: this.sharedBuffer,
       sharedAnimationBuffer: this.sharedBuffer,
     })
+    this._interpreter = interpreter
 
     const executionResult = await interpreter.execute(this.code)
 
@@ -325,6 +326,24 @@ export class TestProgram {
   }
 
   /**
+   * Get sprite state for a given sprite number after execution.
+   *
+   * Returns the sprite's { x, y, visible } state from SpriteStateManager.
+   * Useful for verifying that SPRITE commands moved sprites to expected positions.
+   *
+   * @param spriteNumber - Sprite slot 0-7
+   * @throws Error if run() has not been called
+   */
+  getSpriteState(spriteNumber: number): { x: number; y: number; visible: boolean } | null {
+    if (!this._interpreter) {
+      throw new Error('No interpreter available. Call run() first.')
+    }
+    const states = this._interpreter.getSpriteStates()
+    const state = states.find((s) => s.spriteNumber === spriteNumber)
+    return state ? { x: state.x, y: state.y, visible: state.visible } : null
+  }
+
+  /**
    * Get the shared display buffer accessor for low-level buffer inspection.
    */
   getAccessor(): SharedDisplayBufferAccessor {
@@ -339,4 +358,5 @@ export class TestProgram {
   }
 
   private _lastResult: TestProgramResult | null = null
+  private _interpreter: BasicInterpreter | null = null
 }
