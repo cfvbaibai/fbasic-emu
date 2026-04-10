@@ -3,8 +3,9 @@ import { describe, it } from 'vitest'
 import { TestProgram } from '../../integration/TestProgram'
 
 describe('rockn-rouge program', () => {
-  // Long program (~450 lines) with many PLAY commands and loop structures
-  it('runs successfully without errors', async () => {
+  // Long program (~450 lines) with PLAY commands, IF/GOTO loops, and no PRINT.
+  // All screen rows should remain blank since the program produces no text output.
+  it('runs successfully with empty screen (no PRINT output)', async () => {
     const tp = TestProgram.fromSample('musicRocknRouge')
 
     await tp.run({
@@ -12,5 +13,9 @@ describe('rockn-rouge program', () => {
     })
 
     tp.expectSuccess()
+    // Program has no PRINT statements — screen should stay blank
+    tp.expectRowText(0, /^\s*$/)
+    tp.expectRowText(1, /^\s*$/)
+    tp.expectRowText(23, /^\s*$/)
   }, 30_000)
 })
