@@ -103,6 +103,13 @@ Only post this comment once per issue (check for existing "TOO COMPLEX" comments
 
 ## Phase 3 — Worktree Setup
 
+Before creating a worktree, resolve the main repo root. Never use `${PWD}` for worktree paths — if this command runs from within an existing worktree, `${PWD}` would produce nested paths like `.automation/worktrees/459/.automation/worktrees/483/`.
+
+```bash
+# Resolve main repo root (first entry in worktree list is always the main repo)
+REPO_ROOT=$(git -c safe.directory="$(pwd)" worktree list --porcelain | head -1 | sed -n 's/^worktree //p')
+```
+
 Before creating a worktree, check for collisions (existing worktrees for the same branch or from Codex):
 
 ```bash
@@ -118,8 +125,8 @@ Create a worktree under the automation directory:
 # Branch name: fix/issue-{N}-short-description or feat/issue-{N}-short-description
 BRANCH="fix/issue-${ISSUE_NUM}-$(echo "$ISSUE_TITLE" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | cut -c1-40)"
 
-# Worktree path — single folder named by issue ID
-WT_PATH="${PWD}/.automation/worktrees/${ISSUE_NUM}"
+# Worktree path — single folder named by issue ID, relative to MAIN repo root
+WT_PATH="${REPO_ROOT}/.automation/worktrees/${ISSUE_NUM}"
 
 # Clean up stale worktree entry if directory doesn't exist
 if [ ! -d "$WT_PATH" ]; then
