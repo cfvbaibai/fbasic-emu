@@ -26,7 +26,6 @@
  *
  * ## Future Extensions (pending sub-issues)
  *
- * - #405: `seedBgData()` — BG tile pre-seeding
  * - #406: `scheduleInput()` — timed input injection during execution
  * - #407: screen assertion extensions (cursor, scalars, sprites)
  */
@@ -38,6 +37,8 @@ import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBuffe
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { EXECUTION_LIMITS } from '@/core/constants'
 import { getSampleCode } from '@/core/samples'
+import { getSampleBgData } from '@/core/samples/sampleBgData'
+import type { BgGridData } from '@/features/bg-editor/types'
 
 import { SharedBufferTestAdapter } from '../adapters/SharedBufferTestAdapter'
 import {
@@ -225,6 +226,22 @@ export class TestProgram {
    */
   setInkeyState(keyChar: string): this {
     this.adapter.setInkeyStateForTest(keyChar)
+    return this
+  }
+
+  /**
+   * Seed BG GRAPHIC tile data for the VIEW command.
+   *
+   * When the program executes VIEW, the seeded BG data is copied to the
+   * background screen buffer, allowing tests to verify BG rendering.
+   *
+   * @param bgKey - Key from SAMPLE_BG_DATA (e.g. 'bgView', 'titleScreen')
+   *   or a raw BgGridData array for custom BG data.
+   * @returns this for chaining
+   */
+  withBgData(bgKey: string | BgGridData): this {
+    const data = typeof bgKey === 'string' ? getSampleBgData(bgKey) : bgKey
+    this.adapter.seedBgData(data)
     return this
   }
 
