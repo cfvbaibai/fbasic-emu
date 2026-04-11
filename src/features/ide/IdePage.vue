@@ -139,6 +139,7 @@ useDevApi({
   stopCode,
   pendingInputRequest,
   respondToInputRequest,
+  screenBuffer,
 })
 
 // UI state

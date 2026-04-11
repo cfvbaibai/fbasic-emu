@@ -69,11 +69,19 @@ test.describe('INKEY$ blocking mode', () => {
     // Wait for the program to loop back to the next INKEY$(0) call
     await page.waitForTimeout(KEY_PRESS_INTERVAL_MS)
 
-    // Send 'Q' key - program should read it, detect Q, print "Done!", and END
+    // Send 'Q' key - program should read it, detect Q, print "DONE!", and END
     await page.keyboard.press('Q')
 
     // Wait for program to complete: run button should become enabled again
     await expect(runButton).toBeEnabled({ timeout: COMPLETION_TIMEOUT_MS })
+
+    // Verify "DONE!" appears on the virtual screen after Q exits the loop
+    const screenText = await page.evaluate(() => window.__fbasicIDE?.getScreenText())
+    expect(screenText, 'Screen buffer should be readable via dev API').toBeDefined()
+    expect(
+      screenText!.some(row => row.includes('DONE!')),
+      `Expected "DONE!" on screen. Got: ${JSON.stringify(screenText)}`
+    ).toEqual(true)
 
     // Verify no uncaught page errors occurred during execution
     expect(
