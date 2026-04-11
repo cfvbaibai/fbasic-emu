@@ -186,6 +186,46 @@ describe('TestProgram', () => {
     })
   })
 
+  describe('getSpriteState bounds validation', () => {
+    it('throws RangeError for negative spriteNumber', async () => {
+      const tp = TestProgram.fromCode('10 END')
+      await tp.run()
+      expect(() => tp.getSpriteState(-1)).toThrow(RangeError)
+      expect(() => tp.getSpriteState(-1)).toThrow(
+        'spriteNumber must be 0-7, got -1'
+      )
+    })
+
+    it('throws RangeError for spriteNumber >= SPRITE_COUNT', async () => {
+      const tp = TestProgram.fromCode('10 END')
+      await tp.run()
+      expect(() => tp.getSpriteState(8)).toThrow(RangeError)
+      expect(() => tp.getSpriteState(8)).toThrow(
+        'spriteNumber must be 0-7, got 8'
+      )
+    })
+
+    it('accepts spriteNumber at lower bound 0', async () => {
+      const tp = TestProgram.fromCode('10 END')
+      await tp.run()
+      // Should not throw; returns null because no sprite was defined
+      expect(tp.getSpriteState(0)).toEqual({ x: 0, y: 0, visible: false })
+    })
+
+    it('accepts spriteNumber at upper bound 7', async () => {
+      const tp = TestProgram.fromCode('10 END')
+      await tp.run()
+      expect(tp.getSpriteState(7)).toEqual({ x: 0, y: 0, visible: false })
+    })
+
+    it('throws before run() is called', () => {
+      const tp = TestProgram.fromCode('10 END')
+      expect(() => tp.getSpriteState(0)).toThrow(
+        'No interpreter available. Call run() first.'
+      )
+    })
+  })
+
   describe('options', () => {
     it('respects maxIterations option', async () => {
       const tp = TestProgram.fromCode(
