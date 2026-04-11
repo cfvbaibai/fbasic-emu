@@ -160,6 +160,9 @@ export const TIMING = {
   // STICK repeat interval (typematic-style control for joystick direction reads)
   // This prevents programs from registering continuous direction when held
   STICK_REPEAT_INTERVAL_MS: 120, // ~8 reads per second when direction held
+
+  // UI feedback durations
+  COPIED_FEEDBACK_MS: 2000, // Duration of "Copied!" feedback state in share dialog
 } as const
 
 // Screen dimensions and coordinate limits
