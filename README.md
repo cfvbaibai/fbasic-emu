@@ -31,6 +31,7 @@ Vue 3 + TypeScript + Vite + Chevrotain parser
 
 ## Documentation
 
+- [Wiki](https://github.com/cfvbaibai/fbasic-ide/wiki) - Community-maintained guides and how-tos
 - [CLAUDE.md](CLAUDE.md) - AI coding guidelines and architecture
 - [docs/reference/](docs/reference/) - F-BASIC language manual
 - [docs/teams/](docs/teams/) - Team-specific documentation
