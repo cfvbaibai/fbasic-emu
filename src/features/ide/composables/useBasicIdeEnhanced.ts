@@ -148,7 +148,6 @@ export function useBasicIde() {
     sharedDisplayViews: screen.sharedDisplayViews,
     sharedJoystickBuffer: screen.sharedJoystickBuffer,
     setDecodedScreenState: screen.setDecodedScreenState,
-    registerScheduleRender: screen.registerScheduleRender,
-    registerInvalidateBackgroundBuffer: screen.registerInvalidateBackgroundBuffer,
+    registerCallbacks: screen.registerCallbacks,
   }
 }

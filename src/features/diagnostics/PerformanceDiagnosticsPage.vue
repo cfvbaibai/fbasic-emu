@@ -52,7 +52,7 @@ const {
   sharedDisplayViews,
   sharedJoystickBuffer,
   setDecodedScreenState,
-  registerScheduleRender,
+  registerCallbacks,
 } = useBasicIdeEnhanced()
 
 provideScreenContext({
@@ -74,7 +74,7 @@ provideScreenContext({
   sharedAnimationBuffer: ref(sharedAnimationBuffer),
   sharedJoystickBuffer: ref(sharedJoystickBuffer),
   setDecodedScreenState,
-  registerScheduleRender,
+  registerCallbacks,
 })
 
 const {

@@ -49,7 +49,7 @@ const {
   sharedDisplayViews,
   sharedJoystickBuffer,
   setDecodedScreenState,
-  registerScheduleRender,
+  registerCallbacks,
 } = useBasicIdeEnhanced()
 
 provideScreenContext({
@@ -71,7 +71,7 @@ provideScreenContext({
   sharedAnimationBuffer: ref(sharedAnimationBuffer),
   sharedJoystickBuffer: ref(sharedJoystickBuffer),
   setDecodedScreenState,
-  registerScheduleRender,
+  registerCallbacks,
 })
 
 // Disable STDOUT display for FPS test (PRINT still runs; we avoid stdout DOM updates)
