@@ -101,6 +101,17 @@ function setCode(code: string): void {
 }
 
 /**
+ * Update the program's name
+ */
+function setName(name: string): void {
+  if (!currentProgram.value) return
+
+  currentProgram.value.name = name
+  currentProgram.value.updatedAt = Date.now()
+  isDirty.value = true
+}
+
+/**
  * Update the program's BG data
  */
 function setBg(bg: BgGridData): void {
@@ -259,6 +270,7 @@ export function useProgramStore() {
     newProgram,
     loadProgram,
     setCode,
+    setName,
     setBg,
     save,
     saveAs,

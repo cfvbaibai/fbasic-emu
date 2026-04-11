@@ -194,7 +194,8 @@ function handleInputResponse(
 
 // Handle sample selection with view switching
 function handleLoadSample(sampleType: string) {
-  const hasBg = loadSampleCode(sampleType)
+  const displayName = t(`ide.samples.items.${sampleType}.name`)
+  const hasBg = loadSampleCode(sampleType, displayName)
   sampleSelectorOpen.value = false
   // Switch to code view if sample has no BG data and currently viewing bg-editor
   if (!hasBg && editorView.value === 'bg') {
