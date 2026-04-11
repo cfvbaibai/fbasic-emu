@@ -126,13 +126,60 @@ describe('IF-THEN Statement', () => {
       expect(result.success).toBe(true)
     })
 
-    it('should reject IF without THEN', () => {
-      const source = '10 IF X = 5 PRINT "Error"'
+    it('should parse IF without THEN (THEN-less IF with PRINT)', () => {
+      const source = '10 IF X = 1 PRINT "X=1"'
       const result = parseWithChevrotain(source)
 
-      expect(result.success).toBe(false)
-      expect(result.errors).toBeDefined()
-      expect(result.errors?.length).toBeGreaterThan(0)
+      expect(result.success).toBe(true)
+      expect(result.cst).toBeDefined()
+
+      const statements = result.cst?.children.statement
+      expect(statements).toBeDefined()
+
+      const statementCst = getFirstCstNode(statements)
+      expect(statementCst).toBeDefined()
+
+      if (!statementCst) return
+
+      const commandListCst = getFirstCstNode(statementCst.children.commandList)
+      expect(commandListCst).toBeDefined()
+
+      if (!commandListCst) return
+
+      const commandCst = getFirstCstNode(commandListCst.children.command)
+      expect(commandCst).toBeDefined()
+
+      if (!commandCst) return
+
+      const singleCommandCst = getFirstCstNode(commandCst.children.singleCommand)
+      expect(singleCommandCst).toBeDefined()
+
+      if (!singleCommandCst) return
+
+      const ifThenStmtCst = getFirstCstNode(singleCommandCst.children.ifThenStatement)
+      expect(ifThenStmtCst).toBeDefined()
+
+      if (!ifThenStmtCst) return
+
+      // THEN-less IF should have logicalExpression and commandList (no THEN token)
+      expect(ifThenStmtCst.children.logicalExpression).toBeDefined()
+      expect(ifThenStmtCst.children.commandList).toBeDefined()
+      // THEN token should NOT be present
+      expect(ifThenStmtCst.children.Then).toBeUndefined()
+    })
+
+    it('should parse IF without THEN with LET assignment', () => {
+      const source = '10 IF A = 0 Y = 10'
+      const result = parseWithChevrotain(source)
+
+      expect(result.success).toBe(true)
+    })
+
+    it('should parse IF without THEN with BEEP command', () => {
+      const source = '10 IF A = 0 BEEP'
+      const result = parseWithChevrotain(source)
+
+      expect(result.success).toBe(true)
     })
 
     it('should reject IF-THEN without condition', () => {
