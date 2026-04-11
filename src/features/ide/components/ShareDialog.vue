@@ -6,6 +6,7 @@
 import { computed, nextTick, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import { TIMING } from '@/core/constants'
 import type { CompactBg } from '@/core/types/program-types'
 import { encodeProgram } from '@/shared/utils/programCodec'
 
@@ -77,7 +78,7 @@ async function handleCopy(): Promise<void> {
     copiedTimer = setTimeout(() => {
       copied.value = false
       copiedTimer = null
-    }, 2000)
+    }, TIMING.COPIED_FEEDBACK_MS)
   } catch {
     // Fallback: select the input text so user can manually copy
     urlInputRef.value?.select()
