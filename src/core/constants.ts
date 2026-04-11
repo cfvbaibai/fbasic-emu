@@ -224,6 +224,13 @@ export const PALETTE_STATE_KEY_MAP = {
   CGEN_MODE: 'cgenMode',
 } as const satisfies Record<keyof typeof PALETTE_DEFAULTS, string>
 
+/**
+ * Typed key array for PALETTE_DEFAULTS.
+ * Used by resetPaletteState() to iterate with full type information,
+ * avoiding the need for Object.keys() + type assertion.
+ */
+const PALETTE_DEFAULTS_KEYS = Object.keys(PALETTE_DEFAULTS) as (keyof typeof PALETTE_DEFAULTS)[]
+
 /** Writable palette state with camelCase property names. */
 export type PaletteStateValues = {
   [K in (typeof PALETTE_STATE_KEY_MAP)[keyof typeof PALETTE_STATE_KEY_MAP]]: number
@@ -242,9 +249,8 @@ export type PaletteStateValues = {
  * For Vue reactive refs, wrap with a getter/setter adapter via createPaletteRefTarget().
  */
 export function resetPaletteState(target: PaletteStateValues): void {
-  const mutable = target as { [key: string]: number }
-  for (const key of Object.keys(PALETTE_DEFAULTS) as (keyof typeof PALETTE_DEFAULTS)[]) {
-    mutable[PALETTE_STATE_KEY_MAP[key]] = PALETTE_DEFAULTS[key]
+  for (const key of PALETTE_DEFAULTS_KEYS) {
+    target[PALETTE_STATE_KEY_MAP[key]] = PALETTE_DEFAULTS[key]
   }
 }
 
