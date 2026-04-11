@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 /**
  * WebWorkerDeviceAdapter Integration Tests
  *

@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 /**
  * Integration test for BG data flow from program store to worker
  *

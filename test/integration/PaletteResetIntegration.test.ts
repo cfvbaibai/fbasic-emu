@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 /**
  * Palette Reset Integration Tests (issue #435)
  *

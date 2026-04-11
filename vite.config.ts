@@ -56,17 +56,15 @@ export default defineConfig({
     chunkSizeWarningLimit: 3000,
   },
   test: {
+    include: ['test/**/*.test.ts'],
     globals: true,
-    environment: 'jsdom',
+    environment: 'node',
     setupFiles: ['./test/setup.ts'],
     testTimeout: 10000,
     hookTimeout: 10000,
     teardownTimeout: 10000,
-    pool: 'forks',
-    // Vitest 4: poolOptions are now top-level
-    singleFork: false,
-    maxForks: 4, // Use up to 4 worker processes
-    minForks: 2, // Use at least 2 worker processes
+    pool: 'threads',
+    maxWorkers: 4, // Vitest 4: unified worker config for threads pool
     // Enable parallel test execution
     maxConcurrency: 10,
     // Optimize for faster execution
