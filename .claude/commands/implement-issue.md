@@ -32,6 +32,17 @@ git merge --ff-only origin/master 2>/dev/null || echo "DIVERGED"
 
 Update `config.md` with new `last_sync_commit` hash.
 
+### Post-merge Integrity Check
+
+After merging, verify that recent fixes to `.claude/commands/` files haven't been silently reverted by a fast-forward merge (this happens when a PR branch predates a command fix and merges after it):
+
+```bash
+# Check critical patterns that must not regress
+grep -q 'uuid.uuid4()' .claude/commands/implement-issue.md || echo "INTEGRITY_WARN: SESSION_ID fix reverted"
+```
+
+If any integrity warning fires, **stop and re-apply the fix** before proceeding. This prevents the pipeline from operating with a broken command definition.
+
 If DIVERGED, do NOT rebase/reset. Base all work on `origin/master` explicitly.
 
 Check open PRs for maintenance needs (in this priority order):
