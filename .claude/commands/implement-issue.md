@@ -101,6 +101,22 @@ Suggested split:
 
 Only post this comment once per issue (check for existing "TOO COMPLEX" comments first).
 
+### TDD Classification
+
+After picking an issue, classify it into a TDD category. This classification determines what testing methodology the specialist agent follows in Phase 4.
+
+| Category | Issue Pattern | TDD Approach |
+|----------|--------------|-------------|
+| **A (Feature)** | `feat:` adding new behavior in `src/` | Full TDD — write tests first, verify fail, implement, verify pass |
+| **B (Bug fix)** | `fix:` fixing runtime behavior in `src/` | Full TDD — write regression test first, verify it reproduces bug, fix, verify pass |
+| **C (Test-only)** | `test:` the issue IS adding/modifying tests, or deliverable is test files | No TDD — the test IS the deliverable; writing a test-for-a-test adds no value |
+| **D (Refactor)** | `refactor:` no behavior change (rename, extract, split, delete) | Green-first — verify existing tests pass, refactor, verify they still pass |
+| **E/F/G** | `style:`, `chore:`, `i18n:` formatting, CI/infra, locale data | No TDD — no testable application behavior |
+
+Historical data: ~29% of pipeline implementations are A+B (TDD applies), ~71% are C/D/E/F/G (TDD does not apply or adds no value). Forcing TDD on C/D/E/F/G causes harm — artificial tests, backwards workflows, wasted context.
+
+Set `${TDD_CATEGORY}` to one of: `A`, `B`, `C`, `D`, `E_F_G`.
+
 ## Phase 3 — Worktree Setup
 
 Before creating a worktree, resolve the main repo root. Never use `${PWD}` for worktree paths — if this command runs from within an existing worktree, `${PWD}` would produce nested paths like `.automation/worktrees/459/.automation/worktrees/483/`.
@@ -187,10 +203,70 @@ When changing Vue component structure (removing/renaming CSS classes, changing D
 
 **Bug fix test coverage**: When fixing a bug, add or update test cases that cover the bug scenario. A fix without a regression test is incomplete — the bug could silently reappear. Write a test that reproduces the bug (would fail before the fix) and verifies the fix (passes after). If existing tests already cover the scenario, verify they do and note it.
 
-When done, report back: (1) root cause, (2) files changed, (3) test results, (4) what test covers the bug.
+## TDD Methodology: ${TDD_CATEGORY}
+
+${TDD_INSTRUCTIONS}
+
+When done, report back: (1) TDD cycle summary (what tests were written, how they failed, how implementation made them pass — skip for categories C/D/E_F_G), (2) root cause, (3) files changed, (4) test results.
 ```
 
 When the sub-agent returns, **proceed to Phase 5** without outputting a summary or stopping.
+
+### TDD Instruction Blocks
+
+Set `${TDD_INSTRUCTIONS}` based on the `${TDD_CATEGORY}` classification from Phase 2:
+
+**Category A (Feature) — Full TDD:**
+```
+Follow strict test-driven development:
+
+1. **RED**: Write failing tests FIRST that define the expected behavior/API. Write the test as if the feature already exists — call the API you wish you had.
+2. **Verify RED**: Run the tests and confirm they fail for the RIGHT reason (feature missing, not typo/import error).
+3. **GREEN**: Write the minimal implementation to make tests pass. Don't over-engineer — just enough to pass.
+4. **Verify GREEN**: Run all tests and confirm they pass.
+5. **REFACTOR**: Clean up while keeping tests green. Extract helpers, improve names, remove duplication.
+
+If a test passes immediately, the test is wrong — it's not testing new behavior. Fix the test.
+```
+
+**Category B (Bug fix) — Full TDD with regression test:**
+```
+Follow strict test-driven development:
+
+1. **RED**: Write a regression test that reproduces the bug FIRST. The test must fail with the exact bug symptom before the fix.
+2. **Verify RED**: Run the test and confirm it fails, reproducing the bug.
+3. **GREEN**: Write the minimal fix to make the regression test pass.
+4. **Verify GREEN**: Run all tests and confirm they pass — regression test passes AND no existing tests broke.
+5. **REFACTOR**: Clean up if needed while keeping tests green.
+
+If existing tests already cover the bug scenario, verify they do and note it — but still confirm they would fail without the fix.
+```
+
+**Category C (Test-only) — No TDD:**
+```
+This issue's deliverable IS test code. TDD does not apply — writing a test-for-a-test adds no value.
+
+Write the tests directly. Follow existing test patterns in the codebase (check nearby test files for conventions).
+Run the tests to verify they pass. That's it.
+```
+
+**Category D (Refactor) — Green-first:**
+```
+This is a behavior-preserving refactor. TDD's red-green cycle does not apply — there's no new behavior to test.
+
+1. **Verify GREEN**: Run existing tests and confirm they pass BEFORE making any changes. This is your safety net.
+2. **Refactor**: Make the structural change (rename, extract, split, delete).
+3. **Verify GREEN**: Run existing tests again and confirm they STILL pass.
+
+If existing tests don't cover the code being refactored, add tests for the current behavior BEFORE refactoring. But don't write a "failing test" — the behavior already exists, so tests should pass immediately.
+```
+
+**Category E/F/G (Style/Chore/i18n) — No TDD:**
+```
+This issue involves formatting, infrastructure, or locale data — no testable application behavior.
+
+Make the change directly. Run type-check and lint to verify nothing broke. No TDD cycle needed.
+```
 
 ## Phase 5 — Commit & PR
 
@@ -410,3 +486,4 @@ Follow `.claude/commands/_shared/self-improvement-protocol.md`. Focus on:
 - **PR title must include issue number** and use closing keyword `Closes #N`
 - **Systematic CI debugging** — follow the 4-phase debugging process for CI failures (root cause → pattern analysis → hypothesis → implement); no guess-and-fix
 - **No cosmetic line-saving** — if a file exceeds 500 lines, do REAL structural refactoring (decompose by responsibility), never cosmetic tricks (remove blank lines, condense comments, compress formatting). The pre-commit validation in Phase 5 will reject cosmetic changes.
+- **Conditional TDD** — classify every issue into a TDD category (A/B/C/D/E_F_G) in Phase 2; apply full TDD only for features (A) and bug fixes (B); use green-first for refactors (D); skip TDD for test-only (C), style, chore, and i18n changes (E/F/G). Forcing TDD on non-applicable categories causes artificial tests, backwards workflows, and wasted agent context.
