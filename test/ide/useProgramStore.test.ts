@@ -148,6 +148,21 @@ describe('useProgramStore', () => {
     expect(parsed.name).toBe('Twinkle Star')
   })
 
+  it('should persist code change to localStorage', async () => {
+    const { useProgramStore } = await import('@/features/ide/composables/useProgramStore')
+    const store = useProgramStore()
+
+    store.setCode('10 PRINT "HELLO"')
+
+    // Wait for VueUse's useLocalStorage to sync
+    await new Promise((resolve) => setTimeout(resolve, 50))
+
+    const stored = localStorage.getItem('program:current')
+    expect(stored).not.toBeNull()
+    const parsed = JSON.parse(stored!) as ProgramData
+    expect(parsed.code).toBe('10 PRINT "HELLO"')
+  })
+
   it('should load program and clear dirty', async () => {
     const { useProgramStore } = await import('@/features/ide/composables/useProgramStore')
     const store = useProgramStore()
