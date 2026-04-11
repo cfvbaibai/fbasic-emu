@@ -8,9 +8,15 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { BasicInterpreter } from '@/core/BasicInterpreter'
+import { TIMING } from '@/core/constants'
 import { FBasicParser } from '@/core/parser/FBasicParser'
 import { getSampleCode } from '@/core/samples'
 import type { BasicDeviceAdapter } from '@/core/types/device-types'
+
+/** Compute expected PAUSE duration in ms using the same formula as PauseExecutor. */
+function pauseMs(pauseUnits: number): number {
+  return (pauseUnits * TIMING.FRAME_DURATION_MS) / TIMING.PAUSE_TIMING_DIVISOR
+}
 
 describe('Pause Demo Program', () => {
   let interpreter: BasicInterpreter
@@ -129,17 +135,17 @@ describe('Pause Demo Program', () => {
       // 5x PAUSE 80 + 1x PAUSE 50 + 5x PAUSE 30 + 1x PAUSE 50 + 1x PAUSE 250 = 13 pauses
       expect(durations).toHaveLength(13)
 
-      // PAUSE 80: (80 * 33.33) / 2.75 = 969.45ms each (5 of these)
-      expect(durations.filter((d) => Math.abs(d - 969.45) < 1)).toHaveLength(5)
+      // PAUSE 80: 5 occurrences
+      expect(durations.filter((d) => Math.abs(d - pauseMs(80)) < 1)).toHaveLength(5)
 
-      // PAUSE 50: (50 * 33.33) / 2.75 = 606.06ms each (2 of these)
-      expect(durations.filter((d) => Math.abs(d - 606.06) < 1)).toHaveLength(2)
+      // PAUSE 50: 2 occurrences
+      expect(durations.filter((d) => Math.abs(d - pauseMs(50)) < 1)).toHaveLength(2)
 
-      // PAUSE 30: (30 * 33.33) / 2.75 = 363.63ms each (5 of these)
-      expect(durations.filter((d) => Math.abs(d - 363.63) < 1)).toHaveLength(5)
+      // PAUSE 30: 5 occurrences
+      expect(durations.filter((d) => Math.abs(d - pauseMs(30)) < 1)).toHaveLength(5)
 
-      // PAUSE 250: (250 * 33.33) / 2.75 = 3030.30ms (1 of these)
-      expect(durations.some((d) => Math.abs(d - 3030.30) < 1)).toBe(true)
+      // PAUSE 250: 1 occurrence
+      expect(durations.some((d) => Math.abs(d - pauseMs(250)) < 1)).toBe(true)
     })
 
     it('should produce correct output sequence', async () => {
@@ -195,8 +201,8 @@ describe('Pause Demo Program', () => {
 
       const { durations } = await executeWithCapturedTimeouts(codeWithShortDelays)
       expect(durations).toEqual([
-        expect.closeTo(121.21, 1),
-        expect.closeTo(242.42, 1),
+        expect.closeTo(pauseMs(10), 1),
+        expect.closeTo(pauseMs(20), 1),
       ])
 
       const calls = getPrintedLines()
@@ -214,7 +220,7 @@ describe('Pause Demo Program', () => {
 50 END`
 
       const { durations } = await executeWithCapturedTimeouts(code)
-      expect(durations).toEqual([expect.closeTo(606.06, 1)])
+      expect(durations).toEqual([expect.closeTo(pauseMs(50), 1)])
 
       const calls = getPrintedLines()
       expect(calls[0]).toBe('Pausing...')
@@ -234,7 +240,7 @@ describe('Pause Demo Program', () => {
 
       const { durations } = await executeWithCapturedTimeouts(code)
       expect(durations).toHaveLength(3)
-      expect(durations.every((duration) => Math.abs(duration - 121.21) < 1)).toBe(true)
+      expect(durations.every((duration) => Math.abs(duration - pauseMs(10)) < 1)).toBe(true)
 
       const calls = getPrintedLines()
       expect(calls).toHaveLength(5)
@@ -251,7 +257,7 @@ describe('Pause Demo Program', () => {
 
       const { durations } = await executeWithCapturedTimeouts(code)
       expect(durations).toHaveLength(3)
-      expect(durations.every((duration) => Math.abs(duration - 121.21) < 1)).toBe(true)
+      expect(durations.every((duration) => Math.abs(duration - pauseMs(10)) < 1)).toBe(true)
 
       // Verify outputs: 3 loop prints + 1 final print + final OK.
       const calls = getPrintedLines()
