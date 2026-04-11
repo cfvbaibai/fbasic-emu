@@ -56,6 +56,7 @@ watch(
     role="dialog"
     aria-modal="true"
     aria-labelledby="input-modal-prompt"
+    @keydown.escape="cancel"
   >
     <div class="input-modal">
       <p id="input-modal-prompt" class="input-modal-prompt">
