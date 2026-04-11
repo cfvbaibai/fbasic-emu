@@ -87,6 +87,31 @@ describe('useProgramStore', () => {
     expect(store.isDirty.value).toBe(true)
   })
 
+  it('should update name and mark dirty', async () => {
+    const { useProgramStore } = await import('@/features/ide/composables/useProgramStore')
+    const store = useProgramStore()
+
+    store.setName('Twinkle Star')
+
+    expect(store.programName).toBe('Twinkle Star')
+    expect(store.isDirty.value).toBe(true)
+  })
+
+  it('should persist name change to localStorage', async () => {
+    const { useProgramStore } = await import('@/features/ide/composables/useProgramStore')
+    const store = useProgramStore()
+
+    store.setName('Twinkle Star')
+
+    // Wait for VueUse's useLocalStorage to sync
+    await new Promise((resolve) => setTimeout(resolve, 50))
+
+    const stored = localStorage.getItem('program:current')
+    expect(stored).not.toBeNull()
+    const parsed = JSON.parse(stored!) as ProgramData
+    expect(parsed.name).toBe('Twinkle Star')
+  })
+
   it('should load program and clear dirty', async () => {
     const { useProgramStore } = await import('@/features/ide/composables/useProgramStore')
     const store = useProgramStore()

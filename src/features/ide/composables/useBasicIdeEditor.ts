@@ -16,7 +16,7 @@ export interface BasicIdeEditor {
   updateHighlighting: () => Promise<void>
   parseCode: () => Promise<unknown>
   validateCode: () => Promise<boolean>
-  loadSampleCode: (sampleType: string) => boolean
+  loadSampleCode: (sampleType: string, displayName?: string) => boolean
   sampleSelectOptions: Array<{ value: string; label: string }>
   getParserCapabilities: () => ParserInfo
   getHighlighterCapabilities: () => HighlighterInfo
@@ -64,7 +64,7 @@ export function useBasicIdeEditor(state: BasicIdeState): BasicIdeEditor {
     return cst !== null
   }
 
-  const loadSampleCode = (sampleType: string): boolean => {
+  const loadSampleCode = (sampleType: string, displayName?: string): boolean => {
     if (!sampleType) return false
     const sample = getSampleCode(sampleType)
     if (sample) {
@@ -72,8 +72,13 @@ export function useBasicIdeEditor(state: BasicIdeState): BasicIdeEditor {
       state.code.value = sample.code
       state.currentSampleType.value = sampleType
 
-      // Load BG data into program store if sample has associated BG
+      // Update program name in the store
       const programStore = useProgramStore()
+      if (displayName) {
+        programStore.setName(displayName)
+      }
+
+      // Load BG data into program store if sample has associated BG
       const bgKey = sample.bgKey
       const hasBg = bgKey ? hasSampleBgData(bgKey) : false
       if (hasBg && bgKey) {
