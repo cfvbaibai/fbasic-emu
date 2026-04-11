@@ -241,6 +241,60 @@ describe('useProgramStore', () => {
   })
 
   // --------------------------------------------------------------------------
+  // displayName parameter
+  // --------------------------------------------------------------------------
+
+  describe('displayName parameter', () => {
+    it('should use custom displayName when calling newProgram with a name', async () => {
+      const { useProgramStore } = await import('@/features/ide/composables/useProgramStore')
+      const store = useProgramStore()
+
+      store.newProgram('無題')
+
+      expect(store.programName).toEqual('無題')
+      expect(store.code).toEqual('')
+      expect(store.isDirty.value).toEqual(false)
+    })
+
+    it('should fall back to "Untitled" when newProgram is called without displayName', async () => {
+      const { useProgramStore } = await import('@/features/ide/composables/useProgramStore')
+      const store = useProgramStore()
+
+      store.newProgram()
+
+      expect(store.programName).toEqual('Untitled')
+    })
+
+    it('should use custom displayName via ensureProgram on first use', async () => {
+      // Reset module and localStorage to simulate a fresh first use
+      localStorage.clear()
+      vi.resetModules()
+
+      const { useProgramStore } = await import('@/features/ide/composables/useProgramStore')
+      const store = useProgramStore('無題')
+
+      expect(store.programName).toEqual('無題')
+      expect(store.code).toEqual('')
+    })
+
+    it('should not override existing program when ensureProgram is called with displayName', async () => {
+      // Reset module and localStorage to simulate a fresh first use
+      localStorage.clear()
+      vi.resetModules()
+
+      const { useProgramStore } = await import('@/features/ide/composables/useProgramStore')
+      const store = useProgramStore()
+
+      // First call creates program with default name
+      expect(store.programName).toEqual('Untitled')
+
+      // Second call with custom name should NOT override (already initialized)
+      const store2 = useProgramStore('無題')
+      expect(store2.programName).toEqual('Untitled')
+    })
+  })
+
+  // --------------------------------------------------------------------------
   // Library integration
   // --------------------------------------------------------------------------
 
