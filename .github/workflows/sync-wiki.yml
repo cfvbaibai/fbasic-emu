@@ -3,6 +3,7 @@ on:
   push:
     paths: ['dev-stories/**/*.md']
     branches: [master]
+  workflow_dispatch:
 
 jobs:
   sync:
