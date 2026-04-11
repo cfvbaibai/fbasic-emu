@@ -25,6 +25,19 @@ For each problem identified:
 
 Keep the command definition concise — only add what prevents the same problem. Do not add speculative "what-if" handling for things that haven't happened.
 
+### gh CLI Failure Propagation
+
+When a `gh` command fails with a wrong flag, missing subcommand, or version incompatibility:
+
+1. **Fix the command in the current command file** — replace with the working alternative
+2. **Search ALL command files for the same broken pattern** — the same `gh` version runs every command, so if `gh issue comment list --limit` fails in `triage-issues.md`, it also fails in `implement-issue.md`:
+   ```bash
+   grep -rn "<broken-pattern>" .claude/commands/
+   ```
+3. **Fix every occurrence** — not just the file where the failure was observed
+4. **Add the workaround** to `.claude/commands/_shared/github-operations.md` "Known workarounds" table so future commands avoid the broken pattern entirely
+5. **Never retry the same failing command** — this is the #1 gh CLI failure loop. If a command fails, adapt immediately.
+
 **Scope**: Update only the specific command being run. Only modify shared docs (`.claude/commands/_shared/`) if the improvement applies to all commands.
 
 ## Commit & Push

@@ -73,8 +73,11 @@ Filter out issues with the `invalid` label — do not pick up issues that contra
 For each candidate issue, check for dependency comments:
 
 ```bash
-gh issue comment list $ISSUE_NUM --limit 10 --json body --jq '.[] | .body'
+REPO=$(gh repo view --json nameWithOwner --jq '.nameWithOwner')
+gh api "repos/$REPO/issues/$ISSUE_NUM/comments?per_page=10" --jq '.[].body'
 ```
+
+> **gh CLI fallback**: If any `gh` command fails, do NOT retry the same command. See `.claude/commands/_shared/github-operations.md` "Error Recovery" section for fallback patterns.
 
 **A dependency exists ONLY when a comment explicitly says "depends on #N"** (or "dependency: #N", "blocked by #N"). Extract the referenced issue number and verify it is closed. If the dependency is not yet closed, **skip this issue**.
 
@@ -440,10 +443,15 @@ If CI fails 3 times on the same PR (after 3 fix attempts), stop and report the p
 
 ## Phase 7 — Cleanup
 
-After PR is created/updated and CI is green, remove the worktree defensively (Windows worktree removal is unreliable):
+After PR is created/updated and CI is green, **return to the main repo first** — subsequent steps must not run inside the worktree being deleted:
 
 ```bash
-# Remove worktree — may fail on Windows, use fallback
+cd "$REPO_ROOT"
+```
+
+Remove the worktree defensively (Windows worktree removal is unreliable):
+
+```bash
 git -c safe.directory="$(pwd)" worktree remove "$WT_PATH" --force 2>/dev/null
 git -c safe.directory="$(pwd)" worktree prune 2>/dev/null
 rm -rf "$WT_PATH" 2>/dev/null
@@ -514,6 +522,11 @@ Follow `.claude/commands/_shared/self-improvement-protocol.md`. Focus on:
 - Wrong issue picked or specialist confusion
 - CI surprises or PR merge issues
 - Phase gaps or deviations from documented flow
+- **gh CLI failures** — any `gh` command that failed (wrong flag, missing subcommand, etc.):
+  1. Fix the command in THIS file
+  2. **Search ALL other `.claude/commands/*.md` files for the same broken pattern** — if a `gh` command fails here, it fails everywhere
+  3. Add the workaround to `.claude/commands/_shared/github-operations.md` "Known workarounds" table
+  4. Propagate the fix to every file that uses the broken pattern
 
 ## Important Rules
 

@@ -89,3 +89,34 @@ fi
 ```
 
 When cap is reached, report and stop. Do not create new issues.
+
+## Error Recovery
+
+**When any `gh` command fails, do NOT retry the same command with the same arguments.** This is the most common failure loop — the agent retries an identical failing call multiple times.
+
+### Recovery procedure
+
+1. **Read the error message** — identify whether it's a flag, subcommand, or API error
+2. **Try the `gh api` equivalent** — every `gh` command maps to a GitHub REST API endpoint. `gh api` is more stable across versions and supports pagination natively.
+3. **If `gh api` works** — continue. Record the fix in self-improvement (Phase 9).
+4. **If both fail** — skip the step gracefully. Report in run log. Do NOT stall the pipeline.
+
+### Known workarounds
+
+| Broken command | Error | Working alternative |
+|---|---|---|
+| `gh issue comment list $N --limit 10` | `unknown flag: --limit` / no `list` subcommand | `gh api "repos/$REPO/issues/$N/comments?per_page=10" --jq '.[].body'` |
+
+Before using any `gh` command, verify the subcommand and flags exist:
+```bash
+gh <command> <subcommand> --help 2>&1 | head -5
+```
+
+### Cross-command propagation
+
+When a `gh` CLI failure is discovered and fixed in one command (e.g., `triage-issues.md`), **search ALL other command files for the same pattern** and fix them too. The same `gh` version runs all commands — if it fails in one, it fails in all.
+
+```bash
+# After fixing a gh CLI pattern in one command, check all others
+grep -r "<broken-pattern>" .claude/commands/
+```
