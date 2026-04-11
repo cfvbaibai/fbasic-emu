@@ -1,0 +1,17 @@
+name: Sync Dev Stories to Wiki
+on:
+  push:
+    paths: ['dev-stories/**/*.md']
+    branches: [master]
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Sync stories to wiki
+        env:
+          WIKI_TOKEN: ${{ secrets.WIKI_TOKEN }}
+          WIKI_REPO: cfvbaibai/fbasic-ide
+        run: bash scripts/sync-wiki.sh
