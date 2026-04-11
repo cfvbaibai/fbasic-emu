@@ -8,6 +8,9 @@ import type { ScreenCell } from '@/core/types/execution-types'
 import { BACKGROUND_PALETTES, COLORS } from '@/shared/data/palette'
 import { getBackgroundItemByChar, getCharacterByCode } from '@/shared/utils/backgroundLookup'
 
+/** Default backdrop color code (black) used when none is specified. */
+const DEFAULT_BACKDROP_COLOR = 0
+
 const CELL_SIZE = 8 // 8×8 pixels per character cell
 const COLS = 28 // Background screen: 28 columns
 const ROWS = 24 // Background screen: 24 rows
@@ -110,19 +113,35 @@ function createBackgroundTileImage(
 }
 
 /**
+ * Fill the entire canvas with the backdrop color.
+ * This covers the border area outside the 28x24 tile grid,
+ * ensuring the backdrop color fills the full 256x240 screen.
+ */
+function fillCanvasWithBackdrop(
+  ctx: CanvasRenderingContext2D,
+  canvas: HTMLCanvasElement,
+  backdropColorCode: number
+): void {
+  const color = COLORS[backdropColorCode] ?? COLORS[DEFAULT_BACKDROP_COLOR] ?? '#000000'
+  ctx.fillStyle = color
+  ctx.fillRect(0, 0, canvas.width, canvas.height)
+}
+
+/**
  * Render entire background grid to canvas (full redraw)
  * Uses direct Canvas2D drawImage() - much faster than Konva
  */
 export function renderBackgroundToCanvas(
   canvas: HTMLCanvasElement,
   buffer: ScreenCell[][],
-  paletteCode: number
+  paletteCode: number,
+  backdropColorCode: number = DEFAULT_BACKDROP_COLOR
 ): void {
   const ctx = canvas.getContext('2d', { alpha: false })
   if (!ctx) return
 
-  // Clear canvas
-  ctx.clearRect(0, 0, canvas.width, canvas.height)
+  // Fill entire canvas with backdrop color (covers border area)
+  fillCanvasWithBackdrop(ctx, canvas, backdropColorCode)
 
   // Render all cells
   for (let y = 0; y < ROWS; y++) {
@@ -142,16 +161,19 @@ export function renderBackgroundToCanvas(
 
 /**
  * Render only changed cells to canvas (dirty rendering)
- * Only redraws cells where character or colorPattern changed
+ * Only redraws cells where character or colorPattern changed.
+ * Falls back to full render when lastBuffer is null or backdrop color changed.
  */
 export function renderBackgroundToCanvasDirty(
   canvas: HTMLCanvasElement,
   buffer: ScreenCell[][],
   lastBuffer: ScreenCell[][] | null,
-  paletteCode: number
+  paletteCode: number,
+  backdropColorCode: number = DEFAULT_BACKDROP_COLOR,
+  lastBackdropColorCode: number | null = null
 ): void {
-  if (!lastBuffer) {
-    renderBackgroundToCanvas(canvas, buffer, paletteCode)
+  if (!lastBuffer || lastBackdropColorCode === null || lastBackdropColorCode !== backdropColorCode) {
+    renderBackgroundToCanvas(canvas, buffer, paletteCode, backdropColorCode)
     return
   }
 

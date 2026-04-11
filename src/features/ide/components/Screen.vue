@@ -82,6 +82,9 @@ const backSpriteNodes = shallowRef<Map<number, Konva.Image>>(new Map())
 // Use shallowRef since the buffer array is replaced, not mutated
 const lastBackgroundBufferRef = shallowRef<ScreenCell[][] | null>(null)
 
+// Last backdrop color used for canvas rendering (to detect backdrop changes for dirty render)
+const lastBackdropColorRef = ref<number | null>(null)
+
 // Shared buffer path: last sequence and last decoded buffer (so we only decode when sequence changes)
 // Use shallowRef since the buffer array is replaced, not mutated
 const lastSequenceRef = ref(-1)
@@ -150,13 +153,22 @@ async function render(): Promise<void> {
 
     // Render background using Canvas2D to offscreen canvas (much faster than Konva for text grid)
     const lastBuffer = lastBackgroundBufferRef.value
+    const currentBackdropColor = ctx.backdropColor.value ?? 0
     if (lastBuffer && pendingRenderReasonRef.value === 'bufferOnly') {
-      // Dirty render: only changed cells
-      renderBackgroundToCanvasDirty(backgroundCanvas, bufferToRender, lastBuffer, paletteCode.value)
+      // Dirty render: only changed cells (falls back to full if backdrop changed)
+      renderBackgroundToCanvasDirty(
+        backgroundCanvas,
+        bufferToRender,
+        lastBuffer,
+        paletteCode.value,
+        currentBackdropColor,
+        lastBackdropColorRef.value
+      )
     } else {
       // Full render
-      renderBackgroundToCanvas(backgroundCanvas, bufferToRender, paletteCode.value)
+      renderBackgroundToCanvas(backgroundCanvas, bufferToRender, paletteCode.value, currentBackdropColor)
     }
+    lastBackdropColorRef.value = currentBackdropColor
 
     // Create/update Konva.Image from Canvas2D content to participate in layer stacking
     if (layers.value.backgroundLayer) {
@@ -174,18 +186,6 @@ async function render(): Promise<void> {
       layers.value.backgroundLayer.add(backgroundImage)
       layers.value.backgroundLayer.batchDraw()
     }
-
-    // Determine if background should be cached (static when no active movements)
-    // Pure Buffer Read: check isActive directly from shared buffer
-    ;(() => {
-      if (!ctx.sharedDisplayBufferAccessor) return false
-      for (let actionNumber = 0; actionNumber < 8; actionNumber++) {
-        if (ctx.sharedDisplayBufferAccessor.readSpriteIsActive(actionNumber)) {
-          return true
-        }
-      }
-      return false
-    })()
 
     // Render sprites using Konva
     const layersToRender: KonvaScreenLayers = {
@@ -341,10 +341,14 @@ watch(
 // Register buffer invalidation callback for palette changes (PALETB etc.)
 // Nullifying lastBackgroundBufferRef forces the dirty renderer to do a full redraw
 // since renderBackgroundToCanvasDirty falls back to full render when lastBuffer is null.
+// Also nullify lastBackdropColorRef so backdrop fill is always applied on invalidation.
 watch(
   () => ctx.registerInvalidateBackgroundBuffer,
   fn => {
-    if (fn) fn(() => { lastBackgroundBufferRef.value = null })
+    if (fn) fn(() => {
+      lastBackgroundBufferRef.value = null
+      lastBackdropColorRef.value = null
+    })
   },
   { immediate: true }
 )
