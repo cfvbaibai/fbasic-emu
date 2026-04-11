@@ -25,6 +25,25 @@ Follow `.claude/commands/_shared/github-operations.md` open issue cap logic. Thr
 
 If cap reached, write run log and report noting "cap reached", update config `total_runs`, and stop.
 
+## Phase 2.5 — Context Exploration
+
+Before scanning, build project context to make smarter discovery decisions. This adapts brainstorming's "explore project context" step for automated runs.
+
+1. **Roadmap alignment** — Read `docs/roadmap.md` for current priorities and in-progress work
+2. **Recent activity themes** — Review the last 10 merged PRs for patterns:
+   ```bash
+   gh pr list --state merged --limit 10 --json number,title,labels
+   ```
+3. **Architectural signals** — Check for recent structural changes:
+   - New directories or files added in the last 20 commits
+   - Files that grew significantly (may indicate scope creep needing attention)
+4. **Synthesize scan priorities** — Based on the above, identify 2-3 themes that should influence how findings are evaluated:
+   - Example: "Several palette-related PRs merged recently — prioritize palette code quality findings"
+   - Example: "Roadmap shows sprite work is active — elevate sprite test gap findings"
+   - Example: "New device adapter added — check for missing tests and i18n"
+
+Record the context themes in the run log. These themes do NOT override the focus area rotation — they influence **finding prioritization** within each scan area.
+
 ## Phase 3 — Multi-Angle Scan
 
 Use `total_runs` modulo to rotate focus areas. Every run does a **baseline scan** (3a–3d), then one **focus area** (3e) for deeper analysis.
@@ -114,14 +133,33 @@ Check recently merged PRs for non-blocking observations in review comments that 
 5. Verify unfilled findings are still valid in the current codebase
 6. Create issues for valid gaps (same format as Phase 4)
 
+## Phase 3.5 — Finding Synthesis
+
+Before creating issues, synthesize and evaluate findings. This adapts brainstorming's "propose approaches" and "spec self-review" steps for issue quality.
+
+1. **Deduplicate and cluster** — Group related findings. Three minor i18n gaps in the same component become one issue, not three.
+2. **Evaluate against context themes** (from Phase 2.5) — Findings that align with active project priorities get elevated. Example: a test gap in sprite code is higher priority when sprite work is on the roadmap.
+3. **Consider alternative framings** — For each significant finding, ask:
+   - Is this a symptom of a deeper pattern? (If so, frame the issue at the pattern level)
+   - Is this better as a refactor, a test gap, or a code quality issue? (Pick the most actionable framing)
+   - Does this overlap with an existing issue? (If so, comment on the existing one instead)
+4. **Select top 3** — Rank all findings by: impact × alignment with context themes × actionability. Keep only the top 3.
+
 ## Phase 4 — Create Issues
 
-For each confirmed finding:
+For each selected finding:
 
 1. Draft title in format: `<type>: <description>`
 2. Write a clear body with context, affected files, and suggested approach
-3. Assign priority label (most discovery findings are P3 unless they indicate user-facing breakage)
-4. Create via `gh issue create` with labels: type + priority + `claude-automation`
+3. Assign priority label (most discovery findings are P3 unless they indicate user-facing breakage or align with context themes)
+4. **Issue quality gate** — Before creating, verify the issue passes all checks:
+   - **Specific**: Does it describe a concrete problem, not a vague concern?
+   - **Scoped**: Can it be resolved in a single PR, or does it need decomposition?
+   - **Actionable**: Does the body include enough context for someone to start working on it?
+   - **Non-duplicate**: Does it not overlap with an existing open issue?
+   - **Right type**: Is the label (refactor/fix/enhancement/test) accurate for the proposed fix?
+   If any check fails, revise the issue or skip it.
+5. Create via `gh issue create` with labels: type + priority + `claude-automation`
 
 **Testing issue template** — When creating test gap issues, include:
 ```
@@ -158,10 +196,14 @@ Write outputs following `.claude/commands/_shared/path-conventions.md`:
 ```markdown
 # Issue Discovery Report — YYYY-MM-DD
 
+## Context Themes
+- <2-3 themes from Phase 2.5 that guided this run>
+
 ## Scan Results
 - Focus area: <rotated area>
 - Files scanned: <count>
-- Findings: <count>
+- Raw findings: <count>
+- After synthesis: <count>
 
 ## Created Issues
 - #N: [title](url) — <one-line summary>
@@ -169,8 +211,11 @@ Write outputs following `.claude/commands/_shared/path-conventions.md`:
 ## Skipped (duplicates or too vague)
 - <finding> — reason: <duplicate of #N / too vague / not actionable>
 
+## Patterns & Trends
+- <cross-cutting patterns observed across scan areas, e.g. "3 test gaps all in device adapters — suggests a systematic testing gap in that layer">
+
 ## Key Findings
-- <notable patterns discovered during scan>
+- <notable individual discoveries>
 
 ## Notes
 - <anything noteworthy about this run>
