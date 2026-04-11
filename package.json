@@ -19,7 +19,7 @@
         "test:ui": "vitest --ui",
         "test:run": "vitest run",
         "test:e2e": "playwright test",
-        "test:built-preview": "playwright test --config=playwright.config.preview.ts",
+        "test:built-preview": "playwright test --project=vite-preview",
         "test:run:parallel": "vitest run --maxWorkers=8",
         "test:run:threads": "vitest run --pool=threads --maxWorkers=8",
         "test:run:single": "vitest run --maxWorkers=1",
