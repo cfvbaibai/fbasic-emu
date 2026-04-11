@@ -18,52 +18,23 @@ describe('printable-area program', () => {
     //   Sprite 0: (0,0), Sprite 1: (124,0), Sprite 2: (248,0)
     //   Sprite 3: (248,116), Sprite 4: (248,232)
     //   Sprite 5: (124,232), Sprite 6: (0,232), Sprite 7: (0,116)
-    const sprite0 = tp.getSpriteState(0)
-    expect(sprite0).not.toBeNull()
-    expect(sprite0!.x).toEqual(0)
-    expect(sprite0!.y).toEqual(0)
-    expect(sprite0!.visible).toBe(true)
+    const BOUNDARY_SPRITES = [
+      { index: 0, x: 0, y: 0, label: 'top-left' },
+      { index: 1, x: 124, y: 0, label: 'top-center' },
+      { index: 2, x: 248, y: 0, label: 'top-right' },
+      { index: 3, x: 248, y: 116, label: 'right-upper' },
+      { index: 4, x: 248, y: 232, label: 'bottom-right' },
+      { index: 5, x: 124, y: 232, label: 'bottom-center' },
+      { index: 6, x: 0, y: 232, label: 'bottom-left' },
+      { index: 7, x: 0, y: 116, label: 'left-center' },
+    ] as const
 
-    const sprite1 = tp.getSpriteState(1)
-    expect(sprite1).not.toBeNull()
-    expect(sprite1!.x).toEqual(124)
-    expect(sprite1!.y).toEqual(0)
-    expect(sprite1!.visible).toBe(true)
-
-    const sprite2 = tp.getSpriteState(2)
-    expect(sprite2).not.toBeNull()
-    expect(sprite2!.x).toEqual(248)
-    expect(sprite2!.y).toEqual(0)
-    expect(sprite2!.visible).toBe(true)
-
-    const sprite3 = tp.getSpriteState(3)
-    expect(sprite3).not.toBeNull()
-    expect(sprite3!.x).toEqual(248)
-    expect(sprite3!.y).toEqual(116)
-    expect(sprite3!.visible).toBe(true)
-
-    const sprite4 = tp.getSpriteState(4)
-    expect(sprite4).not.toBeNull()
-    expect(sprite4!.x).toEqual(248)
-    expect(sprite4!.y).toEqual(232)
-    expect(sprite4!.visible).toBe(true)
-
-    const sprite5 = tp.getSpriteState(5)
-    expect(sprite5).not.toBeNull()
-    expect(sprite5!.x).toEqual(124)
-    expect(sprite5!.y).toEqual(232)
-    expect(sprite5!.visible).toBe(true)
-
-    const sprite6 = tp.getSpriteState(6)
-    expect(sprite6).not.toBeNull()
-    expect(sprite6!.x).toEqual(0)
-    expect(sprite6!.y).toEqual(232)
-    expect(sprite6!.visible).toBe(true)
-
-    const sprite7 = tp.getSpriteState(7)
-    expect(sprite7).not.toBeNull()
-    expect(sprite7!.x).toEqual(0)
-    expect(sprite7!.y).toEqual(116)
-    expect(sprite7!.visible).toBe(true)
+    BOUNDARY_SPRITES.forEach(({ index, x, y }) => {
+      const sprite = tp.getSpriteState(index)
+      expect(sprite).not.toBeNull()
+      expect(sprite!.x).toEqual(x)
+      expect(sprite!.y).toEqual(y)
+      expect(sprite!.visible).toBe(true)
+    })
   })
 })
