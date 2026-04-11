@@ -1,32 +1,20 @@
 ---
 name: device
-description: Device Dev for Family Basic IDE. Deep specialist in device adapters, interfaces, message handling, and input/output systems. You OWN src/core/devices/ and related interfaces. Your job is to become extremely familiar with this domain through hands-on work. Use when: (1) Device adapter interfaces or implementations, (2) Message handling between worker and main thread, (3) Joystick/keyboard input systems, (4) Screen state management, (5) WebWorkerManager. Invoke via /device command.
+description: Device Dev for Family Basic IDE. Deep specialist in device adapters, interfaces, message handling, and input/output systems. Owns src/core/devices/ and related interfaces. Use when: (1) Device adapter interfaces or implementations, (2) Message handling between worker and main thread, (3) Joystick/keyboard input systems, (4) Screen state management, (5) WebWorkerManager. Invoke via /device command.
 ---
 
-# Device Dev Skill
+# Device Dev
 
-You are **Device Dev**, a specialist for Family Basic IDE. You own the device layer.
+Specialist for the device layer — adapters, interfaces, message handling, and input/output systems.
 
-## Your Domain
+See [specialist-conventions.md](../references/specialist-conventions.md) for shared working approach, code constraints, and testing conventions.
 
-You own these directories - become deeply familiar with them:
-- `src/core/devices/` - Device adapters, interfaces, message handling
-- `src/core/interfaces.ts` - Device interfaces
+## Domain
 
-## Working Philosophy: Learn As You Work
+- `src/core/devices/` — Device adapters, interfaces, message handling
+- `src/core/interfaces.ts` — Device interfaces
 
-You build expertise through **doing**, not just reading reference docs.
-
-When you start a task:
-1. **Explore first** - Read the relevant files in your domain
-2. **Find patterns** - Look at similar existing implementations
-3. **Implement** - Apply the patterns you found
-4. **Test** - Run tests to validate
-5. **Document** - Leave notes for integration
-
-Each task makes you more familiar with your domain. Embrace the exploration.
-
-## Files You Own
+## Files
 
 | File | Purpose |
 |------|---------|
@@ -39,7 +27,7 @@ Each task makes you more familiar with your domain. Embrace the exploration.
 | `sharedJoystickBuffer.ts` | Joystick buffer |
 | `sharedKeyboardBuffer.ts` | Keyboard buffer |
 
-## Key Concepts to Explore
+## Key Concepts
 
 ### Device Adapter Pattern
 - Interface defines platform-agnostic contract
@@ -73,28 +61,17 @@ Each task makes you more familiar with your domain. Embrace the exploration.
 3. Implement following same patterns
 4. Document for Graphics Dev and Runtime Dev
 
-## Testing
-
-```bash
-pnpm test:run test/devices/
-```
-
-## Integration With Other Specialists
+## Integration
 
 **From Runtime Dev**: They call device methods from executors.
-
 **To Graphics Dev**: Document SharedBuffer layout.
-
 **To IDE Dev**: Document message types for main thread handling.
 
-## Code Constraints
+## Domain-Specific Constraints
 
-- Files: **MAX 500 lines**
-- TypeScript: strict mode, no `any`, `import type` for types
 - postMessage: Use worker signature (no targetOrigin in worker)
 
 ## References
 
-For detailed information, see:
 - **Message types**: `docs/reference/worker-messages.md`
 - **Device patterns**: `docs/teams/platform-team.md` (Device section)

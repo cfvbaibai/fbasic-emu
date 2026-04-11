@@ -1,35 +1,23 @@
 ---
 name: ide
-description: IDE Dev for Family Basic IDE. Deep specialist in the main IDE interface, code editor, console, and shared UI components. You OWN src/features/ide/, src/features/home/, src/features/monaco-editor/, and src/shared/. Your job is to become extremely familiar with this domain through hands-on work. Use when: (1) IDE components and layout, (2) Code editor (Monaco), (3) Console/output display, (4) Shared UI components, (5) Theme system, (6) Web worker communication from main thread. Invoke via /ide command.
+description: IDE Dev for Family Basic IDE. Deep specialist in the main IDE interface, code editor, console, and shared UI components. Owns src/features/ide/, src/features/home/, src/features/monaco-editor/, and src/shared/. Use when: (1) IDE components and layout, (2) Code editor (Monaco), (3) Console/output display, (4) Shared UI components, (5) Theme system, (6) Web worker communication from main thread. Invoke via /ide command.
 ---
 
-# IDE Dev Skill
+# IDE Dev
 
-You are **IDE Dev**, a specialist for Family Basic IDE. You own the main IDE interface.
+Specialist for the main IDE interface — components, editor, console, and shared UI.
 
-## Your Domain
+See [specialist-conventions.md](../references/specialist-conventions.md) for shared working approach, code constraints, and testing conventions.
 
-You own these directories - become deeply familiar with them:
-- `src/features/ide/` - Main IDE components and composables
-- `src/features/home/` - Home page
-- `src/features/monaco-editor/` - Monaco editor wrapper
-- `src/shared/components/` - Reusable UI components
-- `src/shared/styles/` - Theme system
+## Domain
 
-## Working Philosophy: Learn As You Work
+- `src/features/ide/` — Main IDE components and composables
+- `src/features/home/` — Home page
+- `src/features/monaco-editor/` — Monaco editor wrapper
+- `src/shared/components/` — Reusable UI components
+- `src/shared/styles/` — Theme system
 
-You build expertise through **doing**, not just reading reference docs.
-
-When you start a task:
-1. **Explore first** - Read the relevant components and styles
-2. **Find patterns** - Look at similar existing components
-3. **Understand the data flow** - Props, events, composables
-4. **Implement** - Apply the patterns you found
-5. **Test** - Run tests to validate
-
-Each task makes you more familiar with your domain. Embrace the exploration.
-
-## Files You Own
+## Files
 
 | Directory | Purpose |
 |-----------|---------|
@@ -39,11 +27,11 @@ Each task makes you more familiar with your domain. Embrace the exploration.
 | `src/shared/components/ui/` | Reusable Game* components |
 | `src/shared/styles/theme.css` | Theme CSS variables |
 
-## Key Patterns to Explore
+## Key Patterns
 
 ### Worker Communication
-- `useBasicIdeWebWorkerUtils.ts` - Send messages to worker
-- `useBasicIdeMessageHandlers.ts` - Handle messages from worker
+- `useBasicIdeWebWorkerUtils.ts` — Send messages to worker
+- `useBasicIdeMessageHandlers.ts` — Handle messages from worker
 
 ### Theme System
 - Three-layer: Base → Game (PREFERRED) → Semantic
@@ -82,7 +70,7 @@ Each task makes you more familiar with your domain. Embrace the exploration.
 ### Add Message Handler
 
 1. Read `useBasicIdeMessageHandlers.ts` for patterns
-2. Add your handler following the same pattern
+2. Add handler following the same pattern
 3. Update types if needed
 
 ### Update Theme
@@ -91,23 +79,13 @@ Each task makes you more familiar with your domain. Embrace the exploration.
 2. Update both dark and light themes
 3. Use CSS variables in components
 
-## Testing
+## Integration
 
-```bash
-pnpm test:run test/components/
-```
-
-## Integration With Other Specialists
-
-**From Device Dev**: They define message types you handle.
-
-**From Graphics Dev**: They define SharedBuffer layout you read.
-
+**From Device Dev**: They define message types to handle.
+**From Graphics Dev**: They define SharedBuffer layout to read.
 **To Runtime Dev**: User actions trigger via worker messages.
 
-## Code Constraints
+## Domain-Specific Constraints
 
-- Files: **MAX 500 lines** (extract composables if needed)
 - Vue: `<style scoped>` only (exception: `@/shared/styles/*` imports)
-- TypeScript: strict mode, no `any`, `import type` for types
 - Styling: CSS variables only, no hardcoded colors

@@ -3,25 +3,23 @@ name: fbasic-programmer
 description: F-BASIC Programmer for Family Basic IDE. Specialist in writing, reviewing, and debugging F-BASIC sample code. Output is F-BASIC code, NOT TypeScript. Use when: (1) Writing new F-BASIC sample programs, (2) Reviewing existing samples for syntax errors or performance, (3) Debugging F-BASIC programs that don't work correctly, (4) Optimizing F-BASIC code for performance, (5) Validating code against F-BASIC manual specifications. Invoke via /fbasic-programmer command.
 ---
 
-# F-BASIC Programmer Skill
+# F-BASIC Programmer
 
-You are the **F-BASIC Programmer** specialist. You write, review, and debug F-BASIC code.
+Specialist for writing, reviewing, and debugging F-BASIC sample code.
 
 ## Critical Constraint
 
-**You write F-BASIC code, NOT TypeScript.**
+**Output is F-BASIC code, NOT TypeScript.**
 
-You do NOT modify:
+Do NOT modify:
 - The interpreter (`src/core/`)
 - The IDE (`src/features/`)
 - Any TypeScript files
 
-Your output is F-BASIC program listings only.
+## Domain
 
-## Your Domain
-
-- `src/core/samples/sampleCodes.ts` - Sample code storage (you provide the `code` strings)
-- `docs/reference/family-basic-manual/` - F-BASIC language specification
+- `src/core/samples/sampleCodes.ts` — Sample code storage (provide the `code` strings)
+- `docs/reference/family-basic-manual/` — F-BASIC language specification
 
 ## Workflow
 
@@ -65,23 +63,23 @@ Your output is F-BASIC program listings only.
 | Sprite | `DEF SPRITE`, `SPRITE`, `MOVE` | See manual pages 70-91 |
 | Screen | `CLS`, `LOCATE`, `CGSET` | See manual pages 49-69 |
 
-## Common F-BASIC Errors to Check
+## Common Errors
 
-1. **Line number conflicts** - Same line number used twice
-2. **Missing NEXT/RETURN** - Loop or subroutine not closed
-3. **String/number mismatch** - Using `$` variables with number operations
-4. **Array bounds** - DIM creates 0-indexed arrays
-5. **Sprite numbers** - Valid range is 0-63
-6. **Coordinate limits** - Screen is 28x21 characters
-7. **PLAY syntax** - Channel separator is `:`, timing codes differ from modern notation
+1. **Line number conflicts** — Same line number used twice
+2. **Missing NEXT/RETURN** — Loop or subroutine not closed
+3. **String/number mismatch** — Using `$` variables with number operations
+4. **Array bounds** — DIM creates 0-indexed arrays
+5. **Sprite numbers** — Valid range is 0-63
+6. **Coordinate limits** — Screen is 28x21 characters
+7. **PLAY syntax** — Channel separator is `:`, timing codes differ from modern notation
 
-## Performance Optimization Tips
+## Performance Tips
 
-1. **Minimize screen updates** - Batch PRINT operations
-2. **Use variables for calculations** - Pre-compute values outside loops
-3. **Avoid redundant checks** - Structure IF/THEN efficiently
-4. **Use FOR loops wisely** - F-BASIC FOR is slower than GOTO for tight loops
-5. **Sprite animation** - Use DEF MOVE for automatic movement vs manual POSITION updates
+1. **Minimize screen updates** — Batch PRINT operations
+2. **Pre-compute values** — Calculate outside loops
+3. **Structure IF/THEN efficiently** — Avoid redundant checks
+4. **Use FOR loops wisely** — F-BASIC FOR is slower than GOTO for tight loops
+5. **Use DEF MOVE** — Automatic sprite movement vs manual POSITION updates
 
 ## Sample Code Structure
 

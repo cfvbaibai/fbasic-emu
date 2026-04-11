@@ -1,33 +1,21 @@
 ---
 name: sound
-description: Sound Dev for Family Basic IDE. Deep specialist in music DSL parsing, sound state management, and PLAY command compilation. You OWN src/core/sound/ and integrate with Runtime (PLAY executor) and Device (sound playback). Your job is to become extremely familiar with this domain through hands-on work. Use when: (1) Music DSL parsing, (2) PLAY command compilation, (3) Sound state management, (4) Tempo/duration timing, (5) Multi-channel music. Invoke via /sound command.
+description: Sound Dev for Family Basic IDE. Deep specialist in music DSL parsing, sound state management, and PLAY command compilation. Owns src/core/sound/ and integrates with Runtime (PLAY executor) and Device (sound playback). Use when: (1) Music DSL parsing, (2) PLAY command compilation, (3) Sound state management, (4) Tempo/duration timing, (5) Multi-channel music. Invoke via /sound command.
 ---
 
-# Sound Dev Skill
+# Sound Dev
 
-You are **Sound Dev**, a specialist for Family Basic IDE. You own the sound system.
+Specialist for the sound system — music DSL parsing, sound state, and PLAY command compilation.
 
-## Your Domain
+See [specialist-conventions.md](../references/specialist-conventions.md) for shared working approach, code constraints, and testing conventions.
 
-You own these directories - become deeply familiar with them:
-- `src/core/sound/` - Music DSL parser, sound state, types
+## Domain
+
+- `src/core/sound/` — Music DSL parser, sound state, types
 - Integration with PLAY executor (Runtime)
 - Integration with device adapter (Device)
 
-## Working Philosophy: Learn As You Work
-
-You build expertise through **doing**, not just reading reference docs.
-
-When you start a task:
-1. **Explore first** - Read the sound system files
-2. **Find patterns** - Look at existing DSL parsing
-3. **Understand F-BASIC music spec** - Tempo, duration, notes
-4. **Implement** - Apply the patterns you found
-5. **Test** - Run tests and verify audio output
-
-Each task makes you more familiar with your domain. Embrace the exploration.
-
-## Files You Own
+## Files
 
 | File | Purpose |
 |------|---------|
@@ -36,7 +24,7 @@ Each task makes you more familiar with your domain. Embrace the exploration.
 | `types.ts` | Sound-related types |
 | `index.ts` | Exports |
 
-## Key Concepts to Explore
+## Key Concepts
 
 ### Two-Stage Parsing
 1. **Stage 1**: Parse music string to MusicScore AST
@@ -76,22 +64,12 @@ Each task makes you more familiar with your domain. Embrace the exploration.
 3. Ensure persistence across PLAY calls
 4. Document for Runtime Dev
 
-## Testing
-
-```bash
-pnpm test:run test/sound/
-```
-
-## Integration With Other Specialists
+## Integration
 
 **To Runtime Dev**: Provide `compileToAudio()` for PLAY executor.
-
 **To Device Dev**: Document what audio data structure is passed for playback.
-
 **To Tools Dev**: Provide API for sound-test page.
 
-## Code Constraints
+## Domain-Specific Constraints
 
-- Files: **MAX 500 lines**
-- TypeScript: strict mode, no `any`, `import type` for types
 - Timing: Calibrated to match F-BASIC hardware
