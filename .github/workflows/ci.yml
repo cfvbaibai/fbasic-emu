@@ -13,64 +13,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  verify-master:
-    name: Verify (master)
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-        with:
-          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.sha }}
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10.18.2
-          run_install: false
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version-file: '.nvmrc'
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Validation gate checks
-        run: |
-          pnpm check-syntax
-          pnpm verify:script-entrypoints
-          pnpm verify:build-no-unresolved-assets
-
-  verify-pr:
-    name: Verify (PR branch)
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10.18.2
-          run_install: false
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version-file: '.nvmrc'
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Validation gate checks
-        run: pnpm verify:gates
-
   lint-and-typecheck:
     name: Lint and Type Check
     runs-on: ubuntu-latest
@@ -154,6 +96,14 @@ jobs:
 
       - name: Check for critical build warnings
         run: pnpm verify:build-warnings
+
+      - name: Check for unresolved build assets
+        run: pnpm verify:build-no-unresolved-assets
+
+      - name: Validation gate checks
+        run: |
+          pnpm check-syntax
+          pnpm verify:script-entrypoints
 
   e2e:
     name: E2E (Playwright)
