@@ -16,6 +16,9 @@ export default defineConfig({
       'Cross-Origin-Embedder-Policy': 'require-corp',
       'Cross-Origin-Resource-Policy': 'cross-origin',
     },
+    watch: {
+      ignored: ['.automation/**'],
+    },
   },
   resolve: {
     alias: {
