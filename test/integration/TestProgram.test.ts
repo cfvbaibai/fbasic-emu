@@ -7,6 +7,8 @@
 
 import { describe, expect, it } from 'vitest'
 
+import { SCREEN_DIMENSIONS } from '@/core/constants'
+
 import { TestProgram } from './TestProgram'
 
 describe('TestProgram', () => {
@@ -192,7 +194,7 @@ describe('TestProgram', () => {
       await tp.run()
       expect(() => tp.getSpriteState(-1)).toThrow(RangeError)
       expect(() => tp.getSpriteState(-1)).toThrow(
-        'spriteNumber must be 0-7, got -1'
+        `spriteNumber must be 0-${SCREEN_DIMENSIONS.SPRITE_COUNT - 1}, got -1`
       )
     })
 
@@ -201,7 +203,7 @@ describe('TestProgram', () => {
       await tp.run()
       expect(() => tp.getSpriteState(8)).toThrow(RangeError)
       expect(() => tp.getSpriteState(8)).toThrow(
-        'spriteNumber must be 0-7, got 8'
+        `spriteNumber must be 0-${SCREEN_DIMENSIONS.SPRITE_COUNT - 1}, got 8`
       )
     })
 
