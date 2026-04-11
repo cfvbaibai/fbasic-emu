@@ -341,14 +341,16 @@ export function registerCoreStatementRules(
 
   // IF LogicalExpression THEN (CommandList | NumberLiteral)
   // IF LogicalExpression GOTO NumberLiteral
-  // Executes the commands after THEN or jumps to line number if condition is true
+  // IF LogicalExpression CommandList  (THEN-less IF — bare command)
+  // Executes the commands after THEN (or directly, if THEN is omitted) or jumps to line number if condition is true
   // Supports colon-separated statements: IF X THEN PRINT A: PRINT B
   // Supports line number jumps: IF X=10 THEN 500 or IF X=10 GOTO 500
   // Supports logical operators: IF X>0 AND Y<10 THEN 100, IF NOT X=0 THEN PRINT X
+  // Supports THEN-less form: IF X=1 PRINT "X=1", IF A=0 BEEP
   p.ifThenStatement = p.RULE('ifThenStatement', () => {
     p.CONSUME(If)
     p.SUBRULE(p.logicalExpression)
-    // THEN or GOTO (GOTO can be used without THEN)
+    // THEN, GOTO, or bare command (THEN-less IF)
     p.OR([
       {
         // IF ... THEN NumberLiteral (line number jump)
@@ -371,6 +373,14 @@ export function registerCoreStatementRules(
         ALT: () => {
           p.CONSUME(Goto)
           p.CONSUME2(NumberLiteral) // Use CONSUME2 for second occurrence
+        },
+      },
+      {
+        // IF ... CommandList (THEN-less IF — bare command after condition)
+        GATE: () =>
+          p.LA(1).tokenType !== Then && p.LA(1).tokenType !== Goto,
+        ALT: () => {
+          p.SUBRULE2(p.commandList)
         },
       },
     ])
