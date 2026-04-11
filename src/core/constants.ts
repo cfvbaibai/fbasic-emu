@@ -208,15 +208,62 @@ export const PALETTE_DEFAULTS = {
 } as const
 
 /**
- * Reset palette-related state fields to their default values.
- * Accepts a setter callback to support both direct field assignment
- * (e.g. ScreenStateManager private fields) and reactive ref assignment
- * (e.g. Vue .value refs in useBasicIdeExecution).
+ * Maps each PALETTE_DEFAULTS key to the camelCase property name used on
+ * state objects (ScreenStateManager fields, Vue reactive refs, etc.).
+ *
+ * When a new field is added to PALETTE_DEFAULTS, add a corresponding entry
+ * here -- all call sites of resetPaletteState() will automatically pick it up.
  */
-export function resetPaletteState(
-  setter: (defaults: typeof PALETTE_DEFAULTS) => void
-): void {
-  setter(PALETTE_DEFAULTS)
+export const PALETTE_STATE_KEY_MAP = {
+  BG_PALETTE: 'bgPalette',
+  SPRITE_PALETTE: 'spritePalette',
+  BACKDROP_COLOR: 'backdropColor',
+  CGEN_MODE: 'cgenMode',
+} as const satisfies Record<keyof typeof PALETTE_DEFAULTS, string>
+
+/** Writable palette state with camelCase property names. */
+export type PaletteStateValues = {
+  [K in (typeof PALETTE_STATE_KEY_MAP)[keyof typeof PALETTE_STATE_KEY_MAP]]: number
+}
+
+/**
+ * Reset palette-related state fields to their default values.
+ *
+ * Iterates over all PALETTE_DEFAULTS entries and assigns each to the target
+ * object using PALETTE_STATE_KEY_MAP to translate SCREAMING_CASE keys to the
+ * camelCase property names used by state objects. This ensures that adding
+ * a new field to PALETTE_DEFAULTS (and PALETTE_STATE_KEY_MAP) automatically
+ * resets it at every call site -- no per-site updates needed.
+ *
+ * Accepts a target object with writable number properties matching PaletteStateValues.
+ * For Vue reactive refs, wrap with a getter/setter adapter via createPaletteRefTarget().
+ */
+export function resetPaletteState(target: PaletteStateValues): void {
+  const mutable = target as { [key: string]: number }
+  for (const key of Object.keys(PALETTE_DEFAULTS) as (keyof typeof PALETTE_DEFAULTS)[]) {
+    mutable[PALETTE_STATE_KEY_MAP[key]] = PALETTE_DEFAULTS[key]
+  }
+}
+
+/**
+ * Create a palette state target backed by Vue reactive refs.
+ * Returns an object that proxies property reads/writes through .value,
+ * compatible with resetPaletteState().
+ */
+export function createPaletteRefTarget(
+  refs: { [K in keyof PaletteStateValues]: { value: number } },
+): PaletteStateValues {
+  const target = {} as PaletteStateValues
+  for (const key of Object.keys(refs) as (keyof PaletteStateValues)[]) {
+    Object.defineProperty(target, key, {
+      get: () => refs[key].value,
+      set: (value: number) => {
+        refs[key].value = value
+      },
+      enumerable: true,
+    })
+  }
+  return target
 }
 
 // Color patterns and codes
