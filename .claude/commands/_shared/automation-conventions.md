@@ -27,7 +27,12 @@ Schema:
 - total_issues_created: N
 - total_issues_triaged: N
 - total_pr_maintenance: N
-- active_worktrees: []  # list of worktree paths currently in use
+- active_worktrees: []  # list of worktree claims with session coordination
+  # Each entry:
+  # - path: .automation/worktrees/<issue-id>
+  # - session: <conversation GUID>
+  # - issue: <issue number>
+  # - claimed: YYYY-MM-DD HH:MM:SS CST
 ```
 
 Update relevant counters after each run.
