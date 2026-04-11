@@ -90,14 +90,15 @@ describe('StateInspector MOVE tab data', () => {
 
 describe('StateInspector tab header casing consistency', () => {
   it('all inspector tab labels are uppercase in English locale', () => {
-    const { tabPalette, tabSprite, tabMove } = enIde.stateInspector
+    const { tabPalette, tabSprite, tabMove, tabBg } = enIde.stateInspector
 
     expect(tabPalette).toBe('PALETTE')
     expect(tabSprite).toBe('SPRITE')
     expect(tabMove).toBe('MOVE')
+    expect(tabBg).toBe('BG')
 
-    // Regression: all three tab labels must be fully uppercase (F-BASIC keyword style)
-    for (const label of [tabPalette, tabSprite, tabMove]) {
+    // Regression: all tab labels must be fully uppercase (F-BASIC keyword style)
+    for (const label of [tabPalette, tabSprite, tabMove, tabBg]) {
       expect(label).toBe(label.toUpperCase())
     }
   })
