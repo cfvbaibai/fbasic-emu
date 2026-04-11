@@ -95,6 +95,12 @@ const DEFAULT_OPTIONS: Required<TestProgramOptions> = {
 export const EXTENDED_STABLE_TIMEOUT_MS = 5000
 
 /**
+ * Long timeout for programs with very long cumulative PAUSE durations (10s vs default 1s).
+ * Use with spread-override: `{ ...DEFAULT_STABLE_OPTIONS, timeoutMs: LONG_STABLE_TIMEOUT_MS }`
+ */
+export const LONG_STABLE_TIMEOUT_MS = 10_000
+
+/**
  * Shared stable-wait defaults for headless program tests.
  * Spread-override as needed: `{ ...DEFAULT_STABLE_OPTIONS, timeoutMs: EXTENDED_STABLE_TIMEOUT_MS }`
  */
