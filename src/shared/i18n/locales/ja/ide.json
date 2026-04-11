@@ -471,5 +471,16 @@
     "title": "スプライトビューアー",
     "openTitle": "スプライトビューアーを開く",
     "close": "閉じる"
+  },
+  "share": {
+    "title": "共有",
+    "description": "このURLをコピーしてプログラムを共有しましょう。",
+    "copy": "URLをコピー",
+    "copied": "コピーしました！",
+    "close": "閉じる",
+    "encoding": "共有URLを生成中...",
+    "encodeFailed": "共有URLの生成に失敗しました。",
+    "tooLarge": "このプログラムはURLで共有するには大きすぎます。",
+    "loadFailed": "共有プログラムの読み込みに失敗しました"
   }
 }

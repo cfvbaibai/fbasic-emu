@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, shallowRef, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRoute } from 'vue-router'
 
 import type { SharedDisplayViews } from '@/core/animation/sharedDisplayBuffer'
 import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
@@ -19,15 +20,17 @@ import IdeOutputPanel from './components/IdeOutputPanel.vue'
 import IdeSpriteViewerPanel from './components/IdeSpriteViewerPanel.vue'
 import InputModal from './components/InputModal.vue'
 import SampleSelector from './components/SampleSelector.vue'
+import type { CommandPaletteCommand } from './composables/commandPalette'
 import {
-  type CommandPaletteCommand,
   isEditableTarget,
   matchesAnyShortcut,
 } from './composables/commandPalette'
 import { useBasicIde as useBasicIdeEnhanced } from './composables/useBasicIdeEnhanced'
 import type { InputMode } from './composables/useBasicIdeState'
 import { useDevApi } from './composables/useDevApi'
+import { useIdeCommandPalette } from './composables/useIdeCommandPalette'
 import { provideScreenContext } from './composables/useScreenContext'
+import { useShareRoute } from './composables/useShareRoute'
 
 /**
  * IdePage component - The main IDE page for F-BASIC code editing and execution.
@@ -42,9 +45,14 @@ const { t } = useI18n()
 const isE2ELite =
   typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('e2e') === 'lite'
 
+const route = useRoute()
+
 const basicIde = isE2ELite ? null : useBasicIdeEnhanced()
 
+// Share route handling
 const code = basicIde?.code ?? ref('')
+const { shareError, handleShareRoute } = useShareRoute({ code })
+
 const isRunning = basicIde?.isRunning ?? ref(false)
 const output = basicIde?.output ?? ref<string[]>([])
 const errors =
@@ -216,96 +224,18 @@ async function restartCode() {
   await runCode()
 }
 
-const commandPaletteCommands = computed<CommandPaletteCommand[]>(() => [
-  {
-    id: 'run.start',
-    title: t('ide.commandPalette.commands.runStart.title'),
-    description: t('ide.commandPalette.commands.runStart.description'),
-    shortcut: 'Ctrl+Enter / Cmd+Enter',
-    keywords: ['execute', 'start', 'run'],
-    enabled: !isRunning.value,
-    execute: () => {
-      void runCode()
-    },
-  },
-  {
-    id: 'run.stop',
-    title: t('ide.commandPalette.commands.runStop.title'),
-    description: t('ide.commandPalette.commands.runStop.description'),
-    shortcut: 'Ctrl+Shift+Enter / Cmd+Shift+Enter',
-    keywords: ['halt', 'stop'],
-    enabled: isRunning.value,
-    execute: stopCode,
-  },
-  {
-    id: 'run.restart',
-    title: t('ide.commandPalette.commands.runRestart.title'),
-    description: t('ide.commandPalette.commands.runRestart.description'),
-    shortcut: 'Ctrl+Shift+R / Cmd+Shift+R',
-    keywords: ['restart', 'rerun'],
-    execute: () => {
-      void restartCode()
-    },
-  },
-  {
-    id: 'run.clearOutput',
-    title: t('ide.commandPalette.commands.runClearOutput.title'),
-    description: t('ide.commandPalette.commands.runClearOutput.description'),
-    keywords: ['clear', 'output', 'screen'],
-    execute: clearOutput,
-  },
-  {
-    id: 'view.openSampleSelector',
-    title: t('ide.commandPalette.commands.viewOpenSampleSelector.title'),
-    description: t('ide.commandPalette.commands.viewOpenSampleSelector.description'),
-    keywords: ['sample', 'demo'],
-    execute: () => {
-      sampleSelectorOpen.value = true
-    },
-  },
-  {
-    id: 'view.openLogFilters',
-    title: t('ide.commandPalette.commands.viewOpenLogFilters.title'),
-    description: t('ide.commandPalette.commands.viewOpenLogFilters.description'),
-    keywords: ['output', 'logs', 'filters'],
-    execute: () => {
-      logLevelPanelOpen.value = true
-    },
-  },
-  {
-    id: 'view.switchToCode',
-    title: t('ide.commandPalette.commands.viewSwitchToCode.title'),
-    description: t('ide.commandPalette.commands.viewSwitchToCode.description'),
-    keywords: ['code', 'editor'],
-    execute: () => {
-      editorView.value = 'code'
-    },
-  },
-  {
-    id: 'view.switchToBgEditor',
-    title: t('ide.commandPalette.commands.viewSwitchToBgEditor.title'),
-    description: t('ide.commandPalette.commands.viewSwitchToBgEditor.description'),
-    keywords: ['bg', 'background', 'editor'],
-    execute: () => {
-      editorView.value = 'bg'
-    },
-  },
-  {
-    id: 'input.toggleMode',
-    title: t('ide.commandPalette.commands.inputToggleMode.title'),
-    description: t('ide.commandPalette.commands.inputToggleMode.description'),
-    shortcut: 'F9',
-    keywords: ['input', 'keyboard', 'joystick'],
-    execute: toggleInputMode,
-  },
-  {
-    id: 'debug.toggle',
-    title: t('ide.commandPalette.commands.debugToggle.title'),
-    description: t('ide.commandPalette.commands.debugToggle.description'),
-    keywords: ['debug'],
-    execute: toggleDebugMode,
-  },
-])
+// Command palette commands
+const { commands: commandPaletteCommands } = useIdeCommandPalette({
+  isRunning,
+  runCode,
+  stopCode,
+  clearOutput,
+  toggleDebugMode,
+  toggleInputMode,
+  sampleSelectorOpen,
+  logLevelPanelOpen,
+  editorView,
+})
 
 async function handleExecuteCommandFromPalette(command: CommandPaletteCommand) {
   closeCommandPalette()
@@ -320,11 +250,16 @@ const canStop = isRunning
 const parserInfo = shallowRef<ParserInfo | null>(null)
 const highlighterInfo = shallowRef<HighlighterInfo | null>(null)
 
-// Initialize parser info
+// Initialize parser info and handle share route
 onMounted(() => {
   parserInfo.value = getParserCapabilities()
   highlighterInfo.value = getHighlighterCapabilities()
   window.addEventListener('keydown', handleGlobalKeydown)
+
+  // If we arrived via a share link, decode and load the program
+  if (route.name === 'Share') {
+    void handleShareRoute()
+  }
 })
 
 onUnmounted(() => {
@@ -433,6 +368,17 @@ function toggleInputMode() {
 
       <!-- INPUT/LINPUT modal overlay -->
       <Teleport v-if="!isE2ELite" to="body">
+        <!-- Share error notification -->
+        <div v-if="shareError" class="share-error-toast" data-testid="share-error-toast">
+          <span class="share-error-text">{{ t('ide.share.loadFailed') }}: {{ shareError }}</span>
+          <button
+            class="share-error-dismiss"
+            @click="shareError = ''"
+          >
+            &times;
+          </button>
+        </div>
+
         <InputModal
           :pending-request="pendingInputRequest"
           @respond="handleInputResponse"
@@ -487,5 +433,41 @@ function toggleInputMode() {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+}
+
+.share-error-toast {
+  position: fixed;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  background: var(--game-surface-bg-gradient);
+  border: 1px solid var(--semantic-solid-danger);
+  border-radius: 8px;
+  box-shadow: var(--game-shadow-base);
+  max-width: 80vw;
+}
+
+.share-error-text {
+  font-size: 0.8rem;
+  color: var(--semantic-solid-danger);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.share-error-dismiss {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: var(--game-text-secondary);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0 0.25rem;
+  line-height: 1;
 }
 </style>

@@ -29,6 +29,18 @@ const routes: RouteRecordRaw[] = [
       group: 'main',
     },
   },
+  // ============================================
+  // Share Route
+  // ============================================
+  {
+    path: '/share/:data',
+    name: 'Share',
+    component: () => import('@/features/ide/IdePage.vue'),
+    meta: {
+      title: 'Shared Program',
+    },
+    props: true,
+  },
 
   // ============================================
   // Development Tools

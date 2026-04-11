@@ -6,12 +6,17 @@ import { useProgramStore } from '@/features/ide/composables/useProgramStore'
 import { ConfirmDialog, GameButton, GameIconButton } from '@/shared/components/ui'
 import GameIcon from '@/shared/components/ui/GameIcon.vue'
 
+import ShareDialog from './ShareDialog.vue'
+
 const props = withDefaults(defineProps<{ isCompact?: boolean }>(), {
   isCompact: false,
 })
 
 const { t } = useI18n()
 const programStore = useProgramStore()
+
+// Share dialog state
+const showShareDialog = ref(false)
 
 // Renaming state
 const editingName = ref(false)
@@ -215,6 +220,15 @@ onUnmounted(() => {
           data-testid="ide-save-button"
           @click="handleSave"
         />
+        <GameIconButton
+          type="default"
+          icon="mdi:share-variant"
+          size="small"
+          :disabled="isFileOperationPending"
+          :title="t('ide.share.title')"
+          data-testid="ide-share-button"
+          @click="showShareDialog = true"
+        />
       </template>
       <template v-else>
         <GameButton
@@ -246,6 +260,16 @@ onUnmounted(() => {
           @click="handleSave"
         >
           {{ t('ide.toolbar.export') }}
+        </GameButton>
+        <GameButton
+          type="default"
+          icon="mdi:share-variant"
+          size="small"
+          :disabled="isFileOperationPending"
+          data-testid="ide-share-button"
+          @click="showShareDialog = true"
+        >
+          {{ t('ide.share.title') }}
         </GameButton>
       </template>
     </div>
@@ -295,6 +319,14 @@ onUnmounted(() => {
       :message="t('ide.toolbar.discardConfirm')"
       @confirm="handleConfirmDiscard"
       @cancel="handleCancelDiscard"
+    />
+
+    <!-- Share dialog -->
+    <ShareDialog
+      :visible="showShareDialog"
+      :source="programStore.code"
+      :bg="programStore.currentProgram?.value?.bg"
+      @close="showShareDialog = false"
     />
   </div>
 </template>
