@@ -30,11 +30,35 @@ describe('printable-area program', () => {
     expect(sprite1!.y).toEqual(0)
     expect(sprite1!.visible).toBe(true)
 
+    const sprite2 = tp.getSpriteState(2)
+    expect(sprite2).not.toBeNull()
+    expect(sprite2!.x).toEqual(248)
+    expect(sprite2!.y).toEqual(0)
+    expect(sprite2!.visible).toBe(true)
+
+    const sprite3 = tp.getSpriteState(3)
+    expect(sprite3).not.toBeNull()
+    expect(sprite3!.x).toEqual(248)
+    expect(sprite3!.y).toEqual(116)
+    expect(sprite3!.visible).toBe(true)
+
     const sprite4 = tp.getSpriteState(4)
     expect(sprite4).not.toBeNull()
     expect(sprite4!.x).toEqual(248)
     expect(sprite4!.y).toEqual(232)
     expect(sprite4!.visible).toBe(true)
+
+    const sprite5 = tp.getSpriteState(5)
+    expect(sprite5).not.toBeNull()
+    expect(sprite5!.x).toEqual(124)
+    expect(sprite5!.y).toEqual(232)
+    expect(sprite5!.visible).toBe(true)
+
+    const sprite6 = tp.getSpriteState(6)
+    expect(sprite6).not.toBeNull()
+    expect(sprite6!.x).toEqual(0)
+    expect(sprite6!.y).toEqual(232)
+    expect(sprite6!.visible).toBe(true)
 
     const sprite7 = tp.getSpriteState(7)
     expect(sprite7).not.toBeNull()
