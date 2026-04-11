@@ -471,5 +471,16 @@
     "title": "精灵查看器",
     "openTitle": "打开精灵查看器",
     "close": "关闭"
+  },
+  "share": {
+    "title": "分享",
+    "description": "复制此链接以分享您的程序。",
+    "copy": "复制链接",
+    "copied": "已复制！",
+    "close": "关闭",
+    "encoding": "正在生成分享链接...",
+    "encodeFailed": "无法生成分享链接。",
+    "tooLarge": "此程序过大，无法通过链接分享。",
+    "loadFailed": "加载分享程序失败"
   }
 }

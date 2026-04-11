@@ -471,5 +471,16 @@
     "title": "精靈檢視器",
     "openTitle": "開啟精靈檢視器",
     "close": "關閉"
+  },
+  "share": {
+    "title": "分享",
+    "description": "複製此連結以分享您的程式。",
+    "copy": "複製連結",
+    "copied": "已複製！",
+    "close": "關閉",
+    "encoding": "正在產生分享連結...",
+    "encodeFailed": "無法產生分享連結。",
+    "tooLarge": "此程式過大，無法透過連結分享。",
+    "loadFailed": "載入分享程式失敗"
   }
 }

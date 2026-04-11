@@ -22,6 +22,14 @@ vi.mock('vue-i18n', () => ({
         'ide.toolbar.unsavedChanges': 'Unsaved changes',
         'ide.toolbar.openFailed': 'Failed to open file',
         'ide.toolbar.saveFailed': 'Failed to save file',
+        'ide.share.title': 'Share',
+        'ide.share.description': 'Copy this URL to share your program.',
+        'ide.share.copy': 'Copy URL',
+        'ide.share.copied': 'Copied!',
+        'ide.share.close': 'Close',
+        'ide.share.encoding': 'Generating share URL...',
+        'ide.share.encodeFailed': 'Failed to generate share URL.',
+        'ide.share.tooLarge': 'This program is too large to share.',
         'common.confirmDialog.confirm': 'OK',
         'common.confirmDialog.cancel': 'Cancel',
       }
@@ -35,11 +43,21 @@ vi.mock('@/features/ide/composables/useProgramStore', () => ({
   useProgramStore: () => ({
     isDirty: isDirtyRef,
     programName: 'Test Program',
+    code: '10 PRINT "HELLO"',
     newProgram: mockNewProgram,
     open: mockOpen,
     save: mockSave,
     currentProgram: ref(null),
     loadProgram: vi.fn(),
+  }),
+}))
+
+vi.mock('@/shared/utils/programCodec', () => ({
+  encodeProgram: vi.fn().mockResolvedValue({
+    encoded: 'test-encoded',
+    compressed: false,
+    url: 'https://example.com/#/share/test-encoded',
+    tooLarge: false,
   }),
 }))
 

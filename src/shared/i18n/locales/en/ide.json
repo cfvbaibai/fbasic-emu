@@ -471,5 +471,16 @@
     "title": "Sprite Viewer",
     "openTitle": "Open Sprite Viewer",
     "close": "Close"
+  },
+  "share": {
+    "title": "Share",
+    "description": "Copy this URL to share your program with others.",
+    "copy": "Copy URL",
+    "copied": "Copied!",
+    "close": "Close",
+    "encoding": "Generating share URL...",
+    "encodeFailed": "Failed to generate share URL.",
+    "tooLarge": "This program is too large to share via URL.",
+    "loadFailed": "Failed to load shared program"
   }
 }
