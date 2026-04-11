@@ -36,7 +36,7 @@ import { expect } from 'vitest'
 import { createSharedDisplayBuffer } from '@/core/animation/sharedDisplayBuffer'
 import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
 import { BasicInterpreter } from '@/core/BasicInterpreter'
-import { EXECUTION_LIMITS } from '@/core/constants'
+import { EXECUTION_LIMITS, SCREEN_DIMENSIONS } from '@/core/constants'
 import { getSampleCode } from '@/core/samples'
 
 import { SharedBufferTestAdapter } from '../adapters/SharedBufferTestAdapter'
@@ -343,6 +343,11 @@ export class TestProgram {
   getSpriteState(spriteNumber: number): { x: number; y: number; visible: boolean } | null {
     if (!this._interpreter) {
       throw new Error('No interpreter available. Call run() first.')
+    }
+    if (spriteNumber < 0 || spriteNumber >= SCREEN_DIMENSIONS.SPRITE_COUNT) {
+      throw new RangeError(
+        `spriteNumber must be 0-${SCREEN_DIMENSIONS.SPRITE_COUNT - 1}, got ${spriteNumber}`
+      )
     }
     const states = this._interpreter.getSpriteStates()
     const state = states.find((s) => s.spriteNumber === spriteNumber)
