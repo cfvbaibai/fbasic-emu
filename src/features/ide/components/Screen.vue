@@ -331,7 +331,7 @@ function cleanupRenderQueue() {
 
 // Register scheduleRender with parent so SCREEN_CHANGED can trigger a redraw (shared buffer path)
 watch(
-  () => ctx.registerCallbacks?.registerScheduleRender,
+  () => ctx.registerCallbacks.registerScheduleRender,
   fn => {
     if (fn) fn(scheduleRender)
   },
@@ -343,7 +343,7 @@ watch(
 // since renderBackgroundToCanvasDirty falls back to full render when lastBuffer is null.
 // Also nullify lastBackdropColorRef so backdrop fill is always applied on invalidation.
 watch(
-  () => ctx.registerCallbacks?.registerInvalidateBackgroundBuffer,
+  () => ctx.registerCallbacks.registerInvalidateBackgroundBuffer,
   fn => {
     if (fn) fn(() => {
       lastBackgroundBufferRef.value = null
