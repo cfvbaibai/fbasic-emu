@@ -8,6 +8,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { ProgramData } from '@/core/types/program-types'
 import { createEmptyGrid } from '@/features/bg-editor/composables/useBgGrid'
 
+/** Delay for VueUse's useLocalStorage async sync to flush */
+const LOCAL_STORAGE_SYNC_DELAY_MS = 50
+
 // Mock fileIO module
 vi.mock('@/shared/utils/fileIO', () => ({
   saveJsonFile: vi.fn().mockResolvedValue(undefined),
@@ -104,7 +107,7 @@ describe('useProgramStore', () => {
     store.setName('Twinkle Star')
 
     // Wait for VueUse's useLocalStorage to sync
-    await new Promise((resolve) => setTimeout(resolve, 50))
+    await new Promise((resolve) => setTimeout(resolve, LOCAL_STORAGE_SYNC_DELAY_MS))
 
     const stored = localStorage.getItem('program:current')
     expect(stored).not.toBeNull()
@@ -168,7 +171,7 @@ describe('useProgramStore', () => {
     store.setCode('10 PRINT "TEST"')
 
     // Wait for VueUse's useLocalStorage to sync
-    await new Promise((resolve) => setTimeout(resolve, 50))
+    await new Promise((resolve) => setTimeout(resolve, LOCAL_STORAGE_SYNC_DELAY_MS))
 
     // Check localStorage was updated (now stores full program object directly)
     const stored = localStorage.getItem('program:current')
