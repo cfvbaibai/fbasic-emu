@@ -122,7 +122,7 @@ function fillCanvasWithBackdrop(
   canvas: HTMLCanvasElement,
   backdropColorCode: number
 ): void {
-  const color = COLORS[backdropColorCode] ?? COLORS[DEFAULT_BACKDROP_COLOR] ?? '#000000'
+  const color = COLORS[backdropColorCode] ?? COLORS[DEFAULT_BACKDROP_COLOR]!
   ctx.fillStyle = color
   ctx.fillRect(0, 0, canvas.width, canvas.height)
 }
