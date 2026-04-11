@@ -11,6 +11,17 @@ import type { MovementState, SpriteState } from '@/core/sprite/types'
 import type { ScreenCell } from '@/core/types/execution-types'
 
 /**
+ * Register callbacks that Screen.vue provides to the composable chain.
+ * Grouped so the interface stays compact as more register-* callbacks accumulate.
+ */
+export interface ScreenRenderCallbacks {
+  /** Register callback to schedule a screen render (e.g. on SCREEN_CHANGED). */
+  registerScheduleRender: (fn: () => void) => void
+  /** Register callback to invalidate last-rendered background buffer for full redraw. */
+  registerInvalidateBackgroundBuffer: (fn: () => void) => void
+}
+
+/**
  * Screen context: refs and callbacks for the CRT screen and sprites.
  * Provided by IdePage, consumed by ScreenTab and Screen.
  */
@@ -40,9 +51,8 @@ export interface ScreenContextValue {
   /** Shared joystick buffer (main thread writes, workers read). */
   sharedJoystickBuffer: Ref<SharedArrayBuffer | undefined>
   setDecodedScreenState: (decoded: DecodedScreenState) => void
-  registerScheduleRender: (fn: () => void) => void
-  /** Register callback to invalidate last-rendered background buffer for full redraw. */
-  registerInvalidateBackgroundBuffer?: (fn: () => void) => void
+  /** Register callbacks provided by Screen.vue to the composable chain. */
+  registerCallbacks: ScreenRenderCallbacks
   /** Callback to update inspector MOVE tab data (called by animation loop every frame). */
   updateInspectorMoveSlots?: () => void
 }

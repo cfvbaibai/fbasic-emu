@@ -23,6 +23,7 @@ import {
 } from '@/core/devices'
 
 import type { BasicIdeState } from './useBasicIdeState'
+import type { ScreenRenderCallbacks } from './useScreenContext'
 
 export interface BasicIdeScreenIntegration {
   sharedDisplayViews: SharedDisplayViews
@@ -31,9 +32,8 @@ export interface BasicIdeScreenIntegration {
   sharedJoystickBuffer: SharedArrayBuffer
   sharedKeyboardBuffer: SharedArrayBuffer
   sharedKeyboardBufferView: KeyboardBufferView
-  registerScheduleRender: (fn: () => void) => void
-  /** Register callback from Screen.vue to invalidate last-rendered background buffer. */
-  registerInvalidateBackgroundBuffer: (fn: () => void) => void
+  /** Register callbacks provided by Screen.vue. */
+  registerCallbacks: ScreenRenderCallbacks
   setDecodedScreenState: (decoded: DecodedScreenState) => void
   /** Invalidate last-rendered background buffer so next render does a full redraw. */
   invalidateBackgroundBuffer: () => void
@@ -164,8 +164,10 @@ export function useBasicIdeScreenIntegration(state: BasicIdeState): BasicIdeScre
     sharedJoystickBuffer,
     sharedKeyboardBuffer,
     sharedKeyboardBufferView,
-    registerScheduleRender,
-    registerInvalidateBackgroundBuffer,
+    registerCallbacks: {
+      registerScheduleRender,
+      registerInvalidateBackgroundBuffer,
+    },
     setDecodedScreenState,
     invalidateBackgroundBuffer,
     scheduleRender,
