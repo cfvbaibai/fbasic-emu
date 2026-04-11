@@ -155,6 +155,12 @@ export class StatementRouter {
         // Evaluate condition
         const conditionIsTrue = this.ifThenExecutor.evaluateCondition(ifThenStmtCst, expandedStatement.lineNumber)
 
+        // When condition is false, skip colon-scoped statements on the same line
+        if (!conditionIsTrue && expandedStatement.ifScopeEndIndex !== undefined) {
+          this.context.jumpToStatement(expandedStatement.ifScopeEndIndex + 1)
+          return
+        }
+
         // Execute THEN clause if condition is true
         if (conditionIsTrue) {
           // Check if it's a line number jump (IF ... THEN number or IF ... GOTO number)

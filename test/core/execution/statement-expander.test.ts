@@ -54,6 +54,35 @@ function makeCommand(commandName: string): CstNode {
   })
 }
 
+/**
+ * Build an IF-THEN command CST node.
+ * Mirrors the parser structure: command -> singleCommand -> ifThenStatement.
+ * The optional `hasCommandList` flag controls whether the IF has a THEN clause
+ * with a commandList (true = THEN with statements, false = THEN-less IF).
+ */
+function makeIfCommand(options: {
+  hasCommandList?: boolean
+  hasLineNumber?: boolean
+} = {}): CstNode {
+  const ifThenChildren: Record<string, CstElement[]> = {
+    logicalExpression: [makeNode('logicalExpression', {})],
+  }
+  if (options.hasLineNumber) {
+    ifThenChildren.NumberLiteral = [makeToken('100')]
+  } else if (options.hasCommandList) {
+    ifThenChildren.commandList = [makeNode('commandList', { command: [] })]
+  }
+  // THEN-less IF has no Then token and no Goto token — only the bare commandList
+  // When hasCommandList is false and hasLineNumber is false, it's THEN-less
+  // with no inner commandList (the bare command after condition)
+
+  return makeNode('command', {
+    singleCommand: [makeNode('singleCommand', {
+      ifThenStatement: [makeNode('ifThenStatement', ifThenChildren)],
+    })],
+  })
+}
+
 // ---------------------------------------------------------------------------
 // expandStatements
 // ---------------------------------------------------------------------------
@@ -240,6 +269,139 @@ describe('expandStatements', () => {
     // The expanded statements reference the same command nodes
     expect(result.statements[0]!.command).toBe(cmd1)
     expect(result.statements[1]!.command).toBe(cmd2)
+  })
+
+  // ---------------------------------------------------------------------------
+  // IF scope tracking (colon-scoped IF execution)
+  // ---------------------------------------------------------------------------
+
+  describe('IF scope tracking', () => {
+    it('should set ifScopeEndIndex on IF statement when followed by colon-separated commands', () => {
+      // `10 IF X=1 PRINT "A": PRINT "B"`
+      // IF is index 0, PRINT "B" is index 1 — IF scope ends at index 1
+      const stmts = [makeStatement(10, [
+        makeIfCommand(),
+        makeCommand('printStatement'),
+      ])]
+
+      const result = expandStatements(stmts)
+
+      expect(result.statements).toHaveLength(2)
+      // The IF statement should have ifScopeEndIndex pointing to the last statement in its scope
+      expect(result.statements[0]!.ifScopeEndIndex).toBe(1)
+    })
+
+    it('should set ifScopeEndIndex to own index when IF is last command on line', () => {
+      // `10 IF X=1 PRINT "A"` — no colon-separated follow-ups
+      const stmts = [makeStatement(10, [makeIfCommand()])]
+
+      const result = expandStatements(stmts)
+
+      expect(result.statements).toHaveLength(1)
+      // IF with no following commands: scope ends at its own index
+      expect(result.statements[0]!.ifScopeEndIndex).toBe(0)
+    })
+
+    it('should set ifScopeEndIndex spanning multiple colon-separated commands', () => {
+      // `10 IF X=1 PRINT "A": PRINT "B": PRINT "C"`
+      // IF is index 0, PRINT "B" is 1, PRINT "C" is 2 — scope ends at 2
+      const stmts = [makeStatement(10, [
+        makeIfCommand(),
+        makeCommand('printStatement'),
+        makeCommand('printStatement'),
+      ])]
+
+      const result = expandStatements(stmts)
+
+      expect(result.statements).toHaveLength(3)
+      expect(result.statements[0]!.ifScopeEndIndex).toBe(2)
+    })
+
+    it('should set ifScopeEndIndex for nested IF (IF followed by another IF)', () => {
+      // `10 IF X=1 PRINT "A": IF Y=1 PRINT "B"`
+      // First IF is index 0, second IF is index 1 — first IF scope ends at 1
+      const stmts = [makeStatement(10, [
+        makeIfCommand(),
+        makeIfCommand(),
+      ])]
+
+      const result = expandStatements(stmts)
+
+      expect(result.statements).toHaveLength(2)
+      // First IF scopes over the second IF
+      expect(result.statements[0]!.ifScopeEndIndex).toBe(1)
+      // Second IF has no following commands, so scope ends at its own index
+      expect(result.statements[1]!.ifScopeEndIndex).toBe(1)
+    })
+
+    it('should not set ifScopeEndIndex on non-IF statements', () => {
+      // `10 PRINT "A": PRINT "B"`
+      const stmts = [makeStatement(10, [
+        makeCommand('printStatement'),
+        makeCommand('printStatement'),
+      ])]
+
+      const result = expandStatements(stmts)
+
+      expect(result.statements).toHaveLength(2)
+      expect(result.statements[0]!.ifScopeEndIndex).toBeUndefined()
+      expect(result.statements[1]!.ifScopeEndIndex).toBeUndefined()
+    })
+
+    it('should not set ifScopeEndIndex for IF with line number jump (THEN/GOTO)', () => {
+      // `10 IF X=1 THEN 100: PRINT "A"`
+      // IF with line number jump — does NOT scope over following colon commands
+      const stmts = [makeStatement(10, [
+        makeIfCommand({ hasLineNumber: true }),
+        makeCommand('printStatement'),
+      ])]
+
+      const result = expandStatements(stmts)
+
+      expect(result.statements).toHaveLength(2)
+      // IF with line number jump has no colon scope
+      expect(result.statements[0]!.ifScopeEndIndex).toBeUndefined()
+      expect(result.statements[1]!.ifScopeEndIndex).toBeUndefined()
+    })
+
+    it('should set ifScopeEndIndex for IF-THEN with commandList', () => {
+      // `10 IF X=1 THEN PRINT "A": PRINT "B"`
+      // IF-THEN with commandList — scope over following colon commands
+      const stmts = [makeStatement(10, [
+        makeIfCommand({ hasCommandList: true }),
+        makeCommand('printStatement'),
+      ])]
+
+      const result = expandStatements(stmts)
+
+      expect(result.statements).toHaveLength(2)
+      // IF-THEN with commandList scopes over following colon commands
+      expect(result.statements[0]!.ifScopeEndIndex).toBe(1)
+    })
+
+    it('should scope IF over commands across multiple lines', () => {
+      // Line 10: PRINT "A"
+      // Line 20: IF X=1 PRINT "B": PRINT "C"
+      // Line 30: PRINT "D"
+      // IF scope on line 20 should NOT span to line 30
+      const stmts = [
+        makeStatement(10, [makeCommand('printStatement')]),
+        makeStatement(20, [makeIfCommand(), makeCommand('printStatement')]),
+        makeStatement(30, [makeCommand('printStatement')]),
+      ]
+
+      const result = expandStatements(stmts)
+
+      expect(result.statements).toHaveLength(4)
+      // Line 10 PRINT: no IF scope
+      expect(result.statements[0]!.ifScopeEndIndex).toBeUndefined()
+      // Line 20 IF: scope ends at index 2 (PRINT "C" on same line)
+      expect(result.statements[1]!.ifScopeEndIndex).toBe(2)
+      // Line 20 PRINT "C": no IF scope
+      expect(result.statements[2]!.ifScopeEndIndex).toBeUndefined()
+      // Line 30 PRINT "D": no IF scope
+      expect(result.statements[3]!.ifScopeEndIndex).toBeUndefined()
+    })
   })
 })
 
