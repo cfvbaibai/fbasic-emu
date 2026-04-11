@@ -13,12 +13,22 @@ declare global {
       getWorkerUrl?: (workerId: string, label: string) => string
       getWorker?: (workerId: string, label: string) => Worker
     }
-    /** DEV-only API for headless test code injection. Undefined in production builds. */
+    /**
+     * API for headless test automation.
+     * getScreenText is available in all builds (DEV and production).
+     * State-mutating methods are DEV-only; absent in production builds.
+     */
     __fbasicIDE?: {
-      loadCode: (code: string) => void
-      run: () => Promise<void>
-      stop: () => void
-      respondToInput: (value: string) => void
+      /** DEV-only: set editor code. */
+      loadCode?: (code: string) => void
+      /** DEV-only: run the program. */
+      run?: () => Promise<void>
+      /** DEV-only: stop program execution. */
+      stop?: () => void
+      /** DEV-only: respond to a pending INPUT request. */
+      respondToInput?: (value: string) => void
+      /** Read screen buffer as array of trimmed row strings. */
+      getScreenText: () => string[]
     }
   }
 }
