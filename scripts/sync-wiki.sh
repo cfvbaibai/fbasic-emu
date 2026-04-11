@@ -21,6 +21,8 @@ else
   echo "Wiki empty or new, initializing"
   git init "$WIKI_DIR"
   git -C "$WIKI_DIR" remote add origin "$WIKI_URL"
+  git -C "$WIKI_DIR" config user.name "github-actions[bot]"
+  git -C "$WIKI_DIR" config user.email "github-actions[bot]@users.noreply.github.com"
 fi
 
 # --- Copy new/modified stories ---
