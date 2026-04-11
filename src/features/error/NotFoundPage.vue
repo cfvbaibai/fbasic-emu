@@ -24,12 +24,12 @@ const goHome = () => {
   <GameLayout>
     <div class="not-found-content">
       <div class="error-code">404</div>
-      <h1 class="error-title">{{ t('errors.notFound.title', 'Page Not Found') }}</h1>
+      <h1 class="error-title">{{ t('errors.notFound.title') }}</h1>
       <p class="error-message">
-        {{ t('errors.notFound.message', 'The page you are looking for does not exist or has been moved.') }}
+        {{ t('errors.notFound.message') }}
       </p>
       <GameButton type="primary" @click="goHome">
-        {{ t('errors.notFound.goHome', 'Go to Home') }}
+        {{ t('errors.notFound.goHome') }}
       </GameButton>
     </div>
   </GameLayout>
