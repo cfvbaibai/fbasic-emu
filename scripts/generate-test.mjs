@@ -4,23 +4,22 @@
  * Test File Generator for .bas Files
  *
  * Scaffolds a Vitest test file from a BASIC source (.bas) file.
- * The generated test uses the existing test infrastructure
- * (BasicInterpreter, mock device adapter) to execute the program
- * and assert it completes without runtime errors.
+ * The generated test uses the TestProgram helper API to execute
+ * the program and assert it completes without runtime errors.
  *
  * Usage:
  *   node scripts/generate-test.mjs <path-to-file.bas>
  *   node scripts/generate-test.mjs src/core/samples/programs/basics/hello.bas
  *
  * Output:
- *   test/programs/<ProgramName>.test.ts
+ *   test/program/<ProgramName>.test.ts
  */
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { basename, join, resolve } from 'node:path'
 
 const REPO_ROOT = resolve(import.meta.dirname, '..')
-const TEST_OUTPUT_DIR = join(REPO_ROOT, 'test', 'programs')
+const TEST_OUTPUT_DIR = join(REPO_ROOT, 'test', 'program')
 
 function printUsage() {
   console.log(`
@@ -39,7 +38,7 @@ Examples:
   node scripts/generate-test.mjs src/core/samples/programs/comprehensive/route66.bas
 
 Output:
-  test/programs/<ProgramName>.test.ts
+  test/program/<ProgramName>.test.ts
 `)
 }
 
@@ -56,7 +55,7 @@ function toPascalCase(filename) {
 }
 
 /**
- * Generate the Vitest test file content.
+ * Generate the Vitest test file content using TestProgram API.
  */
 function generateTestContent(programName, basFilePath, basSource) {
   return `/**
@@ -64,18 +63,14 @@ function generateTestContent(programName, basFilePath, basSource) {
  *
  * Auto-generated test scaffold for ${programName}.
  * Source: ${basFilePath}
- *
- * Once TestProgram helper (PR #408) is merged, this test can be
- * simplified to use TestProgram instead of the raw infrastructure below.
  */
 
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
-import { beforeEach, describe, expect, it, type MockedFunction, vi } from 'vitest'
+import { describe, it } from 'vitest'
 
-import { BasicInterpreter } from '@/core/BasicInterpreter'
-import type { BasicDeviceAdapter } from '@/core/types/device-types'
+import { TestProgram } from '../integration/TestProgram'
 
 /** Path to the .bas source file (resolved from project root where Vitest runs) */
 const BAS_PATH = resolve(process.cwd(), '${basFilePath}')
@@ -84,67 +79,36 @@ const BAS_PATH = resolve(process.cwd(), '${basFilePath}')
 const SOURCE_CODE = readFileSync(BAS_PATH, 'utf8')
 
 describe('${programName}', () => {
-  let interpreter: BasicInterpreter
-  let mockDeviceAdapter: BasicDeviceAdapter
-  let printOutputMock: MockedFunction<(output: string) => void>
-
-  beforeEach(() => {
-    printOutputMock = vi.fn()
-    mockDeviceAdapter = {
-      getJoystickCount: vi.fn(() => 0),
-      getStickState: vi.fn(() => 0),
-      setStickState: vi.fn(),
-      pushStrigState: vi.fn(),
-      consumeStrigState: vi.fn(() => 0),
-      getSpritePosition: vi.fn(() => null),
-      getInkeyState: vi.fn(() => ''),
-      printOutput: printOutputMock,
-      debugOutput: vi.fn(),
-      errorOutput: vi.fn(),
-      clearScreen: vi.fn(),
-      setCursorPosition: vi.fn(),
-      getCursorPosition: vi.fn(() => ({ x: 0, y: 0 })),
-      getScreenCell: vi.fn(() => ' '),
-      setColorPattern: vi.fn(),
-      setColorPalette: vi.fn(),
-      setBackdropColor: vi.fn(),
-      setCharacterGeneratorMode: vi.fn(),
-      getCharacterGeneratorMode: vi.fn(() => 2),
-    }
-
-    interpreter = new BasicInterpreter({
-      maxIterations: 10000,
-      maxOutputLines: 1000,
-      enableDebugMode: false,
-      strictMode: false,
-      suppressOkPrompt: true,
-      deviceAdapter: mockDeviceAdapter,
-    })
-  })
-
   it('should execute without runtime errors', async () => {
-    const result = await interpreter.execute(SOURCE_CODE)
+    const tp = TestProgram.fromCode(SOURCE_CODE)
 
-    // Log diagnostics on failure for easier debugging
-    if (!result.success || result.errors.length > 0) {
-      console.error('Execution errors:', result.errors)
-    }
+    await tp.run()
 
-    expect(result.success).toBe(true)
-    expect(result.errors).toHaveLength(0)
+    tp.expectSuccess()
   })
 
   // TODO: Add more specific assertions based on expected program behavior:
   //
-  // it('should produce expected output', async () => {
-  //   const result = await interpreter.execute(SOURCE_CODE)
-  //   const outputs = printOutputMock.mock.calls.map(call => call[0])
-  //   expect(outputs).toContain('expected text\\n')
+  // it('should produce expected screen output', async () => {
+  //   const tp = TestProgram.fromCode(SOURCE_CODE)
+  //   await tp.run()
+  //   tp.expectSuccess()
+  //   tp.expectRowText(0, 'Hello, World!')
   // })
   //
-  // it('should set expected variables', async () => {
-  //   const result = await interpreter.execute(SOURCE_CODE)
-  //   expect(result.variables.get('MY_VAR')?.value).toBe(expectedValue)
+  // it('should match display fixture', async () => {
+  //   const tp = TestProgram.fromCode(SOURCE_CODE)
+  //   await tp.run()
+  //   tp.expectSuccess()
+  //   tp.expectFixture('my-fixture-name')
+  // })
+  //
+  // it('should handle input prompts', async () => {
+  //   const tp = TestProgram.fromCode(SOURCE_CODE)
+  //   tp.seedInput(['42'])
+  //   await tp.run()
+  //   tp.expectSuccess()
+  //   tp.expectRowText(10, '42')
   // })
 })
 `
@@ -203,7 +167,7 @@ function main() {
   console.log()
   console.log('Next steps:')
   console.log('  1. Review the generated test file')
-  console.log('  2. Run: pnpm test:run -- test/programs/' + testFileName)
+  console.log('  2. Run: pnpm test:run -- test/program/' + testFileName)
   console.log('  3. Add specific assertions as needed')
 }
 
