@@ -1,6 +1,10 @@
 import { describe, it } from 'vitest'
 
-import { TestProgram } from '../../integration/TestProgram'
+import {
+  DEFAULT_STABLE_OPTIONS,
+  LONG_STABLE_TIMEOUT_MS,
+  TestProgram,
+} from '../../integration/TestProgram'
 
 describe('sprite-control program', () => {
   // 8 directions × (PAUSE 150 + PAUSE 120) = ~36s of pauses, very long program.
@@ -9,7 +13,7 @@ describe('sprite-control program', () => {
   it('runs successfully and tests all 8 directions', async () => {
     const tp = TestProgram.fromSample('spriteControl')
 
-    await tp.run({ stableOptions: { stablePolls: 3, intervalMs: 20, timeoutMs: 10000 } })
+    await tp.run({ stableOptions: { ...DEFAULT_STABLE_OPTIONS, timeoutMs: LONG_STABLE_TIMEOUT_MS } })
 
     tp.expectSuccess()
 
