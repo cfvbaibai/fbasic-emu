@@ -9,6 +9,7 @@ import type enBgEditor from './locales/en/bg-editor.json'
 import type enCoi from './locales/en/coi.json'
 import type enCommon from './locales/en/common.json'
 import type enDiagnostics from './locales/en/diagnostics.json'
+import type enErrors from './locales/en/errors.json'
 import type enHome from './locales/en/home.json'
 import type enIde from './locales/en/ide.json'
 import type enKonvaTest from './locales/en/konva-test.json'
@@ -30,6 +31,7 @@ export type MessageSchema = {
   diagnostics: typeof enDiagnostics
   testing: typeof enTesting
   konvaTest: typeof enKonvaTest
+  errors: typeof enErrors
 }
 
 // Define available locales
