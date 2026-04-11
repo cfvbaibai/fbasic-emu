@@ -293,15 +293,15 @@ describe('useBasicIdeExecution', () => {
 
   /** Palette reactive refs that should be reset by clearOutput/runCode. */
   const PALETTE_REFS = [
-    { key: 'bgPalette', nonDefault: 0, expected: PALETTE_DEFAULTS.BG_PALETTE, label: 'bgPalette' },
-    { key: 'cgenMode', nonDefault: 0, expected: PALETTE_DEFAULTS.CGEN_MODE, label: 'cgenMode' },
-    { key: 'backdropColor', nonDefault: 1, expected: PALETTE_DEFAULTS.BACKDROP_COLOR, label: 'backdropColor' },
-    { key: 'spritePalette', nonDefault: 2, expected: PALETTE_DEFAULTS.SPRITE_PALETTE, label: 'spritePalette' },
+    { key: 'bgPalette', nonDefault: 0, expected: PALETTE_DEFAULTS.BG_PALETTE },
+    { key: 'cgenMode', nonDefault: 0, expected: PALETTE_DEFAULTS.CGEN_MODE },
+    { key: 'backdropColor', nonDefault: 1, expected: PALETTE_DEFAULTS.BACKDROP_COLOR },
+    { key: 'spritePalette', nonDefault: 2, expected: PALETTE_DEFAULTS.SPRITE_PALETTE },
   ] as const
 
   describe('clearOutput resets palette reactive state (issue #444)', () => {
     it.each(PALETTE_REFS)(
-      'should reset $label to default when clearOutput is called',
+      'should reset $key to default when clearOutput is called',
       ({ key, nonDefault, expected }) => {
         const state = createState()
         state[key].value = nonDefault
@@ -318,7 +318,7 @@ describe('useBasicIdeExecution', () => {
 
   describe('runCode resets palette reactive state (issue #435)', () => {
     it.each(PALETTE_REFS)(
-      'should reset $label to default when runCode is called',
+      'should reset $key to default when runCode is called',
       async ({ key, nonDefault, expected }) => {
         const state = createState()
         state[key].value = nonDefault
