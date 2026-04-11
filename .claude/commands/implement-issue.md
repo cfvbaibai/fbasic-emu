@@ -13,6 +13,22 @@ Autonomous issue implementation. This command orchestrates GitHub/git operations
 
 Follow `.claude/commands/_shared/automation-conventions.md` prerequisites.
 
+### Session Identity (for concurrent instance coordination)
+
+Extract this instance's conversation GUID so multiple `/implement-issue` instances can detect each other and avoid picking the same issue:
+
+```bash
+# Run a command that produces persisted output, then extract the session GUID from the path
+SESSION_ID=$(ls -1d ~/.claude/projects/*/*/tool-results/ 2>/dev/null | head -1 | xargs dirname 2>/dev/null | xargs basename 2>/dev/null)
+```
+
+If `SESSION_ID` is empty, skip coordination checks (single-instance mode). Store it for the duration of this run as `${SESSION_ID}`.
+
+This GUID appears in persisted tool output paths like:
+```
+~/.claude/projects/<project-hash>/<SESSION_ID>/tool-results/...
+```
+
 ## Phase 1 — Sync & Scan
 
 ```bash
@@ -77,7 +93,22 @@ gh issue list --state open --search "no:assignee" --json number,title,labels,ass
 
 **Skip issues with the `invalid` label** — they contradict F-BASIC manual behavior and should not be implemented.
 
-Select the **highest-priority unassigned** issue:
+### Active Worktree Exclusion
+
+Before selecting, check `config.md` `active_worktrees` for issues already claimed by another session:
+
+```bash
+# Extract issue numbers from active worktree paths
+ACTIVE_ISSUES=$(grep -oP '\d+' .automation/config.md | grep -oP 'worktrees/\K\d+')
+```
+
+For each active worktree path, extract the issue number (the folder name under `worktrees/`). **Skip any candidate issue whose number matches an active worktree** — another instance is already working on it.
+
+If `active_worktrees` entries include session IDs (format: `{"path": "...", "session": "...", "issue": N, "claimed": "..."}`), skip issues claimed by a *different* `${SESSION_ID}`. If the session ID matches `${SESSION_ID}`, the worktree belongs to this instance — reuse it instead of skipping.
+
+### Issue Selection
+
+Select the **highest-priority unassigned** issue (from candidates NOT excluded above):
 - Prefer issues with `P1` or `P2` labels
 - Among same priority, prefer bugs over enhancements
 - Among same priority and type, **prefer lower issue numbers** (older issues have been waiting longer)
@@ -153,7 +184,17 @@ fi
 git -c safe.directory="$(pwd)" worktree add -b "$BRANCH" "$WT_PATH" origin/master
 ```
 
-Update `config.md` `active_worktrees` with the new worktree path.
+Update `config.md` `active_worktrees` with the new worktree entry including session ID:
+
+```markdown
+- active_worktrees:
+  - path: .automation/worktrees/${ISSUE_NUM}
+    session: ${SESSION_ID}
+    issue: ${ISSUE_NUM}
+    claimed: YYYY-MM-DD HH:MM:SS CST
+```
+
+If an entry for this worktree already exists with a *different* session ID, this indicates a collision — another instance is working on this issue. **Stop and report the conflict.** If the session ID matches `${SESSION_ID}`, this is our own stale worktree from a previous failed run — reuse it.
 
 ## Phase 4 — Delegate to /lead
 
@@ -410,7 +451,7 @@ rm -rf "$WT_PATH" 2>/dev/null
 
 Branch stays on remote for CI.
 
-**Always** update `config.md` to remove the worktree from `active_worktrees`, even if removal partially failed.
+**Always** update `config.md` to remove the worktree entry from `active_worktrees`, even if removal partially failed. Only remove entries matching `${SESSION_ID}` — never clear entries belonging to other sessions.
 
 ## Phase 8 — Report
 
@@ -476,6 +517,7 @@ Follow `.claude/commands/_shared/self-improvement-protocol.md`. Focus on:
 
 ## Important Rules
 
+- **Concurrent instance coordination** — extract session GUID in Phase 0; check `active_worktrees` for issue conflicts before picking (Phase 2); write session ID when claiming (Phase 3); clear on cleanup (Phase 7). Never pick an issue already claimed by another session.
 - **Never implement code directly** — always delegate to `/lead` and specialist agents
 - **Never modify the main repo directory** — all work in worktree
 - **Single-commit rule** — squash to exactly one commit before pushing; CI fix commits must be amended into the original, not pushed separately
