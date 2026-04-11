@@ -15,19 +15,13 @@ Follow `.claude/commands/_shared/automation-conventions.md` prerequisites.
 
 ### Session Identity (for concurrent instance coordination)
 
-Extract this instance's conversation GUID so multiple `/implement-issue` instances can detect each other and avoid picking the same issue:
+Generate a unique session ID so multiple `/implement-issue` instances can detect each other and avoid picking the same issue:
 
 ```bash
-# Run a command that produces persisted output, then extract the session GUID from the path
-SESSION_ID=$(ls -1d ~/.claude/projects/*/*/tool-results/ 2>/dev/null | head -1 | xargs dirname 2>/dev/null | xargs basename 2>/dev/null)
+SESSION_ID=$(python3 -c "import uuid; print(uuid.uuid4())")
 ```
 
 If `SESSION_ID` is empty, skip coordination checks (single-instance mode). Store it for the duration of this run as `${SESSION_ID}`.
-
-This GUID appears in persisted tool output paths like:
-```
-~/.claude/projects/<project-hash>/<SESSION_ID>/tool-results/...
-```
 
 ## Phase 1 — Sync & Scan
 
