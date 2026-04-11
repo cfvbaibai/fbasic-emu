@@ -3,7 +3,9 @@
  * Tests for useProgramStore composable
  */
 
+import type * as VueUse from '@vueuse/core'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { ref } from 'vue'
 
 import type { ProgramData } from '@/core/types/program-types'
 import { createEmptyGrid } from '@/features/bg-editor/composables/useBgGrid'
@@ -95,6 +97,37 @@ describe('useProgramStore', () => {
 
     expect(store.programName).toBe('Twinkle Star')
     expect(store.isDirty.value).toBe(true)
+  })
+
+  it('should not throw or mutate state when setName is called with null current program', async () => {
+    vi.resetModules()
+
+    const controlledRef = ref<ProgramData | null>(null)
+
+    vi.doMock('@vueuse/core', async (importOriginal) => {
+      const actual = await importOriginal<typeof VueUse>()
+      return {
+        ...actual,
+        useLocalStorage: vi.fn().mockReturnValue(controlledRef),
+      }
+    })
+
+    const { useProgramStore } = await import(
+      '@/features/ide/composables/useProgramStore'
+    )
+    const store = useProgramStore()
+
+    // ensureProgram() ran and created a program via newProgram().
+    // Reset the controlled ref to null to exercise the guard.
+    controlledRef.value = null
+
+    expect(() => store.setName('Test Name')).not.toThrow()
+    expect(store.isDirty.value).toBe(false)
+    expect(store.programName).toBe('Untitled')
+
+    // Restore the original @vueuse/core module so subsequent tests use real useLocalStorage
+    vi.doUnmock('@vueuse/core')
+    vi.resetModules()
   })
 
   it('should persist name change to localStorage', async () => {
