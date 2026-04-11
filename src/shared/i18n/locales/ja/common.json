@@ -37,5 +37,6 @@
     "toggleCollapse": "折りたたみの切り替え",
     "clear": "クリア",
     "close": "閉じる"
-  }
+  },
+  "defaultProgramName": "無題"
 }
