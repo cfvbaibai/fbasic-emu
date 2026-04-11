@@ -230,7 +230,7 @@ export function parseWithChevrotain(
           location: {
             start: {
               line: lineIndex + 1,
-              column: err.column || 1,
+              column: err.column ?? 1,
             },
           },
         }))
@@ -259,7 +259,7 @@ export function parseWithChevrotain(
             location: {
               start: {
                 line: lineIndex + 1,
-                column: token?.startColumn || 1,
+                column: token?.startColumn ?? 1,
               },
             },
           }
@@ -303,7 +303,7 @@ export function parseWithChevrotain(
         location: {
           start: {
             line: err.line,
-            column: err.column || 1,
+            column: err.column ?? 1,
           },
         },
       })),
