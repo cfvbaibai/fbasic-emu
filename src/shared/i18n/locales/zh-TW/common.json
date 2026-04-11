@@ -37,5 +37,6 @@
     "toggleCollapse": "切換摺疊",
     "clear": "清除",
     "close": "關閉"
-  }
+  },
+  "defaultProgramName": "未命名"
 }

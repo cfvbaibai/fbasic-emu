@@ -13,7 +13,7 @@ const props = withDefaults(defineProps<{ isCompact?: boolean }>(), {
 })
 
 const { t } = useI18n()
-const programStore = useProgramStore()
+const programStore = useProgramStore(t('common.defaultProgramName'))
 
 // Share dialog state
 const showShareDialog = ref(false)
@@ -78,7 +78,8 @@ function handleCancelDiscard(): void {
 
 // File operations
 function handleNew() {
-  confirmDiscard(() => programStore.newProgram())
+  const defaultName = t('common.defaultProgramName')
+  confirmDiscard(() => programStore.newProgram(defaultName))
 }
 
 function handleOpen() {

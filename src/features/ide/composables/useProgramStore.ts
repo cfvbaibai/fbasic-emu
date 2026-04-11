@@ -27,6 +27,7 @@ import { useProgramLibrary } from './useProgramLibrary'
 // ============================================================================
 
 const STORAGE_KEY = 'program:current'
+const FALLBACK_PROGRAM_NAME = 'Untitled'
 
 /** Current active program - auto-persisted to localStorage */
 const currentProgram = useLocalStorage<ProgramData | null>(STORAGE_KEY, null, {
@@ -50,12 +51,12 @@ const isInitialized = ref(false)
 /**
  * Create a new empty program
  */
-function newProgram(): void {
+function newProgram(displayName?: string): void {
   const now = Date.now()
   currentProgram.value = {
     version: 1,
     id: generateSessionId(),
-    name: 'Untitled',
+    name: displayName ?? FALLBACK_PROGRAM_NAME,
     code: '',
     bg: compressBg(createEmptyGrid()),
     createdAt: now,
@@ -67,7 +68,7 @@ function newProgram(): void {
 /**
  * Ensure a program exists - restore from localStorage or create new
  */
-function ensureProgram(): void {
+function ensureProgram(displayName?: string): void {
   if (isInitialized.value) return
   isInitialized.value = true
 
@@ -78,7 +79,7 @@ function ensureProgram(): void {
   }
 
   // No program found, create new one
-  newProgram()
+  newProgram(displayName)
 }
 
 /**
@@ -243,9 +244,9 @@ function getBg(): BgGridData {
  * - Dirty state tracking
  * - Auto-persistence to localStorage (via VueUse)
  */
-export function useProgramStore() {
+export function useProgramStore(displayName?: string) {
   // Initialize on first use
-  ensureProgram()
+  ensureProgram(displayName)
 
   return {
     // State (readonly to prevent direct mutation)
@@ -257,7 +258,7 @@ export function useProgramStore() {
       return currentProgram.value?.id ?? null
     },
     get programName() {
-      return currentProgram.value?.name ?? 'Untitled'
+      return currentProgram.value?.name ?? FALLBACK_PROGRAM_NAME
     },
     get code() {
       return currentProgram.value?.code ?? ''
