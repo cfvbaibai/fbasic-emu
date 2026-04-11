@@ -341,30 +341,34 @@ export class ScreenStateManager {
   }
 
   /**
+   * Collect palette combination entries for a single palette group.
+   * Iterates all palettes and their combinations, producing a flat list
+   * of entries with palette index, combination index, and color values.
+   */
+  private collectPaletteEntries(
+    palettes: readonly (readonly [number, number, number, number])[][],
+  ): PaletteCombinationEntry[] {
+    const entries: PaletteCombinationEntry[] = []
+    for (let i = 0; i < palettes.length; i++) {
+      const palette = palettes[i]!
+      for (let j = 0; j < palette.length; j++) {
+        const colors = [...palette[j]!] as [number, number, number, number]
+        entries.push({ paletteIndex: i, combination: j, colors })
+      }
+    }
+    return entries
+  }
+
+  /**
    * Get all background and sprite palette combination data.
    * Used by DeviceScreenManager to send palette-combination reset messages
    * to the main thread when a new execution starts.
    */
   getAllPaletteCombinations(): PaletteCombinationSnapshot {
-    const background: PaletteCombinationEntry[] = []
-    for (let i = 0; i < this.backgroundPalettes.length; i++) {
-      const palette = this.backgroundPalettes[i]!
-      for (let j = 0; j < palette.length; j++) {
-        const colors = [...palette[j]!] as [number, number, number, number]
-        background.push({ paletteIndex: i, combination: j, colors })
-      }
+    return {
+      background: this.collectPaletteEntries(this.backgroundPalettes),
+      sprite: this.collectPaletteEntries(this.spritePalettes),
     }
-
-    const sprite: PaletteCombinationEntry[] = []
-    for (let i = 0; i < this.spritePalettes.length; i++) {
-      const palette = this.spritePalettes[i]!
-      for (let j = 0; j < palette.length; j++) {
-        const colors = [...palette[j]!] as [number, number, number, number]
-        sprite.push({ paletteIndex: i, combination: j, colors })
-      }
-    }
-
-    return { background, sprite }
   }
 
   /**
