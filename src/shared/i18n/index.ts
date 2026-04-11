@@ -7,6 +7,7 @@ import enBgEditor from './locales/en/bg-editor.json'
 import enCoi from './locales/en/coi.json'
 import enCommon from './locales/en/common.json'
 import enDiagnostics from './locales/en/diagnostics.json'
+import enErrors from './locales/en/errors.json'
 import enHome from './locales/en/home.json'
 import enIde from './locales/en/ide.json'
 import enKonvaTest from './locales/en/konva-test.json'
@@ -18,6 +19,7 @@ import jaBgEditor from './locales/ja/bg-editor.json'
 import jaCoi from './locales/ja/coi.json'
 import jaCommon from './locales/ja/common.json'
 import jaDiagnostics from './locales/ja/diagnostics.json'
+import jaErrors from './locales/ja/errors.json'
 import jaHome from './locales/ja/home.json'
 import jaIde from './locales/ja/ide.json'
 import jaKonvaTest from './locales/ja/konva-test.json'
@@ -29,6 +31,7 @@ import zhCNBgEditor from './locales/zh-CN/bg-editor.json'
 import zhCNCoi from './locales/zh-CN/coi.json'
 import zhCNCommon from './locales/zh-CN/common.json'
 import zhCNDiagnostics from './locales/zh-CN/diagnostics.json'
+import zhCNErrors from './locales/zh-CN/errors.json'
 import zhCNHome from './locales/zh-CN/home.json'
 import zhCNIde from './locales/zh-CN/ide.json'
 import zhCNKonvaTest from './locales/zh-CN/konva-test.json'
@@ -40,6 +43,7 @@ import zhTWBgEditor from './locales/zh-TW/bg-editor.json'
 import zhTWCoi from './locales/zh-TW/coi.json'
 import zhTWCommon from './locales/zh-TW/common.json'
 import zhTWDiagnostics from './locales/zh-TW/diagnostics.json'
+import zhTWErrors from './locales/zh-TW/errors.json'
 import zhTWHome from './locales/zh-TW/home.json'
 import zhTWIde from './locales/zh-TW/ide.json'
 import zhTWKonvaTest from './locales/zh-TW/konva-test.json'
@@ -88,6 +92,7 @@ const i18n = createI18n<{ message: MessageSchema }, Locale>({
       diagnostics: enDiagnostics,
       testing: enTesting,
       konvaTest: enKonvaTest,
+      errors: enErrors,
     },
     ja: {
       navigation: jaNavigation,
@@ -101,6 +106,7 @@ const i18n = createI18n<{ message: MessageSchema }, Locale>({
       diagnostics: jaDiagnostics,
       testing: jaTesting,
       konvaTest: jaKonvaTest,
+      errors: jaErrors,
     },
     'zh-CN': {
       navigation: zhCNNavigation,
@@ -114,6 +120,7 @@ const i18n = createI18n<{ message: MessageSchema }, Locale>({
       diagnostics: zhCNDiagnostics,
       testing: zhCNTesting,
       konvaTest: zhCNKonvaTest,
+      errors: zhCNErrors,
     },
     'zh-TW': {
       navigation: zhTWNavigation,
@@ -127,6 +134,7 @@ const i18n = createI18n<{ message: MessageSchema }, Locale>({
       diagnostics: zhTWDiagnostics,
       testing: zhTWTesting,
       konvaTest: zhTWKonvaTest,
+      errors: zhTWErrors,
     },
   },
 })
