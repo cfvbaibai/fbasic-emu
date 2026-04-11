@@ -35,14 +35,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: ESLint (no autofix)
-        run: pnpm exec eslint .
-
-      - name: Stylelint
-        run: pnpm lint:style
-
-      - name: Type check
-        run: pnpm type-check
+      - name: Run lint and type checks in parallel
+        run: |
+          pnpm exec eslint . &
+          pnpm lint:style &
+          pnpm type-check &
+          wait
 
   test:
     name: Test
