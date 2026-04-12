@@ -28,15 +28,22 @@ gh pr list --state open --json number,title,author,files,additions,deletions,lab
 
 Check memory at `~/.claude/projects/C--Users-Tony-code-GitHub-fbasic-ide/memory/MEMORY.md` and `~/.claude/projects/C--Users-Tony-code-GitHub-fbasic-ide/memory/pr-reviews.md` for previous reviews.
 
+**Verify review exists on GitHub:** For each PR that appears previously reviewed in memory, confirm the review was actually posted:
+```bash
+gh pr view <number> --json reviews,headRefOid --jq '{latest_sha: .headRefOid, latest_review: (.reviews | sort_by(.submittedAt) | last | .submittedAt // "none")}'
+```
+
 **Skip PR if:**
 - Previously reviewed AND
-- Same head commit SHA (no changes since review) AND
+- Review actually exists on GitHub (not just in memory) AND
+- Latest GitHub review was submitted after (or at) the last known commit SHA AND
 - Verdict was APPROVE
 
 **Re-review if:**
-- New commits since last review (different SHA)
+- New commits since last review (different SHA, OR SHA matches but no review posted for it)
 - Previous verdict was REQUEST CHANGES or NEEDS DISCUSSION
 - No previous review found
+- Review exists in memory but NOT on GitHub (review was never posted or was lost)
 
 ### Step 2c: Identify Specialist
 
