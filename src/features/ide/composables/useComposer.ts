@@ -139,11 +139,14 @@ export function useComposer() {
    */
   function setOctave(value: number, channelIndex?: number): void {
     const index = channelIndex ?? activeChannel.value
+    if (Number.isNaN(index) || index < 0 || index >= CHANNEL_COUNT) return
     channelOctaves.value[index] = value
   }
 
   /** Gets the octave for a specific channel. */
   function getChannelOctave(channelIndex: number): number {
+    if (Number.isNaN(channelIndex) || channelIndex < 0 || channelIndex >= CHANNEL_COUNT)
+      return DEFAULT_OCTAVE
     return channelOctaves.value[channelIndex] ?? DEFAULT_OCTAVE
   }
 
