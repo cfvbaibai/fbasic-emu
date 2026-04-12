@@ -73,6 +73,50 @@ gh pr list --json number,title,state,headRefName,baseRefName,mergeable,statusChe
 
 ### PR Maintenance (stop after handling one if found)
 
+Before handling any PR, extract the issue number and acquire a lock to prevent concurrent sessions from working on the same PR:
+
+```bash
+# Extract issue number from headRefName (stricter format: feat/issue-{N}-slug or fix/issue-{N}-slug)
+ISSUE_NUM=$(echo "$HEAD_REF_NAME" | sed -n 's/.*\/issue-\([0-9]*\)-.*/\1/p')
+
+# Fallback: extract from PR title (format: "feat: resolve #N - ..." or "fix: resolve #N - ...")
+if [ -z "$ISSUE_NUM" ]; then
+  ISSUE_NUM=$(echo "$PR_TITLE" | sed -n 's/.*#\([0-9]*\).*/\1/p')
+fi
+
+# Lock key: use issue-{N} if issue found, otherwise pr-{N}
+if [ -n "$ISSUE_NUM" ]; then
+  LOCK_FILE=".automation/locks/issue-${ISSUE_NUM}.lock"
+else
+  LOCK_FILE=".automation/locks/pr-${PR_NUMBER}.lock"
+fi
+
+# Attempt atomic lock acquisition via noclobber
+if ( set -o noclobber; echo "{\"session\": \"$SESSION_ID\", \"pr\": $PR_NUMBER, \"issue\": ${ISSUE_NUM:-none}, \"claimed\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" > "$LOCK_FILE" ) 2>/dev/null; then
+  echo "LOCK_ACQUIRED"
+else
+  # Lock exists — check if stale (>2 hours old)
+  LOCK_AGE=$(( $(date +%s) - $(date +%s -r "$LOCK_FILE") ))
+  if [ "$LOCK_AGE" -gt 7200 ]; then
+    OLD_SESSION=$(grep -o '"session": "[^"]*"' "$LOCK_FILE" | cut -d'"' -f4)
+    rm -f "$LOCK_FILE"
+    if ( set -o noclobber; echo "{\"session\": \"$SESSION_ID\", \"pr\": $PR_NUMBER, \"issue\": ${ISSUE_NUM:-none}, \"claimed\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\", \"stole_from\": \"$OLD_SESSION\"}" > "$LOCK_FILE" ) 2>/dev/null; then
+      echo "LOCK_STOLEN"
+    else
+      echo "LOCK_BUSY"
+    fi
+  else
+    echo "LOCK_BUSY"
+  fi
+fi
+```
+
+**If `LOCK_BUSY` or lock steal failed**: another session owns this PR — skip to the next PR in the list.
+
+**If `LOCK_ACQUIRED` or `LOCK_STOLEN`**: proceed with maintenance, then release the lock in Phase 7 cleanup (same as issue locks).
+
+For each PR that passes the lock check, handle in this priority order:
+
 1. **Merge conflicts**: Any PR with `mergeable: CONFLICTING` → rebase on origin/master in the PR's existing worktree (or `worktrees/`), force push, report
 2. **Failing CI**: Any PR with failing check runs → `/lead` investigate and fix in worktree, push, report
 3. **Changes requested**: Any PR with review state `CHANGES_REQUESTED` or comments containing "REQUEST CHANGES" / "Request Change" → `/lead` address concerns in worktree, push, report
@@ -235,7 +279,9 @@ fi
 git -c safe.directory="$(pwd)" worktree add -b "$BRANCH" "$WT_PATH" origin/master
 ```
 
-Update `config.md` `active_worktrees` with the new worktree entry including session ID (informational — the lock file in `.automation/locks/` is the authoritative claim):
+Update `config.md` `active_worktrees` with the new worktree entry including session ID:
+
+> **config.md is informational only, NOT authoritative.** It uses plain markdown with no atomicity — concurrent sessions may overwrite each other's entries. The lock file in `.automation/locks/` is the sole authoritative claim. Always read lock files to determine true ownership, never rely on config.md alone.
 
 ```markdown
 - active_worktrees:
@@ -503,10 +549,12 @@ git -c safe.directory="$(pwd)" worktree prune 2>/dev/null
 rm -rf "$WT_PATH" 2>/dev/null
 ```
 
-Remove the issue lock file:
+Remove the lock file (issue lock or PR lock, depending on how it was acquired):
 
 ```bash
+# Remove whichever lock was acquired in Phase 1 or Phase 2
 rm -f ".automation/locks/issue-${ISSUE_NUM}.lock"
+rm -f ".automation/locks/pr-${PR_NUMBER}.lock"
 ```
 
 Branch stays on remote for CI.
@@ -582,7 +630,7 @@ Follow `.claude/commands/_shared/self-improvement-protocol.md`. Focus on:
 
 ## Important Rules
 
-- **Concurrent instance coordination** — extract session GUID in Phase 0; acquire atomic lock file in Phase 2 (primary mechanism); update `config.md` `active_worktrees` in Phase 3 (informational); release lock file in Phase 7. Never pick an issue whose lock file exists and is not stale.
+- **Concurrent instance coordination** — extract session GUID in Phase 0; acquire atomic lock file in Phase 1 (PR maintenance, uses `issue-{N}.lock` or `pr-{N}.lock`) and Phase 2 (new issues, uses `issue-{N}.lock`); update `config.md` `active_worktrees` in Phase 3 (informational only — never rely on it for coordination); release lock file in Phase 7. Never pick an issue or PR whose lock file exists and is not stale.
 - **Never implement code directly** — always delegate to `/lead` and specialist agents
 - **Never modify the main repo directory** — all work in worktree
 - **Single-commit rule** — squash to exactly one commit before pushing; CI fix commits must be amended into the original, not pushed separately
