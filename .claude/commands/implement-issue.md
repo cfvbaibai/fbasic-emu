@@ -23,6 +23,26 @@ SESSION_ID=$(python3 -c "import uuid; print(uuid.uuid4())")
 
 If `SESSION_ID` is empty, skip coordination checks (single-instance mode). Store it for the duration of this run as `${SESSION_ID}`.
 
+### Lock Directory Setup
+
+```bash
+mkdir -p .automation/locks
+```
+
+Prune stale locks from previous crashed runs — remove lock files where neither the worktree directory nor the remote branch exists:
+
+```bash
+for LOCK_FILE in .automation/locks/issue-*.lock; do
+  [ -f "$LOCK_FILE" ] || continue
+  ISSUE_NUM=$(basename "$LOCK_FILE" .lock | sed 's/issue-//')
+  WT_PATH=".automation/worktrees/${ISSUE_NUM}"
+  BRANCH=$(git branch -r --list "origin/fix/issue-${ISSUE_NUM}*" --format='%(refname:short)' | head -1)
+  if [ ! -d "$WT_PATH" ] && [ -z "$BRANCH" ]; then
+    rm -f "$LOCK_FILE"
+  fi
+done
+```
+
 ## Phase 1 — Sync & Scan
 
 ```bash
@@ -101,26 +121,49 @@ gh issue list --state open --search "no:assignee" --json number,title,labels,ass
 
 **Skip issues with the `invalid` label** — they contradict F-BASIC manual behavior and should not be implemented.
 
-### Active Worktree Exclusion
+### Atomic Issue Locking
 
-Before selecting, check `config.md` `active_worktrees` for issues already claimed by another session:
+Use per-issue lock files for atomic issue claiming. Unlike `config.md` (read-check-act is not atomic), bash's `noclobber` makes file creation atomic at the shell level — two instances cannot create the same lock file.
+
+For each candidate issue **in priority order**, attempt to acquire a lock:
 
 ```bash
-# Extract issue numbers from active worktree paths
-ACTIVE_ISSUES=$(grep -oP '\d+' .automation/config.md | grep -oP 'worktrees/\K\d+')
+LOCK_FILE=".automation/locks/issue-${ISSUE_NUM}.lock"
+
+# Atomic lock acquisition via noclobber — fails if file already exists
+if ( set -o noclobber; echo "{\"session\": \"$SESSION_ID\", \"issue\": $ISSUE_NUM, \"claimed\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" > "$LOCK_FILE" ) 2>/dev/null; then
+  echo "LOCK_ACQUIRED"
+else
+  # Lock exists — check if stale (>2 hours old, session almost certainly crashed)
+  LOCK_AGE=$(( $(date +%s) - $(date +%s -r "$LOCK_FILE") ))
+  if [ "$LOCK_AGE" -gt 7200 ]; then
+    OLD_SESSION=$(grep -o '"session": "[^"]*"' "$LOCK_FILE" | cut -d'"' -f4)
+    rm -f "$LOCK_FILE"
+    if ( set -o noclobber; echo "{\"session\": \"$SESSION_ID\", \"issue\": $ISSUE_NUM, \"claimed\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\", \"stole_from\": \"$OLD_SESSION\"}" > "$LOCK_FILE" ) 2>/dev/null; then
+      echo "LOCK_STOLEN (stale: ${LOCK_AGE}s)"
+    else
+      echo "LOCK_STEAL_FAILED"
+    fi
+  else
+    echo "LOCK_BUSY"
+  fi
+fi
 ```
 
-For each active worktree path, extract the issue number (the folder name under `worktrees/`). **Skip any candidate issue whose number matches an active worktree** — another instance is already working on it.
+**If `LOCK_ACQUIRED` or `LOCK_STOLEN`**: this issue is ours — stop iterating, this is the selected issue.
 
-If `active_worktrees` entries include session IDs (format: `{"path": "...", "session": "...", "issue": N, "claimed": "..."}`), skip issues claimed by a *different* `${SESSION_ID}`. If the session ID matches `${SESSION_ID}`, the worktree belongs to this instance — reuse it instead of skipping.
+**If `LOCK_BUSY` or `LOCK_STEAL_FAILED`**: another instance owns this issue — skip to the next candidate in priority order.
 
 ### Issue Selection
 
-Select the **highest-priority unassigned** issue (from candidates NOT excluded above):
+Iterate candidates **in priority order**, attempting atomic lock acquisition for each. The first issue we successfully lock is selected:
+
 - Prefer issues with `P1` or `P2` labels
 - Among same priority, prefer bugs over enhancements
 - Among same priority and type, **prefer lower issue numbers** (older issues have been waiting longer)
 - Scan `.automation/memory/issues/` for existing `issue-*.md` files to avoid re-picking
+
+If all candidates are locked by other instances, report "no issues to implement" and stop.
 
 If all remaining open issues are too complex for the pipeline (multi-module features requiring architectural decisions), post a `## TOO COMPLEX` comment with suggested sub-issue splits. Then report "no issues to implement" and stop.
 
@@ -192,7 +235,7 @@ fi
 git -c safe.directory="$(pwd)" worktree add -b "$BRANCH" "$WT_PATH" origin/master
 ```
 
-Update `config.md` `active_worktrees` with the new worktree entry including session ID:
+Update `config.md` `active_worktrees` with the new worktree entry including session ID (informational — the lock file in `.automation/locks/` is the authoritative claim):
 
 ```markdown
 - active_worktrees:
@@ -201,8 +244,6 @@ Update `config.md` `active_worktrees` with the new worktree entry including sess
     issue: ${ISSUE_NUM}
     claimed: YYYY-MM-DD HH:MM:SS CST
 ```
-
-If an entry for this worktree already exists with a *different* session ID, this indicates a collision — another instance is working on this issue. **Stop and report the conflict.** If the session ID matches `${SESSION_ID}`, this is our own stale worktree from a previous failed run — reuse it.
 
 ## Phase 4 — Delegate to /lead
 
@@ -462,6 +503,12 @@ git -c safe.directory="$(pwd)" worktree prune 2>/dev/null
 rm -rf "$WT_PATH" 2>/dev/null
 ```
 
+Remove the issue lock file:
+
+```bash
+rm -f ".automation/locks/issue-${ISSUE_NUM}.lock"
+```
+
 Branch stays on remote for CI.
 
 **Always** update `config.md` to remove the worktree entry from `active_worktrees`, even if removal partially failed. Only remove entries matching `${SESSION_ID}` — never clear entries belonging to other sessions.
@@ -535,7 +582,7 @@ Follow `.claude/commands/_shared/self-improvement-protocol.md`. Focus on:
 
 ## Important Rules
 
-- **Concurrent instance coordination** — extract session GUID in Phase 0; check `active_worktrees` for issue conflicts before picking (Phase 2); write session ID when claiming (Phase 3); clear on cleanup (Phase 7). Never pick an issue already claimed by another session.
+- **Concurrent instance coordination** — extract session GUID in Phase 0; acquire atomic lock file in Phase 2 (primary mechanism); update `config.md` `active_worktrees` in Phase 3 (informational); release lock file in Phase 7. Never pick an issue whose lock file exists and is not stale.
 - **Never implement code directly** — always delegate to `/lead` and specialist agents
 - **Never modify the main repo directory** — all work in worktree
 - **Single-commit rule** — squash to exactly one commit before pushing; CI fix commits must be amended into the original, not pushed separately
