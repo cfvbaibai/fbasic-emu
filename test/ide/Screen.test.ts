@@ -5,6 +5,8 @@ import { ref } from 'vue'
 
 import Screen from '@/features/ide/components/Screen.vue'
 
+const LOCAL_STORAGE_SYNC_DELAY_MS = 50
+
 // Mock useScreenContext to satisfy Screen.vue's provide/inject dependency
 vi.mock('@/features/ide/composables/useScreenContext', () => ({
   useScreenContext: () => ({
@@ -127,7 +129,7 @@ describe('Screen - scanline filter integration', () => {
     })
 
     // Allow VueUse useLocalStorage to read from localStorage
-    await new Promise((resolve) => setTimeout(resolve, 50))
+    await new Promise((resolve) => setTimeout(resolve, LOCAL_STORAGE_SYNC_DELAY_MS))
 
     expect(wrapper.find('.crt-scanlines').exists()).toEqual(true)
     wrapper.unmount()
