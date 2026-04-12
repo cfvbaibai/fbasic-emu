@@ -19,14 +19,14 @@ describe('printable-area program', () => {
     //   Sprite 3: (248,116), Sprite 4: (248,232)
     //   Sprite 5: (124,232), Sprite 6: (0,232), Sprite 7: (0,116)
     const BOUNDARY_SPRITES = [
-      { index: 0, x: 0, y: 0, label: 'top-left' },
-      { index: 1, x: 124, y: 0, label: 'top-center' },
-      { index: 2, x: 248, y: 0, label: 'top-right' },
-      { index: 3, x: 248, y: 116, label: 'right-upper' },
-      { index: 4, x: 248, y: 232, label: 'bottom-right' },
-      { index: 5, x: 124, y: 232, label: 'bottom-center' },
-      { index: 6, x: 0, y: 232, label: 'bottom-left' },
-      { index: 7, x: 0, y: 116, label: 'left-center' },
+      { index: 0, x: 0, y: 0 },
+      { index: 1, x: 124, y: 0 },
+      { index: 2, x: 248, y: 0 },
+      { index: 3, x: 248, y: 116 },
+      { index: 4, x: 248, y: 232 },
+      { index: 5, x: 124, y: 232 },
+      { index: 6, x: 0, y: 232 },
+      { index: 7, x: 0, y: 116 },
     ] as const
 
     BOUNDARY_SPRITES.forEach(({ index, x, y }) => {
