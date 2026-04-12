@@ -9,7 +9,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { PALETTE_DEFAULTS } from '@/core/constants'
-import { ScreenPaletteState } from '@/core/devices/ScreenPaletteState'
+import {
+  type PaletteCombinationEntry,
+  ScreenPaletteState,
+} from '@/core/devices/ScreenPaletteState'
 import { ORIGINAL_BACKGROUND_PALETTES, ORIGINAL_SPRITE_PALETTES } from '@/shared/data/palette'
 
 // Mock logger to suppress warnings in test output
@@ -21,6 +24,14 @@ vi.mock('@/shared/logger', () => ({
     info: vi.fn(),
   },
 }))
+
+function findPaletteEntry(
+  entries: PaletteCombinationEntry[],
+  paletteIndex: number,
+  combination: number,
+): PaletteCombinationEntry | undefined {
+  return entries.find(e => e.paletteIndex === paletteIndex && e.combination === combination)
+}
 
 describe('ScreenPaletteState', () => {
   let state: ScreenPaletteState
@@ -263,7 +274,7 @@ describe('ScreenPaletteState', () => {
       state.setPaletteCombination('B', 1, [10, 20, 30, 40])
 
       const { background } = state.getAllPaletteCombinations()
-      const entry = background.find(e => e.paletteIndex === 0 && e.combination === 1)
+      const entry = findPaletteEntry(background, 0, 1)
       expect(entry!.colors).toEqual([10, 20, 30, 40])
     })
   })
@@ -309,7 +320,7 @@ describe('ScreenPaletteState', () => {
 
       // Combination was clamped to 0, so palette 0 combination 0 should now be [1,2,3,4]
       const { background } = state.getAllPaletteCombinations()
-      const entry = background.find(e => e.paletteIndex === 0 && e.combination === 0)
+      const entry = findPaletteEntry(background, 0, 0)
       expect(entry!.colors).toEqual([1, 2, 3, 4])
     })
 
@@ -318,7 +329,7 @@ describe('ScreenPaletteState', () => {
       state.setPaletteCombination('B', 10, [11, 12, 13, 14])
 
       const { background } = state.getAllPaletteCombinations()
-      const entry = background.find(e => e.paletteIndex === 0 && e.combination === 3)
+      const entry = findPaletteEntry(background, 0, 3)
       expect(entry!.colors).toEqual([11, 12, 13, 14])
     })
 
@@ -341,13 +352,13 @@ describe('ScreenPaletteState', () => {
       state.setPaletteCombination('B', 0, [10, 20, 30, 40])
 
       const snapshot1 = state.getAllPaletteCombinations()
-      const entry1 = snapshot1.background.find(e => e.paletteIndex === 0 && e.combination === 0)!
+      const entry1 = findPaletteEntry(snapshot1.background, 0, 0)!
 
       // Mutate the returned snapshot — should not affect internal state
       entry1.colors[0] = 999
 
       const snapshot2 = state.getAllPaletteCombinations()
-      const entry2 = snapshot2.background.find(e => e.paletteIndex === 0 && e.combination === 0)!
+      const entry2 = findPaletteEntry(snapshot2.background, 0, 0)!
       expect(entry2.colors).toEqual([10, 20, 30, 40])
     })
   })
@@ -362,7 +373,7 @@ describe('ScreenPaletteState', () => {
       state.setPaletteCombination('B', 0, [99, 99, 99, 99])
 
       const { sprite } = state.getAllPaletteCombinations()
-      const spriteEntry = sprite.find(e => e.paletteIndex === 0 && e.combination === 0)
+      const spriteEntry = findPaletteEntry(sprite, 0, 0)
       const original = ORIGINAL_SPRITE_PALETTES[0][0]
       expect(spriteEntry!.colors).toEqual([...original] as [number, number, number, number])
     })
@@ -372,7 +383,7 @@ describe('ScreenPaletteState', () => {
       state.setPaletteCombination('S', 0, [99, 99, 99, 99])
 
       const { background } = state.getAllPaletteCombinations()
-      const bgEntry = background.find(e => e.paletteIndex === 0 && e.combination === 0)
+      const bgEntry = findPaletteEntry(background, 0, 0)
       const original = ORIGINAL_BACKGROUND_PALETTES[0][0]
       expect(bgEntry!.colors).toEqual([...original] as [number, number, number, number])
     })

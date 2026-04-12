@@ -275,9 +275,7 @@ describe('ShareDialog', () => {
     await openDialog(wrapper)
     await waitForEncoding()
 
-    const buttons = wrapper.findAll('.share-dialog-btn')
-    // Close button is the second button
-    await buttons[1]!.trigger('click')
+    await wrapper.find('[data-testid="share-close-button"]').trigger('click')
 
     expect(wrapper.emitted('close')).toHaveLength(1)
     wrapper.unmount()

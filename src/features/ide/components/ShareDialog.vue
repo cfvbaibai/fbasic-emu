@@ -171,6 +171,7 @@ onUnmounted(() => {
             </button>
             <button
               class="share-dialog-btn share-dialog-btn-close"
+              data-testid="share-close-button"
               @click="handleClose"
             >
               {{ t('ide.share.close') }}
