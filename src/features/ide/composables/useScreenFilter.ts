@@ -9,7 +9,7 @@
  * curvature, vignette layers).
  */
 
-import { useLocalStorage } from '@vueuse/core'
+import { useLocalStorage, usePreferredReducedMotion } from '@vueuse/core'
 import { computed } from 'vue'
 
 const FILTER_STORAGE_KEY = 'fbasic-screen-filter'
@@ -31,6 +31,11 @@ export function useScreenFilter() {
 
   const filterEnabled = computed(() => isEnabled.value)
 
+  const reducedMotionRaw = usePreferredReducedMotion()
+  const prefersReducedMotion = computed(
+    () => reducedMotionRaw.value === 'reduce'
+  )
+
   function toggleFilter(): void {
     isEnabled.value = !isEnabled.value
   }
@@ -41,6 +46,7 @@ export function useScreenFilter() {
 
   return {
     filterEnabled,
+    prefersReducedMotion,
     toggleFilter,
     setFilterEnabled,
   }
