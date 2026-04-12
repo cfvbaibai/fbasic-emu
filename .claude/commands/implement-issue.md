@@ -25,23 +25,31 @@ If `SESSION_ID` is empty, skip coordination checks (single-instance mode). Store
 
 ### Lock Directory Setup
 
+**Resolve the main repo root FIRST** — all lock operations must use absolute paths rooted here. Never use relative paths for locks, because CWD may change to a worktree during the run:
+
 ```bash
-mkdir -p .automation/locks
+# Resolve main repo root (first entry in worktree list is always the main repo)
+REPO_ROOT=$(git -c safe.directory="$(pwd)" worktree list --porcelain | head -1 | sed -n 's/^worktree //p')
+
+# Ensure lock directory exists in the MAIN repo (not a worktree)
+mkdir -p "${REPO_ROOT}/.automation/locks"
 ```
 
 Prune stale locks from previous crashed runs — remove lock files where neither the worktree directory nor the remote branch exists:
 
 ```bash
-for LOCK_FILE in .automation/locks/issue-*.lock; do
+for LOCK_FILE in "${REPO_ROOT}/.automation/locks/issue-*.lock"; do
   [ -f "$LOCK_FILE" ] || continue
   ISSUE_NUM=$(basename "$LOCK_FILE" .lock | sed 's/issue-//')
-  WT_PATH=".automation/worktrees/${ISSUE_NUM}"
-  BRANCH=$(git branch -r --list "origin/fix/issue-${ISSUE_NUM}*" --format='%(refname:short)' | head -1)
+  WT_PATH="${REPO_ROOT}/.automation/worktrees/${ISSUE_NUM}"
+  BRANCH=$(git -c safe.directory="$REPO_ROOT" branch -r --list "origin/fix/issue-${ISSUE_NUM}*" --format='%(refname:short)' | head -1)
   if [ ! -d "$WT_PATH" ] && [ -z "$BRANCH" ]; then
     rm -f "$LOCK_FILE"
   fi
 done
 ```
+
+**Critical**: All subsequent lock file paths in this command MUST use `${REPO_ROOT}/.automation/locks/...` (absolute), never `.automation/locks/...` (relative).
 
 ## Phase 1 — Sync & Scan
 
@@ -73,9 +81,12 @@ gh pr list --json number,title,state,headRefName,baseRefName,mergeable,statusChe
 
 ### PR Maintenance (stop after handling one if found)
 
-Before handling any PR, extract the issue number and acquire a lock to prevent concurrent sessions from working on the same PR:
+Before handling any PR, extract the issue number and acquire a lock to prevent concurrent sessions from working on the same PR. **Always ensure lock directory exists before attempting noclobber:**
 
 ```bash
+# Ensure we're operating in the main repo's lock directory
+mkdir -p "${REPO_ROOT}/.automation/locks"
+
 # Extract issue number from headRefName (stricter format: feat/issue-{N}-slug or fix/issue-{N}-slug)
 ISSUE_NUM=$(echo "$HEAD_REF_NAME" | sed -n 's/.*\/issue-\([0-9]*\)-.*/\1/p')
 
@@ -86,9 +97,9 @@ fi
 
 # Lock key: use issue-{N} if issue found, otherwise pr-{N}
 if [ -n "$ISSUE_NUM" ]; then
-  LOCK_FILE=".automation/locks/issue-${ISSUE_NUM}.lock"
+  LOCK_FILE="${REPO_ROOT}/.automation/locks/issue-${ISSUE_NUM}.lock"
 else
-  LOCK_FILE=".automation/locks/pr-${PR_NUMBER}.lock"
+  LOCK_FILE="${REPO_ROOT}/.automation/locks/pr-${PR_NUMBER}.lock"
 fi
 
 # Attempt atomic lock acquisition via noclobber
@@ -169,10 +180,16 @@ gh issue list --state open --search "no:assignee" --json number,title,labels,ass
 
 Use per-issue lock files for atomic issue claiming. Unlike `config.md` (read-check-act is not atomic), bash's `noclobber` makes file creation atomic at the shell level — two instances cannot create the same lock file.
 
+**Always use `${REPO_ROOT}`-based absolute paths for locks.** Before attempting acquisition, ensure the lock directory exists:
+
+```bash
+mkdir -p "${REPO_ROOT}/.automation/locks"
+```
+
 For each candidate issue **in priority order**, attempt to acquire a lock:
 
 ```bash
-LOCK_FILE=".automation/locks/issue-${ISSUE_NUM}.lock"
+LOCK_FILE="${REPO_ROOT}/.automation/locks/issue-${ISSUE_NUM}.lock"
 
 # Atomic lock acquisition via noclobber — fails if file already exists
 if ( set -o noclobber; echo "{\"session\": \"$SESSION_ID\", \"issue\": $ISSUE_NUM, \"claimed\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" > "$LOCK_FILE" ) 2>/dev/null; then
@@ -245,11 +262,24 @@ Set `${TDD_CATEGORY}` to one of: `A`, `B`, `C`, `D`, `E_F_G`.
 
 ## Phase 3 — Worktree Setup
 
-Before creating a worktree, resolve the main repo root. Never use `${PWD}` for worktree paths — if this command runs from within an existing worktree, `${PWD}` would produce nested paths like `.automation/worktrees/459/.automation/worktrees/483/`.
+> **REPO_ROOT was already resolved in Phase 0.** Do NOT re-resolve it here. Use `${REPO_ROOT}` for all worktree paths.
+
+**Before creating a worktree, verify the lock exists.** If the lock file for this issue is missing, STOP — another session may have claimed it, or the lock was lost. Re-acquire the lock before proceeding:
 
 ```bash
-# Resolve main repo root (first entry in worktree list is always the main repo)
-REPO_ROOT=$(git -c safe.directory="$(pwd)" worktree list --porcelain | head -1 | sed -n 's/^worktree //p')
+# Verify lock exists (must have been acquired in Phase 1 or Phase 2)
+if [ ! -f "${REPO_ROOT}/.automation/locks/issue-${ISSUE_NUM}.lock" ]; then
+  echo "ERROR: No lock file for issue #${ISSUE_NUM}. Cannot create worktree without lock."
+  # Re-attempt lock acquisition
+  mkdir -p "${REPO_ROOT}/.automation/locks"
+  LOCK_FILE="${REPO_ROOT}/.automation/locks/issue-${ISSUE_NUM}.lock"
+  if ( set -o noclobber; echo "{\"session\": \"$SESSION_ID\", \"issue\": $ISSUE_NUM, \"claimed\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" > "$LOCK_FILE" ) 2>/dev/null; then
+    echo "LOCK_REACQUIRED"
+  else
+    echo "LOCK_BUSY — another session owns this issue. STOP."
+    # Do NOT create worktree
+  fi
+fi
 ```
 
 Before creating a worktree, check for collisions (existing worktrees for the same branch or from Codex):
@@ -553,8 +583,8 @@ Remove the lock file (issue lock or PR lock, depending on how it was acquired):
 
 ```bash
 # Remove whichever lock was acquired in Phase 1 or Phase 2
-rm -f ".automation/locks/issue-${ISSUE_NUM}.lock"
-rm -f ".automation/locks/pr-${PR_NUMBER}.lock"
+rm -f "${REPO_ROOT}/.automation/locks/issue-${ISSUE_NUM}.lock"
+rm -f "${REPO_ROOT}/.automation/locks/pr-${PR_NUMBER}.lock"
 ```
 
 Branch stays on remote for CI.
