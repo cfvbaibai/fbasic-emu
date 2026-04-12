@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import type { JoystickBufferView } from '@/core/devices/sharedJoystickBuffer'
 import {
   createViewsFromJoystickBuffer,
   getStickState,
@@ -40,29 +41,32 @@ const STRIG_A = 8
 /** Whether the joystick buffer is available */
 const hasBuffer = computed(() => props.sharedJoystickBuffer != null)
 
-/** Read stick/strig values from the shared buffer (0 when unavailable) */
-const stickStates = computed<[number, number]>(() => {
-  // tick is read to trigger re-computation when parent signals a new frame
+/**
+ * Typed array views over the shared joystick buffer (null when unavailable).
+ * tick is read to trigger re-computation when parent signals a new frame.
+ */
+const views = computed<JoystickBufferView | null>(() => {
   void props.tick
-  if (!props.sharedJoystickBuffer) return [0, 0]
+  if (!props.sharedJoystickBuffer) return null
   try {
-    const view = createViewsFromJoystickBuffer(props.sharedJoystickBuffer)
-    return [getStickState(view, 0), getStickState(view, 1)]
+    return createViewsFromJoystickBuffer(props.sharedJoystickBuffer)
   } catch {
-    return [0, 0]
+    return null
   }
 })
 
+/** Read stick values from the shared buffer (0 when unavailable) */
+const stickStates = computed<[number, number]>(() => {
+  const view = views.value
+  if (!view) return [0, 0]
+  return [getStickState(view, 0), getStickState(view, 1)]
+})
+
+/** Read strig values from the shared buffer (0 when unavailable) */
 const strigStates = computed<[number, number]>(() => {
-  // tick is read to trigger re-computation when parent signals a new frame
-  void props.tick
-  if (!props.sharedJoystickBuffer) return [0, 0]
-  try {
-    const view = createViewsFromJoystickBuffer(props.sharedJoystickBuffer)
-    return [getStrigState(view, 0), getStrigState(view, 1)]
-  } catch {
-    return [0, 0]
-  }
+  const view = views.value
+  if (!view) return [0, 0]
+  return [getStrigState(view, 0), getStrigState(view, 1)]
 })
 
 /** Check if a direction bit is set in the stick state */
