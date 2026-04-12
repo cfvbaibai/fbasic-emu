@@ -78,7 +78,7 @@ defineExpose({
           />
         </GameTabPane>
         <GameTabPane name="buffer" :label="t('ide.bufferInspector.title')">
-          <BufferInspector />
+          <BufferInspector :sprite-states="spriteStates" :sprite-enabled="spriteEnabled" />
         </GameTabPane>
       </GameTabs>
     </div>

@@ -403,7 +403,19 @@
     "empty": "（無）"
   },
   "bufferInspector": {
-    "title": "緩衝區檢查器"
+    "title": "緩衝區檢查器",
+    "spriteSlotsTitle": "精靈槽位",
+    "spriteSlotsDisabled": "SPRITE OFF",
+    "spriteSlotsOn": "開",
+    "spriteSlotsOff": "關",
+    "spriteSlotsDefined": "已定義",
+    "spriteSlotsNone": "-",
+    "spriteSlotsColNumber": "#",
+    "spriteSlotsColX": "X",
+    "spriteSlotsColY": "Y",
+    "spriteSlotsColVisible": "可見",
+    "spriteSlotsColPriority": "優先順序",
+    "spriteSlotsColDefinition": "定義"
   },
   "logLevels": {
     "title": "日誌級別",

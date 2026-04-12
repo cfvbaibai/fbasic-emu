@@ -403,7 +403,19 @@
     "empty": "（なし）"
   },
   "bufferInspector": {
-    "title": "バッファインスペクタ"
+    "title": "バッファインスペクタ",
+    "spriteSlotsTitle": "スプライトスロット",
+    "spriteSlotsDisabled": "SPRITE OFF",
+    "spriteSlotsOn": "ON",
+    "spriteSlotsOff": "OFF",
+    "spriteSlotsDefined": "あり",
+    "spriteSlotsNone": "-",
+    "spriteSlotsColNumber": "#",
+    "spriteSlotsColX": "X",
+    "spriteSlotsColY": "Y",
+    "spriteSlotsColVisible": "表示",
+    "spriteSlotsColPriority": "優先度",
+    "spriteSlotsColDefinition": "定義"
   },
   "logLevels": {
     "title": "ログレベル",

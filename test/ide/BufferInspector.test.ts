@@ -18,6 +18,10 @@ const MOCK_ACCESSOR: SharedDisplayBufferAccessor = {} as SharedDisplayBufferAcce
 describe('BufferInspector', () => {
   it('renders without errors', () => {
     const wrapper = mount(BufferInspector, {
+      props: {
+        spriteStates: [],
+        spriteEnabled: false,
+      },
       global: {
         stubs: {
           GameBlock: defineComponent({ template: '<div><slot /></div>' }),
@@ -31,6 +35,10 @@ describe('BufferInspector', () => {
 
   it('has the correct component name', () => {
     const wrapper = mount(BufferInspector, {
+      props: {
+        spriteStates: [],
+        spriteEnabled: false,
+      },
       global: {
         stubs: {
           GameBlock: defineComponent({ template: '<div><slot /></div>' }),
@@ -44,6 +52,10 @@ describe('BufferInspector', () => {
 
   it('displays the title from i18n key', () => {
     const wrapper = mount(BufferInspector, {
+      props: {
+        spriteStates: [],
+        spriteEnabled: false,
+      },
       global: {
         stubs: {
           GameBlock: defineComponent({
@@ -60,8 +72,12 @@ describe('BufferInspector', () => {
     wrapper.unmount()
   })
 
-  it('renders empty content area', () => {
+  it('renders content area with SpriteSlotsSection', () => {
     const wrapper = mount(BufferInspector, {
+      props: {
+        spriteStates: [],
+        spriteEnabled: false,
+      },
       global: {
         stubs: {
           GameBlock: defineComponent({ template: '<div><slot /></div>' }),
@@ -69,8 +85,32 @@ describe('BufferInspector', () => {
       },
     })
 
-    // Component should exist with no errors, content is empty shell
     expect(wrapper.find('.buffer-inspector-content').exists()).toBe(true)
+    expect(wrapper.find('.sprite-slots-section').exists()).toBe(true)
+    wrapper.unmount()
+  })
+
+  it('passes spriteStates and spriteEnabled to SpriteSlotsSection', () => {
+    const wrapper = mount(BufferInspector, {
+      props: {
+        spriteStates: [
+          { spriteNumber: 0, x: 10, y: 20, visible: true, priority: 0, definition: null },
+        ],
+        spriteEnabled: true,
+      },
+      global: {
+        stubs: {
+          GameBlock: defineComponent({ template: '<div><slot /></div>' }),
+        },
+      },
+    })
+
+    const section = wrapper.findComponent({ name: 'SpriteSlotsSection' })
+    expect(section.exists()).toBe(true)
+    expect(section.props('spriteStates')).toEqual([
+      { spriteNumber: 0, x: 10, y: 20, visible: true, priority: 0, definition: null },
+    ])
+    expect(section.props('spriteEnabled')).toBe(true)
     wrapper.unmount()
   })
 })
