@@ -5,7 +5,7 @@ import { ref } from 'vue'
 
 import Screen from '@/features/ide/components/Screen.vue'
 
-const LOCAL_STORAGE_SYNC_DELAY_MS = 50
+import { LOCAL_STORAGE_SYNC_DELAY_MS } from '../helpers/constants'
 
 // Mock useScreenContext to satisfy Screen.vue's provide/inject dependency
 vi.mock('@/features/ide/composables/useScreenContext', () => ({

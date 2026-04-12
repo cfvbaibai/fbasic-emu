@@ -10,8 +10,7 @@ import { ref } from 'vue'
 import type { ProgramData } from '@/core/types/program-types'
 import { createEmptyGrid } from '@/features/bg-editor/composables/useBgGrid'
 
-/** Delay for VueUse's useLocalStorage async sync to flush */
-const LOCAL_STORAGE_SYNC_DELAY_MS = 50
+import { LOCAL_STORAGE_SYNC_DELAY_MS } from '../helpers/constants'
 
 // Mock fileIO module
 vi.mock('@/shared/utils/fileIO', () => ({
