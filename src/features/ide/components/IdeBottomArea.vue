@@ -1,15 +1,18 @@
 <script setup lang="ts">
-import { useTemplateRef } from 'vue'
+import { ref, useTemplateRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import type { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
 import type { SpriteState } from '@/core/sprite/types'
 import type { ScreenCell } from '@/core/types/execution-types'
+import { GameTabPane, GameTabs } from '@/shared/components/ui'
 
+import BufferInspector from './BufferInspector.vue'
 import JoystickControl from './JoystickControl.vue'
 import StateInspector from './StateInspector.vue'
 
 /**
- * IdeBottomArea - Bottom panel containing Joystick and StateInspector.
+ * IdeBottomArea - Bottom panel containing Joystick and inspector tabs.
  * Extracted from IdePage to reduce file size.
  */
 
@@ -37,6 +40,9 @@ interface Props {
   sharedDisplayBufferAccessor: SharedDisplayBufferAccessor
 }
 
+const { t } = useI18n()
+const activeTab = ref('state')
+
 // StateInspector ref for animation loop to call updateMoveSlotsData
 const stateInspectorRef = useTemplateRef<{ updateMoveSlotsData: () => void }>('stateInspectorRef')
 
@@ -55,19 +61,26 @@ defineExpose({
       />
     </div>
     <div class="bottom-right">
-      <StateInspector
-        ref="stateInspectorRef"
-        :screen-buffer="screenBuffer"
-        :cursor-x="cursorX"
-        :cursor-y="cursorY"
-        :bg-palette="bgPalette"
-        :sprite-palette="spritePalette"
-        :backdrop-color="backdropColor"
-        :cgen-mode="cgenMode"
-        :sprite-states="spriteStates"
-        :sprite-enabled="spriteEnabled"
-        :shared-display-buffer-accessor="sharedDisplayBufferAccessor"
-      />
+      <GameTabs v-model="activeTab" type="border-card" class="inspector-tabs">
+        <GameTabPane name="state" :label="t('ide.stateInspector.title')">
+          <StateInspector
+            ref="stateInspectorRef"
+            :screen-buffer="screenBuffer"
+            :cursor-x="cursorX"
+            :cursor-y="cursorY"
+            :bg-palette="bgPalette"
+            :sprite-palette="spritePalette"
+            :backdrop-color="backdropColor"
+            :cgen-mode="cgenMode"
+            :sprite-states="spriteStates"
+            :sprite-enabled="spriteEnabled"
+            :shared-display-buffer-accessor="sharedDisplayBufferAccessor"
+          />
+        </GameTabPane>
+        <GameTabPane name="buffer" :label="t('ide.bufferInspector.title')">
+          <BufferInspector />
+        </GameTabPane>
+      </GameTabs>
     </div>
   </div>
 </template>
@@ -92,5 +105,15 @@ defineExpose({
   min-height: 0;
   display: flex;
   flex-direction: column;
+}
+
+.inspector-tabs {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
 }
 </style>
