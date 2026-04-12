@@ -299,7 +299,7 @@ Working directory: ${WT_PATH}
 This worktree contains a fresh checkout of origin/master. All implementation must happen inside this worktree.
 
 After implementation, run targeted tests for the files you changed:
-  cd ${WT_PATH} && pnpm install --frozen-lockfile && pnpm -s test:run -- <relevant-test-paths>
+  cd ${WT_PATH} && pnpm install --frozen-lockfile && pnpm -s test:run <relevant-test-paths>
 
 Also always run type-check and eslint on changed files to catch errors before committing:
   cd ${WT_PATH} && pnpm -s type-check
@@ -503,7 +503,7 @@ Proceed to Phase 7.
    Common CI failures and local reproduction:
    - **Type errors**: `pnpm -s type-check` — use codebase helpers (e.g., `getFirstCstNode()` from `cst-helpers.ts`) instead of raw CST access
    - **Lint errors**: `pnpm exec eslint --fix <files>` then amend if needed
-   - **Test failures**: `pnpm -s test:run -- <failing-test-file>`
+   - **Test failures**: `pnpm -s test:run <failing-test-file>`
    - **Build failures**: Usually type errors — check type-check output first
 
 4. Amend the fix into the original commit and force-push:
