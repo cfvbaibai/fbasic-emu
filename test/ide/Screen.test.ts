@@ -92,12 +92,16 @@ vi.mock('@/features/ide/components/DebugGridOverlay.vue', () => ({
   },
 }))
 
-describe('Screen - phosphor glow filter integration', () => {
+describe.each([
+  { className: 'crt-scanlines', label: 'scanline' },
+  { className: 'crt-phosphor-glow', label: 'phosphor glow' },
+  { className: 'crt-color-bleed', label: 'color bleeding' },
+])('Screen - $label filter integration', ({ className }) => {
   beforeEach(() => {
     localStorage.clear()
   })
 
-  it('hides crt-phosphor-glow when filterEnabled is false (default)', () => {
+  it(`hides ${className} when filterEnabled is false (default)`, () => {
     const wrapper = mount(Screen, {
       global: {
         stubs: {
@@ -109,11 +113,11 @@ describe('Screen - phosphor glow filter integration', () => {
     })
 
     expect(wrapper.find('.screen-display').exists()).toEqual(true)
-    expect(wrapper.find('.crt-phosphor-glow').exists()).toEqual(false)
+    expect(wrapper.find(`.${className}`).exists()).toEqual(false)
     wrapper.unmount()
   })
 
-  it('shows crt-phosphor-glow when filterEnabled is true', async () => {
+  it(`shows ${className} when filterEnabled is true`, async () => {
     localStorage.setItem('fbasic-screen-filter', 'true')
 
     const wrapper = mount(Screen, {
@@ -126,94 +130,9 @@ describe('Screen - phosphor glow filter integration', () => {
       },
     })
 
-    await new Promise((resolve) => setTimeout(resolve, 50))
-
-    expect(wrapper.find('.crt-phosphor-glow').exists()).toEqual(true)
-    wrapper.unmount()
-  })
-})
-
-describe('Screen - color bleeding filter integration', () => {
-  beforeEach(() => {
-    localStorage.clear()
-  })
-
-  it('hides crt-color-bleed when filterEnabled is false (default)', () => {
-    const wrapper = mount(Screen, {
-      global: {
-        stubs: {
-          'v-stage': vStageStub,
-          'v-layer': vLayerStub,
-          'v-rect': vRectStub,
-        },
-      },
-    })
-
-    expect(wrapper.find('.screen-display').exists()).toEqual(true)
-    expect(wrapper.find('.crt-color-bleed').exists()).toEqual(false)
-    wrapper.unmount()
-  })
-
-  it('shows crt-color-bleed when filterEnabled is true', async () => {
-    localStorage.setItem('fbasic-screen-filter', 'true')
-
-    const wrapper = mount(Screen, {
-      global: {
-        stubs: {
-          'v-stage': vStageStub,
-          'v-layer': vLayerStub,
-          'v-rect': vRectStub,
-        },
-      },
-    })
-
-    await new Promise((resolve) => setTimeout(resolve, 50))
-
-    expect(wrapper.find('.crt-color-bleed').exists()).toEqual(true)
-    wrapper.unmount()
-  })
-})
-
-describe('Screen - scanline filter integration', () => {
-  beforeEach(() => {
-    localStorage.clear()
-  })
-
-  it('hides crt-scanlines when filterEnabled is false (default)', () => {
-    const wrapper = mount(Screen, {
-      global: {
-        stubs: {
-          'v-stage': vStageStub,
-          'v-layer': vLayerStub,
-          'v-rect': vRectStub,
-        },
-      },
-    })
-
-    // Sanity check: component rendered
-    expect(wrapper.find('.screen-display').exists()).toEqual(true)
-    // Scanlines should not be present when filter is disabled (default)
-    expect(wrapper.find('.crt-scanlines').exists()).toEqual(false)
-    wrapper.unmount()
-  })
-
-  it('shows crt-scanlines when filterEnabled is true', async () => {
-    localStorage.setItem('fbasic-screen-filter', 'true')
-
-    const wrapper = mount(Screen, {
-      global: {
-        stubs: {
-          'v-stage': vStageStub,
-          'v-layer': vLayerStub,
-          'v-rect': vRectStub,
-        },
-      },
-    })
-
-    // Allow VueUse useLocalStorage to read from localStorage
     await new Promise((resolve) => setTimeout(resolve, LOCAL_STORAGE_SYNC_DELAY_MS))
 
-    expect(wrapper.find('.crt-scanlines').exists()).toEqual(true)
+    expect(wrapper.find(`.${className}`).exists()).toEqual(true)
     wrapper.unmount()
   })
 })
