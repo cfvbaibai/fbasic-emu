@@ -423,7 +423,22 @@
     "joystick0": "Joy 0",
     "joystick1": "Joy 1",
     "joystickStick": "STICK",
-    "joystickStrig": "STRIG"
+    "joystickStrig": "STRIG",
+    "animationSyncTitle": "アニメーション同期",
+    "animationSyncIdle": "(アイドル)",
+    "animationSyncAckPending": "保留中",
+    "animationSyncAckReceived": "受信済み",
+    "animationSyncColField": "フィールド",
+    "animationSyncColValue": "値",
+    "animationSyncFieldType": "コマンド種別",
+    "animationSyncFieldAction": "アクション #",
+    "animationSyncFieldStartX": "startX",
+    "animationSyncFieldStartY": "startY",
+    "animationSyncFieldDirection": "方向",
+    "animationSyncFieldSpeed": "速度",
+    "animationSyncFieldDistance": "距離",
+    "animationSyncFieldPriority": "優先度",
+    "animationSyncFieldAck": "ACK"
   },
   "composer": {
     "title": "コントロール",

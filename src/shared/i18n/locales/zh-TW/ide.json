@@ -423,7 +423,22 @@
     "joystick0": "Joy 0",
     "joystick1": "Joy 1",
     "joystickStick": "STICK",
-    "joystickStrig": "STRIG"
+    "joystickStrig": "STRIG",
+    "animationSyncTitle": "動畫同步",
+    "animationSyncIdle": "(閒置)",
+    "animationSyncAckPending": "等待中",
+    "animationSyncAckReceived": "已接收",
+    "animationSyncColField": "欄位",
+    "animationSyncColValue": "值",
+    "animationSyncFieldType": "命令類型",
+    "animationSyncFieldAction": "動作 #",
+    "animationSyncFieldStartX": "startX",
+    "animationSyncFieldStartY": "startY",
+    "animationSyncFieldDirection": "方向",
+    "animationSyncFieldSpeed": "速度",
+    "animationSyncFieldDistance": "距離",
+    "animationSyncFieldPriority": "優先順序",
+    "animationSyncFieldAck": "ACK"
   },
   "composer": {
     "title": "控制",

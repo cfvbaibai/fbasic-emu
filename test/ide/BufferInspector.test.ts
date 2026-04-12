@@ -5,6 +5,8 @@ import { defineComponent } from 'vue'
 
 import { SHARED_DISPLAY_BUFFER_BYTES } from '@/core/animation/sharedDisplayBuffer'
 import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
+import { SyncCommandType } from '@/core/animation/sharedDisplayBuffer'
+import type { SyncCommand } from '@/core/animation/sharedDisplayBufferAccessor'
 import BufferInspector from '@/features/ide/components/BufferInspector.vue'
 import type { ScreenBufferReader } from '@/features/ide/components/types'
 
@@ -24,13 +26,26 @@ const MOCK_ACCESSOR: ScreenBufferReader = {
 const testBuffer = new SharedArrayBuffer(SHARED_DISPLAY_BUFFER_BYTES)
 const MOCK_FULL_ACCESSOR = new SharedDisplayBufferAccessor(testBuffer)
 
+/** Mock accessor with readSyncCommand/readAck for testing */
+function createMockAccessor(overrides: Partial<SharedDisplayBufferAccessor> = {}): SharedDisplayBufferAccessor {
+  return {
+    readScreenChar: () => 0x20,
+    readScreenPattern: () => 0,
+    readSyncCommand: (): SyncCommand | null => null,
+    readAck: (): number => 0,
+    ...overrides,
+  } as SharedDisplayBufferAccessor
+}
+
 describe('BufferInspector', () => {
+  const mockAccessor = createMockAccessor()
+
   it('renders without errors', () => {
     const wrapper = mount(BufferInspector, {
       props: {
         spriteStates: [],
         spriteEnabled: false,
-        sharedDisplayBufferAccessor: MOCK_ACCESSOR,
+        sharedDisplayBufferAccessor: mockAccessor,
       },
       global: {
         stubs: {
@@ -48,7 +63,7 @@ describe('BufferInspector', () => {
       props: {
         spriteStates: [],
         spriteEnabled: false,
-        sharedDisplayBufferAccessor: MOCK_ACCESSOR,
+        sharedDisplayBufferAccessor: mockAccessor,
       },
       global: {
         stubs: {
@@ -66,7 +81,7 @@ describe('BufferInspector', () => {
       props: {
         spriteStates: [],
         spriteEnabled: false,
-        sharedDisplayBufferAccessor: MOCK_ACCESSOR,
+        sharedDisplayBufferAccessor: mockAccessor,
       },
       global: {
         stubs: {
@@ -84,12 +99,12 @@ describe('BufferInspector', () => {
     wrapper.unmount()
   })
 
-  it('renders content area with DisplayBufferSection, JoystickBufferSection and SpriteSlotsSection', () => {
+  it('renders content area with DisplayBufferSection, JoystickBufferSection, SpriteSlotsSection and AnimationSyncSection', () => {
     const wrapper = mount(BufferInspector, {
       props: {
         spriteStates: [],
         spriteEnabled: false,
-        sharedDisplayBufferAccessor: MOCK_ACCESSOR,
+        sharedDisplayBufferAccessor: mockAccessor,
       },
       global: {
         stubs: {
@@ -102,6 +117,7 @@ describe('BufferInspector', () => {
     expect(wrapper.find('.display-buffer-section').exists()).toBe(true)
     expect(wrapper.find('.joystick-buffer-section').exists()).toBe(true)
     expect(wrapper.find('.sprite-slots-section').exists()).toBe(true)
+    expect(wrapper.find('.animation-sync-section').exists()).toBe(true)
     wrapper.unmount()
   })
 
@@ -110,7 +126,7 @@ describe('BufferInspector', () => {
       props: {
         spriteStates: [],
         spriteEnabled: false,
-        sharedDisplayBufferAccessor: MOCK_ACCESSOR,
+        sharedDisplayBufferAccessor: mockAccessor,
       },
       global: {
         stubs: {
@@ -121,7 +137,7 @@ describe('BufferInspector', () => {
 
     const section = wrapper.findComponent({ name: 'DisplayBufferSection' })
     expect(section.exists()).toBe(true)
-    expect(section.props('sharedDisplayBufferAccessor')).toEqual(MOCK_ACCESSOR)
+    expect(section.props('sharedDisplayBufferAccessor')).toEqual(mockAccessor)
     wrapper.unmount()
   })
 
@@ -131,7 +147,7 @@ describe('BufferInspector', () => {
       props: {
         spriteStates: [],
         spriteEnabled: false,
-        sharedDisplayBufferAccessor: MOCK_ACCESSOR,
+        sharedDisplayBufferAccessor: mockAccessor,
         sharedJoystickBuffer: buffer,
       },
       global: {
@@ -154,7 +170,7 @@ describe('BufferInspector', () => {
           { spriteNumber: 0, x: 10, y: 20, visible: true, priority: 0, definition: null },
         ],
         spriteEnabled: true,
-        sharedDisplayBufferAccessor: MOCK_ACCESSOR,
+        sharedDisplayBufferAccessor: mockAccessor,
       },
       global: {
         stubs: {
@@ -169,6 +185,37 @@ describe('BufferInspector', () => {
       { spriteNumber: 0, x: 10, y: 20, visible: true, priority: 0, definition: null },
     ])
     expect(section.props('spriteEnabled')).toBe(true)
+    wrapper.unmount()
+  })
+
+  it('passes sync command and ack status to AnimationSyncSection', () => {
+    const syncCommand: SyncCommand = {
+      commandType: SyncCommandType.START_MOVEMENT,
+      actionNumber: 2,
+      params: { startX: 10, startY: 20, direction: 1, speed: 3, distance: 50, priority: 0 },
+    }
+    const accessor = createMockAccessor({
+      readSyncCommand: () => syncCommand,
+      readAck: () => 1,
+    })
+
+    const wrapper = mount(BufferInspector, {
+      props: {
+        spriteStates: [],
+        spriteEnabled: false,
+        sharedDisplayBufferAccessor: accessor,
+      },
+      global: {
+        stubs: {
+          GameBlock: defineComponent({ template: '<div><slot /></div>' }),
+        },
+      },
+    })
+
+    const section = wrapper.findComponent({ name: 'AnimationSyncSection' })
+    expect(section.exists()).toBe(true)
+    expect(section.props('syncCommand')).toEqual(syncCommand)
+    expect(section.props('ackStatus')).toBe(1)
     wrapper.unmount()
   })
 })
