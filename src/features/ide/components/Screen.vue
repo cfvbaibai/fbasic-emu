@@ -9,6 +9,7 @@ import { initializeKonvaLayers, type KonvaScreenLayers, renderAllScreenLayers } 
 import { useScreenAnimationLoopRenderOnly } from '@/features/ide/composables/useScreenAnimationLoopRenderOnly'
 import { useScreenContext } from '@/features/ide/composables/useScreenContext'
 import { useScreenDebug } from '@/features/ide/composables/useScreenDebug'
+import { useScreenFilter } from '@/features/ide/composables/useScreenFilter'
 import { useScreenZoom } from '@/features/ide/composables/useScreenZoom'
 import { COLORS } from '@/shared/data/palette'
 import { logScreen } from '@/shared/logger'
@@ -49,6 +50,9 @@ const { zoomLevel } = useScreenZoom()
 
 // Use debug settings composable
 const { showGrid } = useScreenDebug()
+
+// Use screen filter composable for CRT scanline toggle
+const { filterEnabled } = useScreenFilter()
 
 // Base screen dimensions (full backdrop/sprite screen: 256×240)
 const BASE_WIDTH = 256
@@ -445,7 +449,7 @@ onDeactivated(cleanupScreen)
   <div class="screen-display">
     <div class="crt-bezel">
       <div class="crt-screen">
-        <div class="crt-scanlines"></div>
+        <div v-if="filterEnabled" class="crt-scanlines"></div>
         <div
           class="screen-stage-wrapper"
           data-testid="ide-screen-stage"
