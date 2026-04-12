@@ -482,5 +482,13 @@
     "encodeFailed": "共有URLの生成に失敗しました。",
     "tooLarge": "このプログラムはURLで共有するには大きすぎます。",
     "loadFailed": "共有プログラムの読み込みに失敗しました"
+  },
+  "tutorial": {
+    "title": "チュートリアル",
+    "defaultTitle": "F-BASICチュートリアル",
+    "closeAriaLabel": "チュートリアルを閉じる",
+    "prev": "前のレッスン",
+    "next": "次のレッスン",
+    "noContent": "レッスン内容はありません。"
   }
 }

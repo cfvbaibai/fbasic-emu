@@ -20,6 +20,7 @@ import IdeOutputPanel from './components/IdeOutputPanel.vue'
 import IdeSpriteViewerPanel from './components/IdeSpriteViewerPanel.vue'
 import InputModal from './components/InputModal.vue'
 import SampleSelector from './components/SampleSelector.vue'
+import TutorialPanel from './components/TutorialPanel.vue'
 import type { CommandPaletteCommand } from './composables/commandPalette'
 import {
   isEditableTarget,
@@ -31,6 +32,7 @@ import { useDevApi } from './composables/useDevApi'
 import { useIdeCommandPalette } from './composables/useIdeCommandPalette'
 import { provideScreenContext } from './composables/useScreenContext'
 import { useShareRoute } from './composables/useShareRoute'
+import { useTutorialPanel } from './composables/useTutorialPanel'
 
 /**
  * IdePage component - The main IDE page for F-BASIC code editing and execution.
@@ -158,6 +160,9 @@ const commandPaletteOpen = shallowRef(false)
 const editorView = shallowRef<'code' | 'bg'>('code')
 const logLevelPanelOpen = shallowRef(false)
 const spriteViewerOpen = shallowRef(false)
+
+// Tutorial panel
+const tutorialPanel = useTutorialPanel()
 
 // Responsive toolbar - observe editor panel which expands with screen
 const editorPanelRef = useTemplateRef<HTMLDivElement>('editorPanelRef')
@@ -333,6 +338,7 @@ function toggleInputMode() {
             @toggle-debug="toggleDebugMode"
             @open-sample-selector="sampleSelectorOpen = true"
             @open-sprite-viewer="spriteViewerOpen = true"
+            @toggle-tutorial-panel="tutorialPanel.toggle()"
           />
         </div>
 
@@ -346,6 +352,16 @@ function toggleInputMode() {
           :variables="variables"
           :debug-output="debugOutput"
           :debug-mode="debugMode"
+        />
+
+        <!-- Right Side Panel - Tutorial -->
+        <TutorialPanel
+          v-if="tutorialPanel.isVisible.value"
+          :has-prev="tutorialPanel.hasPrev.value"
+          :has-next="tutorialPanel.hasNext.value"
+          @close="tutorialPanel.close()"
+          @prev="tutorialPanel.goToPrev()"
+          @next="tutorialPanel.goToNext()"
         />
       </div>
 

@@ -482,5 +482,13 @@
     "encodeFailed": "無法產生分享連結。",
     "tooLarge": "此程式過大，無法透過連結分享。",
     "loadFailed": "載入分享程式失敗"
+  },
+  "tutorial": {
+    "title": "教學",
+    "defaultTitle": "F-BASIC 教學",
+    "closeAriaLabel": "關閉教學",
+    "prev": "上一課",
+    "next": "下一課",
+    "noContent": "暫無課程內容。"
   }
 }
