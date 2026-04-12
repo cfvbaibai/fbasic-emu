@@ -182,6 +182,61 @@ describe('IF-THEN Statement', () => {
       expect(result.success).toBe(true)
     })
 
+    it('should parse IF without THEN with colon-separated statements', () => {
+      const source = '10 IF X = 1 PRINT A: PRINT B'
+      const result = parseWithChevrotain(source)
+
+      expect(result.success).toBe(true)
+      expect(result.cst).toBeDefined()
+
+      const statements = result.cst?.children.statement
+      expect(statements).toBeDefined()
+
+      const statementCst = getFirstCstNode(statements)
+      expect(statementCst).toBeDefined()
+
+      if (!statementCst) return
+
+      const commandListCst = getFirstCstNode(statementCst.children.commandList)
+      expect(commandListCst).toBeDefined()
+
+      if (!commandListCst) return
+
+      const commandCst = getFirstCstNode(commandListCst.children.command)
+      expect(commandCst).toBeDefined()
+
+      if (!commandCst) return
+
+      const singleCommandCst = getFirstCstNode(commandCst.children.singleCommand)
+      expect(singleCommandCst).toBeDefined()
+
+      if (!singleCommandCst) return
+
+      const ifThenStmtCst = getFirstCstNode(singleCommandCst.children.ifThenStatement)
+      expect(ifThenStmtCst).toBeDefined()
+
+      if (!ifThenStmtCst) return
+
+      // THEN-less IF should have logicalExpression and commandList (no THEN token)
+      expect(ifThenStmtCst.children.logicalExpression).toBeDefined()
+      expect(ifThenStmtCst.children.commandList).toBeDefined()
+      // THEN token should NOT be present
+      expect(ifThenStmtCst.children.Then).toBeUndefined()
+
+      // The commandList inside the THEN-less IF should contain colon-separated commands
+      const innerCommandList = getFirstCstNode(ifThenStmtCst.children.commandList)
+      expect(innerCommandList).toBeDefined()
+
+      if (!innerCommandList) return
+
+      const innerCommands = innerCommandList.children.command
+      expect(innerCommands).toBeDefined()
+
+      if (!innerCommands) return
+
+      expect(innerCommands.length).toEqual(2)
+    })
+
     it('should reject IF-THEN without condition', () => {
       const source = '10 IF THEN PRINT "Error"'
       const result = parseWithChevrotain(source)
