@@ -103,6 +103,38 @@ describe('useComposer', () => {
       expect(activeChannel.value).toEqual(2)
     })
 
+    it('ignores negative index', () => {
+      const { activeChannel, setActiveChannel } = useComposer()
+
+      setActiveChannel(-1)
+
+      expect(activeChannel.value).toEqual(0)
+    })
+
+    it('ignores index equal to CHANNEL_COUNT (3)', () => {
+      const { activeChannel, setActiveChannel } = useComposer()
+
+      setActiveChannel(3)
+
+      expect(activeChannel.value).toEqual(0)
+    })
+
+    it('ignores index greater than CHANNEL_COUNT (5)', () => {
+      const { activeChannel, setActiveChannel } = useComposer()
+
+      setActiveChannel(5)
+
+      expect(activeChannel.value).toEqual(0)
+    })
+
+    it('ignores NaN', () => {
+      const { activeChannel, setActiveChannel } = useComposer()
+
+      setActiveChannel(NaN)
+
+      expect(activeChannel.value).toEqual(0)
+    })
+
     it('updates activeNotes to reflect new channel', () => {
       const { activeNotes, setActiveChannel, toggleNote } = useComposer()
 
