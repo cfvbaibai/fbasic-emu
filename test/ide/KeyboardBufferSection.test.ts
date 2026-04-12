@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from 'vitest'
 import type { KeyboardBufferView } from '@/core/devices/sharedKeyboardBuffer'
 import { consumeKeyAvailable, setInkeyState } from '@/core/devices/sharedKeyboardBuffer'
 import KeyboardBufferSection from '@/features/ide/components/KeyboardBufferSection.vue'
+import { POLL_INTERVAL_MS } from '@/features/ide/components/keyboardBufferSectionConstants'
 
 import { createTestKeyboardBuffer } from './helpers/createTestKeyboardBuffer'
 vi.mock('vue-i18n', () => ({
@@ -17,7 +18,7 @@ vi.mock('vue-i18n', () => ({
 /**
  * Mount the component with fake timers.
  * After mutating the keyboard buffer, advance timers by the poll
- * interval (100ms) so the component picks up the change.
+ * interval so the component picks up the change.
  */
 function mountWithFakeTimers(keyboardView: KeyboardBufferView) {
   vi.useFakeTimers()
@@ -94,7 +95,7 @@ describe('KeyboardBufferSection', () => {
     const { wrapper, cleanup } = mountWithFakeTimers(keyboardView)
 
     setInkeyState(keyboardView, 'A', 1)
-    vi.advanceTimersByTime(100)
+    vi.advanceTimersByTime(POLL_INTERVAL_MS)
     await wrapper.vm.$nextTick()
 
     const values = wrapper.findAll('.keyboard-buffer-value')
@@ -114,7 +115,7 @@ describe('KeyboardBufferSection', () => {
 
     // Press a key and advance poll
     setInkeyState(keyboardView, 'B', 0)
-    vi.advanceTimersByTime(100)
+    vi.advanceTimersByTime(POLL_INTERVAL_MS)
     await wrapper.vm.$nextTick()
 
     values = wrapper.findAll('.keyboard-buffer-value')
@@ -122,7 +123,7 @@ describe('KeyboardBufferSection', () => {
 
     // Consume keyAvailable and advance poll
     consumeKeyAvailable(keyboardView)
-    vi.advanceTimersByTime(100)
+    vi.advanceTimersByTime(POLL_INTERVAL_MS)
     await wrapper.vm.$nextTick()
 
     values = wrapper.findAll('.keyboard-buffer-value')
@@ -141,7 +142,7 @@ describe('KeyboardBufferSection', () => {
 
     // Press a key
     setInkeyState(keyboardView, 'X', 0)
-    vi.advanceTimersByTime(100)
+    vi.advanceTimersByTime(POLL_INTERVAL_MS)
     await wrapper.vm.$nextTick()
 
     const updatedCharCells = wrapper.findAll('.keyboard-buffer-char')
@@ -157,7 +158,7 @@ describe('KeyboardBufferSection', () => {
     expect(availableRow.classes()).not.toContain('keyboard-buffer-highlight')
 
     setInkeyState(keyboardView, 'A', 0)
-    vi.advanceTimersByTime(100)
+    vi.advanceTimersByTime(POLL_INTERVAL_MS)
     await wrapper.vm.$nextTick()
 
     expect(availableRow.classes()).toContain('keyboard-buffer-highlight')
@@ -169,7 +170,7 @@ describe('KeyboardBufferSection', () => {
     const { wrapper, cleanup } = mountWithFakeTimers(keyboardView)
 
     setInkeyState(keyboardView, 'A', 0)
-    vi.advanceTimersByTime(100)
+    vi.advanceTimersByTime(POLL_INTERVAL_MS)
     await wrapper.vm.$nextTick()
 
     const availableRow = wrapper.findAll('.keyboard-buffer-row')[2]!
@@ -193,7 +194,7 @@ describe('KeyboardBufferSection', () => {
 
     // Trigger a key press to start the highlight timeout
     setInkeyState(keyboardView, 'A', 0)
-    vi.advanceTimersByTime(100)
+    vi.advanceTimersByTime(POLL_INTERVAL_MS)
     await wrapper.vm.$nextTick()
 
     // Confirm highlight is active (timeout was scheduled)
