@@ -110,7 +110,7 @@
     inset: 0;
     background: radial-gradient( ellipse 140% 100% at 85% 5%, var(--crt-glow-light-40) 0%, var(--crt-glow-light-20) 15%, var(--crt-glow-light-10) 30%, transparent 55%, var(--crt-shadow-dark-40) 100%);
     pointer-events: none;
-    z-index: 4;
+    z-index: 5;
     border-radius: 16px;
 }
 
@@ -141,7 +141,7 @@
     position: absolute;
     inset: 0;
     pointer-events: none;
-    z-index: 3;
+    z-index: 4;
     border-radius: 24px;
     background: radial-gradient(
         ellipse 100% 100% at 50% 50%,
