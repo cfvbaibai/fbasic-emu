@@ -405,7 +405,7 @@
   "bufferInspector": {
     "title": "缓冲区检查器",
     "spriteSlotsTitle": "精灵槽位",
-    "spriteSlotsDisabled": "SPRITE OFF",
+    "spriteSlotsDisabled": "精灵已关闭",
     "spriteSlotsOn": "开",
     "spriteSlotsOff": "关",
     "spriteSlotsDefined": "已定义",
