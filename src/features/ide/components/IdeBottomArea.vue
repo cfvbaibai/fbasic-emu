@@ -3,6 +3,7 @@ import { ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import type { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
+import type { KeyboardBufferView } from '@/core/devices/sharedKeyboardBuffer'
 import type { SpriteState } from '@/core/sprite/types'
 import type { ScreenCell } from '@/core/types/execution-types'
 import { GameTabPane, GameTabs } from '@/shared/components/ui'
@@ -38,6 +39,9 @@ interface Props {
   spriteStates: SpriteState[]
   spriteEnabled: boolean
   sharedDisplayBufferAccessor: SharedDisplayBufferAccessor
+
+  // KeyboardBufferSection props
+  keyboardView: KeyboardBufferView
 }
 
 const { t } = useI18n()
@@ -83,6 +87,7 @@ defineExpose({
             :sprite-enabled="spriteEnabled"
             :shared-display-buffer-accessor="sharedDisplayBufferAccessor"
             :shared-joystick-buffer="sharedJoystickBuffer"
+            :keyboard-view="keyboardView"
           />
         </GameTabPane>
       </GameTabs>

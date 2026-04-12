@@ -6,6 +6,11 @@ import { useRoute } from 'vue-router'
 import type { SharedDisplayViews } from '@/core/animation/sharedDisplayBuffer'
 import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
 import { PALETTE_DEFAULTS } from '@/core/constants'
+import type { KeyboardBufferView } from '@/core/devices'
+import {
+  createSharedKeyboardBuffer,
+  createViewsFromKeyboardBuffer,
+} from '@/core/devices'
 import type { SpriteState } from '@/core/sprite/types'
 import type { HighlighterInfo, ParserInfo, ScreenCell } from '@/core/types/execution-types'
 import type { BasicVariable } from '@/core/types/state-types'
@@ -135,6 +140,8 @@ const sharedDisplayViews: SharedDisplayViews = basicIde?.sharedDisplayViews ?? {
   animationSyncView: {} as Float64Array,
 }
 const sharedJoystickBuffer = basicIde?.sharedJoystickBuffer ?? ({} as SharedArrayBuffer)
+const sharedKeyboardBufferView: KeyboardBufferView =
+  basicIde?.sharedKeyboardBufferView ?? createViewsFromKeyboardBuffer(createSharedKeyboardBuffer())
 const setDecodedScreenState = basicIde?.setDecodedScreenState ?? (() => {})
 const registerCallbacks = basicIde?.registerCallbacks ?? {
   registerScheduleRender: () => {},
@@ -381,6 +388,7 @@ function toggleInputMode() {
         :sprite-states="spriteStates"
         :sprite-enabled="spriteEnabled"
         :shared-display-buffer-accessor="sharedDisplayBufferAccessor"
+        :keyboard-view="sharedKeyboardBufferView"
       />
 
       <!-- INPUT/LINPUT modal overlay -->

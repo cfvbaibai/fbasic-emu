@@ -3,12 +3,14 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import type { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
+import type { KeyboardBufferView } from '@/core/devices/sharedKeyboardBuffer'
 import type { SpriteState } from '@/core/sprite/types'
 import { GameBlock } from '@/shared/components/ui'
 
 import AnimationSyncSection from './AnimationSyncSection.vue'
 import DisplayBufferSection from './DisplayBufferSection.vue'
 import JoystickBufferSection from './JoystickBufferSection.vue'
+import KeyboardBufferSection from './KeyboardBufferSection.vue'
 import SpriteSlotsSection from './SpriteSlotsSection.vue'
 
 defineOptions({
@@ -21,6 +23,7 @@ const props = defineProps<{
   sharedDisplayBufferAccessor: SharedDisplayBufferAccessor
   sharedJoystickBuffer?: SharedArrayBuffer
   tick?: number
+  keyboardView: KeyboardBufferView
 }>()
 
 const { t } = useI18n()
@@ -42,6 +45,7 @@ const ackStatus = computed(() => props.sharedDisplayBufferAccessor.readAck())
         :shared-joystick-buffer="sharedJoystickBuffer"
         :tick="tick"
       />
+      <KeyboardBufferSection :keyboard-view="keyboardView" />
       <SpriteSlotsSection :sprite-states="spriteStates" :sprite-enabled="spriteEnabled" />
       <AnimationSyncSection :sync-command="syncCommand" :ack-status="ackStatus" />
     </div>

@@ -4,23 +4,18 @@ import { describe, expect, it, vi } from 'vitest'
 import { defineComponent } from 'vue'
 
 import { SHARED_DISPLAY_BUFFER_BYTES } from '@/core/animation/sharedDisplayBuffer'
-import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
 import { SyncCommandType } from '@/core/animation/sharedDisplayBuffer'
 import type { SyncCommand } from '@/core/animation/sharedDisplayBufferAccessor'
+import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
+import type { KeyboardBufferView } from '@/core/devices/sharedKeyboardBuffer'
+import { createSharedKeyboardBuffer, createViewsFromKeyboardBuffer } from '@/core/devices/sharedKeyboardBuffer'
 import BufferInspector from '@/features/ide/components/BufferInspector.vue'
-import type { ScreenBufferReader } from '@/features/ide/components/types'
 
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
     t: (key: string) => key,
   }),
 }))
-
-/** Minimal mock satisfying ScreenBufferReader type */
-const MOCK_ACCESSOR: ScreenBufferReader = {
-  readScreenChar: () => 0x20,
-  readScreenPattern: () => 0,
-}
 
 /** Real accessor instance for IdeBottomArea tests (StateInspector needs the full type) */
 const testBuffer = new SharedArrayBuffer(SHARED_DISPLAY_BUFFER_BYTES)
@@ -37,15 +32,22 @@ function createMockAccessor(overrides: Partial<SharedDisplayBufferAccessor> = {}
   } as SharedDisplayBufferAccessor
 }
 
+/** Create a real keyboard buffer view for tests */
+function createTestKeyboardView(): KeyboardBufferView {
+  return createViewsFromKeyboardBuffer(createSharedKeyboardBuffer())
+}
+
 describe('BufferInspector', () => {
   const mockAccessor = createMockAccessor()
 
   it('renders without errors', () => {
+    const keyboardView = createTestKeyboardView()
     const wrapper = mount(BufferInspector, {
       props: {
         spriteStates: [],
         spriteEnabled: false,
         sharedDisplayBufferAccessor: mockAccessor,
+        keyboardView,
       },
       global: {
         stubs: {
@@ -59,11 +61,13 @@ describe('BufferInspector', () => {
   })
 
   it('has the correct component name', () => {
+    const keyboardView = createTestKeyboardView()
     const wrapper = mount(BufferInspector, {
       props: {
         spriteStates: [],
         spriteEnabled: false,
         sharedDisplayBufferAccessor: mockAccessor,
+        keyboardView,
       },
       global: {
         stubs: {
@@ -77,11 +81,13 @@ describe('BufferInspector', () => {
   })
 
   it('displays the title from i18n key', () => {
+    const keyboardView = createTestKeyboardView()
     const wrapper = mount(BufferInspector, {
       props: {
         spriteStates: [],
         spriteEnabled: false,
         sharedDisplayBufferAccessor: mockAccessor,
+        keyboardView,
       },
       global: {
         stubs: {
@@ -99,12 +105,14 @@ describe('BufferInspector', () => {
     wrapper.unmount()
   })
 
-  it('renders content area with DisplayBufferSection, JoystickBufferSection, SpriteSlotsSection and AnimationSyncSection', () => {
+  it('renders content area with DisplayBufferSection, JoystickBufferSection, KeyboardBufferSection, SpriteSlotsSection and AnimationSyncSection', () => {
+    const keyboardView = createTestKeyboardView()
     const wrapper = mount(BufferInspector, {
       props: {
         spriteStates: [],
         spriteEnabled: false,
         sharedDisplayBufferAccessor: mockAccessor,
+        keyboardView,
       },
       global: {
         stubs: {
@@ -116,17 +124,20 @@ describe('BufferInspector', () => {
     expect(wrapper.find('.buffer-inspector-content').exists()).toBe(true)
     expect(wrapper.find('.display-buffer-section').exists()).toBe(true)
     expect(wrapper.find('.joystick-buffer-section').exists()).toBe(true)
+    expect(wrapper.find('.keyboard-buffer-section').exists()).toBe(true)
     expect(wrapper.find('.sprite-slots-section').exists()).toBe(true)
     expect(wrapper.find('.animation-sync-section').exists()).toBe(true)
     wrapper.unmount()
   })
 
   it('passes sharedDisplayBufferAccessor to DisplayBufferSection', () => {
+    const keyboardView = createTestKeyboardView()
     const wrapper = mount(BufferInspector, {
       props: {
         spriteStates: [],
         spriteEnabled: false,
         sharedDisplayBufferAccessor: mockAccessor,
+        keyboardView,
       },
       global: {
         stubs: {
@@ -143,12 +154,14 @@ describe('BufferInspector', () => {
 
   it('passes sharedJoystickBuffer to JoystickBufferSection', () => {
     const buffer = new SharedArrayBuffer(32)
+    const keyboardView = createTestKeyboardView()
     const wrapper = mount(BufferInspector, {
       props: {
         spriteStates: [],
         spriteEnabled: false,
         sharedDisplayBufferAccessor: mockAccessor,
         sharedJoystickBuffer: buffer,
+        keyboardView,
       },
       global: {
         stubs: {
@@ -163,7 +176,30 @@ describe('BufferInspector', () => {
     wrapper.unmount()
   })
 
+  it('passes keyboardView to KeyboardBufferSection', () => {
+    const keyboardView = createTestKeyboardView()
+    const wrapper = mount(BufferInspector, {
+      props: {
+        spriteStates: [],
+        spriteEnabled: false,
+        sharedDisplayBufferAccessor: mockAccessor,
+        keyboardView,
+      },
+      global: {
+        stubs: {
+          GameBlock: defineComponent({ template: '<div><slot /></div>' }),
+        },
+      },
+    })
+
+    const section = wrapper.findComponent({ name: 'KeyboardBufferSection' })
+    expect(section.exists()).toBe(true)
+    expect(section.props('keyboardView')).toStrictEqual(keyboardView)
+    wrapper.unmount()
+  })
+
   it('passes spriteStates and spriteEnabled to SpriteSlotsSection', () => {
+    const keyboardView = createTestKeyboardView()
     const wrapper = mount(BufferInspector, {
       props: {
         spriteStates: [
@@ -171,6 +207,7 @@ describe('BufferInspector', () => {
         ],
         spriteEnabled: true,
         sharedDisplayBufferAccessor: mockAccessor,
+        keyboardView,
       },
       global: {
         stubs: {
@@ -194,6 +231,7 @@ describe('BufferInspector', () => {
       actionNumber: 2,
       params: { startX: 10, startY: 20, direction: 1, speed: 3, distance: 50, priority: 0 },
     }
+    const keyboardView = createTestKeyboardView()
     const accessor = createMockAccessor({
       readSyncCommand: () => syncCommand,
       readAck: () => 1,
@@ -204,6 +242,7 @@ describe('BufferInspector', () => {
         spriteStates: [],
         spriteEnabled: false,
         sharedDisplayBufferAccessor: accessor,
+        keyboardView,
       },
       global: {
         stubs: {
@@ -225,6 +264,7 @@ describe('IdeBottomArea tab integration', () => {
     // Dynamic import to avoid module caching issues
     const ideBottomArea = (await import('@/features/ide/components/IdeBottomArea.vue')).default
 
+    const keyboardView = createTestKeyboardView()
     const wrapper = mount(ideBottomArea, {
       props: {
         screenBuffer: [],
@@ -237,6 +277,7 @@ describe('IdeBottomArea tab integration', () => {
         spriteStates: [],
         spriteEnabled: false,
         sharedDisplayBufferAccessor: MOCK_FULL_ACCESSOR,
+        keyboardView,
       },
       global: {
         stubs: {
@@ -272,6 +313,7 @@ describe('IdeBottomArea tab integration', () => {
   it('defaults to the state tab being active', async () => {
     const ideBottomAreaComponent = (await import('@/features/ide/components/IdeBottomArea.vue')).default
 
+    const keyboardView = createTestKeyboardView()
     const wrapper = mount(ideBottomAreaComponent, {
       props: {
         screenBuffer: [],
@@ -284,6 +326,7 @@ describe('IdeBottomArea tab integration', () => {
         spriteStates: [],
         spriteEnabled: false,
         sharedDisplayBufferAccessor: MOCK_FULL_ACCESSOR,
+        keyboardView,
       },
       global: {
         stubs: {

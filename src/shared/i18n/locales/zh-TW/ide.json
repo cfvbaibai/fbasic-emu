@@ -438,7 +438,11 @@
     "animationSyncFieldSpeed": "速度",
     "animationSyncFieldDistance": "距離",
     "animationSyncFieldPriority": "優先順序",
-    "animationSyncFieldAck": "ACK"
+    "animationSyncFieldAck": "ACK",
+    "keyboardBufferTitle": "鍵盤緩衝區",
+    "keyboardCharCode": "字元碼",
+    "keyboardModifiers": "修飾鍵",
+    "keyboardAvailable": "可用"
   },
   "composer": {
     "title": "控制",
