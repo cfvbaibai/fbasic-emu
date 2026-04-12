@@ -257,3 +257,73 @@ describe('DisplayBufferSection', () => {
     wrapper.unmount()
   })
 })
+
+describe('formatHex', () => {
+  it('formats 0 as "00" (zero padding)', () => {
+    const chars = Array.from({ length: 24 }, () =>
+      Array.from({ length: 28 }, () => 0x20),
+    )
+    chars[0]![0] = 0
+
+    const wrapper = mount(DisplayBufferSection, {
+      props: {
+        sharedDisplayBufferAccessor: makeMockAccessor({ chars }),
+      },
+    })
+
+    const charCells = wrapper.findAll('.display-buffer-char-cell')
+    expect(charCells[0]!.text()).toBe('00')
+    wrapper.unmount()
+  })
+
+  it('formats 15 as "0F" (single-digit hex, uppercase)', () => {
+    const chars = Array.from({ length: 24 }, () =>
+      Array.from({ length: 28 }, () => 0x20),
+    )
+    chars[0]![0] = 15
+
+    const wrapper = mount(DisplayBufferSection, {
+      props: {
+        sharedDisplayBufferAccessor: makeMockAccessor({ chars }),
+      },
+    })
+
+    const charCells = wrapper.findAll('.display-buffer-char-cell')
+    expect(charCells[0]!.text()).toBe('0F')
+    wrapper.unmount()
+  })
+
+  it('formats 255 as "FF" (max byte value)', () => {
+    const chars = Array.from({ length: 24 }, () =>
+      Array.from({ length: 28 }, () => 0x20),
+    )
+    chars[0]![0] = 255
+
+    const wrapper = mount(DisplayBufferSection, {
+      props: {
+        sharedDisplayBufferAccessor: makeMockAccessor({ chars }),
+      },
+    })
+
+    const charCells = wrapper.findAll('.display-buffer-char-cell')
+    expect(charCells[0]!.text()).toBe('FF')
+    wrapper.unmount()
+  })
+
+  it('formats 256 as "100" (overflow beyond 2-digit pad)', () => {
+    const chars = Array.from({ length: 24 }, () =>
+      Array.from({ length: 28 }, () => 0x20),
+    )
+    chars[0]![0] = 256
+
+    const wrapper = mount(DisplayBufferSection, {
+      props: {
+        sharedDisplayBufferAccessor: makeMockAccessor({ chars }),
+      },
+    })
+
+    const charCells = wrapper.findAll('.display-buffer-char-cell')
+    expect(charCells[0]!.text()).toBe('100')
+    wrapper.unmount()
+  })
+})
