@@ -17,6 +17,7 @@ const { t } = useI18n()
 const POLL_INTERVAL_MS = 100
 const HIGHLIGHT_DURATION_MS = 1000
 let pollTimer: ReturnType<typeof setInterval> | null = null
+let highlightTimer: ReturnType<typeof setTimeout> | null = null
 
 const keyCharCode = ref(0)
 const keyModifiers = ref(0)
@@ -32,8 +33,12 @@ function readKeyboardState(): void {
   // Detect keyAvailable transition
   if (newAvailable !== keyAvailable.value && newAvailable !== 0) {
     highlightKeyAvailable.value = true
-    setTimeout(() => {
+    if (highlightTimer !== null) {
+      clearTimeout(highlightTimer)
+    }
+    highlightTimer = setTimeout(() => {
       highlightKeyAvailable.value = false
+      highlightTimer = null
     }, HIGHLIGHT_DURATION_MS)
   }
 
@@ -52,6 +57,10 @@ onBeforeUnmount(() => {
   if (pollTimer !== null) {
     clearInterval(pollTimer)
     pollTimer = null
+  }
+  if (highlightTimer !== null) {
+    clearTimeout(highlightTimer)
+    highlightTimer = null
   }
 })
 </script>

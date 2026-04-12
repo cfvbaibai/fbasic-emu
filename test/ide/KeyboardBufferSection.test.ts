@@ -7,12 +7,12 @@ import { consumeKeyAvailable, setInkeyState } from '@/core/devices/sharedKeyboar
 import KeyboardBufferSection from '@/features/ide/components/KeyboardBufferSection.vue'
 
 import { createTestKeyboardBuffer } from './helpers/createTestKeyboardBuffer'
-
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
     t: (key: string) => key,
   }),
 }))
+
 
 /**
  * Mount the component with fake timers.
@@ -181,5 +181,33 @@ describe('KeyboardBufferSection', () => {
 
     expect(availableRow.classes()).not.toContain('keyboard-buffer-highlight')
     cleanup()
+  })
+
+  it('clears highlight timeout on unmount to prevent stale ref update', async () => {
+    const keyboardView = createTestKeyboardBuffer()
+    vi.useFakeTimers()
+
+    const wrapper = mount(KeyboardBufferSection, {
+      props: { keyboardView },
+    })
+
+    // Trigger a key press to start the highlight timeout
+    setInkeyState(keyboardView, 'A', 0)
+    vi.advanceTimersByTime(100)
+    await wrapper.vm.$nextTick()
+
+    // Confirm highlight is active (timeout was scheduled)
+    const availableRow = wrapper.findAll('.keyboard-buffer-row')[2]!
+    expect(availableRow.classes()).toContain('keyboard-buffer-highlight')
+
+    // Unmount before the highlight duration expires.
+    // The fix clears the highlight timer in onBeforeUnmount.
+    wrapper.unmount()
+
+    // After unmount, both the poll interval and the highlight timer
+    // should be cleared, leaving zero pending timers.
+    expect(vi.getTimerCount()).toBe(0)
+
+    vi.useRealTimers()
   })
 })
