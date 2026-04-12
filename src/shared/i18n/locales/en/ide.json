@@ -438,7 +438,11 @@
     "animationSyncFieldSpeed": "Speed",
     "animationSyncFieldDistance": "Distance",
     "animationSyncFieldPriority": "Priority",
-    "animationSyncFieldAck": "ACK"
+    "animationSyncFieldAck": "ACK",
+    "keyboardBufferTitle": "Keyboard Buffer",
+    "keyboardCharCode": "Char Code",
+    "keyboardModifiers": "Modifiers",
+    "keyboardAvailable": "Available"
   },
   "composer": {
     "title": "Controls",

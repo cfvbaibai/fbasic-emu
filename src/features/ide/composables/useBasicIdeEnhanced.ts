@@ -147,6 +147,7 @@ export function useBasicIde() {
     sharedAnimationBuffer: screen.sharedAnimationBuffer,
     sharedDisplayViews: screen.sharedDisplayViews,
     sharedJoystickBuffer: screen.sharedJoystickBuffer,
+    sharedKeyboardBufferView: screen.sharedKeyboardBufferView,
     setDecodedScreenState: screen.setDecodedScreenState,
     registerCallbacks: screen.registerCallbacks,
   }
