@@ -234,4 +234,81 @@ describe('THEN-less IF colon scoping program integration', () => {
       expect(tp.getAdapter().beepCalls).toEqual(0)
     })
   })
+
+  // ==========================================================================
+  // 5. GOTO within colon chain after THEN-less IF
+  // ==========================================================================
+
+  describe('GOTO within colon chain after THEN-less IF', () => {
+    it('jumps to target line when THEN-less IF condition is true', async () => {
+      const tp = TestProgram.fromCode(
+        [
+          '10 LET X = 1',
+          '20 IF X = 1 PRINT "YES": GOTO 100',
+          '30 PRINT "NO"',
+          '100 PRINT "END"',
+        ].join('\n'),
+      )
+
+      await tp.run()
+
+      tp.expectSuccess()
+      tp.expectRowText(0, 'YES')
+      tp.expectRowText(1, 'END')
+    })
+
+    it('falls through to next line when THEN-less IF condition is false', async () => {
+      const tp = TestProgram.fromCode(
+        [
+          '10 LET X = 0',
+          '20 IF X = 1 PRINT "YES": GOTO 100',
+          '30 PRINT "NO"',
+          '100 PRINT "END"',
+        ].join('\n'),
+      )
+
+      await tp.run()
+
+      tp.expectSuccess()
+      tp.expectRowText(0, 'NO')
+      tp.expectRowText(1, 'END')
+    })
+
+    it('GOTO after PRINT in colon chain jumps past intermediate lines', async () => {
+      const tp = TestProgram.fromCode(
+        [
+          '10 LET A = 1',
+          '20 IF A = 1 PRINT "JUMP": GOTO 50',
+          '30 PRINT "SKIP1"',
+          '40 PRINT "SKIP2"',
+          '50 PRINT "LAND"',
+        ].join('\n'),
+      )
+
+      await tp.run()
+
+      tp.expectSuccess()
+      tp.expectRowText(0, 'JUMP')
+      tp.expectRowText(1, 'LAND')
+    })
+
+    it('false condition skips GOTO and continues sequentially', async () => {
+      const tp = TestProgram.fromCode(
+        [
+          '10 LET A = 0',
+          '20 IF A = 1 PRINT "A1": GOTO 50',
+          '30 PRINT "A2"',
+          '40 PRINT "A3"',
+          '50 PRINT "A4"',
+        ].join('\n'),
+      )
+
+      await tp.run()
+
+      tp.expectSuccess()
+      tp.expectRowText(0, 'A2')
+      tp.expectRowText(1, 'A3')
+      tp.expectRowText(2, 'A4')
+    })
+  })
 })
