@@ -5,6 +5,7 @@ import type { SpriteState } from '@/core/sprite/types'
 import { GameBlock } from '@/shared/components/ui'
 
 import DisplayBufferSection from './DisplayBufferSection.vue'
+import JoystickBufferSection from './JoystickBufferSection.vue'
 import SpriteSlotsSection from './SpriteSlotsSection.vue'
 import type { ScreenBufferReader } from './types'
 
@@ -16,6 +17,8 @@ defineProps<{
   spriteStates: SpriteState[]
   spriteEnabled: boolean
   sharedDisplayBufferAccessor: ScreenBufferReader
+  sharedJoystickBuffer?: SharedArrayBuffer
+  tick?: number
 }>()
 
 const { t } = useI18n()
@@ -30,6 +33,10 @@ const { t } = useI18n()
   >
     <div class="buffer-inspector-content">
       <DisplayBufferSection :shared-display-buffer-accessor="sharedDisplayBufferAccessor" />
+      <JoystickBufferSection
+        :shared-joystick-buffer="sharedJoystickBuffer"
+        :tick="tick"
+      />
       <SpriteSlotsSection :sprite-states="spriteStates" :sprite-enabled="spriteEnabled" />
     </div>
   </GameBlock>

@@ -417,7 +417,13 @@
     "spriteSlotsColPriority": "Priority",
     "spriteSlotsColDefinition": "Definition",
     "displayBufferCharTitle": "Character Codes",
-    "displayBufferPatternTitle": "Color Patterns"
+    "displayBufferPatternTitle": "Color Patterns",
+    "joystickTitle": "Joystick Buffer",
+    "joystickUnavailable": "No joystick buffer",
+    "joystick0": "Joy 0",
+    "joystick1": "Joy 1",
+    "joystickStick": "STICK",
+    "joystickStrig": "STRIG"
   },
   "composer": {
     "title": "Controls",
