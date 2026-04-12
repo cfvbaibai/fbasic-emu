@@ -220,6 +220,76 @@ describe('JoystickBufferSection', () => {
     wrapper.unmount()
   })
 
+  describe('malformed SharedArrayBuffer', () => {
+    it('falls back to [0, 0] stick states when buffer is too small', () => {
+      const truncatedBuffer = new SharedArrayBuffer(8) // needs 32 bytes
+      const wrapper = mount(JoystickBufferSection, {
+        props: {
+          sharedJoystickBuffer: truncatedBuffer,
+          tick: 0,
+        },
+      })
+
+      const stickValues = wrapper.findAll('.joystick-stick-value')
+      expect(stickValues.length).toBe(2)
+      expect(stickValues[0]!.text()).toBe('0')
+      expect(stickValues[1]!.text()).toBe('0')
+      wrapper.unmount()
+    })
+
+    it('falls back to [0, 0] strig states when buffer is too small', () => {
+      const truncatedBuffer = new SharedArrayBuffer(8) // needs 32 bytes
+      const wrapper = mount(JoystickBufferSection, {
+        props: {
+          sharedJoystickBuffer: truncatedBuffer,
+          tick: 0,
+        },
+      })
+
+      const strigValues = wrapper.findAll('.joystick-strig-value')
+      expect(strigValues.length).toBe(2)
+      expect(strigValues[0]!.text()).toBe('0')
+      expect(strigValues[1]!.text()).toBe('0')
+      wrapper.unmount()
+    })
+
+    it('does not highlight any D-pad direction when buffer is too small', () => {
+      const truncatedBuffer = new SharedArrayBuffer(8)
+      const wrapper = mount(JoystickBufferSection, {
+        props: {
+          sharedJoystickBuffer: truncatedBuffer,
+          tick: 0,
+        },
+      })
+
+      const dpads = wrapper.findAll('.joystick-dpad')
+      const dpad0 = dpads[0]!
+      expect(dpad0.find('.dpad-up').classes()).not.toContain('dpad-active')
+      expect(dpad0.find('.dpad-right').classes()).not.toContain('dpad-active')
+      expect(dpad0.find('.dpad-down').classes()).not.toContain('dpad-active')
+      expect(dpad0.find('.dpad-left').classes()).not.toContain('dpad-active')
+      wrapper.unmount()
+    })
+
+    it('falls back to [0, 0] when buffer is zero-length', () => {
+      const emptyBuffer = new SharedArrayBuffer(0)
+      const wrapper = mount(JoystickBufferSection, {
+        props: {
+          sharedJoystickBuffer: emptyBuffer,
+          tick: 0,
+        },
+      })
+
+      const stickValues = wrapper.findAll('.joystick-stick-value')
+      const strigValues = wrapper.findAll('.joystick-strig-value')
+      expect(stickValues[0]!.text()).toBe('0')
+      expect(stickValues[1]!.text()).toBe('0')
+      expect(strigValues[0]!.text()).toBe('0')
+      expect(strigValues[1]!.text()).toBe('0')
+      wrapper.unmount()
+    })
+  })
+
   it('reacts to buffer changes when tick increments', async () => {
     const buffer = createSharedJoystickBuffer()
     const view = createViewsFromJoystickBuffer(buffer)
