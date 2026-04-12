@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { provideScreenDebug } from '@/features/ide/composables/useScreenDebug'
+import { useScreenFilter } from '@/features/ide/composables/useScreenFilter'
 import { provideScreenZoom } from '@/features/ide/composables/useScreenZoom'
 import { GameButton, GameButtonGroup, GameIcon, GameTabPane } from '@/shared/components/ui'
 
@@ -32,6 +33,10 @@ const { zoomLevel, setZoom } = provideScreenZoom()
 // Provide debug settings for child components
 const { showGrid, toggleGrid } = provideScreenDebug()
 
+// Screen filter state (shared singleton via module-level ref)
+const { filterEnabled, prefersReducedMotion, toggleFilter } =
+  useScreenFilter()
+
 // Zoom level options
 const zoomLevels: Array<{ value: 1 | 2 | 3 | 4; label: string }> = [
   { value: 1, label: '×1' },
@@ -43,6 +48,8 @@ const zoomLevels: Array<{ value: 1 | 2 | 3 | 4; label: string }> = [
 // Computed property for template binding (Vue templates auto-unwrap refs, but this helps TypeScript)
 const currentZoomLevel = computed(() => zoomLevel.value)
 const isGridShown = computed(() => showGrid.value)
+const isFilterEnabled = computed(() => filterEnabled.value)
+const isReducedMotion = computed(() => prefersReducedMotion.value)
 </script>
 
 <template>
@@ -74,6 +81,17 @@ const isGridShown = computed(() => showGrid.value)
         >
           <GameIcon icon="mdi:grid" size="small" />
           {{ t('ide.screenTab.grid') }}
+        </GameButton>
+        <GameButton
+          data-testid="ide-filter-toggle"
+          variant="toggle"
+          size="small"
+          :selected="isFilterEnabled"
+          :disabled="isReducedMotion"
+          @click="toggleFilter"
+        >
+          <GameIcon icon="mdi:monitor-shimmer" size="small" />
+          {{ t('ide.screenTab.filter') }}
         </GameButton>
       </div>
     </template>

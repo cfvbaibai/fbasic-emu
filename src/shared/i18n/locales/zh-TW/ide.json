@@ -472,7 +472,8 @@
     }
   },
   "screenTab": {
-    "grid": "網格"
+    "grid": "網格",
+    "filter": "CRT"
   },
   "errors": {
     "executionTimeout": "執行在5分鐘後逾時。您的程式可能包含無限迴圈。"

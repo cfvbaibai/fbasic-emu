@@ -472,7 +472,8 @@
     }
   },
   "screenTab": {
-    "grid": "网格"
+    "grid": "网格",
+    "filter": "CRT"
   },
   "errors": {
     "executionTimeout": "执行在5分钟后超时。您的程序可能包含无限循环。"

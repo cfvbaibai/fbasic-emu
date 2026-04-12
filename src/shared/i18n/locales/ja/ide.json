@@ -472,7 +472,8 @@
     }
   },
   "screenTab": {
-    "grid": "グリッド"
+    "grid": "グリッド",
+    "filter": "CRT"
   },
   "errors": {
     "executionTimeout": "実行が5分でタイムアウトしました。プログラムに無限ループが含まれている可能性があります。"

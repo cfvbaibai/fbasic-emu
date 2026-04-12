@@ -113,4 +113,20 @@ describe('useScreenFilter', () => {
       expect(typeof result.setFilterEnabled).toEqual('function')
     })
   })
+
+  describe('prefersReducedMotion', () => {
+    it('returns prefersReducedMotion as a boolean ref', () => {
+      const { prefersReducedMotion } = useScreenFilter()
+
+      expect(prefersReducedMotion).toBeDefined()
+      expect(typeof prefersReducedMotion.value).toEqual('boolean')
+    })
+
+    it('returns false when prefers-reduced-motion is not set', () => {
+      // Default jsdom environment has no prefers-reduced-motion
+      const { prefersReducedMotion } = useScreenFilter()
+
+      expect(prefersReducedMotion.value).toEqual(false)
+    })
+  })
 })

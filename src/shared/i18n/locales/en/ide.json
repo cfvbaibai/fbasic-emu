@@ -472,7 +472,8 @@
     }
   },
   "screenTab": {
-    "grid": "Grid"
+    "grid": "Grid",
+    "filter": "CRT"
   },
   "errors": {
     "executionTimeout": "Execution timed out after 5 minutes. Your program may contain an infinite loop."
