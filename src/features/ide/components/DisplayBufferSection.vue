@@ -47,14 +47,9 @@ const patternGrid = computed(() => {
   return grid
 })
 
-/** Format a character code as 2-digit hex. */
-function formatCharCode(code: number): string {
-  return code.toString(16).toUpperCase().padStart(2, '0')
-}
-
-/** Format a row index as 2-digit hex. */
-function formatRowIndex(index: number): string {
-  return index.toString(16).toUpperCase().padStart(2, '0')
+/** Format a numeric value as 2-digit uppercase hex string. */
+function formatHex(value: number): string {
+  return value.toString(16).toUpperCase().padStart(2, '0')
 }
 </script>
 
@@ -71,7 +66,7 @@ function formatRowIndex(index: number): string {
           class="display-buffer-char-row"
         >
           <span class="display-buffer-char-row-label">
-            {{ formatRowIndex(y) }}
+            {{ formatHex(y) }}
           </span>
           <span
             v-for="(code, x) in row"
@@ -81,7 +76,7 @@ function formatRowIndex(index: number): string {
               'display-buffer-cell-highlighted': code !== SPACE_CHAR,
             }"
           >
-            {{ formatCharCode(code) }}
+            {{ formatHex(code) }}
           </span>
         </div>
       </div>
@@ -98,7 +93,7 @@ function formatRowIndex(index: number): string {
           class="display-buffer-pattern-row"
         >
           <span class="display-buffer-pattern-row-label">
-            {{ formatRowIndex(y) }}
+            {{ formatHex(y) }}
           </span>
           <span
             v-for="(pattern, x) in row"
