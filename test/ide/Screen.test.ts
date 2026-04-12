@@ -90,6 +90,88 @@ vi.mock('@/features/ide/components/DebugGridOverlay.vue', () => ({
   },
 }))
 
+describe('Screen - phosphor glow filter integration', () => {
+  beforeEach(() => {
+    localStorage.clear()
+  })
+
+  it('hides crt-phosphor-glow when filterEnabled is false (default)', () => {
+    const wrapper = mount(Screen, {
+      global: {
+        stubs: {
+          'v-stage': vStageStub,
+          'v-layer': vLayerStub,
+          'v-rect': vRectStub,
+        },
+      },
+    })
+
+    expect(wrapper.find('.screen-display').exists()).toEqual(true)
+    expect(wrapper.find('.crt-phosphor-glow').exists()).toEqual(false)
+    wrapper.unmount()
+  })
+
+  it('shows crt-phosphor-glow when filterEnabled is true', async () => {
+    localStorage.setItem('fbasic-screen-filter', 'true')
+
+    const wrapper = mount(Screen, {
+      global: {
+        stubs: {
+          'v-stage': vStageStub,
+          'v-layer': vLayerStub,
+          'v-rect': vRectStub,
+        },
+      },
+    })
+
+    await new Promise((resolve) => setTimeout(resolve, 50))
+
+    expect(wrapper.find('.crt-phosphor-glow').exists()).toEqual(true)
+    wrapper.unmount()
+  })
+})
+
+describe('Screen - color bleeding filter integration', () => {
+  beforeEach(() => {
+    localStorage.clear()
+  })
+
+  it('hides crt-color-bleed when filterEnabled is false (default)', () => {
+    const wrapper = mount(Screen, {
+      global: {
+        stubs: {
+          'v-stage': vStageStub,
+          'v-layer': vLayerStub,
+          'v-rect': vRectStub,
+        },
+      },
+    })
+
+    expect(wrapper.find('.screen-display').exists()).toEqual(true)
+    expect(wrapper.find('.crt-color-bleed').exists()).toEqual(false)
+    wrapper.unmount()
+  })
+
+  it('shows crt-color-bleed when filterEnabled is true', async () => {
+    localStorage.setItem('fbasic-screen-filter', 'true')
+
+    const wrapper = mount(Screen, {
+      global: {
+        stubs: {
+          'v-stage': vStageStub,
+          'v-layer': vLayerStub,
+          'v-rect': vRectStub,
+        },
+      },
+    })
+
+    await new Promise((resolve) => setTimeout(resolve, 50))
+
+    expect(wrapper.find('.crt-color-bleed').exists()).toEqual(true)
+    wrapper.unmount()
+  })
+})
+
 describe('Screen - scanline filter integration', () => {
   beforeEach(() => {
     localStorage.clear()
