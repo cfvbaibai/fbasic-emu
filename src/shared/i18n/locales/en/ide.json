@@ -485,5 +485,13 @@
     "encodeFailed": "Failed to generate share URL.",
     "tooLarge": "This program is too large to share via URL.",
     "loadFailed": "Failed to load shared program"
+  },
+  "tutorial": {
+    "title": "Tutorial",
+    "defaultTitle": "F-BASIC Tutorial",
+    "closeAriaLabel": "Close tutorial",
+    "prev": "Previous lesson",
+    "next": "Next lesson",
+    "noContent": "No lesson content available."
   }
 }

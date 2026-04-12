@@ -31,6 +31,7 @@ const emit = defineEmits<{
   (e: 'toggleDebug'): void
   (e: 'openSampleSelector'): void
   (e: 'openSpriteViewer'): void
+  (e: 'toggleTutorialPanel'): void
 }>()
 
 const MonacoCodeEditor = defineAsyncComponent({
@@ -114,6 +115,14 @@ const useLiteEditor = computed(() => {
           :title="t('ide.spriteViewer.openTitle')"
           data-testid="ide-sprite-viewer-button"
           @click="emit('openSpriteViewer')"
+        />
+        <GameIconButton
+          type="default"
+          icon="mdi:book-open-variant"
+          size="small"
+          :title="t('ide.tutorial.title')"
+          data-testid="ide-tutorial-button"
+          @click="emit('toggleTutorialPanel')"
         />
         <IdeControls
           :is-running="props.isRunning"
