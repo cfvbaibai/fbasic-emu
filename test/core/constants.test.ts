@@ -17,7 +17,7 @@ import {
 
 /** Create plain { value: number } wrappers — no Vue dependency needed. */
 function makeRefs(
-  values: Record<string, number>,
+  values: Partial<PaletteStateValues>,
 ): { [K in keyof PaletteStateValues]: { value: number } } {
   return {
     bgPalette: { value: values.bgPalette ?? 0 },
