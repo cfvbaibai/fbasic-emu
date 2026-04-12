@@ -417,7 +417,13 @@
     "spriteSlotsColPriority": "优先级",
     "spriteSlotsColDefinition": "定义",
     "displayBufferCharTitle": "字符代码",
-    "displayBufferPatternTitle": "颜色图案"
+    "displayBufferPatternTitle": "颜色图案",
+    "joystickTitle": "摇杆缓冲区",
+    "joystickUnavailable": "无摇杆缓冲区",
+    "joystick0": "Joy 0",
+    "joystick1": "Joy 1",
+    "joystickStick": "STICK",
+    "joystickStrig": "STRIG"
   },
   "composer": {
     "title": "控制",

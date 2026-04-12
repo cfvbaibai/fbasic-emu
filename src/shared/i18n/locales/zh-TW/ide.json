@@ -417,7 +417,13 @@
     "spriteSlotsColPriority": "優先順序",
     "spriteSlotsColDefinition": "定義",
     "displayBufferCharTitle": "字元代碼",
-    "displayBufferPatternTitle": "顏色圖案"
+    "displayBufferPatternTitle": "顏色圖案",
+    "joystickTitle": "搖桿緩衝區",
+    "joystickUnavailable": "無搖桿緩衝區",
+    "joystick0": "Joy 0",
+    "joystick1": "Joy 1",
+    "joystickStick": "STICK",
+    "joystickStrig": "STRIG"
   },
   "composer": {
     "title": "控制",

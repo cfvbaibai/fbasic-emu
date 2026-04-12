@@ -84,7 +84,7 @@ describe('BufferInspector', () => {
     wrapper.unmount()
   })
 
-  it('renders content area with DisplayBufferSection and SpriteSlotsSection', () => {
+  it('renders content area with DisplayBufferSection, JoystickBufferSection and SpriteSlotsSection', () => {
     const wrapper = mount(BufferInspector, {
       props: {
         spriteStates: [],
@@ -100,6 +100,7 @@ describe('BufferInspector', () => {
 
     expect(wrapper.find('.buffer-inspector-content').exists()).toBe(true)
     expect(wrapper.find('.display-buffer-section').exists()).toBe(true)
+    expect(wrapper.find('.joystick-buffer-section').exists()).toBe(true)
     expect(wrapper.find('.sprite-slots-section').exists()).toBe(true)
     wrapper.unmount()
   })
@@ -121,6 +122,28 @@ describe('BufferInspector', () => {
     const section = wrapper.findComponent({ name: 'DisplayBufferSection' })
     expect(section.exists()).toBe(true)
     expect(section.props('sharedDisplayBufferAccessor')).toEqual(MOCK_ACCESSOR)
+    wrapper.unmount()
+  })
+
+  it('passes sharedJoystickBuffer to JoystickBufferSection', () => {
+    const buffer = new SharedArrayBuffer(32)
+    const wrapper = mount(BufferInspector, {
+      props: {
+        spriteStates: [],
+        spriteEnabled: false,
+        sharedDisplayBufferAccessor: MOCK_ACCESSOR,
+        sharedJoystickBuffer: buffer,
+      },
+      global: {
+        stubs: {
+          GameBlock: defineComponent({ template: '<div><slot /></div>' }),
+        },
+      },
+    })
+
+    const section = wrapper.findComponent({ name: 'JoystickBufferSection' })
+    expect(section.exists()).toBe(true)
+    expect(section.props('sharedJoystickBuffer')).toBe(buffer)
     wrapper.unmount()
   })
 

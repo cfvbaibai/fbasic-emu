@@ -82,6 +82,7 @@ defineExpose({
             :sprite-states="spriteStates"
             :sprite-enabled="spriteEnabled"
             :shared-display-buffer-accessor="sharedDisplayBufferAccessor"
+            :shared-joystick-buffer="sharedJoystickBuffer"
           />
         </GameTabPane>
       </GameTabs>

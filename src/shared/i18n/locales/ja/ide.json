@@ -417,7 +417,13 @@
     "spriteSlotsColPriority": "優先度",
     "spriteSlotsColDefinition": "定義",
     "displayBufferCharTitle": "キャラクタコード",
-    "displayBufferPatternTitle": "カラーパターン"
+    "displayBufferPatternTitle": "カラーパターン",
+    "joystickTitle": "ジョイスティックバッファ",
+    "joystickUnavailable": "ジョイスティックバッファなし",
+    "joystick0": "Joy 0",
+    "joystick1": "Joy 1",
+    "joystickStick": "STICK",
+    "joystickStrig": "STRIG"
   },
   "composer": {
     "title": "コントロール",
