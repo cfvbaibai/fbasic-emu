@@ -108,6 +108,7 @@ describe('useComposer', () => {
       [3, 'index equal to CHANNEL_COUNT (3)'],
       [5, 'index greater than CHANNEL_COUNT (5)'],
       [NaN, 'NaN'],
+      [1.5, 'non-integer float'],
     ])('ignores %s', (index) => {
       const { activeChannel, setActiveChannel } = useComposer()
 

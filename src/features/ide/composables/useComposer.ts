@@ -119,7 +119,7 @@ export function useComposer() {
    * Ignores out-of-range indices (must be 0 to CHANNEL_COUNT - 1).
    */
   function setActiveChannel(index: number): void {
-    if (Number.isNaN(index) || index < 0 || index >= CHANNEL_COUNT) return
+    if (Number.isNaN(index) || !Number.isInteger(index) || index < 0 || index >= CHANNEL_COUNT) return
     activeChannel.value = index
   }
 
