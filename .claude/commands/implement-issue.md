@@ -90,7 +90,7 @@ echo "$LOCK_RESULT"
 
 **If `LOCK_BUSY` or `LOCK_STEAL_FAILED`**: another session owns this PR — skip to the next PR in the list.
 
-**If `LOCK_ACQUIRED` or `LOCK_STOLEN`**: proceed with maintenance, then release the lock in Phase 7 cleanup via `scripts/lock.sh release`.
+**If `LOCK_ACQUIRED`, `LOCK_STOLEN`, or `LOCK_REACQUIRED`**: proceed with maintenance, then release the lock in Phase 7 cleanup via `scripts/lock.sh release`.
 
 For each PR that passes the lock check, handle in this priority order:
 
@@ -113,6 +113,26 @@ gh issue list --state open --search "no:assignee" --json number,title,labels,ass
 ```
 
 Filter out issues with the `invalid` label — do not pick up issues that contradict F-BASIC manual behavior.
+
+### Busy Lock Pre-filter
+
+Before spending time on dependency checks and lock acquisition attempts, pre-scan existing locks to eliminate already-claimed issues:
+
+```bash
+# Get issue numbers locked by OTHER active sessions (excludes own locks and stale locks)
+LOCKED_ISSUES=$(scripts/lock.sh list --exclude-session "$SESSION_ID" | sed 's/^issue-//' | sort -n)
+echo "Locked issues (other sessions): $LOCKED_ISSUES"
+```
+
+**Remove any candidate issue whose number appears in `$LOCKED_ISSUES`** from the candidate list. This avoids:
+- Wasting GitHub API calls checking dependencies for locked issues
+- Wasting lock acquisition bash calls that would just return `LOCK_BUSY`
+
+> **What gets excluded from this list**: Locks owned by `$SESSION_ID` (current session can resume interrupted work) and stale locks (>2 hours, which `acquire` would steal anyway). Only truly busy locks from other active sessions are returned.
+
+> **Race condition note**: A lock could be acquired between this pre-filter and the actual `lock.sh acquire` call below. That's fine — the atomic `acquire` in the "Atomic Issue Locking" section is still the authoritative gate. This pre-filter is purely an optimization to skip obviously busy issues early.
+
+If all candidates are filtered out by this step, report "no issues to implement (all candidates locked)" and stop.
 
 ### Dependency Check
 
@@ -153,7 +173,7 @@ LOCK_RESULT=$(scripts/lock.sh acquire "issue-${ISSUE_NUM}" "$SESSION_ID")
 echo "$LOCK_RESULT"
 ```
 
-**If `LOCK_ACQUIRED` or `LOCK_STOLEN`**: this issue is ours — stop iterating, this is the selected issue.
+**If `LOCK_ACQUIRED`, `LOCK_STOLEN`, or `LOCK_REACQUIRED`**: this issue is ours — stop iterating, this is the selected issue.
 
 **If `LOCK_BUSY` or `LOCK_STEAL_FAILED`**: another instance owns this issue — skip to the next candidate in priority order.
 
@@ -213,7 +233,7 @@ LOCK_STATUS=$(scripts/lock.sh exists "issue-${ISSUE_NUM}")
 if [ "$LOCK_STATUS" = "LOCK_MISSING" ]; then
   echo "ERROR: No lock file for issue #${ISSUE_NUM}. Cannot create worktree without lock."
   LOCK_RESULT=$(scripts/lock.sh acquire "issue-${ISSUE_NUM}" "$SESSION_ID")
-  if echo "$LOCK_RESULT" | grep -q "LOCK_ACQUIRED\|LOCK_STOLEN"; then
+  if echo "$LOCK_RESULT" | grep -q "LOCK_ACQUIRED\|LOCK_STOLEN\|LOCK_REACQUIRED"; then
     echo "LOCK_REACQUIRED"
   else
     echo "LOCK_BUSY — another session owns this issue. STOP."
@@ -518,11 +538,11 @@ git -c safe.directory="$(pwd)" worktree prune 2>/dev/null
 rm -rf "$WT_PATH" 2>/dev/null
 ```
 
-Remove the lock file (issue lock or PR lock, depending on how it was acquired):
+Remove the lock file (issue lock or PR lock, depending on how it was acquired). Pass `$SESSION_ID` to verify ownership — prevents accidentally releasing another session's lock:
 
 ```bash
-scripts/lock.sh release "issue-${ISSUE_NUM}"
-scripts/lock.sh release "pr-${PR_NUMBER}"
+scripts/lock.sh release "issue-${ISSUE_NUM}" "$SESSION_ID"
+scripts/lock.sh release "pr-${PR_NUMBER}" "$SESSION_ID"
 ```
 
 Branch stays on remote for CI.
