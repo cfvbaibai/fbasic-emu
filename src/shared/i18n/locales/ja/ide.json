@@ -423,7 +423,11 @@
     "joystick0": "Joy 0",
     "joystick1": "Joy 1",
     "joystickStick": "STICK",
-    "joystickStrig": "STRIG"
+    "joystickStrig": "STRIG",
+    "keyboardBufferTitle": "キーボードバッファ",
+    "keyboardCharCode": "キャラクタコード",
+    "keyboardModifiers": "修飾キー",
+    "keyboardAvailable": "受付可能"
   },
   "composer": {
     "title": "コントロール",

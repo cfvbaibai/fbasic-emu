@@ -423,7 +423,11 @@
     "joystick0": "Joy 0",
     "joystick1": "Joy 1",
     "joystickStick": "STICK",
-    "joystickStrig": "STRIG"
+    "joystickStrig": "STRIG",
+    "keyboardBufferTitle": "鍵盤緩衝區",
+    "keyboardCharCode": "字元碼",
+    "keyboardModifiers": "修飾鍵",
+    "keyboardAvailable": "可用"
   },
   "composer": {
     "title": "控制",

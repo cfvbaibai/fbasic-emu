@@ -423,7 +423,11 @@
     "joystick0": "Joy 0",
     "joystick1": "Joy 1",
     "joystickStick": "STICK",
-    "joystickStrig": "STRIG"
+    "joystickStrig": "STRIG",
+    "keyboardBufferTitle": "Keyboard Buffer",
+    "keyboardCharCode": "Char Code",
+    "keyboardModifiers": "Modifiers",
+    "keyboardAvailable": "Available"
   },
   "composer": {
     "title": "Controls",
