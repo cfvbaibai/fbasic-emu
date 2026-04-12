@@ -415,7 +415,9 @@
     "spriteSlotsColY": "Y",
     "spriteSlotsColVisible": "可見",
     "spriteSlotsColPriority": "優先順序",
-    "spriteSlotsColDefinition": "定義"
+    "spriteSlotsColDefinition": "定義",
+    "displayBufferCharTitle": "字元代碼",
+    "displayBufferPatternTitle": "顏色圖案"
   },
   "composer": {
     "title": "控制",

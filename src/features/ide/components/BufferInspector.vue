@@ -4,7 +4,9 @@ import { useI18n } from 'vue-i18n'
 import type { SpriteState } from '@/core/sprite/types'
 import { GameBlock } from '@/shared/components/ui'
 
+import DisplayBufferSection from './DisplayBufferSection.vue'
 import SpriteSlotsSection from './SpriteSlotsSection.vue'
+import type { ScreenBufferReader } from './types'
 
 defineOptions({
   name: 'BufferInspector',
@@ -13,6 +15,7 @@ defineOptions({
 defineProps<{
   spriteStates: SpriteState[]
   spriteEnabled: boolean
+  sharedDisplayBufferAccessor: ScreenBufferReader
 }>()
 
 const { t } = useI18n()
@@ -26,6 +29,7 @@ const { t } = useI18n()
     class="buffer-inspector"
   >
     <div class="buffer-inspector-content">
+      <DisplayBufferSection :shared-display-buffer-accessor="sharedDisplayBufferAccessor" />
       <SpriteSlotsSection :sprite-states="spriteStates" :sprite-enabled="spriteEnabled" />
     </div>
   </GameBlock>

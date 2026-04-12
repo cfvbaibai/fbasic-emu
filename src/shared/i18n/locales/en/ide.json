@@ -415,7 +415,9 @@
     "spriteSlotsColY": "Y",
     "spriteSlotsColVisible": "Visible",
     "spriteSlotsColPriority": "Priority",
-    "spriteSlotsColDefinition": "Definition"
+    "spriteSlotsColDefinition": "Definition",
+    "displayBufferCharTitle": "Character Codes",
+    "displayBufferPatternTitle": "Color Patterns"
   },
   "composer": {
     "title": "Controls",
