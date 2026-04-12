@@ -103,6 +103,7 @@ export function useComposer() {
    */
   function clearChannel(channelIndex?: number): void {
     const index = channelIndex ?? activeChannel.value
+    if (Number.isNaN(index) || index < 0 || index >= CHANNEL_COUNT) return
     channelNotes.value[index] = new Set()
   }
 
@@ -190,6 +191,7 @@ export function useComposer() {
     title,
     activeChannel,
     activeNotes,
+    channelNotes,
 
     // Operations
     toggleNote,

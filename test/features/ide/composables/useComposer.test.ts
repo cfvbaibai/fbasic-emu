@@ -103,34 +103,15 @@ describe('useComposer', () => {
       expect(activeChannel.value).toEqual(2)
     })
 
-    it('ignores negative index', () => {
+    it.each([
+      [-1, 'negative index'],
+      [3, 'index equal to CHANNEL_COUNT (3)'],
+      [5, 'index greater than CHANNEL_COUNT (5)'],
+      [NaN, 'NaN'],
+    ])('ignores %s', (index) => {
       const { activeChannel, setActiveChannel } = useComposer()
 
-      setActiveChannel(-1)
-
-      expect(activeChannel.value).toEqual(0)
-    })
-
-    it('ignores index equal to CHANNEL_COUNT (3)', () => {
-      const { activeChannel, setActiveChannel } = useComposer()
-
-      setActiveChannel(3)
-
-      expect(activeChannel.value).toEqual(0)
-    })
-
-    it('ignores index greater than CHANNEL_COUNT (5)', () => {
-      const { activeChannel, setActiveChannel } = useComposer()
-
-      setActiveChannel(5)
-
-      expect(activeChannel.value).toEqual(0)
-    })
-
-    it('ignores NaN', () => {
-      const { activeChannel, setActiveChannel } = useComposer()
-
-      setActiveChannel(NaN)
+      setActiveChannel(index)
 
       expect(activeChannel.value).toEqual(0)
     })
@@ -266,6 +247,23 @@ describe('useComposer', () => {
 
       expect(channelNoteCount(0)).toEqual(0)
       expect(channelNoteCount(1)).toEqual(1)
+    })
+
+    it.each([
+      [NaN, 'NaN'],
+      [-1, 'negative index'],
+      [3, 'index equal to CHANNEL_COUNT (3)'],
+      [5, 'index greater than CHANNEL_COUNT (5)'],
+    ])('ignores %s', (index) => {
+      const { toggleNote, clearChannel, channelNoteCount, channelNotes } =
+        useComposer()
+
+      toggleNote(5, 3)
+      clearChannel(index)
+
+      expect(channelNoteCount(0)).toEqual(1)
+      expect(channelNotes.value.length).toEqual(3)
+      expect('NaN' in channelNotes.value).toEqual(false)
     })
   })
 
@@ -479,6 +477,7 @@ describe('useComposer', () => {
       expect(result).toHaveProperty('title')
       expect(result).toHaveProperty('activeChannel')
       expect(result).toHaveProperty('activeNotes')
+      expect(result).toHaveProperty('channelNotes')
       expect(typeof result.toggleNote).toEqual('function')
       expect(typeof result.clearChannel).toEqual('function')
       expect(typeof result.clearAll).toEqual('function')
