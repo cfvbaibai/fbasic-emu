@@ -3,8 +3,10 @@ import { mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 import { defineComponent } from 'vue'
 
-import type { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
+import { SHARED_DISPLAY_BUFFER_BYTES } from '@/core/animation/sharedDisplayBuffer'
+import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
 import BufferInspector from '@/features/ide/components/BufferInspector.vue'
+import type { ScreenBufferReader } from '@/features/ide/components/types'
 
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
@@ -12,8 +14,15 @@ vi.mock('vue-i18n', () => ({
   }),
 }))
 
-/** Minimal mock satisfying SharedDisplayBufferAccessor type (never called in stubbed tests) */
-const MOCK_ACCESSOR: SharedDisplayBufferAccessor = {} as SharedDisplayBufferAccessor
+/** Minimal mock satisfying ScreenBufferReader type */
+const MOCK_ACCESSOR: ScreenBufferReader = {
+  readScreenChar: () => 0x20,
+  readScreenPattern: () => 0,
+}
+
+/** Real accessor instance for IdeBottomArea tests (StateInspector needs the full type) */
+const testBuffer = new SharedArrayBuffer(SHARED_DISPLAY_BUFFER_BYTES)
+const MOCK_FULL_ACCESSOR = new SharedDisplayBufferAccessor(testBuffer)
 
 describe('BufferInspector', () => {
   it('renders without errors', () => {
@@ -21,6 +30,7 @@ describe('BufferInspector', () => {
       props: {
         spriteStates: [],
         spriteEnabled: false,
+        sharedDisplayBufferAccessor: MOCK_ACCESSOR,
       },
       global: {
         stubs: {
@@ -38,6 +48,7 @@ describe('BufferInspector', () => {
       props: {
         spriteStates: [],
         spriteEnabled: false,
+        sharedDisplayBufferAccessor: MOCK_ACCESSOR,
       },
       global: {
         stubs: {
@@ -55,6 +66,7 @@ describe('BufferInspector', () => {
       props: {
         spriteStates: [],
         spriteEnabled: false,
+        sharedDisplayBufferAccessor: MOCK_ACCESSOR,
       },
       global: {
         stubs: {
@@ -72,11 +84,12 @@ describe('BufferInspector', () => {
     wrapper.unmount()
   })
 
-  it('renders content area with SpriteSlotsSection', () => {
+  it('renders content area with DisplayBufferSection and SpriteSlotsSection', () => {
     const wrapper = mount(BufferInspector, {
       props: {
         spriteStates: [],
         spriteEnabled: false,
+        sharedDisplayBufferAccessor: MOCK_ACCESSOR,
       },
       global: {
         stubs: {
@@ -86,7 +99,28 @@ describe('BufferInspector', () => {
     })
 
     expect(wrapper.find('.buffer-inspector-content').exists()).toBe(true)
+    expect(wrapper.find('.display-buffer-section').exists()).toBe(true)
     expect(wrapper.find('.sprite-slots-section').exists()).toBe(true)
+    wrapper.unmount()
+  })
+
+  it('passes sharedDisplayBufferAccessor to DisplayBufferSection', () => {
+    const wrapper = mount(BufferInspector, {
+      props: {
+        spriteStates: [],
+        spriteEnabled: false,
+        sharedDisplayBufferAccessor: MOCK_ACCESSOR,
+      },
+      global: {
+        stubs: {
+          GameBlock: defineComponent({ template: '<div><slot /></div>' }),
+        },
+      },
+    })
+
+    const section = wrapper.findComponent({ name: 'DisplayBufferSection' })
+    expect(section.exists()).toBe(true)
+    expect(section.props('sharedDisplayBufferAccessor')).toEqual(MOCK_ACCESSOR)
     wrapper.unmount()
   })
 
@@ -97,6 +131,7 @@ describe('BufferInspector', () => {
           { spriteNumber: 0, x: 10, y: 20, visible: true, priority: 0, definition: null },
         ],
         spriteEnabled: true,
+        sharedDisplayBufferAccessor: MOCK_ACCESSOR,
       },
       global: {
         stubs: {
@@ -131,7 +166,7 @@ describe('IdeBottomArea tab integration', () => {
         cgenMode: 2,
         spriteStates: [],
         spriteEnabled: false,
-        sharedDisplayBufferAccessor: MOCK_ACCESSOR,
+        sharedDisplayBufferAccessor: MOCK_FULL_ACCESSOR,
       },
       global: {
         stubs: {
@@ -178,7 +213,7 @@ describe('IdeBottomArea tab integration', () => {
         cgenMode: 2,
         spriteStates: [],
         spriteEnabled: false,
-        sharedDisplayBufferAccessor: MOCK_ACCESSOR,
+        sharedDisplayBufferAccessor: MOCK_FULL_ACCESSOR,
       },
       global: {
         stubs: {

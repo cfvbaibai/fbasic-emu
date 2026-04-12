@@ -415,7 +415,9 @@
     "spriteSlotsColY": "Y",
     "spriteSlotsColVisible": "表示",
     "spriteSlotsColPriority": "優先度",
-    "spriteSlotsColDefinition": "定義"
+    "spriteSlotsColDefinition": "定義",
+    "displayBufferCharTitle": "キャラクタコード",
+    "displayBufferPatternTitle": "カラーパターン"
   },
   "composer": {
     "title": "コントロール",
