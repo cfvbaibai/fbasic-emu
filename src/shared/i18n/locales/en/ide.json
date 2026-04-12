@@ -402,6 +402,9 @@
     "cursor": "Cursor",
     "empty": "(none)"
   },
+  "bufferInspector": {
+    "title": "Buffer Inspector"
+  },
   "logLevels": {
     "title": "Log Levels",
     "description": "Set verbosity per area. {warn} = quiet; {debug} = verbose.",

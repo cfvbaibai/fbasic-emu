@@ -402,6 +402,9 @@
     "cursor": "カーソル",
     "empty": "（なし）"
   },
+  "bufferInspector": {
+    "title": "バッファインスペクタ"
+  },
   "logLevels": {
     "title": "ログレベル",
     "description": "各領域の詳細度を設定します。{warn} = 静か；{debug} = 詳細。",

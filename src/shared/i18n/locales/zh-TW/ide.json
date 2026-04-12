@@ -402,6 +402,9 @@
     "cursor": "游標",
     "empty": "（無）"
   },
+  "bufferInspector": {
+    "title": "緩衝區檢查器"
+  },
   "logLevels": {
     "title": "日誌級別",
     "description": "設定各區域的詳細程度。{warn} = 安靜；{debug} = 詳細。",

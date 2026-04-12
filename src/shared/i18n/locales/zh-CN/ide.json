@@ -402,6 +402,9 @@
     "cursor": "光标",
     "empty": "（无）"
   },
+  "bufferInspector": {
+    "title": "缓冲区检查器"
+  },
   "logLevels": {
     "title": "日志级别",
     "description": "设置各区域的详细程度。{warn} = 安静；{debug} = 详细。",
