@@ -125,13 +125,13 @@ onBeforeUnmount(() => {
   padding: 0.1rem 0.35rem;
   font-size: 0.7rem;
   font-variant-numeric: tabular-nums;
+  transition: background 0.3s ease-out;
 }
 
 .keyboard-buffer-highlight {
   background: var(--game-accent);
   color: var(--game-text-primary);
   border-radius: 2px;
-  transition: background 0.3s ease-out;
 }
 
 .keyboard-buffer-label {
