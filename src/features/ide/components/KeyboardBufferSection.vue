@@ -15,6 +15,7 @@ const props = defineProps<{
 const { t } = useI18n()
 
 const HIGHLIGHT_DURATION_MS = 1000
+const POLL_INTERVAL_MS = 100
 let pollTimer: ReturnType<typeof setInterval> | null = null
 
 const keyCharCode = ref(0)
@@ -44,7 +45,7 @@ function readKeyboardState(): void {
 
 onMounted(() => {
   readKeyboardState()
-  pollTimer = setInterval(readKeyboardState, 100)
+  pollTimer = setInterval(readKeyboardState, POLL_INTERVAL_MS)
 })
 
 onBeforeUnmount(() => {
