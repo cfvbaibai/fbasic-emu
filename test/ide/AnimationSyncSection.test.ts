@@ -2,7 +2,7 @@
 import { mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 
-import { SyncCommandType } from '@/core/animation/sharedDisplayBuffer'
+import { ACK_PENDING, ACK_RECEIVED, SyncCommandType } from '@/core/animation/sharedDisplayBuffer'
 import type { SyncCommand } from '@/core/animation/sharedDisplayBufferAccessor'
 import AnimationSyncSection from '@/features/ide/components/AnimationSyncSection.vue'
 
@@ -34,7 +34,7 @@ describe('AnimationSyncSection', () => {
     const wrapper = mount(AnimationSyncSection, {
       props: {
         syncCommand: null,
-        ackStatus: 0,
+        ackStatus: ACK_PENDING,
       },
     })
 
@@ -46,7 +46,7 @@ describe('AnimationSyncSection', () => {
     const wrapper = mount(AnimationSyncSection, {
       props: {
         syncCommand: null,
-        ackStatus: 0,
+        ackStatus: ACK_PENDING,
       },
     })
 
@@ -60,7 +60,7 @@ describe('AnimationSyncSection', () => {
     const wrapper = mount(AnimationSyncSection, {
       props: {
         syncCommand: null,
-        ackStatus: 0,
+        ackStatus: ACK_PENDING,
       },
     })
 
@@ -74,7 +74,7 @@ describe('AnimationSyncSection', () => {
     const wrapper = mount(AnimationSyncSection, {
       props: {
         syncCommand: makeSyncCommand({ commandType: SyncCommandType.START_MOVEMENT }),
-        ackStatus: 0,
+        ackStatus: ACK_PENDING,
       },
     })
 
@@ -87,7 +87,7 @@ describe('AnimationSyncSection', () => {
     const wrapper = mount(AnimationSyncSection, {
       props: {
         syncCommand: makeSyncCommand(),
-        ackStatus: 0,
+        ackStatus: ACK_PENDING,
       },
     })
 
@@ -102,7 +102,7 @@ describe('AnimationSyncSection', () => {
     const wrapper = mount(AnimationSyncSection, {
       props: {
         syncCommand: makeSyncCommand({ commandType: SyncCommandType.START_MOVEMENT }),
-        ackStatus: 0,
+        ackStatus: ACK_PENDING,
       },
     })
 
@@ -116,7 +116,7 @@ describe('AnimationSyncSection', () => {
     const wrapper = mount(AnimationSyncSection, {
       props: {
         syncCommand: makeSyncCommand({ actionNumber: 3 }),
-        ackStatus: 0,
+        ackStatus: ACK_PENDING,
       },
     })
 
@@ -140,7 +140,7 @@ describe('AnimationSyncSection', () => {
             priority: 1,
           },
         }),
-        ackStatus: 0,
+        ackStatus: ACK_PENDING,
       },
     })
 
@@ -172,7 +172,7 @@ describe('AnimationSyncSection', () => {
     const wrapper = mount(AnimationSyncSection, {
       props: {
         syncCommand: makeSyncCommand(),
-        ackStatus: 0,
+        ackStatus: ACK_PENDING,
       },
     })
 
@@ -187,7 +187,7 @@ describe('AnimationSyncSection', () => {
     const wrapper = mount(AnimationSyncSection, {
       props: {
         syncCommand: makeSyncCommand(),
-        ackStatus: 1,
+        ackStatus: ACK_RECEIVED,
       },
     })
 
@@ -211,7 +211,7 @@ describe('AnimationSyncSection', () => {
       const wrapper = mount(AnimationSyncSection, {
         props: {
           syncCommand: makeSyncCommand({ commandType }),
-          ackStatus: 0,
+          ackStatus: ACK_PENDING,
         },
       })
 
@@ -226,7 +226,7 @@ describe('AnimationSyncSection', () => {
     const wrapper = mount(AnimationSyncSection, {
       props: {
         syncCommand: makeSyncCommand(),
-        ackStatus: 0,
+        ackStatus: ACK_PENDING,
       },
     })
 
