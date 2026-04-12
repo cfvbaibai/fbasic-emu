@@ -518,6 +518,7 @@
     "closeAriaLabel": "Close tutorial",
     "prev": "Previous lesson",
     "next": "Next lesson",
-    "noContent": "No lesson content available."
+    "noContent": "No lesson content available.",
+    "tryIt": "Try It"
   }
 }

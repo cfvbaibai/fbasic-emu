@@ -518,6 +518,7 @@
     "closeAriaLabel": "关闭教程",
     "prev": "上一课",
     "next": "下一课",
-    "noContent": "暂无课程内容。"
+    "noContent": "暂无课程内容。",
+    "tryIt": "试一试"
   }
 }
