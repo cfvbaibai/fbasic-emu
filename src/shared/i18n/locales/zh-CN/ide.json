@@ -417,6 +417,20 @@
     "spriteSlotsColPriority": "优先级",
     "spriteSlotsColDefinition": "定义"
   },
+  "composer": {
+    "title": "控制",
+    "tempo": "速度",
+    "steps": "步数",
+    "octave": "八度",
+    "duration": "时值",
+    "envelope": "包络",
+    "envelopes": {
+      "none": "无",
+      "short": "短",
+      "medium": "中",
+      "long": "长"
+    }
+  },
   "logLevels": {
     "title": "日志级别",
     "description": "设置各区域的详细程度。{warn} = 安静；{debug} = 详细。",

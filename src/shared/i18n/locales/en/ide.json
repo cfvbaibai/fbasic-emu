@@ -417,6 +417,20 @@
     "spriteSlotsColPriority": "Priority",
     "spriteSlotsColDefinition": "Definition"
   },
+  "composer": {
+    "title": "Controls",
+    "tempo": "Tempo",
+    "steps": "Steps",
+    "octave": "Octave",
+    "duration": "Duration",
+    "envelope": "Envelope",
+    "envelopes": {
+      "none": "None",
+      "short": "Short",
+      "medium": "Medium",
+      "long": "Long"
+    }
+  },
   "logLevels": {
     "title": "Log Levels",
     "description": "Set verbosity per area. {warn} = quiet; {debug} = verbose.",
