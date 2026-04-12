@@ -165,7 +165,7 @@ describe.each([
       },
     })
 
-    await new Promise((resolve) => setTimeout(resolve, 50))
+    await new Promise((resolve) => setTimeout(resolve, LOCAL_STORAGE_SYNC_DELAY_MS))
 
     expect(wrapper.find('.crt-vignette').exists()).toEqual(true)
     wrapper.unmount()
