@@ -449,6 +449,8 @@ onDeactivated(cleanupScreen)
   <div class="screen-display">
     <div class="crt-bezel">
       <div class="crt-screen">
+        <div v-if="filterEnabled" class="crt-phosphor-glow"></div>
+        <div v-if="filterEnabled" class="crt-color-bleed"></div>
         <div v-if="filterEnabled" class="crt-scanlines"></div>
         <div
           class="screen-stage-wrapper"
@@ -471,8 +473,7 @@ onDeactivated(cleanupScreen)
             }"
           >
           <v-layer>
-            <!-- Backdrop Screen (F-Basic layer 1: furthest back) -->
-            <!-- 32×30 characters = 256×240 pixels -->
+            <!-- Backdrop Screen (F-Basic layer 1: furthest back, 32×30 chars = 256×240 px) -->
             <v-rect
               :config="{
                 x: 0,
@@ -482,8 +483,7 @@ onDeactivated(cleanupScreen)
                 fill: backdropColorHex,
               }"
             />
-            <!-- Sprite layers (sprite back, sprite front) will be added programmatically -->
-            <!-- Background layer is now Canvas2D for performance (10-50x faster than Konva) -->
+            <!-- Sprite layers added programmatically; background layer uses Canvas2D for performance -->
           </v-layer>
           </v-stage>
           <!-- Debug Grid Overlay -->

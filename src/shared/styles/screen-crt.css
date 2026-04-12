@@ -80,8 +80,29 @@
     inset: 0;
     background: repeating-linear-gradient( 0deg, transparent, transparent 2px, var(--crt-shadow-dark-10) 2px, var(--crt-shadow-dark-10) 4px);
     pointer-events: none;
-    z-index: 2;
+    z-index: 3;
     mix-blend-mode: multiply;
+}
+
+.screen-display .crt-phosphor-glow {
+    position: absolute;
+    inset: 0;
+    background: transparent;
+    pointer-events: none;
+    z-index: 2;
+    box-shadow: inset 0 0 60px 10px var(--crt-glow-light-10), inset 0 0 120px 20px var(--crt-glow-light-20);
+    mix-blend-mode: screen;
+}
+
+.screen-display .crt-color-bleed {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    background: transparent;
+    filter: blur(0.3px);
+    mix-blend-mode: lighten;
+    opacity: 0.3;
 }
 
 .screen-display .crt-reflection {
@@ -89,7 +110,7 @@
     inset: 0;
     background: radial-gradient( ellipse 140% 100% at 85% 5%, var(--crt-glow-light-40) 0%, var(--crt-glow-light-20) 15%, var(--crt-glow-light-10) 30%, transparent 55%, var(--crt-shadow-dark-40) 100%);
     pointer-events: none;
-    z-index: 1;
+    z-index: 4;
     border-radius: 16px;
 }
 
