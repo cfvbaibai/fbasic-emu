@@ -405,7 +405,7 @@
   "bufferInspector": {
     "title": "緩衝區檢查器",
     "spriteSlotsTitle": "精靈槽位",
-    "spriteSlotsDisabled": "SPRITE OFF",
+    "spriteSlotsDisabled": "精靈已關閉",
     "spriteSlotsOn": "開",
     "spriteSlotsOff": "關",
     "spriteSlotsDefined": "已定義",
