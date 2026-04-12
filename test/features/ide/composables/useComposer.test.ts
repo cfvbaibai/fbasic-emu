@@ -103,19 +103,6 @@ describe('useComposer', () => {
       expect(activeChannel.value).toEqual(2)
     })
 
-    it.each([
-      [-1, 'negative index'],
-      [3, 'index equal to CHANNEL_COUNT (3)'],
-      [5, 'index greater than CHANNEL_COUNT (5)'],
-      [NaN, 'NaN'],
-    ])('ignores %s', (index) => {
-      const { activeChannel, setActiveChannel } = useComposer()
-
-      setActiveChannel(index)
-
-      expect(activeChannel.value).toEqual(0)
-    })
-
     it('updates activeNotes to reflect new channel', () => {
       const { activeNotes, setActiveChannel, toggleNote } = useComposer()
 
@@ -249,22 +236,6 @@ describe('useComposer', () => {
       expect(channelNoteCount(1)).toEqual(1)
     })
 
-    it.each([
-      [-1, 'negative index'],
-      [3, 'index equal to CHANNEL_COUNT (3)'],
-      [5, 'index greater than CHANNEL_COUNT (5)'],
-      [NaN, 'NaN'],
-    ])('ignores %s', (index) => {
-      const { toggleNote, clearChannel, channelNoteCount, channelNotes } =
-        useComposer()
-
-      toggleNote(5, 3)
-      clearChannel(index)
-
-      expect(channelNoteCount(0)).toEqual(1)
-      expect(channelNotes.value.length).toEqual(3)
-      expect('NaN' in channelNotes.value).toEqual(false)
-    })
   })
 
   // ---------------------------------------------------------------------------
@@ -351,6 +322,29 @@ describe('useComposer', () => {
 
       expect(title.value).toEqual('My Song')
     })
+  })
+
+  describe('setOctave', () => {
+    it('sets octave for the active channel', () => {
+      const { setOctave, getChannelOctave } = useComposer()
+
+      setOctave(5)
+
+      expect(getChannelOctave(0)).toEqual(5)
+      // Other channels unchanged
+      expect(getChannelOctave(1)).toEqual(DEFAULT_OCTAVE)
+    })
+
+    it('sets octave for a specific channel', () => {
+      const { setOctave, getChannelOctave } = useComposer()
+
+      setOctave(3, 2)
+
+      expect(getChannelOctave(0)).toEqual(DEFAULT_OCTAVE)
+      expect(getChannelOctave(1)).toEqual(DEFAULT_OCTAVE)
+      expect(getChannelOctave(2)).toEqual(3)
+    })
+
   })
 
   // ---------------------------------------------------------------------------

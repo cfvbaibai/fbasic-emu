@@ -27,11 +27,6 @@ import { createNoteCellKey } from '@/features/ide/components/pianoRollConstants'
 /** Number of sound channels in F-BASIC. */
 const CHANNEL_COUNT = 3
 
-/** Returns true if the given index is a valid channel index (0 to CHANNEL_COUNT - 1). */
-function isValidChannelIndex(index: number): boolean {
-  return !Number.isNaN(index) && index >= 0 && index < CHANNEL_COUNT
-}
-
 // ---------------------------------------------------------------------------
 // Module-level singleton state
 // ---------------------------------------------------------------------------
@@ -108,7 +103,8 @@ export function useComposer() {
    */
   function clearChannel(channelIndex?: number): void {
     const index = channelIndex ?? activeChannel.value
-    if (!isValidChannelIndex(index)) return
+    if (!Number.isInteger(index) || index < 0 || index >= CHANNEL_COUNT)
+      return
     channelNotes.value[index] = new Set()
   }
 
@@ -124,7 +120,7 @@ export function useComposer() {
    * Ignores out-of-range indices (must be 0 to CHANNEL_COUNT - 1).
    */
   function setActiveChannel(index: number): void {
-    if (!isValidChannelIndex(index)) return
+    if (!Number.isInteger(index) || index < 0 || index >= CHANNEL_COUNT) return
     activeChannel.value = index
   }
 
@@ -144,13 +140,14 @@ export function useComposer() {
    */
   function setOctave(value: number, channelIndex?: number): void {
     const index = channelIndex ?? activeChannel.value
-    if (Number.isNaN(index) || index < 0 || index >= CHANNEL_COUNT) return
+    if (!Number.isInteger(index) || index < 0 || index >= CHANNEL_COUNT)
+      return
     channelOctaves.value[index] = value
   }
 
   /** Gets the octave for a specific channel. */
   function getChannelOctave(channelIndex: number): number {
-    if (Number.isNaN(channelIndex) || channelIndex < 0 || channelIndex >= CHANNEL_COUNT)
+    if (!Number.isInteger(channelIndex) || channelIndex < 0 || channelIndex >= CHANNEL_COUNT)
       return DEFAULT_OCTAVE
     return channelOctaves.value[channelIndex] ?? DEFAULT_OCTAVE
   }
