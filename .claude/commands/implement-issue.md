@@ -23,33 +23,19 @@ SESSION_ID=$(python3 -c "import uuid; print(uuid.uuid4())")
 
 If `SESSION_ID` is empty, skip coordination checks (single-instance mode). Store it for the duration of this run as `${SESSION_ID}`.
 
-### Lock Directory Setup
+### Lock Directory Setup & Prune
 
-**Resolve the main repo root FIRST** — all lock operations must use absolute paths rooted here. Never use relative paths for locks, because CWD may change to a worktree during the run:
+Lock operations use `scripts/lock.sh` which resolves `REPO_ROOT` internally — safe to call from any CWD including worktrees.
 
 ```bash
-# Resolve main repo root (first entry in worktree list is always the main repo)
+scripts/lock.sh prune
+```
+
+**Resolve `REPO_ROOT` for non-lock operations** (worktree paths, etc.) — this is still needed for Phases 3-7:
+
+```bash
 REPO_ROOT=$(git -c safe.directory="$(pwd)" worktree list --porcelain | head -1 | sed -n 's/^worktree //p')
-
-# Ensure lock directory exists in the MAIN repo (not a worktree)
-mkdir -p "${REPO_ROOT}/.automation/locks"
 ```
-
-Prune stale locks from previous crashed runs — remove lock files where neither the worktree directory nor the remote branch exists:
-
-```bash
-for LOCK_FILE in "${REPO_ROOT}/.automation/locks/issue-*.lock"; do
-  [ -f "$LOCK_FILE" ] || continue
-  ISSUE_NUM=$(basename "$LOCK_FILE" .lock | sed 's/issue-//')
-  WT_PATH="${REPO_ROOT}/.automation/worktrees/${ISSUE_NUM}"
-  BRANCH=$(git -c safe.directory="$REPO_ROOT" branch -r --list "origin/fix/issue-${ISSUE_NUM}*" --format='%(refname:short)' | head -1)
-  if [ ! -d "$WT_PATH" ] && [ -z "$BRANCH" ]; then
-    rm -f "$LOCK_FILE"
-  fi
-done
-```
-
-**Critical**: All subsequent lock file paths in this command MUST use `${REPO_ROOT}/.automation/locks/...` (absolute), never `.automation/locks/...` (relative).
 
 ## Phase 1 — Sync & Scan
 
@@ -67,6 +53,7 @@ After merging, verify that recent fixes to `.claude/commands/` files haven't bee
 ```bash
 # Check critical patterns that must not regress
 grep -q 'uuid.uuid4()' .claude/commands/implement-issue.md || echo "INTEGRITY_WARN: SESSION_ID fix reverted"
+grep -q 'scripts/lock.sh' .claude/commands/implement-issue.md || echo "INTEGRITY_WARN: lock.sh refactoring reverted"
 ```
 
 If any integrity warning fires, **stop and re-apply the fix** before proceeding. This prevents the pipeline from operating with a broken command definition.
@@ -81,12 +68,9 @@ gh pr list --json number,title,state,headRefName,baseRefName,mergeable,statusChe
 
 ### PR Maintenance (stop after handling one if found)
 
-Before handling any PR, extract the issue number and acquire a lock to prevent concurrent sessions from working on the same PR. **Always ensure lock directory exists before attempting noclobber:**
+Before handling any PR, extract the issue number and acquire a lock to prevent concurrent sessions from working on the same PR:
 
 ```bash
-# Ensure we're operating in the main repo's lock directory
-mkdir -p "${REPO_ROOT}/.automation/locks"
-
 # Extract issue number from headRefName (stricter format: feat/issue-{N}-slug or fix/issue-{N}-slug)
 ISSUE_NUM=$(echo "$HEAD_REF_NAME" | sed -n 's/.*\/issue-\([0-9]*\)-.*/\1/p')
 
@@ -97,34 +81,16 @@ fi
 
 # Lock key: use issue-{N} if issue found, otherwise pr-{N}
 if [ -n "$ISSUE_NUM" ]; then
-  LOCK_FILE="${REPO_ROOT}/.automation/locks/issue-${ISSUE_NUM}.lock"
+  LOCK_RESULT=$(scripts/lock.sh acquire "issue-${ISSUE_NUM}" "$SESSION_ID" --pr "$PR_NUMBER" --issue "$ISSUE_NUM")
 else
-  LOCK_FILE="${REPO_ROOT}/.automation/locks/pr-${PR_NUMBER}.lock"
+  LOCK_RESULT=$(scripts/lock.sh acquire "pr-${PR_NUMBER}" "$SESSION_ID" --pr "$PR_NUMBER")
 fi
-
-# Attempt atomic lock acquisition via noclobber
-if ( set -o noclobber; echo "{\"session\": \"$SESSION_ID\", \"pr\": $PR_NUMBER, \"issue\": ${ISSUE_NUM:-none}, \"claimed\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" > "$LOCK_FILE" ) 2>/dev/null; then
-  echo "LOCK_ACQUIRED"
-else
-  # Lock exists — check if stale (>2 hours old)
-  LOCK_AGE=$(( $(date +%s) - $(date +%s -r "$LOCK_FILE") ))
-  if [ "$LOCK_AGE" -gt 7200 ]; then
-    OLD_SESSION=$(grep -o '"session": "[^"]*"' "$LOCK_FILE" | cut -d'"' -f4)
-    rm -f "$LOCK_FILE"
-    if ( set -o noclobber; echo "{\"session\": \"$SESSION_ID\", \"pr\": $PR_NUMBER, \"issue\": ${ISSUE_NUM:-none}, \"claimed\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\", \"stole_from\": \"$OLD_SESSION\"}" > "$LOCK_FILE" ) 2>/dev/null; then
-      echo "LOCK_STOLEN"
-    else
-      echo "LOCK_BUSY"
-    fi
-  else
-    echo "LOCK_BUSY"
-  fi
-fi
+echo "$LOCK_RESULT"
 ```
 
-**If `LOCK_BUSY` or lock steal failed**: another session owns this PR — skip to the next PR in the list.
+**If `LOCK_BUSY` or `LOCK_STEAL_FAILED`**: another session owns this PR — skip to the next PR in the list.
 
-**If `LOCK_ACQUIRED` or `LOCK_STOLEN`**: proceed with maintenance, then release the lock in Phase 7 cleanup (same as issue locks).
+**If `LOCK_ACQUIRED` or `LOCK_STOLEN`**: proceed with maintenance, then release the lock in Phase 7 cleanup via `scripts/lock.sh release`.
 
 For each PR that passes the lock check, handle in this priority order:
 
@@ -178,37 +144,13 @@ gh issue list --state open --search "no:assignee" --json number,title,labels,ass
 
 ### Atomic Issue Locking
 
-Use per-issue lock files for atomic issue claiming. Unlike `config.md` (read-check-act is not atomic), bash's `noclobber` makes file creation atomic at the shell level — two instances cannot create the same lock file.
-
-**Always use `${REPO_ROOT}`-based absolute paths for locks.** Before attempting acquisition, ensure the lock directory exists:
-
-```bash
-mkdir -p "${REPO_ROOT}/.automation/locks"
-```
+Use per-issue lock files for atomic issue claiming. The `scripts/lock.sh` script handles REPO_ROOT resolution, directory creation, and atomic noclobber — safe to call from any CWD.
 
 For each candidate issue **in priority order**, attempt to acquire a lock:
 
 ```bash
-LOCK_FILE="${REPO_ROOT}/.automation/locks/issue-${ISSUE_NUM}.lock"
-
-# Atomic lock acquisition via noclobber — fails if file already exists
-if ( set -o noclobber; echo "{\"session\": \"$SESSION_ID\", \"issue\": $ISSUE_NUM, \"claimed\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" > "$LOCK_FILE" ) 2>/dev/null; then
-  echo "LOCK_ACQUIRED"
-else
-  # Lock exists — check if stale (>2 hours old, session almost certainly crashed)
-  LOCK_AGE=$(( $(date +%s) - $(date +%s -r "$LOCK_FILE") ))
-  if [ "$LOCK_AGE" -gt 7200 ]; then
-    OLD_SESSION=$(grep -o '"session": "[^"]*"' "$LOCK_FILE" | cut -d'"' -f4)
-    rm -f "$LOCK_FILE"
-    if ( set -o noclobber; echo "{\"session\": \"$SESSION_ID\", \"issue\": $ISSUE_NUM, \"claimed\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\", \"stole_from\": \"$OLD_SESSION\"}" > "$LOCK_FILE" ) 2>/dev/null; then
-      echo "LOCK_STOLEN (stale: ${LOCK_AGE}s)"
-    else
-      echo "LOCK_STEAL_FAILED"
-    fi
-  else
-    echo "LOCK_BUSY"
-  fi
-fi
+LOCK_RESULT=$(scripts/lock.sh acquire "issue-${ISSUE_NUM}" "$SESSION_ID")
+echo "$LOCK_RESULT"
 ```
 
 **If `LOCK_ACQUIRED` or `LOCK_STOLEN`**: this issue is ours — stop iterating, this is the selected issue.
@@ -267,17 +209,14 @@ Set `${TDD_CATEGORY}` to one of: `A`, `B`, `C`, `D`, `E_F_G`.
 **Before creating a worktree, verify the lock exists.** If the lock file for this issue is missing, STOP — another session may have claimed it, or the lock was lost. Re-acquire the lock before proceeding:
 
 ```bash
-# Verify lock exists (must have been acquired in Phase 1 or Phase 2)
-if [ ! -f "${REPO_ROOT}/.automation/locks/issue-${ISSUE_NUM}.lock" ]; then
+LOCK_STATUS=$(scripts/lock.sh exists "issue-${ISSUE_NUM}")
+if [ "$LOCK_STATUS" = "LOCK_MISSING" ]; then
   echo "ERROR: No lock file for issue #${ISSUE_NUM}. Cannot create worktree without lock."
-  # Re-attempt lock acquisition
-  mkdir -p "${REPO_ROOT}/.automation/locks"
-  LOCK_FILE="${REPO_ROOT}/.automation/locks/issue-${ISSUE_NUM}.lock"
-  if ( set -o noclobber; echo "{\"session\": \"$SESSION_ID\", \"issue\": $ISSUE_NUM, \"claimed\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" > "$LOCK_FILE" ) 2>/dev/null; then
+  LOCK_RESULT=$(scripts/lock.sh acquire "issue-${ISSUE_NUM}" "$SESSION_ID")
+  if echo "$LOCK_RESULT" | grep -q "LOCK_ACQUIRED\|LOCK_STOLEN"; then
     echo "LOCK_REACQUIRED"
   else
     echo "LOCK_BUSY — another session owns this issue. STOP."
-    # Do NOT create worktree
   fi
 fi
 ```
@@ -582,9 +521,8 @@ rm -rf "$WT_PATH" 2>/dev/null
 Remove the lock file (issue lock or PR lock, depending on how it was acquired):
 
 ```bash
-# Remove whichever lock was acquired in Phase 1 or Phase 2
-rm -f "${REPO_ROOT}/.automation/locks/issue-${ISSUE_NUM}.lock"
-rm -f "${REPO_ROOT}/.automation/locks/pr-${PR_NUMBER}.lock"
+scripts/lock.sh release "issue-${ISSUE_NUM}"
+scripts/lock.sh release "pr-${PR_NUMBER}"
 ```
 
 Branch stays on remote for CI.
@@ -660,7 +598,7 @@ Follow `.claude/commands/_shared/self-improvement-protocol.md`. Focus on:
 
 ## Important Rules
 
-- **Concurrent instance coordination** — extract session GUID in Phase 0; acquire atomic lock file in Phase 1 (PR maintenance, uses `issue-{N}.lock` or `pr-{N}.lock`) and Phase 2 (new issues, uses `issue-{N}.lock`); update `config.md` `active_worktrees` in Phase 3 (informational only — never rely on it for coordination); release lock file in Phase 7. Never pick an issue or PR whose lock file exists and is not stale.
+- **Concurrent instance coordination** — extract session GUID in Phase 0; acquire atomic lock via `scripts/lock.sh` in Phase 1 (PR maintenance) and Phase 2 (new issues); verify lock via `scripts/lock.sh exists` in Phase 3; release lock via `scripts/lock.sh release` in Phase 7. Never pick an issue or PR whose lock file exists and is not stale.
 - **Never implement code directly** — always delegate to `/lead` and specialist agents
 - **Never modify the main repo directory** — all work in worktree
 - **Single-commit rule** — squash to exactly one commit before pushing; CI fix commits must be amended into the original, not pushed separately
