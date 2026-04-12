@@ -17,9 +17,16 @@ vi.mock('vue-i18n', () => ({
   }),
 }))
 
-/** Real accessor instance for IdeBottomArea tests (StateInspector needs the full type) */
-const testBuffer = new SharedArrayBuffer(SHARED_DISPLAY_BUFFER_BYTES)
-const MOCK_FULL_ACCESSOR = new SharedDisplayBufferAccessor(testBuffer)
+/**
+ * Real accessor instance for IdeBottomArea integration tests.
+ * Both BufferInspector children are stubbed in these tests, so the accessor
+ * is unused at runtime. A real instance is used because SharedDisplayBufferAccessor
+ * is a class type that cannot be structurally satisfied by a plain object without
+ * type assertions like `as never`.
+ */
+const MOCK_FULL_ACCESSOR: SharedDisplayBufferAccessor = new SharedDisplayBufferAccessor(
+  new SharedArrayBuffer(SHARED_DISPLAY_BUFFER_BYTES),
+)
 
 /** Mock accessor with readSyncCommand/readAck for testing */
 function createMockAccessor(overrides: Partial<SharedDisplayBufferAccessor> = {}): SharedDisplayBufferAccessor {
