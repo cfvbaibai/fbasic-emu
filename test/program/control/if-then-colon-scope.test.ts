@@ -158,7 +158,51 @@ describe('THEN-less IF colon scoping program integration', () => {
   })
 
   // ==========================================================================
-  // 4. Multi-statement colon chains within IF branches
+  // 4. THEN-less IF with GOTO in colon chain
+  // ==========================================================================
+
+  describe('THEN-less IF with GOTO in colon chain', () => {
+    it('executes GOTO as first statement and skips subsequent colon-separated statements', async () => {
+      const tp = TestProgram.fromCode(
+        [
+          '10 LET X = 1',
+          '20 IF X = 1 GOTO 50: PRINT "NO"',
+          '30 PRINT "MID"',
+          '50 PRINT "JUMPED"',
+          '60 END',
+        ].join('\n'),
+      )
+
+      await tp.run()
+
+      tp.expectSuccess()
+      // GOTO executed immediately -> "NO" and "MID" skipped, jumped to 50
+      tp.expectRowText(0, 'JUMPED')
+    })
+
+    it('does NOT scope colon statements when IF condition is false and GOTO is a line number jump', async () => {
+      const tp = TestProgram.fromCode(
+        [
+          '10 LET X = 0',
+          '20 IF X = 1 GOTO 50: PRINT "YES"',
+          '30 PRINT "FELL"',
+          '50 PRINT "JUMPED"',
+          '60 END',
+        ].join('\n'),
+      )
+
+      await tp.run()
+
+      tp.expectSuccess()
+      // IF-GOTO with line number does NOT scope colon statements (per statement-expander)
+      // X=0 false -> GOTO skipped, but "YES" runs independently as outer statement
+      tp.expectRowText(0, 'YES')
+      tp.expectRowText(1, 'FELL')
+    })
+  })
+
+  // ==========================================================================
+  // 5. Multi-statement colon chains within IF branches
   // ==========================================================================
 
   describe('multi-statement colon chains within IF branches', () => {
