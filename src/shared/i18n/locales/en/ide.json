@@ -423,7 +423,22 @@
     "joystick0": "Joy 0",
     "joystick1": "Joy 1",
     "joystickStick": "STICK",
-    "joystickStrig": "STRIG"
+    "joystickStrig": "STRIG",
+    "animationSyncTitle": "Animation Sync",
+    "animationSyncIdle": "(idle)",
+    "animationSyncAckPending": "Pending",
+    "animationSyncAckReceived": "Received",
+    "animationSyncColField": "Field",
+    "animationSyncColValue": "Value",
+    "animationSyncFieldType": "Command Type",
+    "animationSyncFieldAction": "Action #",
+    "animationSyncFieldStartX": "startX",
+    "animationSyncFieldStartY": "startY",
+    "animationSyncFieldDirection": "Direction",
+    "animationSyncFieldSpeed": "Speed",
+    "animationSyncFieldDistance": "Distance",
+    "animationSyncFieldPriority": "Priority",
+    "animationSyncFieldAck": "ACK"
   },
   "composer": {
     "title": "Controls",
