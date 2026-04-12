@@ -16,17 +16,22 @@ const props = defineProps<{
 
 const { t } = useI18n()
 
-const COMMAND_TYPE_NAMES: Record<SyncCommandType, string> = {
-  [SyncCommandType.NONE]: 'NONE',
-  [SyncCommandType.START_MOVEMENT]: 'START',
-  [SyncCommandType.STOP_MOVEMENT]: 'STOP',
-  [SyncCommandType.ERASE_MOVEMENT]: 'ERASE',
-  [SyncCommandType.SET_POSITION]: 'SET',
-  [SyncCommandType.CLEAR_ALL_MOVEMENTS]: 'CLEAR_ALL',
+const COMMAND_TYPE_KEYS: Record<SyncCommandType, string> = {
+  [SyncCommandType.NONE]: 'ide.bufferInspector.animationSyncCommandTypeNone',
+  [SyncCommandType.START_MOVEMENT]:
+    'ide.bufferInspector.animationSyncCommandTypeStartMovement',
+  [SyncCommandType.STOP_MOVEMENT]:
+    'ide.bufferInspector.animationSyncCommandTypeStopMovement',
+  [SyncCommandType.ERASE_MOVEMENT]:
+    'ide.bufferInspector.animationSyncCommandTypeEraseMovement',
+  [SyncCommandType.SET_POSITION]:
+    'ide.bufferInspector.animationSyncCommandTypeSetPosition',
+  [SyncCommandType.CLEAR_ALL_MOVEMENTS]:
+    'ide.bufferInspector.animationSyncCommandTypeClearAllMovements',
 }
 
 function commandTypeName(type: SyncCommandType): string {
-  return COMMAND_TYPE_NAMES[type]
+  return t(COMMAND_TYPE_KEYS[type])
 }
 
 interface SyncRow {

@@ -108,7 +108,9 @@ describe('AnimationSyncSection', () => {
 
     const cells = wrapper.findAll('.sync-cell')
     expect(cells[0]!.text()).toBe('ide.bufferInspector.animationSyncFieldType')
-    expect(cells[1]!.text()).toBe('START')
+    expect(cells[1]!.text()).toBe(
+      'ide.bufferInspector.animationSyncCommandTypeStartMovement',
+    )
     wrapper.unmount()
   })
 
@@ -197,14 +199,14 @@ describe('AnimationSyncSection', () => {
     wrapper.unmount()
   })
 
-  it('maps all SyncCommandType values to display names', () => {
+  it('maps all SyncCommandType values to i18n keys', () => {
     const cases: [SyncCommandType, string][] = [
-      [SyncCommandType.NONE, 'NONE'],
-      [SyncCommandType.START_MOVEMENT, 'START'],
-      [SyncCommandType.STOP_MOVEMENT, 'STOP'],
-      [SyncCommandType.ERASE_MOVEMENT, 'ERASE'],
-      [SyncCommandType.SET_POSITION, 'SET'],
-      [SyncCommandType.CLEAR_ALL_MOVEMENTS, 'CLEAR_ALL'],
+      [SyncCommandType.NONE, 'ide.bufferInspector.animationSyncCommandTypeNone'],
+      [SyncCommandType.START_MOVEMENT, 'ide.bufferInspector.animationSyncCommandTypeStartMovement'],
+      [SyncCommandType.STOP_MOVEMENT, 'ide.bufferInspector.animationSyncCommandTypeStopMovement'],
+      [SyncCommandType.ERASE_MOVEMENT, 'ide.bufferInspector.animationSyncCommandTypeEraseMovement'],
+      [SyncCommandType.SET_POSITION, 'ide.bufferInspector.animationSyncCommandTypeSetPosition'],
+      [SyncCommandType.CLEAR_ALL_MOVEMENTS, 'ide.bufferInspector.animationSyncCommandTypeClearAllMovements'],
     ]
 
     for (const [commandType, expectedName] of cases) {
