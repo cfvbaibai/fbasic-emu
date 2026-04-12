@@ -3,25 +3,16 @@ import { mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 
 import type { KeyboardBufferView } from '@/core/devices/sharedKeyboardBuffer'
-import {
-  consumeKeyAvailable,
-  createSharedKeyboardBuffer,
-  createViewsFromKeyboardBuffer,
-  setInkeyState,
-} from '@/core/devices/sharedKeyboardBuffer'
+import { consumeKeyAvailable, setInkeyState } from '@/core/devices/sharedKeyboardBuffer'
 import KeyboardBufferSection from '@/features/ide/components/KeyboardBufferSection.vue'
+
+import { createTestKeyboardBuffer } from './helpers/createTestKeyboardBuffer'
 
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
     t: (key: string) => key,
   }),
 }))
-
-/** Create a real keyboard buffer and views for testing */
-function createTestKeyboardBuffer(): KeyboardBufferView {
-  const buffer = createSharedKeyboardBuffer()
-  return createViewsFromKeyboardBuffer(buffer)
-}
 
 /**
  * Mount the component with fake timers.
