@@ -130,3 +130,23 @@
     image-rendering: crisp-edges;
     filter: brightness(1.05) contrast(1.1);
 }
+
+/* Curvature effect — rounded screen edges when CRT filter is active */
+.screen-display .crt-screen.crt-filter-active {
+    border-radius: 24px;
+}
+
+/* Vignette overlay — darkened corners simulating CRT tube edge falloff */
+.screen-display .crt-vignette {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 3;
+    border-radius: 24px;
+    background: radial-gradient(
+        ellipse 100% 100% at 50% 50%,
+        transparent 60%,
+        var(--crt-shadow-dark-30) 80%,
+        var(--crt-shadow-dark-60) 100%
+    );
+}

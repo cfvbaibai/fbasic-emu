@@ -216,4 +216,39 @@ describe('Screen - scanline filter integration', () => {
     expect(wrapper.find('.crt-scanlines').exists()).toEqual(true)
     wrapper.unmount()
   })
+
+  it('hides crt-vignette when filterEnabled is false (default)', () => {
+    const wrapper = mount(Screen, {
+      global: {
+        stubs: {
+          'v-stage': vStageStub,
+          'v-layer': vLayerStub,
+          'v-rect': vRectStub,
+        },
+      },
+    })
+
+    expect(wrapper.find('.screen-display').exists()).toEqual(true)
+    expect(wrapper.find('.crt-vignette').exists()).toEqual(false)
+    wrapper.unmount()
+  })
+
+  it('shows crt-vignette when filterEnabled is true', async () => {
+    localStorage.setItem('fbasic-screen-filter', 'true')
+
+    const wrapper = mount(Screen, {
+      global: {
+        stubs: {
+          'v-stage': vStageStub,
+          'v-layer': vLayerStub,
+          'v-rect': vRectStub,
+        },
+      },
+    })
+
+    await new Promise((resolve) => setTimeout(resolve, 50))
+
+    expect(wrapper.find('.crt-vignette').exists()).toEqual(true)
+    wrapper.unmount()
+  })
 })

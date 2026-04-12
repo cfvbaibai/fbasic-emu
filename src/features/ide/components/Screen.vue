@@ -383,21 +383,16 @@ watch(
 // Backdrop is managed by vue-konva template via backdropColorHex computed property
 
 // Initialize Animation Worker (single writer to shared buffer)
-const animationWorkerResult = useAnimationWorker({
-  sharedAnimationBuffer: computed(() => ctx.sharedAnimationBuffer.value ?? null),
-  onReady: () => {
-    logScreen.debug('[Screen] Animation Worker ready')
-    // Animation Worker is now ready - it polls the shared buffer for commands
-  },
-  onError: (error) => {
-    logScreen.error('[Screen] Animation Worker error:', error)
-  },
-})
-
-const {
-  initialize: initializeAnimationWorker,
-  terminate: terminateAnimationWorker,
-} = animationWorkerResult
+const { initialize: initializeAnimationWorker, terminate: terminateAnimationWorker } =
+  useAnimationWorker({
+    sharedAnimationBuffer: computed(() => ctx.sharedAnimationBuffer.value ?? null),
+    onReady: () => {
+      logScreen.debug('[Screen] Animation Worker ready')
+    },
+    onError: (error) => {
+      logScreen.error('[Screen] Animation Worker error:', error)
+    },
+  })
 
 // Initial render when stage becomes available
 watch(
@@ -448,10 +443,11 @@ onDeactivated(cleanupScreen)
 <template>
   <div class="screen-display">
     <div class="crt-bezel">
-      <div class="crt-screen">
+      <div :class="['crt-screen', { 'crt-filter-active': filterEnabled }]">
         <div v-if="filterEnabled" class="crt-phosphor-glow"></div>
         <div v-if="filterEnabled" class="crt-color-bleed"></div>
         <div v-if="filterEnabled" class="crt-scanlines"></div>
+        <div v-if="filterEnabled" class="crt-vignette"></div>
         <div
           class="screen-stage-wrapper"
           data-testid="ide-screen-stage"
