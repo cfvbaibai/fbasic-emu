@@ -403,7 +403,19 @@
     "empty": "（无）"
   },
   "bufferInspector": {
-    "title": "缓冲区检查器"
+    "title": "缓冲区检查器",
+    "spriteSlotsTitle": "精灵槽位",
+    "spriteSlotsDisabled": "SPRITE OFF",
+    "spriteSlotsOn": "开",
+    "spriteSlotsOff": "关",
+    "spriteSlotsDefined": "已定义",
+    "spriteSlotsNone": "-",
+    "spriteSlotsColNumber": "#",
+    "spriteSlotsColX": "X",
+    "spriteSlotsColY": "Y",
+    "spriteSlotsColVisible": "可见",
+    "spriteSlotsColPriority": "优先级",
+    "spriteSlotsColDefinition": "定义"
   },
   "logLevels": {
     "title": "日志级别",

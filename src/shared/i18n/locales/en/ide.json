@@ -403,7 +403,19 @@
     "empty": "(none)"
   },
   "bufferInspector": {
-    "title": "Buffer Inspector"
+    "title": "Buffer Inspector",
+    "spriteSlotsTitle": "Sprite Slots",
+    "spriteSlotsDisabled": "SPRITE OFF",
+    "spriteSlotsOn": "ON",
+    "spriteSlotsOff": "OFF",
+    "spriteSlotsDefined": "Yes",
+    "spriteSlotsNone": "-",
+    "spriteSlotsColNumber": "#",
+    "spriteSlotsColX": "X",
+    "spriteSlotsColY": "Y",
+    "spriteSlotsColVisible": "Visible",
+    "spriteSlotsColPriority": "Priority",
+    "spriteSlotsColDefinition": "Definition"
   },
   "logLevels": {
     "title": "Log Levels",

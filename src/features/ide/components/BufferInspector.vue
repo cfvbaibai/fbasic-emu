@@ -1,11 +1,19 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 
+import type { SpriteState } from '@/core/sprite/types'
 import { GameBlock } from '@/shared/components/ui'
+
+import SpriteSlotsSection from './SpriteSlotsSection.vue'
 
 defineOptions({
   name: 'BufferInspector',
 })
+
+defineProps<{
+  spriteStates: SpriteState[]
+  spriteEnabled: boolean
+}>()
 
 const { t } = useI18n()
 </script>
@@ -17,7 +25,9 @@ const { t } = useI18n()
     :hide-header="true"
     class="buffer-inspector"
   >
-    <div class="buffer-inspector-content" />
+    <div class="buffer-inspector-content">
+      <SpriteSlotsSection :sprite-states="spriteStates" :sprite-enabled="spriteEnabled" />
+    </div>
   </GameBlock>
 </template>
 
