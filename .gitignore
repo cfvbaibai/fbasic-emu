@@ -1,6 +1,7 @@
 # Claude Code local settings
 .claude/settings.local.json
 .claude/scheduled_tasks.lock
+.claude/scheduled_tasks.json
 
 # Claude auto-memory (session context, should not be committed)
 .claude/projects/
