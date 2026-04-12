@@ -84,6 +84,31 @@ Increment NNN for same-day runs. Template:
 - Issues affected: #N, #N, ...
 ```
 
+## Separation of Concerns: Automation Config vs Application Code
+
+Automation config changes (`.claude/commands/`, `.claude/settings.json`, `.automation/`, `scripts/`) MUST NEVER be mixed with application code changes (`src/`, tests) in the same PR.
+
+### Rule
+
+If an issue-implementation run produces both automation config changes and application code changes, they must be separated:
+
+1. **Commit separately** — automation config changes get their own commit with a `chore:` prefix
+2. **PR separately** — automation config changes should be pushed to `origin/master` directly (see self-improvement protocol), not included in the feature PR
+
+### Self-Improvement During Issue Implementation
+
+The self-improvement phase may update `.claude/commands/` files. When this happens during an issue implementation run:
+
+1. **Do not stage automation files with code changes** — use explicit `git add` for code files only
+2. **Commit and push automation changes first** — per the self-improvement protocol, push to `origin/master` before creating the feature PR
+3. **Then create the feature PR** — containing only application code changes
+
+### Rationale
+
+- Cleaner git history — each PR has a single, clear purpose
+- Easier review — reviewers can focus on one type of change
+- Safer rollback — reverting a code change doesn't undo automation improvements
+
 ## Report
 
 Location: `.automation/reports/YYYY-MM/YYYY-MM-DD.md`
