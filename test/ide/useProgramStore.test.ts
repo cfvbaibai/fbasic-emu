@@ -155,7 +155,7 @@ describe('useProgramStore', () => {
     store.setCode('10 PRINT "HELLO"')
 
     // Wait for VueUse's useLocalStorage to sync
-    await new Promise((resolve) => setTimeout(resolve, 50))
+    await new Promise((resolve) => setTimeout(resolve, LOCAL_STORAGE_SYNC_DELAY_MS))
 
     const stored = localStorage.getItem('program:current')
     expect(stored).not.toBeNull()
