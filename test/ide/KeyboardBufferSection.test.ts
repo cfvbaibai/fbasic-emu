@@ -18,7 +18,7 @@ vi.mock('vue-i18n', () => ({
 /**
  * Mount the component with fake timers.
  * After mutating the keyboard buffer, advance timers by the poll
- * interval so the component picks up the change.
+ * interval (POLL_INTERVAL_MS) so the component picks up the change.
  */
 function mountWithFakeTimers(keyboardView: KeyboardBufferView) {
   vi.useFakeTimers()
