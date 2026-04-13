@@ -1,8 +1,8 @@
 /**
- * Barrel export for basics tutorial lessons (1-5).
+ * Barrel export for tutorial lesson data files.
  *
  * Imports all individual lesson modules and exports them
- * as a single ordered array for consumption by TutorialPanel.vue.
+ * as ordered arrays for consumption by TutorialPanel.vue.
  */
 
 import { lesson1Print } from './lessons/lesson1Print'
@@ -10,6 +10,9 @@ import { lesson2Variables } from './lessons/lesson2Variables'
 import { lesson3Input } from './lessons/lesson3Input'
 import { lesson4IfThen } from './lessons/lesson4IfThen'
 import { lesson5ForNext } from './lessons/lesson5ForNext'
+import { lesson6Cls } from './lessons/lesson6Cls'
+import { lesson7Color } from './lessons/lesson7Color'
+import { lesson8Locate } from './lessons/lesson8Locate'
 import type { Lesson } from './types'
 
 /**
@@ -28,4 +31,18 @@ export const basicsLessons: Lesson[] = [
   lesson3Input,
   lesson4IfThen,
   lesson5ForNext,
+]
+
+/**
+ * Ordered array of screen tutorial lessons.
+ *
+ * Lesson order:
+ * 6. CLS — clearing the screen
+ * 7. COLOR — setting text and background colors
+ * 8. LOCATE — cursor positioning and screen functions
+ */
+export const screenLessons: Lesson[] = [
+  lesson6Cls,
+  lesson7Color,
+  lesson8Locate,
 ]
