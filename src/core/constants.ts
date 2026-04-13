@@ -165,6 +165,19 @@ export const TIMING = {
   COPIED_FEEDBACK_MS: 2000, // Duration of "Copied!" feedback state in share dialog
 } as const
 
+// Sound constants
+/** Number of independent audio channels in F-BASIC. */
+export const CHANNEL_COUNT = 3
+
+/**
+ * Returns true if the given index is a valid channel index (0 to CHANNEL_COUNT - 1).
+ *
+ * Shared by the composer UI (useComposer) and the execution layer (SoundService).
+ */
+export function isValidChannelIndex(index: number): boolean {
+  return !Number.isNaN(index) && index >= 0 && index < CHANNEL_COUNT
+}
+
 // Screen dimensions and coordinate limits
 export const SCREEN_DIMENSIONS = {
   BACKGROUND: {
