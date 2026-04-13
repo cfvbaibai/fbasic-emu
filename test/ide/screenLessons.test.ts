@@ -9,6 +9,8 @@ import { describe, expect, it } from 'vitest'
 
 import { screenLessons } from '@/features/ide/tutorial/index'
 
+import { extractCodeBlocks } from '../helpers/extractCodeBlocks'
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
@@ -23,22 +25,6 @@ const LESSON_KEYWORDS: Array<RegExp> = [
   /\bCOLOR\b/,
   /\bLOCATE\b/,
 ]
-
-/**
- * Extracts all fenced code block contents from a markdown string.
- */
-function extractCodeBlocks(markdown: string): string[] {
-  const blocks: string[] = []
-  const regex = /```(?:\w*)\n([\s\S]*?)```/g
-  let match: RegExpExecArray | null
-  while ((match = regex.exec(markdown)) !== null) {
-    const code = match[1]?.trim()
-    if (code != null && code.length > 0) {
-      blocks.push(code)
-    }
-  }
-  return blocks
-}
 
 // ---------------------------------------------------------------------------
 // Tests
