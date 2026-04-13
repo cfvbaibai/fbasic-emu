@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { mount } from '@vue/test-utils'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ref } from 'vue'
 
 import Screen from '@/features/ide/components/Screen.vue'
@@ -97,12 +97,18 @@ describe.each([
   { className: 'crt-phosphor-glow', label: 'phosphor glow' },
   { className: 'crt-color-bleed', label: 'color bleeding' },
 ])('Screen - $label filter integration', ({ className }) => {
+  let wrapper: ReturnType<typeof mount>
+
   beforeEach(() => {
     localStorage.clear()
   })
 
+  afterEach(() => {
+    wrapper.unmount()
+  })
+
   it(`hides ${className} when filterEnabled is false (default)`, () => {
-    const wrapper = mount(Screen, {
+    wrapper = mount(Screen, {
       global: {
         stubs: {
           'v-stage': vStageStub,
@@ -114,13 +120,12 @@ describe.each([
 
     expect(wrapper.find('.screen-display').exists()).toEqual(true)
     expect(wrapper.find(`.${className}`).exists()).toEqual(false)
-    wrapper.unmount()
   })
 
   it(`shows ${className} when filterEnabled is true`, async () => {
     localStorage.setItem('fbasic-screen-filter', 'true')
 
-    const wrapper = mount(Screen, {
+    wrapper = mount(Screen, {
       global: {
         stubs: {
           'v-stage': vStageStub,
@@ -133,11 +138,10 @@ describe.each([
     await new Promise((resolve) => setTimeout(resolve, LOCAL_STORAGE_SYNC_DELAY_MS))
 
     expect(wrapper.find(`.${className}`).exists()).toEqual(true)
-    wrapper.unmount()
   })
 
   it('hides crt-vignette when filterEnabled is false (default)', () => {
-    const wrapper = mount(Screen, {
+    wrapper = mount(Screen, {
       global: {
         stubs: {
           'v-stage': vStageStub,
@@ -149,13 +153,12 @@ describe.each([
 
     expect(wrapper.find('.screen-display').exists()).toEqual(true)
     expect(wrapper.find('.crt-vignette').exists()).toEqual(false)
-    wrapper.unmount()
   })
 
   it('shows crt-vignette when filterEnabled is true', async () => {
     localStorage.setItem('fbasic-screen-filter', 'true')
 
-    const wrapper = mount(Screen, {
+    wrapper = mount(Screen, {
       global: {
         stubs: {
           'v-stage': vStageStub,
@@ -168,6 +171,5 @@ describe.each([
     await new Promise((resolve) => setTimeout(resolve, LOCAL_STORAGE_SYNC_DELAY_MS))
 
     expect(wrapper.find('.crt-vignette').exists()).toEqual(true)
-    wrapper.unmount()
   })
 })
