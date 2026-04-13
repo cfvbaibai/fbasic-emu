@@ -308,6 +308,68 @@ describe('JoystickBufferSection', () => {
     wrapper.unmount()
   })
 
+  it('highlights only A button when only A is active', () => {
+    const buffer = createSharedJoystickBuffer()
+    const view = createViewsFromJoystickBuffer(buffer)
+    setStrigState(view, 0, 8) // A only
+
+    const wrapper = mount(JoystickBufferSection, {
+      props: {
+        sharedJoystickBuffer: buffer,
+        tick: 0,
+      },
+    })
+
+    const buttonContainers = wrapper.findAll('.joystick-dpad-buttons')
+    const buttons0 = buttonContainers[0]!.findAll('.dpad-button')
+    expect(buttons0.length).toBe(4)
+
+    // Only A is active
+    expect(buttons0[0]!.classes()).toContain('dpad-active') // A
+    expect(buttons0[1]!.classes()).not.toContain('dpad-active') // B
+    expect(buttons0[2]!.classes()).not.toContain('dpad-active') // Sel
+    expect(buttons0[3]!.classes()).not.toContain('dpad-active') // Sta
+
+    // Joystick 1 should have no active buttons
+    const buttons1 = buttonContainers[1]!.findAll('.dpad-button')
+    expect(buttons1.length).toBe(4)
+    for (const btn of buttons1) {
+      expect(btn.classes()).not.toContain('dpad-active')
+    }
+    wrapper.unmount()
+  })
+
+  it('highlights only Start button when only Start is active', () => {
+    const buffer = createSharedJoystickBuffer()
+    const view = createViewsFromJoystickBuffer(buffer)
+    setStrigState(view, 0, 1) // Start only
+
+    const wrapper = mount(JoystickBufferSection, {
+      props: {
+        sharedJoystickBuffer: buffer,
+        tick: 0,
+      },
+    })
+
+    const buttonContainers = wrapper.findAll('.joystick-dpad-buttons')
+    const buttons0 = buttonContainers[0]!.findAll('.dpad-button')
+    expect(buttons0.length).toBe(4)
+
+    // Only Start is active
+    expect(buttons0[0]!.classes()).not.toContain('dpad-active') // A
+    expect(buttons0[1]!.classes()).not.toContain('dpad-active') // B
+    expect(buttons0[2]!.classes()).not.toContain('dpad-active') // Sel
+    expect(buttons0[3]!.classes()).toContain('dpad-active') // Sta
+
+    // Joystick 1 should have no active buttons
+    const buttons1 = buttonContainers[1]!.findAll('.dpad-button')
+    expect(buttons1.length).toBe(4)
+    for (const btn of buttons1) {
+      expect(btn.classes()).not.toContain('dpad-active')
+    }
+    wrapper.unmount()
+  })
+
   it('does not highlight any button when strig state is 0', () => {
     const buffer = createSharedJoystickBuffer()
 
