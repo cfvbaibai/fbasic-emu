@@ -560,6 +560,9 @@
     "exporting": "エクスポート中...",
     "exportFailed": "HTMLファイルのエクスポートに失敗しました。"
   },
+  "musicComposer": {
+    "title": "ミュージックコンポーザー"
+  },
   "tutorial": {
     "title": "チュートリアル",
     "defaultTitle": "F-BASICチュートリアル",

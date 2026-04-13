@@ -48,7 +48,7 @@ describe('MusicComposerPage', () => {
     wrapper.unmount()
   })
 
-  it('renders a placeholder heading with "Music Composer"', async () => {
+  it('renders a placeholder heading with i18n key musicComposer.title', async () => {
     const { default: pageComponent } = (await import(
       '@/features/music-composer/MusicComposerPage.vue'
     )) as { default: Component }
@@ -64,7 +64,7 @@ describe('MusicComposerPage', () => {
 
     const heading = wrapper.find('h1')
     expect(heading.exists()).toBe(true)
-    expect(heading.text()).toEqual('Music Composer')
+    expect(heading.text()).toEqual('musicComposer.title')
     wrapper.unmount()
   })
 

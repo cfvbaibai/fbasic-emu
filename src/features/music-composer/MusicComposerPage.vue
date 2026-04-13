@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+
 import { GameLayout } from '@/shared/components/ui'
 
 /**
@@ -10,12 +12,14 @@ import { GameLayout } from '@/shared/components/ui'
 defineOptions({
   name: 'MusicComposerPage',
 })
+
+const { t } = useI18n()
 </script>
 
 <template>
   <GameLayout>
     <div class="music-composer-page">
-      <h1>Music Composer</h1>
+      <h1>{{ t('musicComposer.title') }}</h1>
     </div>
   </GameLayout>
 </template>
