@@ -18,6 +18,19 @@ vi.mock('vue-i18n', () => ({
 }))
 
 /**
+ * Test-only interface listing the accessor methods needed by BufferInspector
+ * and its child sections in these tests. Provides compile-time safety: if
+ * BufferInspector later calls an accessor method not listed here, TypeScript
+ * will flag the mock as incomplete.
+ */
+interface TestAccessor {
+  readScreenChar(x: number, y: number): number
+  readScreenPattern(x: number, y: number): number
+  readSyncCommand(): SyncCommand | null
+  readAck(): number
+}
+
+/**
  * Real accessor instance for IdeBottomArea integration tests.
  * Both BufferInspector children are stubbed in these tests, so the accessor
  * is unused at runtime. A real instance is used because SharedDisplayBufferAccessor
@@ -28,19 +41,19 @@ const MOCK_FULL_ACCESSOR: SharedDisplayBufferAccessor = new SharedDisplayBufferA
   new SharedArrayBuffer(SHARED_DISPLAY_BUFFER_BYTES),
 )
 
-/** Mock accessor with readSyncCommand/readAck for testing */
-function createMockAccessor(overrides: Partial<SharedDisplayBufferAccessor> = {}): SharedDisplayBufferAccessor {
+/** Mock accessor with methods needed by BufferInspector tests. */
+function createMockAccessor(overrides: Partial<TestAccessor> = {}): TestAccessor {
   return {
     readScreenChar: () => 0x20,
     readScreenPattern: () => 0,
     readSyncCommand: (): SyncCommand | null => null,
     readAck: (): number => 0,
     ...overrides,
-  } as SharedDisplayBufferAccessor
+  }
 }
 
 describe('BufferInspector', () => {
-  const mockAccessor = createMockAccessor()
+  const mockAccessor = createMockAccessor() as SharedDisplayBufferAccessor
 
   it('renders without errors', () => {
     const keyboardView = createTestKeyboardBuffer()
@@ -237,7 +250,7 @@ describe('BufferInspector', () => {
     const accessor = createMockAccessor({
       readSyncCommand: () => syncCommand,
       readAck: () => 1,
-    })
+    }) as SharedDisplayBufferAccessor
     const wrapper = mount(BufferInspector, {
       props: {
         spriteStates: [],
