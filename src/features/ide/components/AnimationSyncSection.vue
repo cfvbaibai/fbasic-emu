@@ -99,7 +99,7 @@ const rows = computed<SyncRow[]>(() => {
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(row, index) in rows" :key="index" class="sync-row">
+        <tr v-for="row in rows" :key="row.field" class="sync-row">
           <td class="sync-cell">{{ row.field }}</td>
           <td class="sync-cell">{{ row.value }}</td>
         </tr>
