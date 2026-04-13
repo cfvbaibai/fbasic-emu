@@ -546,6 +546,20 @@
     "tooLarge": "此程式過大，無法透過連結分享。",
     "loadFailed": "載入分享程式失敗"
   },
+  "exportHtml": {
+    "title": "匯出為 HTML",
+    "description": "將程式匯出為可在任意瀏覽器中執行的獨立 HTML 檔案。",
+    "titleLabel": "頁面標題",
+    "themeLabel": "主題",
+    "themeDark": "深色",
+    "themeLight": "淺色",
+    "includeSound": "包含聲音",
+    "includeSprites": "包含精靈",
+    "exportButton": "匯出",
+    "cancelButton": "取消",
+    "exporting": "正在匯出...",
+    "exportFailed": "匯出 HTML 檔案失敗。"
+  },
   "tutorial": {
     "title": "教學",
     "defaultTitle": "F-BASIC 教學",

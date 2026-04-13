@@ -546,6 +546,20 @@
     "tooLarge": "This program is too large to share via URL.",
     "loadFailed": "Failed to load shared program"
   },
+  "exportHtml": {
+    "title": "Export as HTML",
+    "description": "Export your program as a standalone HTML file that runs in any browser.",
+    "titleLabel": "Page Title",
+    "themeLabel": "Theme",
+    "themeDark": "Dark",
+    "themeLight": "Light",
+    "includeSound": "Include sound",
+    "includeSprites": "Include sprites",
+    "exportButton": "Export",
+    "cancelButton": "Cancel",
+    "exporting": "Exporting...",
+    "exportFailed": "Failed to export HTML file."
+  },
   "tutorial": {
     "title": "Tutorial",
     "defaultTitle": "F-BASIC Tutorial",
