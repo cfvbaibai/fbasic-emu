@@ -21,6 +21,10 @@
       "name": "スプライトビューア",
       "description": "キャラクタースプライトを表示"
     },
+    "composer": {
+      "name": "コンポーザー",
+      "description": "ミュージックコンポーザー"
+    },
     "performanceDiagnostics": {
       "name": "パフォーマンス",
       "description": "パフォーマンス診断"

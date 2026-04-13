@@ -56,6 +56,17 @@ const routes: RouteRecordRaw[] = [
       group: 'tools',
     },
   },
+  {
+    path: '/composer',
+    name: 'Composer',
+    component: () => import('@/features/music-composer/MusicComposerPage.vue'),
+    meta: {
+      title: 'Composer',
+      showInNav: true,
+      icon: 'mdi:music-note',
+      group: 'tools',
+    },
+  },
   // ============================================
   // Testing & Diagnostics
   // ============================================
