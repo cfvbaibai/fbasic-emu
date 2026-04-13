@@ -11,6 +11,7 @@
 
 import { computed, ref } from 'vue'
 
+import { CHANNEL_C_DEFAULT_DUTY, CHANNEL_C_DEFAULT_ENVELOPE } from '@/core/sound/constants'
 import { calculateNoteFrequency } from '@/core/sound/noteFrequency'
 import type { Note, Rest } from '@/core/sound/types'
 import type { NoteCellKey } from '@/features/ide/components/pianoRollConstants'
@@ -25,6 +26,9 @@ import { useWebAudioPlayer } from '@/features/ide/composables/useWebAudioPlayer'
 
 /** Number of sound channels in F-BASIC. */
 const CHANNEL_COUNT = 3
+
+/** Default volume for composer playback preview (0-15 scale). */
+const COMPOSER_DEFAULT_VOLUME = 10
 
 /** Returns true if the given index is a valid channel index (0 to CHANNEL_COUNT - 1). */
 function isValidChannelIndex(index: number): boolean {
@@ -145,9 +149,9 @@ function buildStepAudioEvents(
             frequency,
             duration: stepDurationMs,
             channel: ch,
-            duty: 2, // 50% duty cycle (square wave default)
-            envelope: 0, // Constant volume
-            volumeOrLength: 10, // Moderate volume
+            duty: CHANNEL_C_DEFAULT_DUTY,
+            envelope: CHANNEL_C_DEFAULT_ENVELOPE,
+            volumeOrLength: COMPOSER_DEFAULT_VOLUME,
           })
           hasNotes = true
         }
