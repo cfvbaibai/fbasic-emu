@@ -27,6 +27,11 @@ import { createNoteCellKey } from '@/features/ide/components/pianoRollConstants'
 /** Number of sound channels in F-BASIC. */
 const CHANNEL_COUNT = 3
 
+/** Returns true if the given index is a valid channel index (0 to CHANNEL_COUNT - 1). */
+function isValidChannelIndex(index: number): boolean {
+  return !Number.isNaN(index) && index >= 0 && index < CHANNEL_COUNT
+}
+
 // ---------------------------------------------------------------------------
 // Module-level singleton state
 // ---------------------------------------------------------------------------
@@ -103,7 +108,7 @@ export function useComposer() {
    */
   function clearChannel(channelIndex?: number): void {
     const index = channelIndex ?? activeChannel.value
-    if (Number.isNaN(index) || index < 0 || index >= CHANNEL_COUNT) return
+    if (!isValidChannelIndex(index)) return
     channelNotes.value[index] = new Set()
   }
 
@@ -119,7 +124,7 @@ export function useComposer() {
    * Ignores out-of-range indices (must be 0 to CHANNEL_COUNT - 1).
    */
   function setActiveChannel(index: number): void {
-    if (Number.isNaN(index) || index < 0 || index >= CHANNEL_COUNT) return
+    if (!isValidChannelIndex(index)) return
     activeChannel.value = index
   }
 
