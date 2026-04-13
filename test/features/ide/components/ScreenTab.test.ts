@@ -146,13 +146,16 @@ describe('ScreenTab', () => {
     wrapper.unmount()
   })
 
-  it('disables filter toggle when prefers-reduced-motion is active', () => {
+  it('disables filter toggle when prefers-reduced-motion is active', async () => {
     mockPrefersReducedMotion.value = true
 
     const wrapper = mountScreenTab()
 
     const filterButton = wrapper.find('[data-testid="ide-filter-toggle"]')
     expect(filterButton.attributes('disabled')).toBeDefined()
+
+    await filterButton.trigger('click')
+    expect(mockToggleFilter).not.toHaveBeenCalled()
     wrapper.unmount()
   })
 })
