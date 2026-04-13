@@ -34,9 +34,9 @@ vi.mock('@/features/ide/composables/useScreenFilter', () => ({
 
 // Stub GameButton to capture click events and attributes
 const gameButtonStub = defineComponent({
-  props: ['variant', 'size', 'selected', 'disabled'],
+  props: ['variant', 'size', 'selected', 'disabled', 'dataTestid'],
   template:
-    '<button :data-variant="variant" :data-selected="String(selected)" :disabled="disabled" :data-testid="$attrs[\'data-testid\']"><slot /></button>',
+    '<button :data-variant="variant" :data-selected="String(selected)" :disabled="disabled" :data-testid="dataTestid"><slot /></button>',
 })
 
 // Stub GameButtonGroup
