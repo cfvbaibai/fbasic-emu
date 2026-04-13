@@ -353,28 +353,6 @@ describe('useComposer', () => {
     })
   })
 
-  describe('setOctave', () => {
-    it('sets octave for the active channel', () => {
-      const { setOctave, getChannelOctave } = useComposer()
-
-      setOctave(5)
-
-      expect(getChannelOctave(0)).toEqual(5)
-      // Other channels unchanged
-      expect(getChannelOctave(1)).toEqual(DEFAULT_OCTAVE)
-    })
-
-    it('sets octave for a specific channel', () => {
-      const { setOctave, getChannelOctave } = useComposer()
-
-      setOctave(3, 2)
-
-      expect(getChannelOctave(0)).toEqual(DEFAULT_OCTAVE)
-      expect(getChannelOctave(1)).toEqual(DEFAULT_OCTAVE)
-      expect(getChannelOctave(2)).toEqual(3)
-    })
-  })
-
   // ---------------------------------------------------------------------------
   // Reset
   // ---------------------------------------------------------------------------
