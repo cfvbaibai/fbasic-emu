@@ -48,7 +48,7 @@ const patternGrid = computed(() => {
 })
 
 /** Format a numeric value as 2-digit uppercase hex string. */
-function formatHex(value: number): string {
+function formatHex2(value: number): string {
   return value.toString(16).toUpperCase().padStart(2, '0')
 }
 </script>
@@ -66,7 +66,7 @@ function formatHex(value: number): string {
           class="display-buffer-char-row"
         >
           <span class="display-buffer-char-row-label">
-            {{ formatHex(y) }}
+            {{ formatHex2(y) }}
           </span>
           <span
             v-for="(code, x) in row"
@@ -76,7 +76,7 @@ function formatHex(value: number): string {
               'display-buffer-cell-highlighted': code !== SPACE_CHAR,
             }"
           >
-            {{ formatHex(code) }}
+            {{ formatHex2(code) }}
           </span>
         </div>
       </div>
@@ -93,7 +93,7 @@ function formatHex(value: number): string {
           class="display-buffer-pattern-row"
         >
           <span class="display-buffer-pattern-row-label">
-            {{ formatHex(y) }}
+            {{ formatHex2(y) }}
           </span>
           <span
             v-for="(pattern, x) in row"
