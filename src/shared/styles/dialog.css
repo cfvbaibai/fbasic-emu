@@ -1,0 +1,103 @@
+/**
+ * Shared dialog styles for modal dialogs (ExportHtmlDialog, ShareDialog, etc.).
+ * All selectors are scoped under the game-dialog-* namespace.
+ */
+
+/* Overlay — fixed backdrop behind the dialog */
+.game-dialog-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--base-alpha-gray-00-60);
+}
+
+/* Dialog container */
+.game-dialog {
+  background: var(--game-surface-bg-gradient);
+  border: 2px solid var(--game-surface-border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  min-width: 420px;
+  max-width: 90vw;
+  box-shadow: var(--game-shadow-base);
+}
+
+/* Title heading */
+.game-dialog-title {
+  margin: 0 0 0.75rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--game-text-primary);
+}
+
+/* Description paragraph below title */
+.game-dialog-description {
+  margin: 0 0 0.75rem;
+  font-size: 0.875rem;
+  color: var(--game-text-secondary);
+  line-height: 1.4;
+}
+
+/* Loading state message */
+.game-dialog-loading {
+  padding: 1rem 0;
+  text-align: center;
+  color: var(--game-text-secondary);
+  font-size: 0.875rem;
+}
+
+/* Error state message */
+.game-dialog-error {
+  padding: 0.75rem;
+  color: var(--semantic-solid-danger);
+  font-size: 0.875rem;
+  background: var(--base-alpha-danger-10);
+  border-radius: 6px;
+}
+
+/* Action buttons row */
+.game-dialog-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+/* Base button style */
+.game-dialog-btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--game-surface-border);
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.game-dialog-btn:focus-visible {
+  outline: 2px solid var(--base-solid-primary);
+  outline-offset: 2px;
+}
+
+/* Primary action button (e.g. Copy, Export) */
+.game-dialog-btn-primary {
+  background: var(--base-solid-primary);
+  color: var(--game-text-contrast);
+  border-color: var(--base-solid-primary);
+}
+
+.game-dialog-btn-primary:hover {
+  opacity: 0.9;
+}
+
+/* Secondary action button (e.g. Close, Cancel) */
+.game-dialog-btn-secondary {
+  background: transparent;
+  color: var(--game-text-secondary);
+}
+
+.game-dialog-btn-secondary:hover {
+  background: var(--game-surface-bg-start);
+}

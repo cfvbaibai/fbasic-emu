@@ -92,18 +92,18 @@ onUnmounted(() => {
   <Teleport to="body">
     <div
       v-if="visible"
-      class="export-html-dialog-overlay"
+      class="game-dialog-overlay"
       role="dialog"
       aria-modal="true"
       :aria-label="t('ide.exportHtml.title')"
       @click="handleOverlayClick"
     >
-      <div class="export-html-dialog">
-        <h3 class="export-html-dialog-title">
+      <div class="game-dialog">
+        <h3 class="game-dialog-title">
           {{ t('ide.exportHtml.title') }}
         </h3>
 
-        <p class="export-html-dialog-description">
+        <p class="game-dialog-description">
           {{ t('ide.exportHtml.description') }}
         </p>
 
@@ -111,7 +111,7 @@ onUnmounted(() => {
         <div
           v-if="isExporting"
           data-testid="export-html-exporting"
-          class="export-html-dialog-loading"
+          class="game-dialog-loading"
         >
           {{ t('ide.exportHtml.exporting') }}
         </div>
@@ -120,7 +120,7 @@ onUnmounted(() => {
         <div
           v-else-if="exportError"
           data-testid="export-html-error"
-          class="export-html-dialog-error"
+          class="game-dialog-error"
         >
           {{ t('ide.exportHtml.exportFailed') }}
         </div>
@@ -192,16 +192,16 @@ onUnmounted(() => {
           </div>
 
           <!-- Actions -->
-          <div class="export-html-dialog-actions">
+          <div class="game-dialog-actions">
             <button
-              class="export-html-dialog-btn export-html-dialog-btn-export"
+              class="game-dialog-btn game-dialog-btn-primary"
               data-testid="export-html-export-button"
               @click="handleExport"
             >
               {{ t('ide.exportHtml.exportButton') }}
             </button>
             <button
-              class="export-html-dialog-btn export-html-dialog-btn-cancel"
+              class="game-dialog-btn game-dialog-btn-secondary"
               data-testid="export-html-cancel-button"
               @click="handleClose"
             >
@@ -215,55 +215,14 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-.export-html-dialog-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--base-alpha-gray-00-60);
+@import url('@/shared/styles/dialog.css');
+
+/* Export-html-specific: description has larger bottom margin */
+.game-dialog-description {
+  margin-bottom: 1rem;
 }
 
-.export-html-dialog {
-  background: var(--game-surface-bg-gradient);
-  border: 2px solid var(--game-surface-border);
-  border-radius: 12px;
-  padding: 1.5rem;
-  min-width: 420px;
-  max-width: 90vw;
-  box-shadow: var(--game-shadow-base);
-}
-
-.export-html-dialog-title {
-  margin: 0 0 0.75rem;
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: var(--game-text-primary);
-}
-
-.export-html-dialog-description {
-  margin: 0 0 1rem;
-  font-size: 0.875rem;
-  color: var(--game-text-secondary);
-  line-height: 1.4;
-}
-
-.export-html-dialog-loading {
-  padding: 1rem 0;
-  text-align: center;
-  color: var(--game-text-secondary);
-  font-size: 0.875rem;
-}
-
-.export-html-dialog-error {
-  padding: 0.75rem;
-  color: var(--semantic-solid-danger);
-  font-size: 0.875rem;
-  background: var(--base-alpha-danger-10);
-  border-radius: 6px;
-}
-
+/* Export-html-specific: form field */
 .export-html-dialog-field {
   margin-bottom: 0.75rem;
 }
@@ -293,6 +252,7 @@ onUnmounted(() => {
   box-shadow: 0 0 0 2px var(--base-alpha-primary-20);
 }
 
+/* Export-html-specific: fieldset for theme selection */
 .export-html-dialog-fieldset {
   margin: 0 0 0.75rem;
   border: none;
@@ -313,6 +273,7 @@ onUnmounted(() => {
   cursor: pointer;
 }
 
+/* Export-html-specific: toggle checkboxes */
 .export-html-dialog-toggles {
   display: flex;
   flex-direction: column;
@@ -327,45 +288,5 @@ onUnmounted(() => {
   font-size: 0.875rem;
   color: var(--game-text-primary);
   cursor: pointer;
-}
-
-.export-html-dialog-actions {
-  display: flex;
-  gap: 0.75rem;
-  justify-content: flex-end;
-}
-
-.export-html-dialog-btn {
-  padding: 0.5rem 1rem;
-  border: 1px solid var(--game-surface-border);
-  border-radius: 6px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.export-html-dialog-btn:focus-visible {
-  outline: 2px solid var(--base-solid-primary);
-  outline-offset: 2px;
-}
-
-.export-html-dialog-btn-export {
-  background: var(--base-solid-primary);
-  color: var(--game-text-contrast);
-  border-color: var(--base-solid-primary);
-}
-
-.export-html-dialog-btn-export:hover {
-  opacity: 0.9;
-}
-
-.export-html-dialog-btn-cancel {
-  background: transparent;
-  color: var(--game-text-secondary);
-}
-
-.export-html-dialog-btn-cancel:hover {
-  background: var(--game-surface-bg-start);
 }
 </style>
