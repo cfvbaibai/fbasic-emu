@@ -1,14 +1,10 @@
-<script lang="ts">
-const HIGHLIGHT_DURATION_MS = 1000
-</script>
-
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import type { KeyboardBufferView } from '@/core/devices/sharedKeyboardBuffer'
 
-import { POLL_INTERVAL_MS } from './keyboardBufferSectionConstants'
+import { HIGHLIGHT_DURATION_MS, POLL_INTERVAL_MS } from './keyboardBufferSectionConstants'
 
 defineOptions({
   name: 'KeyboardBufferSection',
@@ -19,6 +15,7 @@ const props = defineProps<{
 }>()
 
 const { t } = useI18n()
+
 let pollTimer: ReturnType<typeof setInterval> | null = null
 let highlightTimer: ReturnType<typeof setTimeout> | null = null
 
