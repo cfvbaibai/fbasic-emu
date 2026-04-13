@@ -54,6 +54,8 @@ After merging, verify that recent fixes to `.claude/commands/` files haven't bee
 # Check critical patterns that must not regress
 grep -q 'uuid.uuid4()' .claude/commands/implement-issue.md || echo "INTEGRITY_WARN: SESSION_ID fix reverted"
 grep -q 'scripts/lock.sh' .claude/commands/implement-issue.md || echo "INTEGRITY_WARN: lock.sh refactoring reverted"
+grep -q 'Why no.*body field' .claude/commands/implement-issue.md || echo "INTEGRITY_WARN: body-removal fix reverted"
+grep -q 'grep -iE.*depends on' .claude/commands/implement-issue.md || echo "INTEGRITY_WARN: deterministic dependency check reverted"
 ```
 
 If any integrity warning fires, **stop and re-apply the fix** before proceeding. This prevents the pipeline from operating with a broken command definition.
@@ -109,8 +111,10 @@ If any PR was handled above, **stop here**. Write PR memory, run log, and report
 Query triaged, unassigned issues sorted by priority, **excluding invalid issues**:
 
 ```bash
-gh issue list --state open --search "no:assignee" --json number,title,labels,assignees,body --limit 20
+gh issue list --state open --search "no:assignee" --json number,title,labels,assignees --limit 50
 ```
+
+> **Why no `body` field?** The issue body is NOT needed for Phase 2 (dependency check, selection). Including it causes the LLM to incorrectly parse body content like "Parent: #N" as a dependency. The body is fetched separately in Phase 3 after the issue is selected.
 
 Filter out issues with the `invalid` label — do not pick up issues that contradict F-BASIC manual behavior.
 
@@ -136,31 +140,43 @@ If all candidates are filtered out by this step, report "no issues to implement 
 
 ### Dependency Check
 
-For each candidate issue, check for dependency comments:
+For each candidate issue, run this **deterministic** command sequence to check for open dependencies. This replaces LLM interpretation with explicit grep + API calls — no ambiguity about what counts as a dependency or whether it's resolved.
 
 ```bash
 REPO=$(gh repo view --json nameWithOwner --jq '.nameWithOwner')
-gh api "repos/$REPO/issues/$ISSUE_NUM/comments?per_page=10" --jq '.[].body'
+
+# Extract dependency issue numbers from COMMENTS only (not body, not title).
+# Matches: "depends on #N", "dependency: #N", "blocked by #N" (case-insensitive)
+# Does NOT match: "Parent: #N", "Part of #N", "Related to #N", body text, title text
+DEP_NUMS=$(gh api "repos/$REPO/issues/$ISSUE_NUM/comments?per_page=10" \
+  --jq '.[].body' \
+  | grep -iE '(depends on|dependency:|blocked by)' \
+  | grep -oE '#[0-9]+' \
+  | tr -d '#' \
+  | sort -u)
+
+if [ -n "$DEP_NUMS" ]; then
+  BLOCKED=false
+  for DEP in $DEP_NUMS; do
+    DEP_STATE=$(gh issue view "$DEP" --json state --jq '.state' 2>/dev/null || echo "NOT_FOUND")
+    if [ "$DEP_STATE" = "OPEN" ]; then
+      echo "BLOCKED: #$ISSUE_NUM is blocked by #$DEP (open)"
+      BLOCKED=true
+    fi
+  done
+  if [ "$BLOCKED" = "false" ]; then
+    echo "UNBLOCKED: #$ISSUE_NUM — all dependencies closed"
+  fi
+else
+  echo "UNBLOCKED: #$ISSUE_NUM — no dependencies"
+fi
 ```
+
+**Only issues outputting `BLOCKED` should be skipped.** Issues with no dependencies, or whose dependencies are all closed/not-found, are unblocked and proceed to locking.
 
 > **gh CLI fallback**: If any `gh` command fails, do NOT retry the same command. See `.claude/commands/_shared/github-operations.md` "Error Recovery" section for fallback patterns.
 
-**A dependency exists ONLY when a comment explicitly says "depends on #N"** (or "dependency: #N", "blocked by #N"). Extract the referenced issue number and verify it is closed. If the dependency is not yet closed, **skip this issue**.
-
-**The following are NOT dependencies** — do NOT skip issues for these:
-- Parent/sub-issue relationships (e.g., "Part of #N", "Sub-issue of #N", GitHub's built-in parent tracking)
-- Casual references (e.g., "Related to #N", "See also #N", "Fixes #N")
-- Any issue number mentioned in the body that is not an explicit dependency statement
-
-Only explicit "depends on #N" / "dependency: #N" / "blocked by #N" phrasing in comments counts as a dependency.
-
-If all candidate issues are blocked by real dependencies, report "no issues to implement" and stop.
-
-```bash
-gh issue list --state open --search "no:assignee" --json number,title,labels,assignees,body --limit 50
-```
-
-**Skip issues with the `invalid` label** — they contradict F-BASIC manual behavior and should not be implemented.
+If all candidate issues are blocked, report "no issues to implement" and stop.
 
 ### Atomic Issue Locking
 
@@ -279,6 +295,17 @@ Update `config.md` `active_worktrees` with the new worktree entry including sess
     issue: ${ISSUE_NUM}
     claimed: YYYY-MM-DD HH:MM:SS CST
 ```
+
+### Fetch Issue Details (for Phase 4)
+
+Now that the issue is selected and locked, fetch the details needed for the specialist agent:
+
+```bash
+ISSUE_URL=$(gh issue view "$ISSUE_NUM" --json url --jq '.url')
+ISSUE_BODY=$(gh issue view "$ISSUE_NUM" --json body --jq '.body')
+```
+
+> **Why fetch body here instead of Phase 2?** The body is NOT needed for dependency checking or issue selection. Including it in the Phase 2 query caused the LLM to incorrectly parse body content like "Parent: #N" as a dependency, blocking sub-issues whose parent issue is still open.
 
 ## Phase 4 — Delegate to /lead
 
