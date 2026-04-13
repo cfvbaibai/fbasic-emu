@@ -16,6 +16,7 @@ import {
   CHANNEL_C_INDEX,
 } from './constants'
 import { validateMusicString } from './musicValidation'
+import { calculateNoteFrequency } from './noteFrequency'
 import type { SoundStateManager } from './SoundStateManager'
 import type {
   CompiledAudio,
@@ -34,19 +35,6 @@ import type {
 } from './types'
 
 export { validateMusicString }
-
-/**
- * Note names to semitone offset mapping (C = 0)
- */
-const NOTE_SEMITONES: Record<string, number> = {
-  C: 0,
-  D: 2,
-  E: 4,
-  F: 5,
-  G: 7,
-  A: 9,
-  B: 11,
-}
 
 /**
  * Tempo to milliseconds per whole note mapping
@@ -238,23 +226,6 @@ export function parseMusicToAst(musicString: string): MusicScore {
 // ============================================================================
 // STAGE 2: Compile MusicScore to CompiledAudio (audio-ready)
 // ============================================================================
-
-/**
- * Calculate frequency in Hz for a given note and octave
- * Uses equal temperament tuning with A4 = 440Hz
- */
-function calculateNoteFrequency(noteName: string, octave: number, sharp: boolean): number {
-  const baseSemitone = NOTE_SEMITONES[noteName]
-  if (baseSemitone === undefined) {
-    throw new Error(`Invalid note name: ${noteName}`)
-  }
-
-  const semitone = baseSemitone + (sharp ? 1 : 0)
-  const midiNote = (octave + 2) * 12 + semitone + 12
-  const frequency = 440 * Math.pow(2, (midiNote - 69) / 12)
-
-  return frequency
-}
 
 /**
  * Duration in ms for F-BASIC length code 0-9
