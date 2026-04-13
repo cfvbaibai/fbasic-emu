@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { SyncCommandType } from '@/core/animation/sharedDisplayBuffer'
+import { ACK_PENDING, SyncCommandType } from '@/core/animation/sharedDisplayBuffer'
 import type { SyncCommand } from '@/core/animation/sharedDisplayBufferAccessor'
 
 defineOptions({
@@ -72,7 +72,7 @@ const rows = computed<SyncRow[]>(() => {
     },
     {
       field: t('ide.bufferInspector.animationSyncFieldAck'),
-      value: props.ackStatus === 0
+      value: props.ackStatus === ACK_PENDING
         ? t('ide.bufferInspector.animationSyncAckPending')
         : t('ide.bufferInspector.animationSyncAckReceived'),
     },
