@@ -250,10 +250,10 @@ describe('useComposer', () => {
     })
 
     it.each([
-      [NaN, 'NaN'],
       [-1, 'negative index'],
       [3, 'index equal to CHANNEL_COUNT (3)'],
       [5, 'index greater than CHANNEL_COUNT (5)'],
+      [NaN, 'NaN'],
     ])('ignores %s', (index) => {
       const { toggleNote, clearChannel, channelNoteCount, channelNotes } =
         useComposer()
