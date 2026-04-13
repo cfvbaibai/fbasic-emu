@@ -1,3 +1,7 @@
+<script lang="ts">
+const HIGHLIGHT_DURATION_MS = 1000
+</script>
+
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -15,8 +19,6 @@ const props = defineProps<{
 }>()
 
 const { t } = useI18n()
-
-const HIGHLIGHT_DURATION_MS = 1000
 let pollTimer: ReturnType<typeof setInterval> | null = null
 let highlightTimer: ReturnType<typeof setTimeout> | null = null
 
