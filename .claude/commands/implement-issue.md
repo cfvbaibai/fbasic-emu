@@ -145,41 +145,15 @@ For each candidate issue, run this **deterministic** command sequence to check f
 ```bash
 REPO=$(gh repo view --json nameWithOwner --jq '.nameWithOwner')
 
-# Check for deadlock resolution override — if any comment contains "Deadlock Resolution",
-# the triager has explicitly overridden dependencies for this issue. Treat as unblocked.
-HAS_OVERRIDE=$(gh api "repos/$REPO/issues/$ISSUE_NUM/comments?per_page=10" \
+# Extract dependency issue numbers from COMMENTS only (not body, not title).
+# Matches: "depends on #N", "dependency: #N", "blocked by #N" (case-insensitive)
+# Does NOT match: "Parent: #N", "Part of #N", "Related to #N", body text, title text
+DEP_NUMS=$(gh api "repos/$REPO/issues/$ISSUE_NUM/comments?per_page=10" \
   --jq '.[].body' \
-  | grep -qi 'deadlock resolution' && echo "OVERRIDE" || echo "")
-
-if [ "$HAS_OVERRIDE" = "OVERRIDE" ]; then
-  echo "UNBLOCKED: #$ISSUE_NUM — deadlock resolution override"
-else
-  # Extract dependency issue numbers from COMMENTS only (not body, not title).
-  # Matches: "depends on #N", "dependency: #N", "blocked by #N" (case-insensitive)
-  # Does NOT match: "Parent: #N", "Part of #N", "Related to #N", body text, title text
-  DEP_NUMS=$(gh api "repos/$REPO/issues/$ISSUE_NUM/comments?per_page=10" \
-    --jq '.[].body' \
-    | grep -iE '(depends on|dependency:|blocked by)' \
-    | grep -oE '#[0-9]+' \
-    | tr -d '#' \
-    | sort -u)
-
-  if [ -n "$DEP_NUMS" ]; then
-    BLOCKED=false
-    for DEP in $DEP_NUMS; do
-      DEP_STATE=$(gh issue view "$DEP" --json state --jq '.state' 2>/dev/null || echo "NOT_FOUND")
-      if [ "$DEP_STATE" = "OPEN" ]; then
-        echo "BLOCKED: #$ISSUE_NUM is blocked by #$DEP (open)"
-        BLOCKED=true
-      fi
-    done
-    if [ "$BLOCKED" = "false" ]; then
-      echo "UNBLOCKED: #$ISSUE_NUM — all dependencies closed"
-    fi
-  else
-    echo "UNBLOCKED: #$ISSUE_NUM — no dependencies"
-  fi
-fi
+  | grep -iE '(depends on|dependency:|blocked by)' \
+  | grep -oE '#[0-9]+' \
+  | tr -d '#' \
+  | sort -u)
 
 if [ -n "$DEP_NUMS" ]; then
   BLOCKED=false
@@ -282,6 +256,16 @@ if [ "$LOCK_STATUS" = "LOCK_MISSING" ]; then
   fi
 fi
 ```
+
+### Fetch Latest Master (Pre-Worktree)
+
+Between Phase 1 (sync) and Phase 3 (worktree), time may have passed on PR maintenance checks. Fetch the absolute latest master to ensure the worktree is based on the freshest base:
+
+```bash
+git fetch origin master
+```
+
+Do NOT merge into the current branch — the worktree will be created directly from `origin/master`. This fetch just ensures `origin/master` is up-to-date before the worktree is created below.
 
 Before creating a worktree, check for collisions (existing worktrees for the same branch or from Codex):
 
@@ -465,6 +449,19 @@ git diff origin/master -- ':(exclude)*.snap' | grep -E '^\-' | grep -v '^\-\-\-'
 If any file exceeds 500 lines, **STOP**. Send the sub-agent back to do real structural refactoring. Do NOT proceed to commit.
 
 If the diff shows removed blank lines, removed comments, or condensed formatting that doesn't correspond to actual logic changes, **STOP**. This indicates cosmetic tricks were used. Send the sub-agent back to undo them and do real refactoring instead.
+
+### Pre-Push Rebase
+
+Between Phase 3 (worktree creation) and now, the specialist agent spent time implementing. Master may have advanced during that time. Fetch and rebase onto latest master before pushing to avoid phantom CI failures from a stale base:
+
+```bash
+cd "$WT_PATH"
+
+git fetch origin master
+git rebase origin/master
+```
+
+If the rebase has conflicts, resolve them carefully — the feature changes should apply cleanly on top of master. If conflicts indicate that master introduced a breaking change that affects the feature's approach, STOP and reassess.
 
 ### Commit & Push
 

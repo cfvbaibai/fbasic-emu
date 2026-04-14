@@ -203,27 +203,54 @@ For each cycle found:
 1. **Identify the weakest link** — the dependency that is least justified. Common cases:
    - Sub-issue depends on a sibling step's *implementation*, but only needs its *interface/type* (can be defined independently)
    - Sub-issue depends on a parent step that only exists to coordinate, not to provide output
-2. **Post a resolution comment** on the issue with the removable dependency:
+2. **Edit the dependency comment** to remove the circular dependency declaration. Find the comment that declared the removable dependency and rewrite it so it no longer matches implement-issue's dependency grep patterns (`depends on`, `dependency:`, `blocked by`):
 
 ```bash
-gh issue comment $NUMBER --body "## Deadlock Resolution — Dependency on #X Removed
+# Find the comment ID that declares the dependency on #X (the weakest link)
+COMMENT_ID=$(gh api "repos/$REPO/issues/$NUMBER/comments?per_page=20" \
+  --jq '.[] | select(.body | test("depends on #X"; "i")) | .id' | head -1)
 
-This issue was part of a circular dependency chain: #A → #B → #X → #A
-
-The dependency on #X is unnecessary because [reason]. Updated scope: [new scope without the dependency].
-
-### Impact
-- Removes the cycle, unblocking [list of issues]
-- [Any side effects on other dependencies]"
+# Edit the comment to remove the dependency. The new body must NOT contain
+# "depends on", "dependency:", or "blocked by" to avoid false blocking.
+gh api -X PATCH "repos/$REPO/issues/comments/$COMMENT_ID" \
+  -f body="Dependency on #X removed (deadlock resolution). Reason: [reason]. Updated scope: [new scope]."
 ```
 
-3. **Do NOT edit the issue body** — the comment serves as the override. The original dependency text remains for traceability.
-4. **Note the resolution in the report** under "Dependency Deadlocks Resolved".
+3. **Note the resolution in the report** under "Dependency Deadlocks Resolved".
 
 ### Rules
-- Only post resolution comments for cycles that actually block implementation (not theoretical)
+- Only resolve cycles that actually block implementation (not theoretical)
 - Prefer the minimal change — remove one dependency per cycle, not multiple
-- If no clean resolution exists, note the deadlock in the report without posting a comment (escalate to user)
+- If no clean resolution exists (both dependencies are genuinely needed), **merge the deadlocked issues** into a single issue. Pick the lower-numbered issue as the target, combine both scopes into its body, close the other with a "merged into" comment, and edit any dependency comments on the surviving issue to remove the now-self-referencing dependency:
+  ```bash
+  TARGET=<lower issue number>
+  SOURCE=<higher issue number>
+
+  # Read both bodies
+  TARGET_BODY=$(gh issue view $TARGET --json body --jq '.body')
+  SOURCE_BODY=$(gh issue view $SOURCE --json body --jq '.body')
+  SOURCE_TITLE=$(gh issue view $SOURCE --json title --jq '.title')
+
+  # Append source scope to target body
+  gh issue edit $TARGET --body "$TARGET_BODY
+
+  ---
+  Merged from #$SOURCE: $SOURCE_TITLE
+
+  $SOURCE_BODY"
+
+  # Close source with merge comment
+  gh issue comment $SOURCE --body "Merged into #$TARGET — deadlock between #$TARGET and #$SOURCE could not be resolved by removing a single dependency. Combined scope into #$TARGET."
+  gh issue close $SOURCE
+
+  # Edit dependency comments on target to remove self-reference
+  COMMENT_ID=$(gh api "repos/$REPO/issues/$TARGET/comments?per_page=20" \
+    --jq ".[] | select(.body | test(\"depends on #$SOURCE\"; \"i\")) | .id" | head -1)
+  if [ -n "$COMMENT_ID" ]; then
+    gh api -X PATCH "repos/$REPO/issues/comments/$COMMENT_ID" \
+      -f body="Dependency on #$SOURCE removed (merged into this issue)."
+  fi
+  ```
 
 ## Phase 5 — Report
 
@@ -263,6 +290,7 @@ Write outputs following `.claude/commands/_shared/path-conventions.md`:
 
 ## Dependency Deadlocks Resolved
 - #A → #B → #C → #A: removed dependency #B → #C (reason: interface-only, no implementation needed)
+- #A ↔ #B: merged #B into #A (both dependencies genuine, could not remove singly)
 
 ## Summary
 - Issues triaged: N
