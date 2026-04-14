@@ -90,7 +90,7 @@ export function toExportFilename(title: string): string {
   if (trimmed.length === 0) {
     return DEFAULT_EXPORT_FILENAME
   }
-  return `${title}.html`
+  return `${trimmed}.html`
 }
 
 /**

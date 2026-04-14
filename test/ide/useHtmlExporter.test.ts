@@ -53,8 +53,8 @@ describe('toExportFilename', () => {
     expect(toExportFilename('プログラム')).toEqual('プログラム.html')
   })
 
-  it('does not trim meaningful whitespace from title', () => {
-    expect(toExportFilename(' Hello ')).toEqual(' Hello .html')
+  it('trims leading and trailing whitespace from title', () => {
+    expect(toExportFilename(' Hello ')).toEqual('Hello.html')
   })
 })
 
@@ -267,6 +267,20 @@ describe('useHtmlExporter', () => {
 
       expect(exportError.value).toEqual('Blob creation failed')
       globalThis.Blob = savedBlob
+    })
+
+    it('trims leading and trailing whitespace from title in filename', async () => {
+      const { exportHtml } = mountComposable()
+
+      await exportHtml({
+        title: ' Hello ',
+        theme: 'dark',
+        includeSound: false,
+        includeSprites: false,
+      })
+
+      const anchor = capturedAnchors[0]!
+      expect(anchor.getAttribute('download')).toEqual('Hello.html')
     })
 
     it('uses fallback filename when title is empty string', async () => {
