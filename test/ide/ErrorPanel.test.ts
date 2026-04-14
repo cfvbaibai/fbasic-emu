@@ -5,23 +5,16 @@ import { defineComponent } from 'vue'
 
 import ErrorPanel from '@/features/ide/components/ErrorPanel.vue'
 
+import { createI18nMock } from '../helpers/createI18nMock'
+
+const mockT = createI18nMock({
+  'ide.output.errorLine': 'Line {line}',
+  'ide.errorPanel.sourceLabel': 'At:',
+  'ide.errorPanel.stackTrace': 'Stack trace',
+})
+
 vi.mock('vue-i18n', () => ({
-  useI18n: () => ({
-    t: (key: string, params?: Record<string, string | number>) => {
-      const messages: Record<string, string> = {
-        'ide.output.errorLine': 'Line {line}',
-        'ide.errorPanel.sourceLabel': 'At:',
-        'ide.errorPanel.stackTrace': 'Stack trace',
-      }
-      let text = messages[key] ?? key
-      if (params) {
-        for (const [k, v] of Object.entries(params)) {
-          text = text.replace(`{${k}}`, String(v))
-        }
-      }
-      return text
-    },
-  }),
+  useI18n: () => ({ t: mockT }),
 }))
 
 const gameIconStub = defineComponent({

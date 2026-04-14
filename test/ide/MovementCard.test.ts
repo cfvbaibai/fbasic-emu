@@ -6,55 +6,48 @@ import { defineComponent } from 'vue'
 import type { MovementSlotData } from '@/features/ide/components/MovementCard.vue'
 import MovementCard from '@/features/ide/components/MovementCard.vue'
 
+import { createI18nMock } from '../helpers/createI18nMock'
+
+const mockT = createI18nMock({
+  'ide.movementCard.actionNumber': 'Action number',
+  'ide.movementCard.statusActive': 'Active',
+  'ide.movementCard.statusPaused': 'Paused',
+  'ide.movementCard.directionAria': 'direction {direction}',
+  'ide.movementCard.characterTypes.MARIO': 'Mario',
+  'ide.movementCard.characterTypes.LADY': 'Lady',
+  'ide.movementCard.characterTypes.FIGHTER_FLY': 'Fighter Fly',
+  'ide.movementCard.characterTypes.ACHILLES': 'Achilles',
+  'ide.movementCard.characterTypes.PENGUIN': 'Penguin',
+  'ide.movementCard.characterTypes.FIREBALL': 'Fireball',
+  'ide.movementCard.characterTypes.CAR': 'Car',
+  'ide.movementCard.characterTypes.SPINNER': 'Spinner',
+  'ide.movementCard.characterTypes.STAR_KILLER': 'Star Killer',
+  'ide.movementCard.characterTypes.STARSHIP': 'Starship',
+  'ide.movementCard.characterTypes.EXPLOSION': 'Explosion',
+  'ide.movementCard.characterTypes.SMILEY': 'Smiley',
+  'ide.movementCard.characterTypes.LASER': 'Laser',
+  'ide.movementCard.characterTypes.SHELL_CREEPER': 'Shellcreeper',
+  'ide.movementCard.characterTypes.SIDE_STEPPER': 'Sidestepper',
+  'ide.movementCard.characterTypes.NITPICKER': 'Nitpicker',
+  'ide.movementCard.directions.0': 'none',
+  'ide.movementCard.directions.1': 'up',
+  'ide.movementCard.directions.2': 'up-right',
+  'ide.movementCard.directions.3': 'right',
+  'ide.movementCard.directions.4': 'down-right',
+  'ide.movementCard.directions.5': 'down',
+  'ide.movementCard.directions.6': 'down-left',
+  'ide.movementCard.directions.7': 'left',
+  'ide.movementCard.directions.8': 'up-left',
+})
+
+vi.mock('vue-i18n', () => ({
+  useI18n: () => ({ t: mockT }),
+}))
+
 const gameIconStub = defineComponent({
   props: ['icon', 'size'],
   template: '<span :data-icon="icon" />',
 })
-
-vi.mock('vue-i18n', () => ({
-  useI18n: () => ({
-    t: (key: string, params?: Record<string, string | number>) => {
-      const messages: Record<string, string> = {
-        'ide.movementCard.actionNumber': 'Action number',
-        'ide.movementCard.statusActive': 'Active',
-        'ide.movementCard.statusPaused': 'Paused',
-        'ide.movementCard.directionAria': 'direction {direction}',
-        'ide.movementCard.characterTypes.MARIO': 'Mario',
-        'ide.movementCard.characterTypes.LADY': 'Lady',
-        'ide.movementCard.characterTypes.FIGHTER_FLY': 'Fighter Fly',
-        'ide.movementCard.characterTypes.ACHILLES': 'Achilles',
-        'ide.movementCard.characterTypes.PENGUIN': 'Penguin',
-        'ide.movementCard.characterTypes.FIREBALL': 'Fireball',
-        'ide.movementCard.characterTypes.CAR': 'Car',
-        'ide.movementCard.characterTypes.SPINNER': 'Spinner',
-        'ide.movementCard.characterTypes.STAR_KILLER': 'Star Killer',
-        'ide.movementCard.characterTypes.STARSHIP': 'Starship',
-        'ide.movementCard.characterTypes.EXPLOSION': 'Explosion',
-        'ide.movementCard.characterTypes.SMILEY': 'Smiley',
-        'ide.movementCard.characterTypes.LASER': 'Laser',
-        'ide.movementCard.characterTypes.SHELL_CREEPER': 'Shellcreeper',
-        'ide.movementCard.characterTypes.SIDE_STEPPER': 'Sidestepper',
-        'ide.movementCard.characterTypes.NITPICKER': 'Nitpicker',
-        'ide.movementCard.directions.0': 'none',
-        'ide.movementCard.directions.1': 'up',
-        'ide.movementCard.directions.2': 'up-right',
-        'ide.movementCard.directions.3': 'right',
-        'ide.movementCard.directions.4': 'down-right',
-        'ide.movementCard.directions.5': 'down',
-        'ide.movementCard.directions.6': 'down-left',
-        'ide.movementCard.directions.7': 'left',
-        'ide.movementCard.directions.8': 'up-left',
-      }
-      let text = messages[key] ?? key
-      if (params) {
-        for (const [k, v] of Object.entries(params)) {
-          text = text.replace(`{${k}}`, String(v))
-        }
-      }
-      return text
-    },
-  }),
-}))
 
 function createSlotData(overrides: Partial<MovementSlotData> = {}): MovementSlotData {
   return {
