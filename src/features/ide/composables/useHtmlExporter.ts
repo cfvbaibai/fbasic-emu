@@ -10,6 +10,9 @@ import { ref } from 'vue'
 
 import type { CompactBg } from '@/core/types/program-types'
 
+/** Default filename used when the export title is empty or whitespace-only. */
+export const DEFAULT_EXPORT_FILENAME = 'program.html'
+
 /** Options for the HTML export. */
 export interface HtmlExportOptions {
   /** Title for the exported HTML page. */
@@ -74,6 +77,23 @@ function triggerDownload(blob: Blob, filename: string): void {
 }
 
 /**
+ * Converts a user-provided title into a safe export filename.
+ *
+ * Falls back to {@link DEFAULT_EXPORT_FILENAME} when the title is empty
+ * or consists solely of whitespace, preventing filenames like `.html`.
+ *
+ * @param title - The user-provided page title
+ * @returns A filename string ending in `.html`
+ */
+export function toExportFilename(title: string): string {
+  const trimmed = title.trim()
+  if (trimmed.length === 0) {
+    return DEFAULT_EXPORT_FILENAME
+  }
+  return `${title}.html`
+}
+
+/**
  * Composable for exporting an F-BASIC program as a standalone HTML file.
  *
  * @param source - The F-BASIC program source code
@@ -100,7 +120,7 @@ export function useHtmlExporter(
     try {
       const html = buildMinimalHtml(source.value, options)
       const blob = new Blob([html], { type: HTML_MIME_TYPE })
-      const filename = `${options.title}.html`
+      const filename = toExportFilename(options.title)
       triggerDownload(blob, filename)
     } catch (err) {
       exportError.value = err instanceof Error ? err.message : String(err)
