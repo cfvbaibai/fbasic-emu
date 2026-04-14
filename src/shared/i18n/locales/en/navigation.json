@@ -21,6 +21,10 @@
       "name": "Sprite Viewer",
       "description": "View Character Sprites"
     },
+    "composer": {
+      "name": "Composer",
+      "description": "Music Composer"
+    },
     "performanceDiagnostics": {
       "name": "Performance",
       "description": "Performance Diagnostics"

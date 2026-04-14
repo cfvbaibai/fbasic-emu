@@ -21,6 +21,10 @@
       "name": "精靈檢視器",
       "description": "檢視角色精靈"
     },
+    "composer": {
+      "name": "作曲器",
+      "description": "音樂作曲器"
+    },
     "performanceDiagnostics": {
       "name": "效能診斷",
       "description": "效能診斷工具"

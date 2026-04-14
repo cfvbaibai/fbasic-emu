@@ -21,6 +21,10 @@
       "name": "精灵查看器",
       "description": "查看角色精灵"
     },
+    "composer": {
+      "name": "作曲器",
+      "description": "音乐作曲器"
+    },
     "performanceDiagnostics": {
       "name": "性能诊断",
       "description": "性能诊断工具"
