@@ -66,7 +66,7 @@ export const screenLessons: Lesson[] = [
  * 12. Background Graphics — CGSET, PALETB, VIEW
  * 13. Sprite Colors — PALETS, combining sprites with backgrounds
  * 14. Playing Sound — PLAY statement, notes, tempo, duration
- * 15. Background Music — BGPLAY, BGMSTOP
+ * 15. Background Music — BGPLAY
  * 16. Building a Game (Part 1) — sprites, movement, collision
  * 17. Building a Game (Part 2) — sound, score, game over
  */

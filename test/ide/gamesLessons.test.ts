@@ -9,6 +9,8 @@ import { describe, expect, it } from 'vitest'
 
 import { gamesLessons } from '@/features/ide/tutorial/index'
 
+import { extractCodeBlocks } from '../helpers/extractCodeBlocks'
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
@@ -27,24 +29,8 @@ const LESSON_KEYWORDS: Array<RegExp> = [
   /\bPLAY\b/,
   /\bBGPLAY\b/,
   /\bGOTO\b/,
-  /\bBGMSTOP\b/,
+  /\bBGPLAY\b/,
 ]
-
-/**
- * Extracts all fenced code block contents from a markdown string.
- */
-function extractCodeBlocks(markdown: string): string[] {
-  const blocks: string[] = []
-  const regex = /```(?:\w*)\n([\s\S]*?)```/g
-  let match: RegExpExecArray | null
-  while ((match = regex.exec(markdown)) !== null) {
-    const code = match[1]?.trim()
-    if (code != null && code.length > 0) {
-      blocks.push(code)
-    }
-  }
-  return blocks
-}
 
 // ---------------------------------------------------------------------------
 // Tests
@@ -192,7 +178,6 @@ describe('gamesLessons', () => {
   it('Background Music lesson explains BGPLAY', () => {
     const lesson = gamesLessons[6]!
     expect(lesson.content).toMatch(/\bBGPLAY\b/)
-    expect(lesson.content).toMatch(/\bBGMSTOP\b/)
     expect(lesson.content).toMatch(/music/i)
   })
 
