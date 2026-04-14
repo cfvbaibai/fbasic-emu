@@ -145,15 +145,41 @@ For each candidate issue, run this **deterministic** command sequence to check f
 ```bash
 REPO=$(gh repo view --json nameWithOwner --jq '.nameWithOwner')
 
-# Extract dependency issue numbers from COMMENTS only (not body, not title).
-# Matches: "depends on #N", "dependency: #N", "blocked by #N" (case-insensitive)
-# Does NOT match: "Parent: #N", "Part of #N", "Related to #N", body text, title text
-DEP_NUMS=$(gh api "repos/$REPO/issues/$ISSUE_NUM/comments?per_page=10" \
+# Check for deadlock resolution override — if any comment contains "Deadlock Resolution",
+# the triager has explicitly overridden dependencies for this issue. Treat as unblocked.
+HAS_OVERRIDE=$(gh api "repos/$REPO/issues/$ISSUE_NUM/comments?per_page=10" \
   --jq '.[].body' \
-  | grep -iE '(depends on|dependency:|blocked by)' \
-  | grep -oE '#[0-9]+' \
-  | tr -d '#' \
-  | sort -u)
+  | grep -qi 'deadlock resolution' && echo "OVERRIDE" || echo "")
+
+if [ "$HAS_OVERRIDE" = "OVERRIDE" ]; then
+  echo "UNBLOCKED: #$ISSUE_NUM — deadlock resolution override"
+else
+  # Extract dependency issue numbers from COMMENTS only (not body, not title).
+  # Matches: "depends on #N", "dependency: #N", "blocked by #N" (case-insensitive)
+  # Does NOT match: "Parent: #N", "Part of #N", "Related to #N", body text, title text
+  DEP_NUMS=$(gh api "repos/$REPO/issues/$ISSUE_NUM/comments?per_page=10" \
+    --jq '.[].body' \
+    | grep -iE '(depends on|dependency:|blocked by)' \
+    | grep -oE '#[0-9]+' \
+    | tr -d '#' \
+    | sort -u)
+
+  if [ -n "$DEP_NUMS" ]; then
+    BLOCKED=false
+    for DEP in $DEP_NUMS; do
+      DEP_STATE=$(gh issue view "$DEP" --json state --jq '.state' 2>/dev/null || echo "NOT_FOUND")
+      if [ "$DEP_STATE" = "OPEN" ]; then
+        echo "BLOCKED: #$ISSUE_NUM is blocked by #$DEP (open)"
+        BLOCKED=true
+      fi
+    done
+    if [ "$BLOCKED" = "false" ]; then
+      echo "UNBLOCKED: #$ISSUE_NUM — all dependencies closed"
+    fi
+  else
+    echo "UNBLOCKED: #$ISSUE_NUM — no dependencies"
+  fi
+fi
 
 if [ -n "$DEP_NUMS" ]; then
   BLOCKED=false
