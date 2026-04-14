@@ -9,8 +9,8 @@
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import type { CompactBg } from '@/core/types/program-types'
 import { buildExportHtml } from '@/features/ide/composables/buildExportHtml'
+import { useProgramStore } from '@/features/ide/composables/useProgramStore'
 
 /** Default filename used when the export title is empty or whitespace-only. */
 export const DEFAULT_EXPORT_FILENAME = 'program.html'
@@ -67,17 +67,15 @@ export function toExportFilename(title: string): string {
 /**
  * Composable for exporting an F-BASIC program as a standalone HTML file.
  *
- * @param source - The F-BASIC program source code
- * @param _bg - Optional BG data (reserved for future use)
+ * Reads the current program source from the program store.
+ *
  * @returns Reactive export state and the exportHtml function
  */
-export function useHtmlExporter(
-  source: { value: string },
-  _bg?: { value: CompactBg | undefined },
-) {
+export function useHtmlExporter() {
   const isExporting = ref(false)
   const exportError = ref('')
   const { locale } = useI18n()
+  const programStore = useProgramStore()
 
   /**
    * Triggers the HTML export with the given options.
@@ -91,7 +89,7 @@ export function useHtmlExporter(
     exportError.value = ''
 
     try {
-      const html = buildExportHtml(source.value, options, locale.value)
+      const html = buildExportHtml(programStore.code, options, locale.value)
       const blob = new Blob([html], { type: HTML_MIME_TYPE })
       const filename = toExportFilename(options.title)
       triggerDownload(blob, filename)

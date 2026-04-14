@@ -4,7 +4,8 @@
  *
  * Covers: file download mechanism including Blob creation,
  * URL.createObjectURL / revokeObjectURL lifecycle,
- * temporary anchor element creation and click trigger.
+ * temporary anchor element creation and click trigger,
+ * and program store integration.
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -22,18 +23,26 @@ vi.mock('vue-i18n', () => ({
   }),
 }))
 
+// -- Program store mock -------------------------------------------------------
+
+const mockCode = ref('10 PRINT "HELLO"')
+
+vi.mock('@/features/ide/composables/useProgramStore', () => ({
+  useProgramStore: () => ({
+    get code() {
+      return mockCode.value
+    },
+  }),
+}))
+
 const MOCK_BLOB_URL = 'blob:mock-url'
 
 // ============================================================================
 // Helpers
 // ============================================================================
 
-function createSourceRef(code: string) {
-  return ref(code)
-}
-
-function mountComposable(code = '10 PRINT "HELLO"') {
-  return useHtmlExporter(createSourceRef(code))
+function mountComposable() {
+  return useHtmlExporter()
 }
 
 // ============================================================================
@@ -132,7 +141,7 @@ describe('useHtmlExporter', () => {
 
   describe('download mechanism', () => {
     it('creates a Blob with HTML content type when exportHtml is called', async () => {
-      const { exportHtml } = mountComposable('10 PRINT "HELLO"')
+      const { exportHtml } = mountComposable()
 
       const blobSpy = vi.spyOn(globalThis, 'Blob')
 
@@ -154,7 +163,7 @@ describe('useHtmlExporter', () => {
     })
 
     it('calls URL.createObjectURL with the blob', async () => {
-      const { exportHtml } = mountComposable('10 CLS')
+      const { exportHtml } = mountComposable()
 
       await exportHtml({
         title: 'My Program',
@@ -169,7 +178,7 @@ describe('useHtmlExporter', () => {
     })
 
     it('creates a temporary anchor element with download attribute set to filename', async () => {
-      const { exportHtml } = mountComposable('10 PRINT "HI"')
+      const { exportHtml } = mountComposable()
 
       await exportHtml({
         title: 'My Program',
@@ -185,7 +194,7 @@ describe('useHtmlExporter', () => {
     })
 
     it('triggers click on the anchor element', async () => {
-      const { exportHtml } = mountComposable('10 PRINT "HI"')
+      const { exportHtml } = mountComposable()
 
       await exportHtml({
         title: 'My Program',
@@ -200,7 +209,7 @@ describe('useHtmlExporter', () => {
     })
 
     it('calls URL.revokeObjectURL for cleanup after download', async () => {
-      const { exportHtml } = mountComposable('10 PRINT "HI"')
+      const { exportHtml } = mountComposable()
 
       await exportHtml({
         title: 'My Program',
@@ -214,7 +223,7 @@ describe('useHtmlExporter', () => {
     })
 
     it('removes the anchor element from the DOM after download', async () => {
-      const { exportHtml } = mountComposable('10 PRINT "HI"')
+      const { exportHtml } = mountComposable()
 
       await exportHtml({
         title: 'My Program',
@@ -303,6 +312,43 @@ describe('useHtmlExporter', () => {
 
       const anchor = capturedAnchors[0]!
       expect(anchor.getAttribute('download')).toEqual(DEFAULT_EXPORT_FILENAME)
+    })
+  })
+
+  // -- Program store integration ----------------------------------------------
+
+  describe('program store integration', () => {
+    it('reads program source from useProgramStore', async () => {
+      const { exportHtml } = mountComposable()
+
+      const blobSpy = vi.spyOn(globalThis, 'Blob')
+      await exportHtml({
+        title: 'Test',
+        theme: 'dark',
+        includeSound: false,
+        includeSprites: false,
+      })
+
+      const [content] = blobSpy.mock.calls[0]!
+      expect((content as string[])[0]).toContain('10 PRINT "HELLO"')
+      blobSpy.mockRestore()
+    })
+
+    it('exports the current store code without requiring a source parameter', async () => {
+      mockCode.value = '20 GOTO 10'
+      const { exportHtml } = mountComposable()
+
+      const blobSpy = vi.spyOn(globalThis, 'Blob')
+      await exportHtml({
+        title: 'Test',
+        theme: 'dark',
+        includeSound: false,
+        includeSprites: false,
+      })
+
+      const [content] = blobSpy.mock.calls[0]!
+      expect((content as string[])[0]).toContain('20 GOTO 10')
+      blobSpy.mockRestore()
     })
   })
 })
