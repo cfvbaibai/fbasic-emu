@@ -6,7 +6,7 @@
 .game-navigation {
   border-bottom: 1px solid var(--game-nav-border);
   flex-shrink: 0;
-  z-index: 1000;
+  z-index: var(--z-index-navigation);
 }
 
 .nav-container {
@@ -238,7 +238,7 @@
   transform: translateY(-10px);
   pointer-events: none;
   transition: all 0.2s ease;
-  z-index: 1001;
+  z-index: var(--z-index-nav-dropdown);
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
