@@ -560,6 +560,9 @@
     "exporting": "Exporting...",
     "exportFailed": "Failed to export HTML file."
   },
+  "musicComposer": {
+    "title": "Music Composer"
+  },
   "tutorial": {
     "title": "Tutorial",
     "defaultTitle": "F-BASIC Tutorial",

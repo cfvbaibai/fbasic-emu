@@ -560,6 +560,9 @@
     "exporting": "正在匯出...",
     "exportFailed": "匯出 HTML 檔案失敗。"
   },
+  "musicComposer": {
+    "title": "音樂作曲器"
+  },
   "tutorial": {
     "title": "教學",
     "defaultTitle": "F-BASIC 教學",
