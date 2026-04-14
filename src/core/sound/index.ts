@@ -36,3 +36,4 @@ export type {
   SoundState,
 } from './types'
 export { isNote, isRest } from './types'
+export { WebAudioPlayer } from './WebAudioPlayer'
