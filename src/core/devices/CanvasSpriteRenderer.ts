@@ -13,12 +13,15 @@
  */
 
 import type { SpriteState } from '@/core/sprite/types'
+import { COLORS, ORIGINAL_SPRITE_PALETTES } from '@/shared/data/palette'
 
 import type { CanvasSurface } from './CanvasScreenRenderer'
 
 /** Number of color indices in a sprite palette (0=transparent, 1-3=colors). */
 const PALETTE_SIZE = 4
 
+/** Default sprite palette index (CGSET default). */
+const DEFAULT_SPRITE_PALETTE_INDEX = 1
 /** Default sprite palette colors (NES-like: black, white, red, cyan). */
 const DEFAULT_SPRITE_COLORS: ReadonlyArray<string> = [
   '#000000', // index 0: black (used for transparent via alpha=0)
@@ -27,6 +30,29 @@ const DEFAULT_SPRITE_COLORS: ReadonlyArray<string> = [
   '#00FFFF', // index 3: cyan
 ]
 
+/**
+ * Resolve a color combination from the sprite palette data.
+ *
+ * Looks up the palette at `paletteIndex`, then the combination at
+ * `combinationIndex` within that palette, and maps each NES color
+ * code through the COLORS table to a hex string.
+ *
+ * @param paletteIndex - Sprite palette index (0-2, set by CGSET)
+ * @param combinationIndex - Color combination index (0-3, from DEF SPRITE)
+ * @returns Array of 4 hex color strings, or DEFAULT_SPRITE_COLORS as fallback
+ */
+function resolveSpritePalette(
+  paletteIndex: number,
+  combinationIndex: number,
+): ReadonlyArray<string> {
+  const palette = ORIGINAL_SPRITE_PALETTES[paletteIndex]
+  if (!palette) return DEFAULT_SPRITE_COLORS
+
+  const combination = palette[combinationIndex]
+  if (!combination) return DEFAULT_SPRITE_COLORS
+
+  return combination.map(code => COLORS[code] ?? COLORS[0] ?? '#000000')
+}
 /** Width of a single tile in pixels. */
 const TILE_WIDTH = 8
 
@@ -66,6 +92,7 @@ export interface SpriteImageData {
 export class CanvasSpriteRenderer {
   private readonly canvas: CanvasSurface
   private spriteEnabled = false
+  private spritePaletteIndex = DEFAULT_SPRITE_PALETTE_INDEX
 
   constructor(canvas: CanvasSurface) {
     this.canvas = canvas
@@ -98,6 +125,21 @@ export class CanvasSpriteRenderer {
    */
   isSpriteEnabled(): boolean {
     return this.spriteEnabled
+  }
+
+  /**
+   * Set the active sprite palette index (0-2).
+   * Set by CGSET to select which sprite palette group to use.
+   */
+  setSpritePalette(index: number): void {
+    this.spritePaletteIndex = Math.max(0, Math.min(2, index))
+  }
+
+  /**
+   * Get the current sprite palette index.
+   */
+  getSpritePaletteIndex(): number {
+    return this.spritePaletteIndex
   }
 
   /**
@@ -137,21 +179,22 @@ export class CanvasSpriteRenderer {
   generateSpriteImageData(sprite: SpriteState): SpriteImageData | null {
     if (!sprite.visible || !sprite.definition) return null
 
-    const { size, tiles } = sprite.definition
+    const { size, tiles, colorCombination } = sprite.definition
     const pixelWidth = size === 1 ? TILE_WIDTH * 2 : TILE_WIDTH
     const pixelHeight = size === 1 ? TILE_HEIGHT * 2 : TILE_HEIGHT
 
+    const palette = resolveSpritePalette(this.spritePaletteIndex, colorCombination)
     const data = new Uint8ClampedArray(pixelWidth * pixelHeight * 4)
 
     if (size === 1 && tiles.length >= 4) {
       // 16x16 sprite: 4 tiles in 2x2 arrangement
-      this.blitTile(data, tiles[0]!, 0, 0, pixelWidth)
-      this.blitTile(data, tiles[1]!, TILE_WIDTH, 0, pixelWidth)
-      this.blitTile(data, tiles[2]!, 0, TILE_HEIGHT, pixelWidth)
-      this.blitTile(data, tiles[3]!, TILE_WIDTH, TILE_HEIGHT, pixelWidth)
+      this.blitTile(data, tiles[0]!, 0, 0, pixelWidth, palette)
+      this.blitTile(data, tiles[1]!, TILE_WIDTH, 0, pixelWidth, palette)
+      this.blitTile(data, tiles[2]!, 0, TILE_HEIGHT, pixelWidth, palette)
+      this.blitTile(data, tiles[3]!, TILE_WIDTH, TILE_HEIGHT, pixelWidth, palette)
     } else if (tiles.length >= 1) {
       // 8x8 sprite: 1 tile
-      this.blitTile(data, tiles[0]!, 0, 0, pixelWidth)
+      this.blitTile(data, tiles[0]!, 0, 0, pixelWidth, palette)
     }
 
     return { width: pixelWidth, height: pixelHeight, data }
@@ -163,6 +206,7 @@ export class CanvasSpriteRenderer {
    */
   resetState(): void {
     this.spriteEnabled = false
+    this.spritePaletteIndex = DEFAULT_SPRITE_PALETTE_INDEX
   }
 
   /**
@@ -170,13 +214,14 @@ export class CanvasSpriteRenderer {
    *
    * Each pixel in the tile is a color index (0-3). Index 0 is
    * transparent (alpha = 0). Indices 1-3 are mapped to the
-   * default sprite palette colors.
+   * provided palette colors.
    *
    * @param output - The output RGBA pixel buffer
    * @param tile - 8x8 tile with color indices (0-3)
    * @param offsetX - X offset in pixels within the output buffer
    * @param offsetY - Y offset in pixels within the output buffer
    * @param stride - Total width of the output image in pixels
+   * @param palette - Array of 4 hex color strings for indices 0-3
    */
   private blitTile(
     output: Uint8ClampedArray,
@@ -184,6 +229,7 @@ export class CanvasSpriteRenderer {
     offsetX: number,
     offsetY: number,
     stride: number,
+    palette: ReadonlyArray<string>,
   ): void {
     for (let ty = 0; ty < TILE_HEIGHT; ty++) {
       for (let tx = 0; tx < TILE_WIDTH; tx++) {
@@ -200,7 +246,7 @@ export class CanvasSpriteRenderer {
           output[pixelOffset + 3] = 0
         } else {
           // Map color index to RGBA via hex color string
-          const color = DEFAULT_SPRITE_COLORS[colorIndex]!
+          const color = palette[colorIndex]!
           const rgb = hexToRgb(color)
           output[pixelOffset] = rgb.r
           output[pixelOffset + 1] = rgb.g
