@@ -99,7 +99,8 @@ export const lesson16BuildingAGame1: Lesson = {
     '170 ERA 1',
     '180 CLS',
     '190 PRINT "GAME OVER!"',
-    '200 LOCATE 0,22',
+    '200 PRINT "COLLISION!"',
+    '210 LOCATE 0,22',
     '```',
 
     '## Key Concepts',
