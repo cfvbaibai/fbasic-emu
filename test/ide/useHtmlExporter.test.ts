@@ -16,6 +16,8 @@ import {
   useHtmlExporter,
 } from '@/features/ide/composables/useHtmlExporter'
 
+const MOCK_BLOB_URL = 'blob:mock-url'
+
 // ============================================================================
 // Helpers
 // ============================================================================
@@ -79,7 +81,7 @@ describe('useHtmlExporter', () => {
     removedElements = []
 
     // Spy on URL methods
-    createObjectURLSpy = vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:mock-url')
+    createObjectURLSpy = vi.spyOn(URL, 'createObjectURL').mockReturnValue(MOCK_BLOB_URL)
     revokeObjectURLSpy = vi.spyOn(URL, 'revokeObjectURL')
 
     // Spy on document.createElement to capture anchor creation
@@ -173,7 +175,7 @@ describe('useHtmlExporter', () => {
       expect(capturedAnchors).toHaveLength(1)
       const anchor = capturedAnchors[0]!
       expect(anchor.getAttribute('download')).toEqual('My Program.html')
-      expect(anchor.getAttribute('href')).toEqual('blob:mock-url')
+      expect(anchor.getAttribute('href')).toEqual(MOCK_BLOB_URL)
     })
 
     it('triggers click on the anchor element', async () => {
@@ -202,7 +204,7 @@ describe('useHtmlExporter', () => {
       })
 
       expect(revokeObjectURLSpy).toHaveBeenCalledTimes(1)
-      expect(revokeObjectURLSpy).toHaveBeenCalledWith('blob:mock-url')
+      expect(revokeObjectURLSpy).toHaveBeenCalledWith(MOCK_BLOB_URL)
     })
 
     it('removes the anchor element from the DOM after download', async () => {
