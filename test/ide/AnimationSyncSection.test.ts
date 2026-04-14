@@ -8,7 +8,32 @@ import AnimationSyncSection from '@/features/ide/components/AnimationSyncSection
 
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
-    t: (key: string) => key,
+    t: (key: string) => {
+      const messages: Record<string, string> = {
+        'ide.bufferInspector.animationSyncTitle': 'Animation Sync',
+        'ide.bufferInspector.animationSyncIdle': '(idle)',
+        'ide.bufferInspector.animationSyncColField': 'Field',
+        'ide.bufferInspector.animationSyncColValue': 'Value',
+        'ide.bufferInspector.animationSyncFieldType': 'Command Type',
+        'ide.bufferInspector.animationSyncFieldAction': 'Action #',
+        'ide.bufferInspector.animationSyncFieldStartX': 'startX',
+        'ide.bufferInspector.animationSyncFieldStartY': 'startY',
+        'ide.bufferInspector.animationSyncFieldDirection': 'Direction',
+        'ide.bufferInspector.animationSyncFieldSpeed': 'Speed',
+        'ide.bufferInspector.animationSyncFieldDistance': 'Distance',
+        'ide.bufferInspector.animationSyncFieldPriority': 'Priority',
+        'ide.bufferInspector.animationSyncFieldAck': 'ACK',
+        'ide.bufferInspector.animationSyncAckPending': 'Pending',
+        'ide.bufferInspector.animationSyncAckReceived': 'Received',
+        'ide.bufferInspector.animationSyncCommandTypeNone': 'None',
+        'ide.bufferInspector.animationSyncCommandTypeStartMovement': 'Start',
+        'ide.bufferInspector.animationSyncCommandTypeStopMovement': 'Stop',
+        'ide.bufferInspector.animationSyncCommandTypeEraseMovement': 'Erase',
+        'ide.bufferInspector.animationSyncCommandTypeSetPosition': 'Set',
+        'ide.bufferInspector.animationSyncCommandTypeClearAllMovements': 'Clear All',
+      }
+      return messages[key] ?? key
+    },
   }),
 }))
 
@@ -52,7 +77,7 @@ describe('AnimationSyncSection', () => {
 
     const title = wrapper.find('.animation-sync-title')
     expect(title.exists()).toBe(true)
-    expect(title.text()).toBe('ide.bufferInspector.animationSyncTitle')
+    expect(title.text()).toBe('Animation Sync')
     wrapper.unmount()
   })
 
@@ -65,7 +90,7 @@ describe('AnimationSyncSection', () => {
     })
 
     expect(wrapper.find('.animation-sync-idle').exists()).toBe(true)
-    expect(wrapper.find('.animation-sync-idle').text()).toBe('ide.bufferInspector.animationSyncIdle')
+    expect(wrapper.find('.animation-sync-idle').text()).toBe('(idle)')
     expect(wrapper.find('.animation-sync-table').exists()).toBe(false)
     wrapper.unmount()
   })
@@ -93,8 +118,8 @@ describe('AnimationSyncSection', () => {
 
     const headers = wrapper.findAll('.sync-hdr')
     expect(headers.length).toBe(2)
-    expect(headers[0]!.text()).toBe('ide.bufferInspector.animationSyncColField')
-    expect(headers[1]!.text()).toBe('ide.bufferInspector.animationSyncColValue')
+    expect(headers[0]!.text()).toBe('Field')
+    expect(headers[1]!.text()).toBe('Value')
     wrapper.unmount()
   })
 
@@ -107,9 +132,9 @@ describe('AnimationSyncSection', () => {
     })
 
     const cells = wrapper.findAll('.sync-cell')
-    expect(cells[0]!.text()).toBe('ide.bufferInspector.animationSyncFieldType')
+    expect(cells[0]!.text()).toBe('Command Type')
     expect(cells[1]!.text()).toBe(
-      'ide.bufferInspector.animationSyncCommandTypeStartMovement',
+      'Start',
     )
     wrapper.unmount()
   })
@@ -124,7 +149,7 @@ describe('AnimationSyncSection', () => {
 
     const cells = wrapper.findAll('.sync-cell')
     // Action row is the 2nd row: field at index 2, value at index 3
-    expect(cells[2]!.text()).toBe('ide.bufferInspector.animationSyncFieldAction')
+    expect(cells[2]!.text()).toBe('Action #')
     expect(cells[3]!.text()).toBe('3')
     wrapper.unmount()
   })
@@ -155,17 +180,17 @@ describe('AnimationSyncSection', () => {
     // Row 5: speed (indices 10,11)
     // Row 6: distance (indices 12,13)
     // Row 7: priority (indices 14,15)
-    expect(cells[4]!.text()).toBe('ide.bufferInspector.animationSyncFieldStartX')
+    expect(cells[4]!.text()).toBe('startX')
     expect(cells[5]!.text()).toBe('10')
-    expect(cells[6]!.text()).toBe('ide.bufferInspector.animationSyncFieldStartY')
+    expect(cells[6]!.text()).toBe('startY')
     expect(cells[7]!.text()).toBe('20')
-    expect(cells[8]!.text()).toBe('ide.bufferInspector.animationSyncFieldDirection')
+    expect(cells[8]!.text()).toBe('Direction')
     expect(cells[9]!.text()).toBe('3')
-    expect(cells[10]!.text()).toBe('ide.bufferInspector.animationSyncFieldSpeed')
+    expect(cells[10]!.text()).toBe('Speed')
     expect(cells[11]!.text()).toBe('5')
-    expect(cells[12]!.text()).toBe('ide.bufferInspector.animationSyncFieldDistance')
+    expect(cells[12]!.text()).toBe('Distance')
     expect(cells[13]!.text()).toBe('100')
-    expect(cells[14]!.text()).toBe('ide.bufferInspector.animationSyncFieldPriority')
+    expect(cells[14]!.text()).toBe('Priority')
     expect(cells[15]!.text()).toBe('1')
     wrapper.unmount()
   })
@@ -180,8 +205,8 @@ describe('AnimationSyncSection', () => {
 
     const cells = wrapper.findAll('.sync-cell')
     // ACK is the last row: field at 16, value at 17
-    expect(cells[16]!.text()).toBe('ide.bufferInspector.animationSyncFieldAck')
-    expect(cells[17]!.text()).toBe('ide.bufferInspector.animationSyncAckPending')
+    expect(cells[16]!.text()).toBe('ACK')
+    expect(cells[17]!.text()).toBe('Pending')
     wrapper.unmount()
   })
 
@@ -194,19 +219,19 @@ describe('AnimationSyncSection', () => {
     })
 
     const cells = wrapper.findAll('.sync-cell')
-    expect(cells[16]!.text()).toBe('ide.bufferInspector.animationSyncFieldAck')
-    expect(cells[17]!.text()).toBe('ide.bufferInspector.animationSyncAckReceived')
+    expect(cells[16]!.text()).toBe('ACK')
+    expect(cells[17]!.text()).toBe('Received')
     wrapper.unmount()
   })
 
   it('maps all SyncCommandType values to i18n keys', () => {
     const cases: [SyncCommandType, string][] = [
-      [SyncCommandType.NONE, 'ide.bufferInspector.animationSyncCommandTypeNone'],
-      [SyncCommandType.START_MOVEMENT, 'ide.bufferInspector.animationSyncCommandTypeStartMovement'],
-      [SyncCommandType.STOP_MOVEMENT, 'ide.bufferInspector.animationSyncCommandTypeStopMovement'],
-      [SyncCommandType.ERASE_MOVEMENT, 'ide.bufferInspector.animationSyncCommandTypeEraseMovement'],
-      [SyncCommandType.SET_POSITION, 'ide.bufferInspector.animationSyncCommandTypeSetPosition'],
-      [SyncCommandType.CLEAR_ALL_MOVEMENTS, 'ide.bufferInspector.animationSyncCommandTypeClearAllMovements'],
+      [SyncCommandType.NONE, 'None'],
+      [SyncCommandType.START_MOVEMENT, 'Start'],
+      [SyncCommandType.STOP_MOVEMENT, 'Stop'],
+      [SyncCommandType.ERASE_MOVEMENT, 'Erase'],
+      [SyncCommandType.SET_POSITION, 'Set'],
+      [SyncCommandType.CLEAR_ALL_MOVEMENTS, 'Clear All'],
     ]
 
     for (const [commandType, expectedName] of cases) {
@@ -218,7 +243,7 @@ describe('AnimationSyncSection', () => {
       })
 
       const cells = wrapper.findAll('.sync-cell')
-      expect(cells[0]!.text()).toBe('ide.bufferInspector.animationSyncFieldType')
+      expect(cells[0]!.text()).toBe('Command Type')
       expect(cells[1]!.text()).toBe(expectedName)
       wrapper.unmount()
     }

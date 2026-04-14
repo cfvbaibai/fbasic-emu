@@ -7,7 +7,15 @@ import InputModal from '@/features/ide/components/InputModal.vue'
 
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
-    t: (key: string) => key,
+    t: (key: string) => {
+      const messages: Record<string, string> = {
+        'ide.inputModal.inputPlaceholder': 'Separate multiple values with commas',
+        'ide.inputModal.linputPlaceholder': 'Enter text (up to 31 chars)',
+        'ide.input.submit': 'OK',
+        'ide.input.cancel': 'Cancel',
+      }
+      return messages[key] ?? key
+    },
   }),
 }))
 
@@ -67,7 +75,7 @@ describe('InputModal', () => {
     })
 
     const input = wrapper.find('[data-testid="input-modal-field"]')
-    expect(input.attributes('placeholder')).toEqual('ide.inputModal.inputPlaceholder')
+    expect(input.attributes('placeholder')).toEqual('Separate multiple values with commas')
     wrapper.unmount()
   })
 
@@ -78,7 +86,7 @@ describe('InputModal', () => {
     })
 
     const input = wrapper.find('[data-testid="input-modal-field"]')
-    expect(input.attributes('placeholder')).toEqual('ide.inputModal.linputPlaceholder')
+    expect(input.attributes('placeholder')).toEqual('Enter text (up to 31 chars)')
     wrapper.unmount()
   })
 

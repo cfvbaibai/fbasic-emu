@@ -17,7 +17,12 @@ vi.mock('@/shared/components/ui', () => ({
 // Stub vue-i18n
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
-    t: (key: string) => key,
+    t: (key: string) => {
+      const messages: Record<string, string> = {
+        'musicComposer.title': 'Music Composer',
+      }
+      return messages[key] ?? key
+    },
     locale: ref('en'),
   }),
 }))
@@ -64,7 +69,7 @@ describe('MusicComposerPage', () => {
 
     const heading = wrapper.find('h1')
     expect(heading.exists()).toBe(true)
-    expect(heading.text()).toEqual('musicComposer.title')
+    expect(heading.text()).toEqual('Music Composer')
     wrapper.unmount()
   })
 

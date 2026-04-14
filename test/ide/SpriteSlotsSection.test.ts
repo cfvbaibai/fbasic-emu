@@ -7,7 +7,23 @@ import SpriteSlotsSection from '@/features/ide/components/SpriteSlotsSection.vue
 
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
-    t: (key: string) => key,
+    t: (key: string) => {
+      const messages: Record<string, string> = {
+        'ide.bufferInspector.spriteSlotsTitle': 'Sprite Slots',
+        'ide.bufferInspector.spriteSlotsDisabled': 'SPRITE OFF',
+        'ide.bufferInspector.spriteSlotsOn': 'ON',
+        'ide.bufferInspector.spriteSlotsOff': 'OFF',
+        'ide.bufferInspector.spriteSlotsDefined': 'Yes',
+        'ide.bufferInspector.spriteSlotsNone': '-',
+        'ide.bufferInspector.spriteSlotsColNumber': '#',
+        'ide.bufferInspector.spriteSlotsColX': 'X',
+        'ide.bufferInspector.spriteSlotsColY': 'Y',
+        'ide.bufferInspector.spriteSlotsColVisible': 'Visible',
+        'ide.bufferInspector.spriteSlotsColPriority': 'Priority',
+        'ide.bufferInspector.spriteSlotsColDefinition': 'Definition',
+      }
+      return messages[key] ?? key
+    },
   }),
 }))
 
@@ -59,7 +75,7 @@ describe('SpriteSlotsSection', () => {
     })
 
     expect(wrapper.find('.sprite-slots-disabled').exists()).toBe(true)
-    expect(wrapper.find('.sprite-slots-disabled').text()).toBe('ide.bufferInspector.spriteSlotsDisabled')
+    expect(wrapper.find('.sprite-slots-disabled').text()).toBe('SPRITE OFF')
     wrapper.unmount()
   })
 
@@ -85,7 +101,7 @@ describe('SpriteSlotsSection', () => {
 
     const title = wrapper.find('.sprite-slots-title')
     expect(title.exists()).toBe(true)
-    expect(title.text()).toBe('ide.bufferInspector.spriteSlotsTitle')
+    expect(title.text()).toBe('Sprite Slots')
     wrapper.unmount()
   })
 
@@ -157,8 +173,8 @@ describe('SpriteSlotsSection', () => {
 
     const visibleCells = wrapper.findAll('.sprite-slots-cell-visible')
     expect(visibleCells.length).toBe(2)
-    expect(visibleCells[0]!.text()).toBe('ide.bufferInspector.spriteSlotsOn')
-    expect(visibleCells[1]!.text()).toBe('ide.bufferInspector.spriteSlotsOff')
+    expect(visibleCells[0]!.text()).toBe('ON')
+    expect(visibleCells[1]!.text()).toBe('OFF')
     wrapper.unmount()
   })
 
@@ -207,8 +223,8 @@ describe('SpriteSlotsSection', () => {
 
     const defCells = wrapper.findAll('.sprite-slots-cell-definition')
     expect(defCells.length).toBe(2)
-    expect(defCells[0]!.text()).toBe('ide.bufferInspector.spriteSlotsNone')
-    expect(defCells[1]!.text()).toBe('ide.bufferInspector.spriteSlotsDefined')
+    expect(defCells[0]!.text()).toBe('-')
+    expect(defCells[1]!.text()).toBe('Yes')
     wrapper.unmount()
   })
 
@@ -222,12 +238,12 @@ describe('SpriteSlotsSection', () => {
 
     const headers = wrapper.findAll('.sprite-slots-header-cell')
     expect(headers.length).toBe(6)
-    expect(headers[0]!.text()).toBe('ide.bufferInspector.spriteSlotsColNumber')
-    expect(headers[1]!.text()).toBe('ide.bufferInspector.spriteSlotsColX')
-    expect(headers[2]!.text()).toBe('ide.bufferInspector.spriteSlotsColY')
-    expect(headers[3]!.text()).toBe('ide.bufferInspector.spriteSlotsColVisible')
-    expect(headers[4]!.text()).toBe('ide.bufferInspector.spriteSlotsColPriority')
-    expect(headers[5]!.text()).toBe('ide.bufferInspector.spriteSlotsColDefinition')
+    expect(headers[0]!.text()).toBe('#')
+    expect(headers[1]!.text()).toBe('X')
+    expect(headers[2]!.text()).toBe('Y')
+    expect(headers[3]!.text()).toBe('Visible')
+    expect(headers[4]!.text()).toBe('Priority')
+    expect(headers[5]!.text()).toBe('Definition')
     wrapper.unmount()
   })
 })

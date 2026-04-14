@@ -7,7 +7,20 @@ import LogLevelPanel from '@/features/ide/components/LogLevelPanel.vue'
 
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
-    t: (key: string) => key,
+    t: (key: string, params?: Record<string, string | number>) => {
+      const messages: Record<string, string> = {
+        'ide.logLevels.title': 'Log Levels',
+        'ide.logLevels.description': 'Set verbosity per area. {warn} = quiet; {debug} = verbose.',
+        'ide.logLevels.ariaLabelFor': 'Log level for {name}',
+      }
+      let text = messages[key] ?? key
+      if (params) {
+        for (const [k, v] of Object.entries(params)) {
+          text = text.replace(`{${k}}`, String(v))
+        }
+      }
+      return text
+    },
   }),
 }))
 
@@ -191,7 +204,7 @@ describe('LogLevelPanel', () => {
     })
 
     const firstSelect = wrapper.find('select')
-    expect(firstSelect.attributes('aria-label')).toEqual('ide.logLevels.ariaLabelFor')
+    expect(firstSelect.attributes('aria-label')).toEqual('Log level for Screen')
     wrapper.unmount()
   })
 })

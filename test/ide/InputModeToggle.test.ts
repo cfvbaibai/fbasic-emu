@@ -7,7 +7,15 @@ import InputModeToggle from '@/features/ide/components/InputModeToggle.vue'
 
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
-    t: (key: string) => key,
+    t: (key: string) => {
+      const messages: Record<string, string> = {
+        'ide.inputModeToggle.joystickTitle': 'Joystick Mode (STICK/STRIG)',
+        'ide.inputModeToggle.keyboardTitle': 'Keyboard Mode (INKEY$)',
+        'ide.inputModeToggle.joystick': 'Joy',
+        'ide.inputModeToggle.keyboard': 'Key',
+      }
+      return messages[key] ?? key
+    },
   }),
 }))
 
@@ -112,8 +120,8 @@ describe('InputModeToggle', () => {
     })
 
     const buttons = wrapper.findAll('button')
-    expect(buttons[0]!.attributes('title')).toEqual('ide.inputModeToggle.joystickTitle')
-    expect(buttons[1]!.attributes('title')).toEqual('ide.inputModeToggle.keyboardTitle')
+    expect(buttons[0]!.attributes('title')).toEqual('Joystick Mode (STICK/STRIG)')
+    expect(buttons[1]!.attributes('title')).toEqual('Keyboard Mode (INKEY$)')
     wrapper.unmount()
   })
 

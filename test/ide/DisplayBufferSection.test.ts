@@ -7,7 +7,13 @@ import type { ScreenBufferReader } from '@/features/ide/components/types'
 
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
-    t: (key: string) => key,
+    t: (key: string) => {
+      const messages: Record<string, string> = {
+        'ide.bufferInspector.displayBufferCharTitle': 'Character Codes',
+        'ide.bufferInspector.displayBufferPatternTitle': 'Color Patterns',
+      }
+      return messages[key] ?? key
+    },
   }),
 }))
 
@@ -53,7 +59,7 @@ describe('DisplayBufferSection', () => {
 
     const charTitle = wrapper.find('.display-buffer-char-title')
     expect(charTitle.exists()).toBe(true)
-    expect(charTitle.text()).toBe('ide.bufferInspector.displayBufferCharTitle')
+    expect(charTitle.text()).toBe('Character Codes')
     wrapper.unmount()
   })
 
@@ -66,7 +72,7 @@ describe('DisplayBufferSection', () => {
 
     const patternTitle = wrapper.find('.display-buffer-pattern-title')
     expect(patternTitle.exists()).toBe(true)
-    expect(patternTitle.text()).toBe('ide.bufferInspector.displayBufferPatternTitle')
+    expect(patternTitle.text()).toBe('Color Patterns')
     wrapper.unmount()
   })
 

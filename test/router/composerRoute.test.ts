@@ -6,7 +6,12 @@ import type { RouteRecordNormalized } from 'vue-router'
 // Stub vue-i18n for router (needed by i18n module)
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
-    t: (key: string) => key,
+    t: (key: string) => {
+      const messages: Record<string, string> = {
+        'navigation.appTitle': 'F-BASIC IDE',
+      }
+      return messages[key] ?? key
+    },
     locale: ref('en'),
   }),
   createI18n: vi.fn(() => ({})),

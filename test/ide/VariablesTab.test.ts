@@ -7,7 +7,12 @@ import VariablesTab from '@/features/ide/components/VariablesTab.vue'
 
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
-    t: (key: string) => key,
+    t: (key: string) => {
+      const messages: Record<string, string> = {
+        'ide.output.variables': 'Variables',
+      }
+      return messages[key] ?? key
+    },
   }),
 }))
 

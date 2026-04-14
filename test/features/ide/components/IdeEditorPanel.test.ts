@@ -8,7 +8,16 @@ import IdeEditorPanel from '@/features/ide/components/IdeEditorPanel.vue'
 
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
-    t: (key: string) => key,
+    t: (key: string) => {
+      const messages: Record<string, string> = {
+        'ide.codeEditor.title': 'Code Editor',
+        'ide.codeEditor.loading': 'Loading editor...',
+        'ide.samples.load': 'Sample',
+        'ide.spriteViewer.openTitle': 'Open Sprite Viewer',
+        'ide.tutorial.title': 'Tutorial',
+      }
+      return messages[key] ?? key
+    },
   }),
 }))
 

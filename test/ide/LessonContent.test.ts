@@ -10,7 +10,12 @@ import LessonContent from '@/features/ide/components/LessonContent.vue'
 
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
-    t: (key: string) => key,
+    t: (key: string) => {
+      const messages: Record<string, string> = {
+        'ide.tutorial.tryIt': 'Try It',
+      }
+      return messages[key] ?? key
+    },
   }),
 }))
 
@@ -170,7 +175,7 @@ describe('LessonContent', () => {
     })
 
     const tryButton = wrapper.find('[data-testid="lesson-try-it-button"]')
-    expect(tryButton.text()).toEqual('ide.tutorial.tryIt')
+    expect(tryButton.text()).toEqual('Try It')
     wrapper.unmount()
   })
 

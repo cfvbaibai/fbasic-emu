@@ -10,7 +10,15 @@ import { POLL_INTERVAL_MS } from '@/features/ide/components/keyboardBufferSectio
 import { createTestKeyboardBuffer } from './helpers/createTestKeyboardBuffer'
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
-    t: (key: string) => key,
+    t: (key: string) => {
+      const messages: Record<string, string> = {
+        'ide.bufferInspector.keyboardBufferTitle': 'Keyboard Buffer',
+        'ide.bufferInspector.keyboardCharCode': 'Char Code',
+        'ide.bufferInspector.keyboardModifiers': 'Modifiers',
+        'ide.bufferInspector.keyboardAvailable': 'Available',
+      }
+      return messages[key] ?? key
+    },
   }),
 }))
 
@@ -47,7 +55,7 @@ describe('KeyboardBufferSection', () => {
 
     const title = wrapper.find('.keyboard-buffer-title')
     expect(title.exists()).toBe(true)
-    expect(title.text()).toBe('ide.bufferInspector.keyboardBufferTitle')
+    expect(title.text()).toBe('Keyboard Buffer')
     wrapper.unmount()
   })
 
@@ -70,9 +78,9 @@ describe('KeyboardBufferSection', () => {
 
     const labels = wrapper.findAll('.keyboard-buffer-label')
     expect(labels.length).toBe(3)
-    expect(labels[0]!.text()).toBe('ide.bufferInspector.keyboardCharCode')
-    expect(labels[1]!.text()).toBe('ide.bufferInspector.keyboardModifiers')
-    expect(labels[2]!.text()).toBe('ide.bufferInspector.keyboardAvailable')
+    expect(labels[0]!.text()).toBe('Char Code')
+    expect(labels[1]!.text()).toBe('Modifiers')
+    expect(labels[2]!.text()).toBe('Available')
     wrapper.unmount()
   })
 
