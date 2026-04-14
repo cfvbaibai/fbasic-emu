@@ -11,12 +11,7 @@ import { createTestKeyboardBuffer } from './helpers/createTestKeyboardBuffer'
 
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
-    t: (key: string) => {
-      const messages: Record<string, string> = {
-        'ide.bufferInspector.title': 'Buffer Inspector',
-      }
-      return messages[key] ?? key
-    },
+    t: (key: string) => key,
   }),
 }))
 

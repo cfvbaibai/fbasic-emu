@@ -385,7 +385,6 @@
     "openLogLevels": "打开日志级别"
   },
   "stateInspector": {
-    "title": "状态检查",
     "tabPalette": "PALETTE",
     "tabSprite": "SPRITE",
     "tabMove": "MOVE",
@@ -404,7 +403,6 @@
     "empty": "（无）"
   },
   "bufferInspector": {
-    "title": "缓冲区检查器",
     "spriteSlotsTitle": "精灵槽位",
     "spriteSlotsDisabled": "精灵已关闭",
     "spriteSlotsOn": "开",

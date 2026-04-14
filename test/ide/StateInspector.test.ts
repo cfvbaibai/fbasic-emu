@@ -13,7 +13,6 @@ vi.mock('vue-i18n', () => ({
   useI18n: () => ({
     t: (key: string) => {
       const messages: Record<string, string> = {
-        'ide.stateInspector.title': 'State Inspector',
         'ide.stateInspector.tabPalette': 'PALETTE',
         'ide.stateInspector.tabSprite': 'SPRITE',
         'ide.stateInspector.tabMove': 'MOVE',
