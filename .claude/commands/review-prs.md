@@ -170,6 +170,7 @@ gh pr review <number> --comment --body "## Review: APPROVE
 
 **REQUEST CHANGES:**
 ```bash
+# Note: Use --comment instead of --request-changes for own PRs (GitHub doesn't allow self-request-changes)
 gh pr review <number> --request-changes --body "## Review: REQUEST CHANGES
 
 ### Issues Found
