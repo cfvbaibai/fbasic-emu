@@ -43,11 +43,6 @@ export const lesson15BackgroundMusic: Lesson = {
     'The music plays while the program',
     'continues to print messages.',
 
-    '## Starting New Music',
-
-    'Call `BGPLAY` again to start a new song.',
-    'The old song is replaced:',
-
     '## Combining Music with Sprites',
 
     'Background music works great with games:',
