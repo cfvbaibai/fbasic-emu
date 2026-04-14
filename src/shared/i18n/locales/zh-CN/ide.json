@@ -4,6 +4,7 @@
     "new": "新建",
     "import": "导入",
     "export": "导出",
+    "exportHtml": "导出为 HTML",
     "discardConfirm": "是否放弃未保存的更改？",
     "programNamePlaceholder": "程序名称",
     "unsavedChanges": "未保存的更改",

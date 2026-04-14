@@ -4,6 +4,7 @@
     "new": "新規",
     "import": "インポート",
     "export": "エクスポート",
+    "exportHtml": "HTMLとしてエクスポート",
     "discardConfirm": "未保存の変更を破棄しますか？",
     "programNamePlaceholder": "プログラム名",
     "unsavedChanges": "未保存の変更",
