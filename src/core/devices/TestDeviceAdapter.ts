@@ -3,6 +3,10 @@
  *
  * A mock implementation of BasicDeviceAdapter for unit testing the BasicInterpreter.
  * Provides controlled behavior for testing without external dependencies.
+ *
+ * Screen output capture and display state tracking are delegated to TestScreenCapture.
+ * Backward-compatible property accessors proxy to screen.* so existing tests
+ * continue to work unchanged. New code should access screen.* directly.
  */
 
 import type { CompiledAudio } from '@/core/sound/types'
@@ -10,71 +14,88 @@ import type { BasicDeviceAdapter } from '@/core/types/device-types'
 import type { BgGridData } from '@/features/bg-editor/types'
 import { logDevice } from '@/shared/logger'
 
-import {
-  aggregateAllOutputs,
-  applyPaletteCombination,
-  DEFAULT_BACKGROUND_PALETTES,
-  DEFAULT_SPRITE_PALETTES,
-} from './TestDeviceAdapterHelpers'
 import { TestDeviceInputScheduler } from './TestDeviceInputScheduler'
+import { TestScreenCapture } from './TestScreenCapture'
 
 export class TestDeviceAdapter implements BasicDeviceAdapter {
+  // === SCREEN CAPTURE (delegated) ===
+  public readonly screen = new TestScreenCapture()
+
   // === JOYSTICK STATE ===
   private joystickCount = 2
   private stickStates: Map<number, number> = new Map()
   private strigBuffer: Map<number, number[]> = new Map()
 
-  // === OUTPUT CAPTURE ===
-  public printOutputs: string[] = []
-  public debugOutputs: string[] = []
-  public errorOutputs: string[] = []
-  public clearScreenCalls = 0
-  public cursorPosition: { x: number; y: number } = { x: 0, y: 0 }
-  public colorPatternCalls: Array<{ x: number; y: number; pattern: number }> = []
-  public colorPaletteCalls: Array<{
-    bgPalette: number
-    spritePalette: number
-  }> = []
-  public paletteCombinationCalls: Array<{
-    target: 'B' | 'S'
-    paletteIndex: number
-    combination: number
-    colors: [number, number, number, number]
-  }> = []
-  public currentColorPalette: { bgPalette: number; spritePalette: number } = {
-    bgPalette: 1,
-    spritePalette: 1,
-  }
-  public runtimeBackgroundPalettes = DEFAULT_BACKGROUND_PALETTES.map(
-    p => p.map(c => [...c] as [number, number, number, number])
-  )
-  public runtimeSpritePalettes = DEFAULT_SPRITE_PALETTES.map(
-    p => p.map(c => [...c] as [number, number, number, number])
-  )
-  public backdropColorCalls: number[] = []
-  public currentBackdropColor: number = 0 // Default backdrop color (0 = black)
-  public cgenModeCalls: number[] = []
-  public currentCgenMode: number = 2 // Default is 2 (B on BG, A on sprite)
-
-  private spritePositions: Map<number, { x: number; y: number }> = new Map()
-
   // === INPUT (for INPUT/LINPUT executor tests) ===
-  /** Queue of responses for requestInput; each call pops the next. Default: ['0'] if empty. */
   public inputResponseQueue: string[][] = []
 
   // === INPUT TIMELINE SCHEDULING ===
-  /** Scheduler delegates frame tracking and event delivery. Public for direct access. */
   public readonly inputScheduler = new TestDeviceInputScheduler({
     setStickState: (player, direction) => this.setStickState(player, direction),
     pushStrigState: (player, button) => this.pushStrigState(player, button),
     setInkeyState: (keyChar) => this.setInkeyStateForTest(keyChar),
   })
 
+  // === SPRITE STATE ===
+  private spritePositions: Map<number, { x: number; y: number }> = new Map()
+
+  // === SOUND CAPTURE ===
+  public playSoundCalls: CompiledAudio[] = []
+  public playSoundBackgroundCalls: CompiledAudio[] = []
+  public beepCalls: number = 0
+
+  // === BG GRAPHIC (VIEW command) ===
+  public copyBgGraphicToBackgroundCalls = 0
+  private seededBgData: BgGridData | null = null
+
+  // === KEYBOARD INPUT (INKEY$) ===
+  private inkeyState: string = ''
+  public waitForInkeyQueue: string[] = []
+
   constructor() {
     logDevice.debug('TestDeviceAdapter created')
   }
 
-  // === JOYSTICK INPUT METHODS ===
+  // ===========================================================================
+  // Backward-compatible property accessors
+  // New code should use screen.* directly. These exist so that the ~50 test
+  // files referencing adapter.printOutputs etc. continue to compile unchanged.
+  // ===========================================================================
+
+  get printOutputs() { return this.screen.printOutputs }
+  set printOutputs(v: string[]) { this.screen.printOutputs = v }
+  get debugOutputs() { return this.screen.debugOutputs }
+  set debugOutputs(v: string[]) { this.screen.debugOutputs = v }
+  get errorOutputs() { return this.screen.errorOutputs }
+  set errorOutputs(v: string[]) { this.screen.errorOutputs = v }
+  get clearScreenCalls() { return this.screen.clearScreenCalls }
+  set clearScreenCalls(v: number) { this.screen.clearScreenCalls = v }
+  get cursorPosition() { return this.screen.cursorPosition }
+  set cursorPosition(v: { x: number; y: number }) { this.screen.cursorPosition = v }
+  get colorPatternCalls() { return this.screen.colorPatternCalls }
+  set colorPatternCalls(v: Array<{ x: number; y: number; pattern: number }>) { this.screen.colorPatternCalls = v }
+  get colorPaletteCalls() { return this.screen.colorPaletteCalls }
+  set colorPaletteCalls(v: Array<{ bgPalette: number; spritePalette: number }>) { this.screen.colorPaletteCalls = v }
+  get paletteCombinationCalls() { return this.screen.paletteCombinationCalls }
+  set paletteCombinationCalls(v: typeof this.screen.paletteCombinationCalls) { this.screen.paletteCombinationCalls = v }
+  get currentColorPalette() { return this.screen.currentColorPalette }
+  set currentColorPalette(v: { bgPalette: number; spritePalette: number }) { this.screen.currentColorPalette = v }
+  get runtimeBackgroundPalettes() { return this.screen.runtimeBackgroundPalettes }
+  set runtimeBackgroundPalettes(v: [number, number, number, number][][]) { this.screen.runtimeBackgroundPalettes = v }
+  get runtimeSpritePalettes() { return this.screen.runtimeSpritePalettes }
+  set runtimeSpritePalettes(v: [number, number, number, number][][]) { this.screen.runtimeSpritePalettes = v }
+  get backdropColorCalls() { return this.screen.backdropColorCalls }
+  set backdropColorCalls(v: number[]) { this.screen.backdropColorCalls = v }
+  get currentBackdropColor() { return this.screen.currentBackdropColor }
+  set currentBackdropColor(v: number) { this.screen.currentBackdropColor = v }
+  get cgenModeCalls() { return this.screen.cgenModeCalls }
+  set cgenModeCalls(v: number[]) { this.screen.cgenModeCalls = v }
+  get currentCgenMode() { return this.screen.currentCgenMode }
+  set currentCgenMode(v: number) { this.screen.currentCgenMode = v }
+
+  // ===========================================================================
+  // JOYSTICK INPUT
+  // ===========================================================================
 
   getJoystickCount(): number {
     return this.joystickCount
@@ -121,81 +142,62 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
     return state
   }
 
-  // === KEYBOARD INPUT (INKEY$) ===
-
-  /** Current keyboard state for INKEY$ testing */
-  private inkeyState: string = ''
+  // ===========================================================================
+  // KEYBOARD INPUT (INKEY$)
+  // ===========================================================================
 
   getInkeyState(): string {
     return this.inkeyState
   }
 
-  /**
-   * Set keyboard state for testing INKEY$
-   */
+  /** Set keyboard state for testing INKEY$ */
   setInkeyStateForTest(keyChar: string): void {
     this.inkeyState = keyChar
   }
 
-  /**
-   * Clear keyboard state (called on key up in real adapter)
-   */
+  /** Clear keyboard state (called on key up in real adapter) */
   clearInkeyStateForTest(): void {
     this.inkeyState = ''
   }
 
-  /** Queue of key responses for waitForInkey; each call pops the next. */
-  public waitForInkeyQueue: string[] = []
-
-  /**
-   * Wait for a key press (blocking mode for INKEY$(0)).
-   * For testing: returns immediately with queued key or current state.
-   */
+  /** Wait for a key press (blocking mode for INKEY$(0)). Returns immediately for testing. */
   waitForInkey?(): Promise<string> {
-    // First check if there's a queued response
     if (this.waitForInkeyQueue.length > 0) {
       return Promise.resolve(this.waitForInkeyQueue.shift()!)
     }
-    // Otherwise return current state (may be empty string if no key pressed)
     return Promise.resolve(this.inkeyState)
   }
 
-  /**
-   * Wait for a key press synchronously (blocking mode for INKEY$(0)).
-   * For testing: returns immediately with queued key or current state.
-   */
+  /** Wait for a key press synchronously (blocking mode for INKEY$(0)). Returns immediately for testing. */
   waitForInkeyBlocking?(): string {
-    // First check if there's a queued response
     if (this.waitForInkeyQueue.length > 0) {
       return this.waitForInkeyQueue.shift()!
     }
-    // Otherwise return current state
     return this.inkeyState
   }
 
-  // === SPRITE POSITION QUERY ===
+  // ===========================================================================
+  // SPRITE POSITION
+  // ===========================================================================
 
   getSpritePosition(actionNumber: number): { x: number; y: number } | null {
     return this.spritePositions.get(actionNumber) ?? null
   }
 
-  /**
-   * Store position for sprite (called when POSITION runs).
-   * Used so MOVE uses it when no prior START_MOVEMENT.
-   */
+  /** Store position for sprite (called when POSITION runs). */
   setSpritePosition(actionNumber: number, x: number, y: number): void {
     this.spritePositions.set(actionNumber, { x, y })
     logDevice.debug('Set sprite position:', { actionNumber, x, y })
   }
 
-  /**
-   * Set sprite position for XPOS/YPOS tests (alias for test helper)
-   */
+  /** Alias for test helper (setSpritePosition) */
   setSpritePositionForTest(actionNumber: number, x: number, y: number): void {
     this.setSpritePosition(actionNumber, x, y)
   }
 
-  // === INPUT (INPUT/LINPUT) ===
+  // ===========================================================================
+  // INPUT (INPUT/LINPUT)
+  // ===========================================================================
 
   requestInput?(
     _prompt: string,
@@ -205,10 +207,9 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
     return Promise.resolve(values ?? ['0'])
   }
 
-  // === SOUND OUTPUT ===
-
-  /** Captured playSound calls for testing */
-  public playSoundCalls: CompiledAudio[] = []
+  // ===========================================================================
+  // SOUND OUTPUT
+  // ===========================================================================
 
   playSound?(audio: CompiledAudio): Promise<void> {
     this.playSoundCalls.push(audio)
@@ -216,172 +217,31 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
     return Promise.resolve()
   }
 
-  /** Captured playSoundBackground calls for testing */
-  public playSoundBackgroundCalls: CompiledAudio[] = []
-
   playSoundBackground?(audio: CompiledAudio): void {
     this.playSoundBackgroundCalls.push(audio)
     logDevice.debug('BGPLAY sound, channels:', audio.channels.length)
   }
-
-  /** Captured beep calls for testing */
-  public beepCalls: number = 0
 
   beep?(): void {
     this.beepCalls++
     logDevice.debug('Beep')
   }
 
-  // === BG GRAPHIC (VIEW command) ===
-
-  /** Count of copyBgGraphicToBackground calls for testing */
-  public copyBgGraphicToBackgroundCalls = 0
-
-  /** Seeded BG grid data for VIEW command testing. Null until seedBgData() is called. */
-  private seededBgData: BgGridData | null = null
+  // ===========================================================================
+  // BG GRAPHIC (VIEW command)
+  // ===========================================================================
 
   copyBgGraphicToBackground?(): void {
     this.copyBgGraphicToBackgroundCalls++
     logDevice.debug('Copy BG GRAPHIC to Background Screen called')
   }
 
-  /**
-   * Get the seeded BG grid data, or null if no data has been seeded.
-   */
   getSeededBgData(): BgGridData | null {
     return this.seededBgData
   }
 
-  // === TEXT OUTPUT METHODS ===
-
-  printOutput(output: string): void {
-    this.printOutputs.push(output)
-    logDevice.debug('Print output:', output)
-  }
-
-  debugOutput(output: string): void {
-    this.debugOutputs.push(output)
-    logDevice.debug('Debug output:', output)
-  }
-
-  errorOutput(output: string): void {
-    this.errorOutputs.push(output)
-    logDevice.debug('Error output:', output)
-  }
-
-  clearScreen(): void {
-    this.clearScreenCalls++
-    this.printOutputs = []
-    this.debugOutputs = []
-    this.errorOutputs = []
-    logDevice.debug('Clear screen called')
-  }
-
-  setCursorPosition(x: number, y: number): void {
-    this.cursorPosition = { x, y }
-    logDevice.debug('Set cursor position:', { x, y })
-  }
-
-  getCursorPosition(): { x: number; y: number } {
-    return this.cursorPosition
-  }
-
-  getScreenCell(x: number, y: number, _colorSwitch = 0): string | number {
-    // Simple implementation for testing - returns space character
-    // Real implementation would use screen buffer
-    logDevice.debug('Get screen cell:', { x, y })
-    return ' '
-  }
-
-  setColorPattern(x: number, y: number, pattern: number): void {
-    // Store color pattern calls for testing
-    if (!this.colorPatternCalls) {
-      this.colorPatternCalls = []
-    }
-    this.colorPatternCalls.push({ x, y, pattern })
-    logDevice.debug('Set color pattern:', { x, y, pattern })
-  }
-
-  setColorPalette(bgPalette: number, spritePalette: number): void {
-    // Store color palette calls for testing
-    if (!this.colorPaletteCalls) {
-      this.colorPaletteCalls = []
-    }
-    this.colorPaletteCalls.push({ bgPalette, spritePalette })
-    this.currentColorPalette = { bgPalette, spritePalette }
-    logDevice.debug('Set color palette:', {
-      bgPalette,
-      spritePalette,
-    })
-  }
-
-  setPaletteCombination(target: 'B' | 'S', combination: number, c1: number, c2: number, c3: number, c4: number): void {
-    const colors: [number, number, number, number] = [c1, c2, c3, c4]
-    const result = applyPaletteCombination(
-      target,
-      combination,
-      colors,
-      this.currentColorPalette.bgPalette,
-      this.currentColorPalette.spritePalette,
-      this.runtimeBackgroundPalettes,
-      this.runtimeSpritePalettes
-    )
-    this.paletteCombinationCalls.push(result)
-  }
-
-  setBackdropColor(colorCode: number): void {
-    // Store backdrop color calls for testing
-    if (!this.backdropColorCalls) {
-      this.backdropColorCalls = []
-    }
-    this.backdropColorCalls.push(colorCode)
-    this.currentBackdropColor = colorCode
-    logDevice.debug('Set backdrop color:', colorCode)
-  }
-
-  setCharacterGeneratorMode(mode: number): void {
-    // Store CGEN mode calls for testing
-    if (!this.cgenModeCalls) {
-      this.cgenModeCalls = []
-    }
-    this.cgenModeCalls.push(mode)
-    this.currentCgenMode = mode
-    logDevice.debug('Set character generator mode:', mode)
-  }
-
-  getCharacterGeneratorMode(): number {
-    return this.currentCgenMode ?? 2 // Default is 2 per F-BASIC spec
-  }
-
-  // === TEST HELPER METHODS ===
-
-  /**
-   * Set up joystick state for testing
-   */
-  setupJoystickState(joystickId: number, stickState: number, strigEvents: number[] = []): void {
-    this.setStickState(joystickId, stickState)
-    for (const strigEvent of strigEvents) {
-      this.pushStrigState(joystickId, strigEvent)
-    }
-  }
-
-  /**
-   * Simulate STRIG button press
-   */
-  simulateStrigPress(joystickId: number, buttonValue: number): void {
-    this.pushStrigState(joystickId, buttonValue)
-  }
-
-  /**
-   * Simulate STICK direction
-   */
-  simulateStickDirection(joystickId: number, directionValue: number): void {
-    this.setStickState(joystickId, directionValue)
-  }
-
   /**
    * Seed BG tile grid data for VIEW command testing.
-   * Allows programmatically loading BG data before execution without UI interaction.
    * Subclasses with screen buffers (e.g. SharedBufferTestAdapter) override
    * copyBgGraphicToBackground() to apply this data to the buffer.
    */
@@ -390,27 +250,106 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
     logDevice.debug('BG data seeded:', { rows: bgTiles.length })
   }
 
-  /**
-   * Clear all captured outputs
-   */
-  clearOutputs(): void {
-    this.printOutputs = []
-    this.debugOutputs = []
-    this.errorOutputs = []
-    this.clearScreenCalls = 0
+  // ===========================================================================
+  // TEXT OUTPUT (delegated to screen capture)
+  // ===========================================================================
+
+  printOutput(output: string): void {
+    this.screen.recordPrintOutput(output)
+    logDevice.debug('Print output:', output)
   }
 
-  /**
-   * Clear all joystick state
-   */
+  debugOutput(output: string): void {
+    this.screen.recordDebugOutput(output)
+    logDevice.debug('Debug output:', output)
+  }
+
+  errorOutput(output: string): void {
+    this.screen.recordErrorOutput(output)
+    logDevice.debug('Error output:', output)
+  }
+
+  clearScreen(): void {
+    this.screen.recordClearScreen()
+    logDevice.debug('Clear screen called')
+  }
+
+  setCursorPosition(x: number, y: number): void {
+    this.screen.recordCursorPosition(x, y)
+    logDevice.debug('Set cursor position:', { x, y })
+  }
+
+  getCursorPosition(): { x: number; y: number } {
+    return this.screen.cursorPosition
+  }
+
+  getScreenCell(x: number, y: number, _colorSwitch = 0): string | number {
+    logDevice.debug('Get screen cell:', { x, y })
+    return ' '
+  }
+
+  setColorPattern(x: number, y: number, pattern: number): void {
+    this.screen.recordColorPattern(x, y, pattern)
+    logDevice.debug('Set color pattern:', { x, y, pattern })
+  }
+
+  setColorPalette(bgPalette: number, spritePalette: number): void {
+    this.screen.recordColorPalette(bgPalette, spritePalette)
+    logDevice.debug('Set color palette:', { bgPalette, spritePalette })
+  }
+
+  setPaletteCombination(target: 'B' | 'S', combination: number, c1: number, c2: number, c3: number, c4: number): void {
+    this.screen.recordPaletteCombination(target, combination, c1, c2, c3, c4)
+  }
+
+  setBackdropColor(colorCode: number): void {
+    this.screen.recordBackdropColor(colorCode)
+    logDevice.debug('Set backdrop color:', colorCode)
+  }
+
+  setCharacterGeneratorMode(mode: number): void {
+    this.screen.recordCgenMode(mode)
+    logDevice.debug('Set character generator mode:', mode)
+  }
+
+  getCharacterGeneratorMode(): number {
+    return this.screen.currentCgenMode
+  }
+
+  // ===========================================================================
+  // TEST HELPERS
+  // ===========================================================================
+
+  /** Set up joystick state for testing */
+  setupJoystickState(joystickId: number, stickState: number, strigEvents: number[] = []): void {
+    this.setStickState(joystickId, stickState)
+    for (const strigEvent of strigEvents) {
+      this.pushStrigState(joystickId, strigEvent)
+    }
+  }
+
+  /** Simulate STRIG button press */
+  simulateStrigPress(joystickId: number, buttonValue: number): void {
+    this.pushStrigState(joystickId, buttonValue)
+  }
+
+  /** Simulate STICK direction */
+  simulateStickDirection(joystickId: number, directionValue: number): void {
+    this.setStickState(joystickId, directionValue)
+  }
+
+  /** Clear all captured outputs */
+  clearOutputs(): void {
+    this.screen.clearOutputs()
+  }
+
+  /** Clear all joystick state */
   clearJoystickState(): void {
     this.stickStates.clear()
     this.strigBuffer.clear()
   }
 
-  /**
-   * Reset all state
-   */
+  /** Reset all state */
   reset(): void {
     this.clearOutputs()
     this.clearJoystickState()
@@ -419,48 +358,28 @@ export class TestDeviceAdapter implements BasicDeviceAdapter {
     this.inputScheduler.reset()
   }
 
-  /**
-   * Get all captured outputs as a single string.
-   * Delegates to aggregateAllOutputs helper.
-   */
+  /** Get all captured outputs as a single string */
   getAllOutputs(): string {
-    return aggregateAllOutputs(this.printOutputs, this.debugOutputs, this.errorOutputs)
+    return this.screen.getAllOutputs()
   }
 
-  /**
-   * Check if specific output was captured
-   */
+  /** Check if specific output was captured */
   hasOutput(output: string, type: 'print' | 'debug' | 'error' = 'print'): boolean {
-    switch (type) {
-      case 'print':
-        return this.printOutputs.includes(output)
-      case 'debug':
-        return this.debugOutputs.includes(output)
-      case 'error':
-        return this.errorOutputs.includes(output)
-      default:
-        return false
-    }
+    return this.screen.hasOutput(output, type)
   }
 
-  /**
-   * Get the number of times clearScreen was called
-   */
+  /** Get the number of times clearScreen was called */
   getClearScreenCallCount(): number {
-    return this.clearScreenCalls
+    return this.screen.getClearScreenCallCount()
   }
 
-  /**
-   * Check if any STRIG events are pending for a joystick
-   */
+  /** Check if any STRIG events are pending for a joystick */
   hasPendingStrigEvents(joystickId: number): boolean {
     const buffer = this.strigBuffer.get(joystickId)
     return buffer ? buffer.length > 0 : false
   }
 
-  /**
-   * Get pending STRIG events count for a joystick
-   */
+  /** Get pending STRIG events count for a joystick */
   getPendingStrigEventsCount(joystickId: number): number {
     const buffer = this.strigBuffer.get(joystickId)
     return buffer ? buffer.length : 0
