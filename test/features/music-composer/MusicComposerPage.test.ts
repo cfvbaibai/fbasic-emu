@@ -14,10 +14,15 @@ vi.mock('@/shared/components/ui', () => ({
   GameLayout: gameLayoutStub,
 }))
 
-// Stub vue-i18n
+// Stub vue-i18n with inline translations
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
-    t: (key: string) => key,
+    t: (key: string) => {
+      const messages: Record<string, string> = {
+        'musicComposer.title': 'Music Composer',
+      }
+      return messages[key] ?? key
+    },
     locale: ref('en'),
   }),
 }))
@@ -48,7 +53,7 @@ describe('MusicComposerPage', () => {
     wrapper.unmount()
   })
 
-  it('renders a placeholder heading with i18n key musicComposer.title', async () => {
+  it('renders a heading with translated text "Music Composer"', async () => {
     const { default: pageComponent } = (await import(
       '@/features/music-composer/MusicComposerPage.vue'
     )) as { default: Component }
@@ -64,7 +69,7 @@ describe('MusicComposerPage', () => {
 
     const heading = wrapper.find('h1')
     expect(heading.exists()).toBe(true)
-    expect(heading.text()).toEqual('musicComposer.title')
+    expect(heading.text()).toEqual('Music Composer')
     wrapper.unmount()
   })
 
