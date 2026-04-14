@@ -7,6 +7,7 @@
  */
 
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import type { CompactBg } from '@/core/types/program-types'
 import { buildExportHtml } from '@/features/ide/composables/buildExportHtml'
@@ -76,6 +77,7 @@ export function useHtmlExporter(
 ) {
   const isExporting = ref(false)
   const exportError = ref('')
+  const { locale } = useI18n()
 
   /**
    * Triggers the HTML export with the given options.
@@ -89,7 +91,7 @@ export function useHtmlExporter(
     exportError.value = ''
 
     try {
-      const html = buildExportHtml(source.value, options)
+      const html = buildExportHtml(source.value, options, locale.value)
       const blob = new Blob([html], { type: HTML_MIME_TYPE })
       const filename = toExportFilename(options.title)
       triggerDownload(blob, filename)

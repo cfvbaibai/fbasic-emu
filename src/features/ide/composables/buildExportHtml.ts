@@ -98,11 +98,13 @@ function buildThemeCss(theme: 'dark' | 'light'): string {
  *
  * @param source - The F-BASIC program source code
  * @param options - Export configuration options
+ * @param locale - The user's current locale for the HTML lang attribute
  * @returns A complete HTML document string
  */
 export function buildExportHtml(
   source: string,
   options: HtmlExportOptions,
+  locale: string,
 ): string {
   const css = buildThemeCss(options.theme)
   const escapedTitle = escapeHtml(options.title)
@@ -110,7 +112,7 @@ export function buildExportHtml(
 
   return [
     '<!DOCTYPE html>',
-    '<html lang="en">',
+    `<html lang="${locale}">`,
     '<head>',
     '  <meta charset="UTF-8">',
     '  <meta name="viewport" content="width=device-width, initial-scale=1.0">',

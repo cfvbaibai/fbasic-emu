@@ -16,6 +16,12 @@ import {
   useHtmlExporter,
 } from '@/features/ide/composables/useHtmlExporter'
 
+vi.mock('vue-i18n', () => ({
+  useI18n: () => ({
+    locale: ref('en'),
+  }),
+}))
+
 const MOCK_BLOB_URL = 'blob:mock-url'
 
 // ============================================================================
