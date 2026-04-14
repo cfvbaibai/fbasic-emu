@@ -7,19 +7,18 @@ import { consumeKeyAvailable, setInkeyState } from '@/core/devices/sharedKeyboar
 import KeyboardBufferSection from '@/features/ide/components/KeyboardBufferSection.vue'
 import { POLL_INTERVAL_MS } from '@/features/ide/components/keyboardBufferSectionConstants'
 
+import { createI18nMock } from '../helpers/createI18nMock'
 import { createTestKeyboardBuffer } from './helpers/createTestKeyboardBuffer'
+
+const mockT = createI18nMock({
+  'ide.bufferInspector.keyboardBufferTitle': 'Keyboard Buffer',
+  'ide.bufferInspector.keyboardCharCode': 'Char Code',
+  'ide.bufferInspector.keyboardModifiers': 'Modifiers',
+  'ide.bufferInspector.keyboardAvailable': 'Available',
+})
+
 vi.mock('vue-i18n', () => ({
-  useI18n: () => ({
-    t: (key: string) => {
-      const messages: Record<string, string> = {
-        'ide.bufferInspector.keyboardBufferTitle': 'Keyboard Buffer',
-        'ide.bufferInspector.keyboardCharCode': 'Char Code',
-        'ide.bufferInspector.keyboardModifiers': 'Modifiers',
-        'ide.bufferInspector.keyboardAvailable': 'Available',
-      }
-      return messages[key] ?? key
-    },
-  }),
+  useI18n: () => ({ t: mockT }),
 }))
 
 

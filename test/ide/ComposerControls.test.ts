@@ -5,20 +5,19 @@ import { defineComponent } from 'vue'
 
 import ComposerControls from '@/features/ide/components/ComposerControls.vue'
 
+import { createI18nMock } from '../helpers/createI18nMock'
+
+const mockT = createI18nMock({
+  'ide.composer.title': 'Controls',
+  'ide.composer.tempo': 'Tempo',
+  'ide.composer.steps': 'Steps',
+  'ide.composer.octave': 'Octave',
+  'ide.composer.duration': 'Duration',
+  'ide.composer.envelope': 'Envelope',
+})
+
 vi.mock('vue-i18n', () => ({
-  useI18n: () => ({
-    t: (key: string) => {
-      const messages: Record<string, string> = {
-        'ide.composer.title': 'Controls',
-        'ide.composer.tempo': 'Tempo',
-        'ide.composer.steps': 'Steps',
-        'ide.composer.octave': 'Octave',
-        'ide.composer.duration': 'Duration',
-        'ide.composer.envelope': 'Envelope',
-      }
-      return messages[key] ?? key
-    },
-  }),
+  useI18n: () => ({ t: mockT }),
 }))
 
 // ---------------------------------------------------------------------------

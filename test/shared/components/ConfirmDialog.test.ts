@@ -5,16 +5,15 @@ import { nextTick } from 'vue'
 
 import ConfirmDialog from '@/shared/components/ui/ConfirmDialog.vue'
 
+import { createI18nMock } from '../../helpers/createI18nMock'
+
+const mockT = createI18nMock({
+  'common.confirmDialog.confirm': 'Confirm',
+  'common.confirmDialog.cancel': 'Cancel',
+})
+
 vi.mock('vue-i18n', () => ({
-  useI18n: () => ({
-    t: (key: string) => {
-      const messages: Record<string, string> = {
-        'common.confirmDialog.confirm': 'Confirm',
-        'common.confirmDialog.cancel': 'Cancel',
-      }
-      return messages[key] ?? key
-    },
-  }),
+  useI18n: () => ({ t: mockT }),
 }))
 
 describe('ConfirmDialog', () => {

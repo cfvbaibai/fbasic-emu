@@ -7,17 +7,18 @@ import App from '@/App.vue'
 import { COI_SERVICE_WORKER_REGISTRATION_FAILED_EVENT } from '@/shared/constants/coiServiceWorker'
 import { reloadPage } from '@/shared/utils/reloadPage'
 
+import { createI18nMock } from './helpers/createI18nMock'
+
+const mockT = createI18nMock({
+  'coi.warning.message': 'High-performance mode is unavailable because cross-origin isolation is not enabled. Try reloading, use HTTPS, and confirm COOP/COEP headers are configured.',
+  'coi.warning.reload': 'Reload',
+  'coi.warning.dismiss': 'Dismiss',
+})
+
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
     locale: ref('en'),
-    t: (key: string) => {
-      const messages: Record<string, string> = {
-        'coi.warning.message': 'High-performance mode is unavailable because cross-origin isolation is not enabled. Try reloading, use HTTPS, and confirm COOP/COEP headers are configured.',
-        'coi.warning.reload': 'Reload',
-        'coi.warning.dismiss': 'Dismiss',
-      }
-      return messages[key] ?? key
-    },
+    t: mockT,
   }),
 }))
 

@@ -5,20 +5,19 @@ import { defineComponent } from 'vue'
 
 import TutorialPanel from '@/features/ide/components/TutorialPanel.vue'
 
+import { createI18nMock } from '../helpers/createI18nMock'
+
+const mockT = createI18nMock({
+  'ide.tutorial.title': 'Tutorial',
+  'ide.tutorial.defaultTitle': 'F-BASIC Tutorial',
+  'ide.tutorial.closeAriaLabel': 'Close tutorial',
+  'ide.tutorial.prev': 'Previous lesson',
+  'ide.tutorial.next': 'Next lesson',
+  'ide.tutorial.noContent': 'No lesson content available.',
+})
+
 vi.mock('vue-i18n', () => ({
-  useI18n: () => ({
-    t: (key: string) => {
-      const messages: Record<string, string> = {
-        'ide.tutorial.title': 'Tutorial',
-        'ide.tutorial.defaultTitle': 'F-BASIC Tutorial',
-        'ide.tutorial.closeAriaLabel': 'Close tutorial',
-        'ide.tutorial.prev': 'Previous lesson',
-        'ide.tutorial.next': 'Next lesson',
-        'ide.tutorial.noContent': 'No lesson content available.',
-      }
-      return messages[key] ?? key
-    },
-  }),
+  useI18n: () => ({ t: mockT }),
 }))
 
 const gameIconButtonStub = defineComponent({

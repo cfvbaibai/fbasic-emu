@@ -6,18 +6,16 @@ import { defineComponent } from 'vue'
 
 import ScreenTab from '@/features/ide/components/ScreenTab.vue'
 
-// Stub vue-i18n
+import { createI18nMock } from '../../../helpers/createI18nMock'
+
+const mockT = createI18nMock({
+  'ide.output.screen': 'Screen',
+  'ide.screenTab.grid': 'Grid',
+  'ide.screenTab.filter': 'CRT',
+})
+
 vi.mock('vue-i18n', () => ({
-  useI18n: () => ({
-    t: (key: string) => {
-      const messages: Record<string, string> = {
-        'ide.output.screen': 'Screen',
-        'ide.screenTab.grid': 'Grid',
-        'ide.screenTab.filter': 'CRT',
-      }
-      return messages[key] ?? key
-    },
-  }),
+  useI18n: () => ({ t: mockT }),
 }))
 
 // Mock useScreenFilter with controllable state

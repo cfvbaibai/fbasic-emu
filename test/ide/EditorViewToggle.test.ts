@@ -5,18 +5,17 @@ import { defineComponent } from 'vue'
 
 import EditorViewToggle from '@/features/ide/components/EditorViewToggle.vue'
 
+import { createI18nMock } from '../helpers/createI18nMock'
+
+const mockT = createI18nMock({
+  'ide.editorViewToggle.codeTitle': 'Code',
+  'ide.editorViewToggle.bgTitle': 'BG',
+  'ide.editorViewToggle.code': 'Code',
+  'ide.editorViewToggle.bg': 'BG',
+})
+
 vi.mock('vue-i18n', () => ({
-  useI18n: () => ({
-    t: (key: string) => {
-      const messages: Record<string, string> = {
-        'ide.editorViewToggle.codeTitle': 'Code',
-        'ide.editorViewToggle.bgTitle': 'BG',
-        'ide.editorViewToggle.code': 'Code',
-        'ide.editorViewToggle.bg': 'BG',
-      }
-      return messages[key] ?? key
-    },
-  }),
+  useI18n: () => ({ t: mockT }),
 }))
 
 const gameButtonStub = defineComponent({

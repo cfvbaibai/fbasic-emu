@@ -6,35 +6,34 @@ import { ACK_PENDING, ACK_RECEIVED, SyncCommandType } from '@/core/animation/sha
 import type { SyncCommand } from '@/core/animation/sharedDisplayBufferAccessor'
 import AnimationSyncSection from '@/features/ide/components/AnimationSyncSection.vue'
 
+import { createI18nMock } from '../helpers/createI18nMock'
+
+const mockT = createI18nMock({
+  'ide.bufferInspector.animationSyncTitle': 'Animation Sync',
+  'ide.bufferInspector.animationSyncIdle': '(idle)',
+  'ide.bufferInspector.animationSyncColField': 'Field',
+  'ide.bufferInspector.animationSyncColValue': 'Value',
+  'ide.bufferInspector.animationSyncFieldType': 'Command Type',
+  'ide.bufferInspector.animationSyncFieldAction': 'Action #',
+  'ide.bufferInspector.animationSyncFieldStartX': 'startX',
+  'ide.bufferInspector.animationSyncFieldStartY': 'startY',
+  'ide.bufferInspector.animationSyncFieldDirection': 'Direction',
+  'ide.bufferInspector.animationSyncFieldSpeed': 'Speed',
+  'ide.bufferInspector.animationSyncFieldDistance': 'Distance',
+  'ide.bufferInspector.animationSyncFieldPriority': 'Priority',
+  'ide.bufferInspector.animationSyncFieldAck': 'ACK',
+  'ide.bufferInspector.animationSyncAckPending': 'Pending',
+  'ide.bufferInspector.animationSyncAckReceived': 'Received',
+  'ide.bufferInspector.animationSyncCommandTypeNone': 'None',
+  'ide.bufferInspector.animationSyncCommandTypeStartMovement': 'Start',
+  'ide.bufferInspector.animationSyncCommandTypeStopMovement': 'Stop',
+  'ide.bufferInspector.animationSyncCommandTypeEraseMovement': 'Erase',
+  'ide.bufferInspector.animationSyncCommandTypeSetPosition': 'Set',
+  'ide.bufferInspector.animationSyncCommandTypeClearAllMovements': 'Clear All',
+})
+
 vi.mock('vue-i18n', () => ({
-  useI18n: () => ({
-    t: (key: string) => {
-      const messages: Record<string, string> = {
-        'ide.bufferInspector.animationSyncTitle': 'Animation Sync',
-        'ide.bufferInspector.animationSyncIdle': '(idle)',
-        'ide.bufferInspector.animationSyncColField': 'Field',
-        'ide.bufferInspector.animationSyncColValue': 'Value',
-        'ide.bufferInspector.animationSyncFieldType': 'Command Type',
-        'ide.bufferInspector.animationSyncFieldAction': 'Action #',
-        'ide.bufferInspector.animationSyncFieldStartX': 'startX',
-        'ide.bufferInspector.animationSyncFieldStartY': 'startY',
-        'ide.bufferInspector.animationSyncFieldDirection': 'Direction',
-        'ide.bufferInspector.animationSyncFieldSpeed': 'Speed',
-        'ide.bufferInspector.animationSyncFieldDistance': 'Distance',
-        'ide.bufferInspector.animationSyncFieldPriority': 'Priority',
-        'ide.bufferInspector.animationSyncFieldAck': 'ACK',
-        'ide.bufferInspector.animationSyncAckPending': 'Pending',
-        'ide.bufferInspector.animationSyncAckReceived': 'Received',
-        'ide.bufferInspector.animationSyncCommandTypeNone': 'None',
-        'ide.bufferInspector.animationSyncCommandTypeStartMovement': 'Start',
-        'ide.bufferInspector.animationSyncCommandTypeStopMovement': 'Stop',
-        'ide.bufferInspector.animationSyncCommandTypeEraseMovement': 'Erase',
-        'ide.bufferInspector.animationSyncCommandTypeSetPosition': 'Set',
-        'ide.bufferInspector.animationSyncCommandTypeClearAllMovements': 'Clear All',
-      }
-      return messages[key] ?? key
-    },
-  }),
+  useI18n: () => ({ t: mockT }),
 }))
 
 /** Factory for a SyncCommand with defaults */

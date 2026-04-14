@@ -5,18 +5,17 @@ import { defineComponent } from 'vue'
 
 import InputModeToggle from '@/features/ide/components/InputModeToggle.vue'
 
+import { createI18nMock } from '../helpers/createI18nMock'
+
+const mockT = createI18nMock({
+  'ide.inputModeToggle.joystickTitle': 'Joystick Mode (STICK/STRIG)',
+  'ide.inputModeToggle.keyboardTitle': 'Keyboard Mode (INKEY$)',
+  'ide.inputModeToggle.joystick': 'Joy',
+  'ide.inputModeToggle.keyboard': 'Key',
+})
+
 vi.mock('vue-i18n', () => ({
-  useI18n: () => ({
-    t: (key: string) => {
-      const messages: Record<string, string> = {
-        'ide.inputModeToggle.joystickTitle': 'Joystick Mode (STICK/STRIG)',
-        'ide.inputModeToggle.keyboardTitle': 'Keyboard Mode (INKEY$)',
-        'ide.inputModeToggle.joystick': 'Joy',
-        'ide.inputModeToggle.keyboard': 'Key',
-      }
-      return messages[key] ?? key
-    },
-  }),
+  useI18n: () => ({ t: mockT }),
 }))
 
 const gameButtonStub = defineComponent({

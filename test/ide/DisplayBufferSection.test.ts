@@ -5,16 +5,15 @@ import { describe, expect, it, vi } from 'vitest'
 import DisplayBufferSection from '@/features/ide/components/DisplayBufferSection.vue'
 import type { ScreenBufferReader } from '@/features/ide/components/types'
 
+import { createI18nMock } from '../helpers/createI18nMock'
+
+const mockT = createI18nMock({
+  'ide.bufferInspector.displayBufferCharTitle': 'Character Codes',
+  'ide.bufferInspector.displayBufferPatternTitle': 'Color Patterns',
+})
+
 vi.mock('vue-i18n', () => ({
-  useI18n: () => ({
-    t: (key: string) => {
-      const messages: Record<string, string> = {
-        'ide.bufferInspector.displayBufferCharTitle': 'Character Codes',
-        'ide.bufferInspector.displayBufferPatternTitle': 'Color Patterns',
-      }
-      return messages[key] ?? key
-    },
-  }),
+  useI18n: () => ({ t: mockT }),
 }))
 
 /** Create a mock accessor with screen char/pattern data */

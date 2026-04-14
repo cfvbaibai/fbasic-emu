@@ -9,27 +9,25 @@ import ExportHtmlDialog from '@/features/ide/components/ExportHtmlDialog.vue'
 // ---------------------------------------------------------------------------
 // Mocks
 // ---------------------------------------------------------------------------
+import { createI18nMock } from '../helpers/createI18nMock'
+
+const mockT = createI18nMock({
+  'ide.exportHtml.title': 'Export as HTML',
+  'ide.exportHtml.description': 'Export your program as a standalone HTML file that runs in any browser.',
+  'ide.exportHtml.exporting': 'Exporting...',
+  'ide.exportHtml.exportFailed': 'Failed to export HTML file.',
+  'ide.exportHtml.titleLabel': 'Page Title',
+  'ide.exportHtml.themeLabel': 'Theme',
+  'ide.exportHtml.themeDark': 'Dark',
+  'ide.exportHtml.themeLight': 'Light',
+  'ide.exportHtml.includeSound': 'Include sound',
+  'ide.exportHtml.includeSprites': 'Include sprites',
+  'ide.exportHtml.exportButton': 'Export',
+  'ide.exportHtml.cancelButton': 'Cancel',
+})
 
 vi.mock('vue-i18n', () => ({
-  useI18n: () => ({
-    t: (key: string) => {
-      const messages: Record<string, string> = {
-        'ide.exportHtml.title': 'Export as HTML',
-        'ide.exportHtml.description': 'Export your program as a standalone HTML file that runs in any browser.',
-        'ide.exportHtml.exporting': 'Exporting...',
-        'ide.exportHtml.exportFailed': 'Failed to export HTML file.',
-        'ide.exportHtml.titleLabel': 'Page Title',
-        'ide.exportHtml.themeLabel': 'Theme',
-        'ide.exportHtml.themeDark': 'Dark',
-        'ide.exportHtml.themeLight': 'Light',
-        'ide.exportHtml.includeSound': 'Include sound',
-        'ide.exportHtml.includeSprites': 'Include sprites',
-        'ide.exportHtml.exportButton': 'Export',
-        'ide.exportHtml.cancelButton': 'Cancel',
-      }
-      return messages[key] ?? key
-    },
-  }),
+  useI18n: () => ({ t: mockT }),
 }))
 
 const mockExportHtml = vi.fn()

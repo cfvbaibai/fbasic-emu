@@ -5,18 +5,17 @@ import { defineComponent } from 'vue'
 
 import IdeControls from '@/features/ide/components/IdeControls.vue'
 
+import { createI18nMock } from '../helpers/createI18nMock'
+
+const mockT = createI18nMock({
+  'ide.controls.run': 'Run',
+  'ide.controls.stop': 'Stop',
+  'ide.controls.clear': 'Clear',
+  'ide.controls.debug': 'Debug',
+})
+
 vi.mock('vue-i18n', () => ({
-  useI18n: () => ({
-    t: (key: string) => {
-      const messages: Record<string, string> = {
-        'ide.controls.run': 'Run',
-        'ide.controls.stop': 'Stop',
-        'ide.controls.clear': 'Clear',
-        'ide.controls.debug': 'Debug',
-      }
-      return messages[key] ?? key
-    },
-  }),
+  useI18n: () => ({ t: mockT }),
 }))
 
 const gameIconButtonStub = defineComponent({

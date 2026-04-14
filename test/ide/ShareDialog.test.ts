@@ -9,23 +9,21 @@ import ShareDialog from '@/features/ide/components/ShareDialog.vue'
 // ---------------------------------------------------------------------------
 // Mocks
 // ---------------------------------------------------------------------------
+import { createI18nMock } from '../helpers/createI18nMock'
+
+const mockT = createI18nMock({
+  'ide.share.title': 'Share',
+  'ide.share.description': 'Copy this URL to share your program with others.',
+  'ide.share.copy': 'Copy URL',
+  'ide.share.copied': 'Copied!',
+  'ide.share.close': 'Close',
+  'ide.share.encoding': 'Generating share URL...',
+  'ide.share.encodeFailed': 'Failed to generate share URL.',
+  'ide.share.tooLarge': 'This program is too large to share via URL.',
+})
 
 vi.mock('vue-i18n', () => ({
-  useI18n: () => ({
-    t: (key: string) => {
-      const messages: Record<string, string> = {
-        'ide.share.title': 'Share',
-        'ide.share.description': 'Copy this URL to share your program with others.',
-        'ide.share.copy': 'Copy URL',
-        'ide.share.copied': 'Copied!',
-        'ide.share.close': 'Close',
-        'ide.share.encoding': 'Generating share URL...',
-        'ide.share.encodeFailed': 'Failed to generate share URL.',
-        'ide.share.tooLarge': 'This program is too large to share via URL.',
-      }
-      return messages[key] ?? key
-    },
-  }),
+  useI18n: () => ({ t: mockT }),
 }))
 
 const mockEncodeProgram = vi.fn()
