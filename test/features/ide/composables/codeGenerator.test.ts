@@ -19,7 +19,6 @@ function makeState(
     envelope: 'none',
     title: '',
     channelNotes: [[], [], []],
-    channelOctaves: [4, 4, 4],
     ...overrides,
   }
 }
@@ -67,7 +66,6 @@ describe('generatePlayCode', () => {
       const notes: NoteCellKey[] = [createNoteCellKey(11, 0)] // C5
       const state = makeState({
         channelNotes: [notes, [], []],
-        channelOctaves: [4, 4, 4],
       })
 
       const lines = generatePlayCode(state)
@@ -81,7 +79,6 @@ describe('generatePlayCode', () => {
       const notes: NoteCellKey[] = [createNoteCellKey(21, 0)]
       const state = makeState({
         channelNotes: [notes, [], []],
-        channelOctaves: [4, 4, 4],
       })
 
       const lines = generatePlayCode(state)
@@ -95,7 +92,6 @@ describe('generatePlayCode', () => {
       const notes: NoteCellKey[] = [createNoteCellKey(17, 0)]
       const state = makeState({
         channelNotes: [notes, [], []],
-        channelOctaves: [4, 4, 4],
       })
 
       const lines = generatePlayCode(state)
@@ -109,7 +105,6 @@ describe('generatePlayCode', () => {
       const notes: NoteCellKey[] = [createNoteCellKey(35, 0)]
       const state = makeState({
         channelNotes: [notes, [], []],
-        channelOctaves: [3, 4, 4],
       })
 
       const lines = generatePlayCode(state)
@@ -123,7 +118,6 @@ describe('generatePlayCode', () => {
       const notes: NoteCellKey[] = [createNoteCellKey(0, 0)]
       const state = makeState({
         channelNotes: [notes, [], []],
-        channelOctaves: [5, 4, 4],
       })
 
       const lines = generatePlayCode(state)
@@ -212,7 +206,6 @@ describe('generatePlayCode', () => {
       ]
       const state = makeState({
         channelNotes: [notes, [], []],
-        channelOctaves: [4, 4, 4],
       })
 
       const lines = generatePlayCode(state)
@@ -229,7 +222,6 @@ describe('generatePlayCode', () => {
       ]
       const state = makeState({
         channelNotes: [notes, [], []],
-        channelOctaves: [5, 4, 4],
       })
 
       const lines = generatePlayCode(state)
