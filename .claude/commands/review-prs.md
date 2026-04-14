@@ -131,6 +131,8 @@ For complex PRs or multiple PRs, you MAY use the Agent tool with `subagent_type=
 
 Evaluate whether the PR is safe to merge. This step determines the verdict.
 
+**Core principle: address in one shot.** If something is worth fixing, it should be a blocking finding so it gets fixed in the PR — not deferred to a follow-up issue. Err on the side of REQUEST CHANGES rather than approving with a list of Minor items.
+
 **Checklist:**
 1. **Correctness** — Does the code do what it claims?
 2. **Code quality** — Follows conventions (TypeScript strict, import type, no any, files under 500 lines, scoped styles)?
@@ -138,23 +140,29 @@ Evaluate whether the PR is safe to merge. This step determines the verdict.
 4. **Edge cases** — Error handling, boundary conditions?
 5. **Potential issues** — Breaking changes, side effects?
 6. **TEST INTEGRITY (CRITICAL)** — Were any tests removed, weakened, loosened, or skipped to avoid fixing a real bug? Look for: deleted test cases, loosened assertions (e.g., toEqual→toContain), changed expected values to match wrong output, added skip/todo/pending. If detected, verdict MUST be REQUEST CHANGES.
+7. **Code duplication** — Is logic, helpers, or setup/teardown duplicated across functions or test files that could be extracted? If fixable within the PR scope, REQUEST CHANGES.
+8. **Magic numbers** — Are hardcoded values used where named constants should be (e.g., duplicated across files, shared meanings)? If a constant already exists or can easily be added, REQUEST CHANGES.
+9. **Inconsistent patterns** — Are mixed styles used within the same PR (e.g., regex vs literal assertions, different approaches to similar problems)? If unifiable within scope, REQUEST CHANGES.
+
+**Judgment call — blocking vs minor:**
+- **Blocking (REQUEST CHANGES):** The fix is within the PR's scope and effort. Fix it now.
+- **Minor:** The fix requires work outside the PR's scope (e.g., new feature, cross-cutting refactor touching many files, or a decision from product/design).
 
 **Output:** Verdict (APPROVE / REQUEST CHANGES / NEEDS DISCUSSION) + key findings for review body.
 
-### Step 3b — Non-Blocking Analysis (MANDATORY — feeds Phase 5)
+### Step 3b — Minor Analysis (scope-gated only)
 
-This step is **always executed**, even if the verdict is APPROVE. It is a separate, dedicated scan for improvement opportunities. Do NOT skip this step. Do NOT write "(none)" without actively searching.
+This step is for observations that are **genuinely out of scope** for the current PR but worth tracking. Most observations from the checklist in Step 3a should have already been caught as blocking findings.
 
-**Scan categories (check each one):**
-1. **Magic numbers** — Hardcoded values that should be named constants (e.g., default palette values duplicated across files)
-2. **Code duplication** — Logic, helpers, or setup/teardown blocks repeated across functions or test files
-3. **Inconsistent patterns** — Mixed styles within the same PR (e.g., regex vs literal assertions, different timeout strategies)
-4. **Missing test coverage** — Smoke-only tests without assertions, untested code paths, interactive programs only testing exit paths
-5. **Potential improvements** — Opportunities for refactoring, better abstractions, or clearer naming
+Only produce Minor items when the fix would require work **outside the PR's scope**:
+- A cross-cutting refactor touching 5+ files (not feasible as a PR amendment)
+- A new feature or capability not related to the PR's purpose
+- A design/product decision that needs discussion before proceeding
+- Something that depends on an unmerged PR or future milestone
 
-**Output:** A list of non-blocking observations. Each observation MUST become a GitHub issue in Phase 5.
+**Do NOT produce Minor items for things that could be fixed with a small amendment to the current PR.** Those should be blocking findings in Step 3a.
 
-**Rule:** If the scan produces zero observations for a non-trivial PR (>20 lines changed or >2 files), re-examine the diff — you likely missed something.
+**Output:** A list of scope-gated observations (may be empty — most well-scoped PRs will have zero Minor items).
 
 ## Phase 4 — Post Reviews & Create Follow-up Issues
 
@@ -175,7 +183,7 @@ gh pr review <number> --comment --body "## Review: APPROVE
 - [Finding 2]
 
 ### Minor
-[Every non-blocking observation from Step 3b MUST be listed here. Each item will become a GitHub issue in Step 4b.]
+[Only scope-gated items from Step 3b — fixes outside the PR's scope. Omit this section entirely if none.]
 - [Observation 1]
 - [Observation 2]
 
@@ -210,34 +218,23 @@ gh pr review <number> --comment --body "## Review: NEEDS DISCUSSION
 [Explanation of why discussion is needed]
 
 ### Minor
-[Every non-blocking observation from Step 3b MUST be listed here. Each item will become a GitHub issue in Step 4b.]
+[Only scope-gated items from Step 3b — fixes outside the PR's scope. Omit this section entirely if none.]
 - [Observation 1]
 - [Observation 2]
 
 🤖 Reviewed by Claude Code ([Specialist] specialist)"
 ```
 
-### Step 4b — Create Follow-up Issues (MANDATORY, inline with Step 4a)
+### Step 4b — Create Follow-up Issues (scope-gated only)
 
-**STOP: Do NOT proceed to Phase 6 until this step is complete for every PR reviewed in Step 4a.**
+For each review just posted, create a GitHub issue for each Minor observation listed in the review body. Since Minor items are now scope-gated (Step 3b), every Minor item represents work that is genuinely outside the current PR's scope.
 
-For each review just posted, create a GitHub issue for **every** Minor observation listed in the review body.
+**Create an issue for every Minor item** — the scope gate in Step 3b already filtered out noise.
 
-**IMPORTANT: Create a GitHub issue for EVERY non-blocking suggestion found during review, regardless of size or perceived importance.** The triage process decides what to work on, not the reviewer. Every suggestion becomes a tracked issue.
-
-**The 20 open issue cap does NOT apply here** — review findings are real observations from actual code and must not be silently dropped. Do not check the issue cap before creating follow-up issues from reviews.
-
-**Always create issues for:**
-- Non-blocking improvement suggestions ("Consider...", "Optional...")
-- Code style/formatting issues (missing spaces, inconsistent patterns)
-- Test pattern improvements (`null as never`, better type safety)
-- Missing coverage in samples/docs (missing operators, incomplete examples)
-- Any observation noted as "minor" or "non-blocking" in the review body
-
-**Only skip when:**
+**Skip when:**
 - An existing GitHub issue already covers the exact same suggestion
 
-For each suggestion, create an issue immediately after posting the review:
+For each qualifying suggestion, create an issue immediately after posting the review:
 
 ```bash
 gh issue create --title "<type>: <concise description>" \
@@ -276,7 +273,7 @@ For each PR reviewed in Phase 4 with Minor items in its review body:
 
 **If any PR has N > M:** Go back and create the missing issues now. Do NOT proceed until all Minor items have corresponding issues.
 
-**If a PR had no Minor items (N=0):** This is acceptable only for trivial PRs (<20 lines, 1-2 files). For non-trivial PRs with zero Minor items, flag this in the run log as a potential missed scan.
+**If a PR had no Minor items (N=0):** This is a good outcome — the PR was clean enough that no follow-up issues were needed. No further action required.
 
 ## Phase 6 — Handle Wrong Requirements
 
@@ -352,8 +349,8 @@ Follow `.claude/commands/_shared/self-improvement-protocol.md`.
 
 Focus on:
 - Were verdicts accurate? Any false positives/negatives?
-- **Issue creation completeness: Did every Minor item in every review get a corresponding GitHub issue?** (target: 100% — any gap here is a process failure)
-- Were follow-up issues well-scoped and actionable?
+- **Issue quality over quantity: Were filed issues genuinely worth tracking as separate work, or should they have been blocking findings or omitted entirely?** (target: high-signal, low-noise issues)
+- Were actionable findings addressed as blocking changes instead of being deferred to follow-up issues?
 - Did the specialist mapping match the actual PR scope?
 - Were any real issues missed during review?
 - When audit was run, what percentage of findings were already tracked? (target: >90%)
