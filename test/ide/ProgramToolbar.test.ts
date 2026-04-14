@@ -5,12 +5,12 @@ import { ref } from 'vue'
 
 import ProgramToolbar from '@/features/ide/components/ProgramToolbar.vue'
 
+import { createI18nMock } from '../helpers/createI18nMock'
+
 const mockNewProgram = vi.fn()
 const mockOpen = vi.fn()
 const mockSave = vi.fn()
 const isDirtyRef = ref(true)
-
-import { createI18nMock } from '../helpers/createI18nMock'
 
 const mockT = createI18nMock({
   'ide.toolbar.new': 'New',
