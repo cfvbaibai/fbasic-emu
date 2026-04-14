@@ -34,6 +34,11 @@ describe('createI18nMock', () => {
     )
   })
 
+  it('converts numeric params to string', () => {
+    const t = createI18nMock({ count: 'Count: {n}' })
+    expect(t('count', { n: 42 })).toEqual('Count: 42')
+  })
+
   it('replaces repeated placeholder among multiple distinct ones', () => {
     const t = createI18nMock({
       msg: '{a} and {b} and {a}',
