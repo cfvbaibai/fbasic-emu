@@ -146,7 +146,11 @@ This step is **always executed**, even if the verdict is APPROVE. It is a separa
 
 **Rule:** If the scan produces zero observations for a non-trivial PR (>20 lines changed or >2 files), re-examine the diff — you likely missed something.
 
-## Phase 4 — Post Reviews
+## Phase 4 — Post Reviews & Create Follow-up Issues
+
+**IMPORTANT: These two steps are coupled.** After posting each review, immediately create issues for ALL Minor items in that review before moving to the next PR. Do NOT batch reviews first and create issues later — issues must be created inline, one PR at a time.
+
+### Step 4a — Post Review
 
 **APPROVE:**
 ```bash
@@ -161,7 +165,7 @@ gh pr review <number> --comment --body "## Review: APPROVE
 - [Finding 2]
 
 ### Minor
-[Every non-blocking observation from Step 3b MUST be listed here. Each item will become a GitHub issue in Phase 5.]
+[Every non-blocking observation from Step 3b MUST be listed here. Each item will become a GitHub issue in Step 4b.]
 - [Observation 1]
 - [Observation 2]
 
@@ -196,16 +200,18 @@ gh pr review <number> --comment --body "## Review: NEEDS DISCUSSION
 [Explanation of why discussion is needed]
 
 ### Minor
-[Every non-blocking observation from Step 3b MUST be listed here. Each item will become a GitHub issue in Phase 5.]
+[Every non-blocking observation from Step 3b MUST be listed here. Each item will become a GitHub issue in Step 4b.]
 - [Observation 1]
 - [Observation 2]
 
 🤖 Reviewed by Claude Code ([Specialist] specialist)"
 ```
 
-## Phase 5 — Create Follow-up Issues
+### Step 4b — Create Follow-up Issues (MANDATORY, inline with Step 4a)
 
-**This phase is fed by Step 3b (Non-Blocking Analysis).** Re-read each posted review's `### Minor` section and create a GitHub issue for every item listed.
+**STOP: Do NOT proceed to Phase 6 until this step is complete for every PR reviewed in Step 4a.**
+
+For each review just posted, create a GitHub issue for **every** Minor observation listed in the review body.
 
 **IMPORTANT: Create a GitHub issue for EVERY non-blocking suggestion found during review, regardless of size or perceived importance.** The triage process decides what to work on, not the reviewer. Every suggestion becomes a tracked issue.
 
@@ -235,6 +241,33 @@ From PR #<number> review: https://github.com/cfvbaibai/fbasic-ide/pull/<number>"
 
 Issue title prefixes: `fix:` for bugs/correctness, `style:` for formatting, `refactor:` for patterns, `docs:` for documentation/samples.
 
+### Step 4c — Verify Issue Count (MANDATORY)
+
+After creating issues for a review, verify the count matches:
+
+1. Count the Minor items listed in the review body → `N`
+2. Count the issues just created for that PR → `M`
+3. Assert `N == M`
+
+**If N > M:** Issues are missing. Review each Minor item and create the missing issues before proceeding.
+**If N < M:** Duplicate issues were created. This should not happen — if it does, close the duplicates.
+
+Record the count in the run log: "PR #X: N Minor items → M issues created"
+
+## Phase 5 — Verify Issue Creation
+
+**Before saving results, verify Phase 4b completed for every PR reviewed.**
+
+For each PR reviewed in Phase 4 with Minor items in its review body:
+
+1. Count Minor items in the review body → `N`
+2. Count issues created for that PR (from Step 4c log) → `M`
+3. Assert `N == M`
+
+**If any PR has N > M:** Go back and create the missing issues now. Do NOT proceed until all Minor items have corresponding issues.
+
+**If a PR had no Minor items (N=0):** This is acceptable only for trivial PRs (<20 lines, 1-2 files). For non-trivial PRs with zero Minor items, flag this in the run log as a potential missed scan.
+
 ## Phase 6 — Handle Wrong Requirements
 
 If a PR is based on an incorrect requirement:
@@ -248,10 +281,12 @@ gh issue close <issue-number> --comment "[Explanation]"
 
 ## Phase 7 — Save Review Results
 
+**Before saving, confirm Phase 5 verification passed for all PRs.** Do not save results if any PR has missing issues.
+
 After posting each review, update memory files:
 
-- `~/.claude/projects/C--Users-Tony-code-GitHub-fbasic-ide/memory/MEMORY.md` — add review entry to PR review history section
-- `~/.claude/projects/C--Users-Tony-code-GitHub-fbasic-ide/memory/pr-reviews.md` — detailed per-PR review notes
+- `~/.claude/projects/C--Users-Tony-code-GitHub-fbasic-ide/memory/MEMORY.md` — add review entry to PR review history section. Include the issue count: "Minor: N → M issues created"
+- `~/.claude/projects/C--Users-Tony-code-GitHub-fbasic-ide/memory/pr-reviews.md` — detailed per-PR review notes. Include a `Follow-up Issues` section listing all issue numbers created from the review
 
 ## Phase 8 — Report
 
@@ -307,6 +342,7 @@ Follow `.claude/commands/_shared/self-improvement-protocol.md`.
 
 Focus on:
 - Were verdicts accurate? Any false positives/negatives?
+- **Issue creation completeness: Did every Minor item in every review get a corresponding GitHub issue?** (target: 100% — any gap here is a process failure)
 - Were follow-up issues well-scoped and actionable?
 - Did the specialist mapping match the actual PR scope?
 - Were any real issues missed during review?
