@@ -38,6 +38,9 @@ const HTML_MIME_TYPE = 'text/html;charset=utf-8'
  * @returns HTML string with the program source embedded
  */
 function buildMinimalHtml(source: string, options: HtmlExportOptions): string {
+  // TODO(#772): Use options.theme to embed the correct theme stylesheet
+  // TODO(#773): Use options.includeSound to conditionally embed sound data
+  // TODO(#773): Use options.includeSprites to conditionally embed sprite data
   const escapedSource = source
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
