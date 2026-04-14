@@ -5,6 +5,7 @@
  */
 
 // Device implementations
+export * from './MainThreadDeviceAdapter'
 export * from './TestDeviceAdapter'
 export * from './WebWorkerDeviceAdapter'
 
