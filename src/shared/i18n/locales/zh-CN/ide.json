@@ -546,6 +546,20 @@
     "tooLarge": "此程序过大，无法通过链接分享。",
     "loadFailed": "加载分享程序失败"
   },
+  "exportHtml": {
+    "title": "导出为 HTML",
+    "description": "将程序导出为可在任意浏览器中运行的独立 HTML 文件。",
+    "titleLabel": "页面标题",
+    "themeLabel": "主题",
+    "themeDark": "深色",
+    "themeLight": "浅色",
+    "includeSound": "包含声音",
+    "includeSprites": "包含精灵",
+    "exportButton": "导出",
+    "cancelButton": "取消",
+    "exporting": "正在导出...",
+    "exportFailed": "导出 HTML 文件失败。"
+  },
   "tutorial": {
     "title": "教程",
     "defaultTitle": "F-BASIC 教程",

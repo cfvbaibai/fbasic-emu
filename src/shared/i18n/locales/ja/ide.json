@@ -546,6 +546,20 @@
     "tooLarge": "このプログラムはURLで共有するには大きすぎます。",
     "loadFailed": "共有プログラムの読み込みに失敗しました"
   },
+  "exportHtml": {
+    "title": "HTMLとしてエクスポート",
+    "description": "プログラムをスタンドアロンHTMLファイルとしてエクスポートします。",
+    "titleLabel": "ページタイトル",
+    "themeLabel": "テーマ",
+    "themeDark": "ダーク",
+    "themeLight": "ライト",
+    "includeSound": "サウンドを含む",
+    "includeSprites": "スプライトを含む",
+    "exportButton": "エクスポート",
+    "cancelButton": "キャンセル",
+    "exporting": "エクスポート中...",
+    "exportFailed": "HTMLファイルのエクスポートに失敗しました。"
+  },
   "tutorial": {
     "title": "チュートリアル",
     "defaultTitle": "F-BASICチュートリアル",
