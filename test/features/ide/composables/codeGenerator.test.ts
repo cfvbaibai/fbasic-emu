@@ -262,6 +262,18 @@ describe('generatePlayCode', () => {
 
       expect(lines[0]).toContain(`C${expectedLength}"`)
     })
+
+    it('falls back to length 5 for unrecognized duration', () => {
+      const notes: NoteCellKey[] = [createNoteCellKey(23, 0)]
+      const state = makeState({
+        duration: 'invalid',
+        channelNotes: [notes, [], []],
+      })
+
+      const lines = generatePlayCode(state)
+
+      expect(lines[0]).toContain('C5"')
+    })
   })
 
   // -------------------------------------------------------------------------
@@ -316,6 +328,18 @@ describe('generatePlayCode', () => {
 
       expect(lines[0]).toContain('M1V15')
     })
+
+    it('falls back to M0V15 for unrecognized envelope', () => {
+      const notes: NoteCellKey[] = [createNoteCellKey(23, 0)]
+      const state = makeState({
+        envelope: 'invalid',
+        channelNotes: [notes, [], []],
+      })
+
+      const lines = generatePlayCode(state)
+
+      expect(lines[0]).toContain('M0V15')
+    })
   })
 
   // -------------------------------------------------------------------------
@@ -357,6 +381,25 @@ describe('generatePlayCode', () => {
       const lines = generatePlayCode(state)
 
       expect(lines[0]).toContain('T1')
+    })
+
+    it.each([
+      [0, 'T8'],
+      [-100, 'T8'],
+      [39, 'T8'],
+      [241, 'T1'],
+      [300, 'T1'],
+      [999, 'T1'],
+    ] as const)('clamps out-of-range tempo %i to %s', (tempo, expectedT) => {
+      const notes: NoteCellKey[] = [createNoteCellKey(23, 0)]
+      const state = makeState({
+        tempo,
+        channelNotes: [notes, [], []],
+      })
+
+      const lines = generatePlayCode(state)
+
+      expect(lines[0]).toContain(expectedT)
     })
   })
 })
