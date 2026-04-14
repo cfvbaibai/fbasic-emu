@@ -68,10 +68,7 @@ describe('IdeBottomArea tab structure', () => {
     expect(tabPanes.length).toBe(4)
 
     const names = tabPanes.map(p => p.attributes('data-name'))
-    expect(names).toContain('palettes')
-    expect(names).toContain('sprite')
-    expect(names).toContain('move')
-    expect(names).toContain('buffer')
+    expect(names).toEqual(['palettes', 'sprite', 'move', 'buffer'])
     wrapper.unmount()
   })
 
