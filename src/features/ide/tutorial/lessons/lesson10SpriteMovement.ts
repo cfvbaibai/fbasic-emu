@@ -71,7 +71,7 @@ export const lesson10SpriteMovement: Lesson = {
     '## Speed Control',
 
     'The `speed` value controls how fast',
-    'the sprite moves (1 is slowest, 16 is fastest):',
+    'the sprite moves (0 is slowest, 255 is fastest):',
     '```basic',
     '10 SPRITE ON',
     '20 DEF SPRITE 0,(1,1,0,0,0)=CHR$(225)',
