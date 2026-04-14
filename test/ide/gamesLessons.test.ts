@@ -175,9 +175,10 @@ describe('gamesLessons', () => {
     expect(lesson.content).toMatch(/tempo/i)
   })
 
-  it('Background Music lesson explains BGPLAY', () => {
+  it('Background Music lesson explains BGPLAY and BGMSTOP', () => {
     const lesson = gamesLessons[6]!
     expect(lesson.content).toMatch(/\bBGPLAY\b/)
+    expect(lesson.content).toMatch(/\bBGMSTOP\b/)
     expect(lesson.content).toMatch(/music/i)
   })
 
