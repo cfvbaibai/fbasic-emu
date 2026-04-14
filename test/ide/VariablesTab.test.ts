@@ -5,15 +5,14 @@ import { defineComponent } from 'vue'
 
 import VariablesTab from '@/features/ide/components/VariablesTab.vue'
 
+import { createI18nMock } from '../helpers/createI18nMock'
+
+const mockT = createI18nMock({
+  'ide.output.variables': 'Variables',
+})
+
 vi.mock('vue-i18n', () => ({
-  useI18n: () => ({
-    t: (key: string) => {
-      const messages: Record<string, string> = {
-        'ide.output.variables': 'Variables',
-      }
-      return messages[key] ?? key
-    },
-  }),
+  useI18n: () => ({ t: mockT }),
 }))
 
 const gameTabPaneStub = defineComponent({

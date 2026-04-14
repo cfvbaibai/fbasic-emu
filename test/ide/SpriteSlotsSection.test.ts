@@ -5,26 +5,25 @@ import { describe, expect, it, vi } from 'vitest'
 import type { SpriteState } from '@/core/sprite/types'
 import SpriteSlotsSection from '@/features/ide/components/SpriteSlotsSection.vue'
 
+import { createI18nMock } from '../helpers/createI18nMock'
+
+const mockT = createI18nMock({
+  'ide.bufferInspector.spriteSlotsTitle': 'Sprite Slots',
+  'ide.bufferInspector.spriteSlotsDisabled': 'SPRITE OFF',
+  'ide.bufferInspector.spriteSlotsOn': 'ON',
+  'ide.bufferInspector.spriteSlotsOff': 'OFF',
+  'ide.bufferInspector.spriteSlotsDefined': 'Yes',
+  'ide.bufferInspector.spriteSlotsNone': '-',
+  'ide.bufferInspector.spriteSlotsColNumber': '#',
+  'ide.bufferInspector.spriteSlotsColX': 'X',
+  'ide.bufferInspector.spriteSlotsColY': 'Y',
+  'ide.bufferInspector.spriteSlotsColVisible': 'Visible',
+  'ide.bufferInspector.spriteSlotsColPriority': 'Priority',
+  'ide.bufferInspector.spriteSlotsColDefinition': 'Definition',
+})
+
 vi.mock('vue-i18n', () => ({
-  useI18n: () => ({
-    t: (key: string) => {
-      const messages: Record<string, string> = {
-        'ide.bufferInspector.spriteSlotsTitle': 'Sprite Slots',
-        'ide.bufferInspector.spriteSlotsDisabled': 'SPRITE OFF',
-        'ide.bufferInspector.spriteSlotsOn': 'ON',
-        'ide.bufferInspector.spriteSlotsOff': 'OFF',
-        'ide.bufferInspector.spriteSlotsDefined': 'Yes',
-        'ide.bufferInspector.spriteSlotsNone': '-',
-        'ide.bufferInspector.spriteSlotsColNumber': '#',
-        'ide.bufferInspector.spriteSlotsColX': 'X',
-        'ide.bufferInspector.spriteSlotsColY': 'Y',
-        'ide.bufferInspector.spriteSlotsColVisible': 'Visible',
-        'ide.bufferInspector.spriteSlotsColPriority': 'Priority',
-        'ide.bufferInspector.spriteSlotsColDefinition': 'Definition',
-      }
-      return messages[key] ?? key
-    },
-  }),
+  useI18n: () => ({ t: mockT }),
 }))
 
 /** Factory for a single SpriteState */

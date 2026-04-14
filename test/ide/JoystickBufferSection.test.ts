@@ -10,20 +10,19 @@ import {
 } from '@/core/devices/sharedJoystickBuffer'
 import JoystickBufferSection from '@/features/ide/components/JoystickBufferSection.vue'
 
+import { createI18nMock } from '../helpers/createI18nMock'
+
+const mockT = createI18nMock({
+  'ide.bufferInspector.joystickTitle': 'Joystick Buffer',
+  'ide.bufferInspector.joystickUnavailable': 'No joystick buffer',
+  'ide.bufferInspector.joystick0': 'Joy 0',
+  'ide.bufferInspector.joystick1': 'Joy 1',
+  'ide.bufferInspector.joystickStick': 'STICK',
+  'ide.bufferInspector.joystickStrig': 'STRIG',
+})
+
 vi.mock('vue-i18n', () => ({
-  useI18n: () => ({
-    t: (key: string) => {
-      const messages: Record<string, string> = {
-        'ide.bufferInspector.joystickTitle': 'Joystick Buffer',
-        'ide.bufferInspector.joystickUnavailable': 'No joystick buffer',
-        'ide.bufferInspector.joystick0': 'Joy 0',
-        'ide.bufferInspector.joystick1': 'Joy 1',
-        'ide.bufferInspector.joystickStick': 'STICK',
-        'ide.bufferInspector.joystickStrig': 'STRIG',
-      }
-      return messages[key] ?? key
-    },
-  }),
+  useI18n: () => ({ t: mockT }),
 }))
 
 function mountWithBuffer(bufferSize: number) {

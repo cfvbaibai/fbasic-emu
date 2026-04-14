@@ -7,12 +7,15 @@ import { SHARED_DISPLAY_BUFFER_BYTES } from '@/core/animation/sharedDisplayBuffe
 import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
 import IdeBottomArea from '@/features/ide/components/IdeBottomArea.vue'
 
+import { createI18nMock } from '../helpers/createI18nMock'
 import { createTestKeyboardBuffer } from './helpers/createTestKeyboardBuffer'
 
+const mockT = createI18nMock({
+  'ide.bufferInspector.title': 'Buffer Inspector',
+})
+
 vi.mock('vue-i18n', () => ({
-  useI18n: () => ({
-    t: (key: string) => key,
-  }),
+  useI18n: () => ({ t: mockT }),
 }))
 
 /**

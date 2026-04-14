@@ -7,16 +7,14 @@ import LessonContent from '@/features/ide/components/LessonContent.vue'
 // ---------------------------------------------------------------------------
 // Mocks
 // ---------------------------------------------------------------------------
+import { createI18nMock } from '../helpers/createI18nMock'
+
+const mockT = createI18nMock({
+  'ide.tutorial.tryIt': 'Try It',
+})
 
 vi.mock('vue-i18n', () => ({
-  useI18n: () => ({
-    t: (key: string) => {
-      const messages: Record<string, string> = {
-        'ide.tutorial.tryIt': 'Try It',
-      }
-      return messages[key] ?? key
-    },
-  }),
+  useI18n: () => ({ t: mockT }),
 }))
 
 // ---------------------------------------------------------------------------

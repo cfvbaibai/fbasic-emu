@@ -10,31 +10,32 @@ const mockOpen = vi.fn()
 const mockSave = vi.fn()
 const isDirtyRef = ref(true)
 
+import { createI18nMock } from '../helpers/createI18nMock'
+
+const mockT = createI18nMock({
+  'ide.toolbar.new': 'New',
+  'ide.toolbar.import': 'Import',
+  'ide.toolbar.export': 'Export',
+  'ide.toolbar.discardConfirm': 'Discard unsaved changes?',
+  'ide.toolbar.programNamePlaceholder': 'Program name',
+  'ide.toolbar.unsavedChanges': 'Unsaved changes',
+  'ide.toolbar.openFailed': 'Failed to open file',
+  'ide.toolbar.saveFailed': 'Failed to save file',
+  'ide.share.title': 'Share',
+  'ide.share.description': 'Copy this URL to share your program.',
+  'ide.share.copy': 'Copy URL',
+  'ide.share.copied': 'Copied!',
+  'ide.share.close': 'Close',
+  'ide.share.encoding': 'Generating share URL...',
+  'ide.share.encodeFailed': 'Failed to generate share URL.',
+  'ide.share.tooLarge': 'This program is too large to share.',
+  'common.confirmDialog.confirm': 'OK',
+  'common.confirmDialog.cancel': 'Cancel',
+})
+
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
-    t: (key: string) => {
-      const messages: Record<string, string> = {
-        'ide.toolbar.new': 'New',
-        'ide.toolbar.import': 'Import',
-        'ide.toolbar.export': 'Export',
-        'ide.toolbar.discardConfirm': 'Discard unsaved changes?',
-        'ide.toolbar.programNamePlaceholder': 'Program name',
-        'ide.toolbar.unsavedChanges': 'Unsaved changes',
-        'ide.toolbar.openFailed': 'Failed to open file',
-        'ide.toolbar.saveFailed': 'Failed to save file',
-        'ide.share.title': 'Share',
-        'ide.share.description': 'Copy this URL to share your program.',
-        'ide.share.copy': 'Copy URL',
-        'ide.share.copied': 'Copied!',
-        'ide.share.close': 'Close',
-        'ide.share.encoding': 'Generating share URL...',
-        'ide.share.encodeFailed': 'Failed to generate share URL.',
-        'ide.share.tooLarge': 'This program is too large to share.',
-        'common.confirmDialog.confirm': 'OK',
-        'common.confirmDialog.cancel': 'Cancel',
-      }
-      return messages[key] ?? key
-    },
+    t: mockT,
     locale: ref('en'),
   }),
 }))

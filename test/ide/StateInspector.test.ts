@@ -7,26 +7,25 @@ import type { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplay
 import IdeBottomArea from '@/features/ide/components/IdeBottomArea.vue'
 import enIde from '@/shared/i18n/locales/en/ide.json'
 
+import { createI18nMock } from '../helpers/createI18nMock'
 import { createTestKeyboardBuffer } from './helpers/createTestKeyboardBuffer'
 
+const mockT = createI18nMock({
+  'ide.stateInspector.title': 'State Inspector',
+  'ide.stateInspector.tabPalette': 'PALETTE',
+  'ide.stateInspector.tabSprite': 'SPRITE',
+  'ide.stateInspector.tabMove': 'MOVE',
+  'ide.stateInspector.tabBg': 'BG',
+  'ide.stateInspector.backdrop': 'Backdrop',
+  'ide.stateInspector.cgen': 'CGEN',
+  'ide.stateInspector.spriteEnabled': 'SPRITE ON',
+  'ide.stateInspector.on': 'ON',
+  'ide.stateInspector.off': 'OFF',
+  'ide.stateInspector.empty': '(none)',
+})
+
 vi.mock('vue-i18n', () => ({
-  useI18n: () => ({
-    t: (key: string) => {
-      const messages: Record<string, string> = {
-        'ide.stateInspector.tabPalette': 'PALETTE',
-        'ide.stateInspector.tabSprite': 'SPRITE',
-        'ide.stateInspector.tabMove': 'MOVE',
-        'ide.stateInspector.tabBg': 'BG',
-        'ide.stateInspector.backdrop': 'Backdrop',
-        'ide.stateInspector.cgen': 'CGEN',
-        'ide.stateInspector.spriteEnabled': 'SPRITE ON',
-        'ide.stateInspector.on': 'ON',
-        'ide.stateInspector.off': 'OFF',
-        'ide.stateInspector.empty': '(none)',
-      }
-      return messages[key] ?? key
-    },
-  }),
+  useI18n: () => ({ t: mockT }),
 }))
 
 type InspectorAccessor = Pick<

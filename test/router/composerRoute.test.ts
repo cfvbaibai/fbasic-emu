@@ -3,15 +3,16 @@ import { describe, expect, it, vi } from 'vitest'
 import { ref } from 'vue'
 import type { RouteRecordNormalized } from 'vue-router'
 
+import { createI18nMock } from '../helpers/createI18nMock'
+
+const mockT = createI18nMock({
+  'navigation.appTitle': 'F-BASIC IDE',
+})
+
 // Stub vue-i18n for router (needed by i18n module)
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
-    t: (key: string) => {
-      const messages: Record<string, string> = {
-        'navigation.appTitle': 'F-BASIC IDE',
-      }
-      return messages[key] ?? key
-    },
+    t: mockT,
     locale: ref('en'),
   }),
   createI18n: vi.fn(() => ({})),

@@ -4,6 +4,12 @@ import { describe, expect, it, vi } from 'vitest'
 import { ref } from 'vue'
 import { type Component,defineComponent } from 'vue'
 
+import { createI18nMock } from '../../helpers/createI18nMock'
+
+const mockT = createI18nMock({
+  'musicComposer.title': 'Music Composer',
+})
+
 // Stub GameLayout to avoid pulling in GameNavigation and its heavy deps
 const gameLayoutStub = defineComponent({
   name: 'GameLayout',
@@ -14,15 +20,9 @@ vi.mock('@/shared/components/ui', () => ({
   GameLayout: gameLayoutStub,
 }))
 
-// Stub vue-i18n with inline translations
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
-    t: (key: string) => {
-      const messages: Record<string, string> = {
-        'musicComposer.title': 'Music Composer',
-      }
-      return messages[key] ?? key
-    },
+    t: mockT,
     locale: ref('en'),
   }),
 }))

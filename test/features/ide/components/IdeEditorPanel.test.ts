@@ -6,19 +6,18 @@ import { defineComponent } from 'vue'
 
 import IdeEditorPanel from '@/features/ide/components/IdeEditorPanel.vue'
 
+import { createI18nMock } from '../../../helpers/createI18nMock'
+
+const mockT = createI18nMock({
+  'ide.codeEditor.title': 'Code Editor',
+  'ide.codeEditor.loading': 'Loading editor...',
+  'ide.samples.load': 'Sample',
+  'ide.spriteViewer.openTitle': 'Open Sprite Viewer',
+  'ide.tutorial.title': 'Tutorial',
+})
+
 vi.mock('vue-i18n', () => ({
-  useI18n: () => ({
-    t: (key: string) => {
-      const messages: Record<string, string> = {
-        'ide.codeEditor.title': 'Code Editor',
-        'ide.codeEditor.loading': 'Loading editor...',
-        'ide.samples.load': 'Sample',
-        'ide.spriteViewer.openTitle': 'Open Sprite Viewer',
-        'ide.tutorial.title': 'Tutorial',
-      }
-      return messages[key] ?? key
-    },
-  }),
+  useI18n: () => ({ t: mockT }),
 }))
 
 const gameBlockStub = defineComponent({

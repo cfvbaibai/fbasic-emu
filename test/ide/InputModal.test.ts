@@ -5,18 +5,17 @@ import { defineComponent, nextTick } from 'vue'
 
 import InputModal from '@/features/ide/components/InputModal.vue'
 
+import { createI18nMock } from '../helpers/createI18nMock'
+
+const mockT = createI18nMock({
+  'ide.inputModal.inputPlaceholder': 'Separate multiple values with commas',
+  'ide.inputModal.linputPlaceholder': 'Enter text (up to 31 chars)',
+  'ide.input.submit': 'OK',
+  'ide.input.cancel': 'Cancel',
+})
+
 vi.mock('vue-i18n', () => ({
-  useI18n: () => ({
-    t: (key: string) => {
-      const messages: Record<string, string> = {
-        'ide.inputModal.inputPlaceholder': 'Separate multiple values with commas',
-        'ide.inputModal.linputPlaceholder': 'Enter text (up to 31 chars)',
-        'ide.input.submit': 'OK',
-        'ide.input.cancel': 'Cancel',
-      }
-      return messages[key] ?? key
-    },
-  }),
+  useI18n: () => ({ t: mockT }),
 }))
 
 const gameInputStub = defineComponent({
