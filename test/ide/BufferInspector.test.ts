@@ -25,6 +25,33 @@ const MOCK_FULL_ACCESSOR: SharedDisplayBufferAccessor = new SharedDisplayBufferA
   new SharedArrayBuffer(SHARED_DISPLAY_BUFFER_BYTES),
 )
 
+// --- Stub components with explicit props for prop-binding verification ---
+
+const displayBufferSectionStub = defineComponent({
+  props: ['sharedDisplayBufferAccessor'],
+  template: '<div class="display-buffer-section" />',
+})
+
+const joystickBufferSectionStub = defineComponent({
+  props: ['sharedJoystickBuffer'],
+  template: '<div class="joystick-buffer-section" />',
+})
+
+const keyboardBufferSectionStub = defineComponent({
+  props: ['keyboardView'],
+  template: '<div class="keyboard-buffer-section" />',
+})
+
+const spriteSlotsSectionStub = defineComponent({
+  props: ['spriteStates', 'spriteEnabled'],
+  template: '<div class="sprite-slots-section" />',
+})
+
+const animationSyncSectionStub = defineComponent({
+  props: ['syncCommand', 'ackStatus'],
+  template: '<div class="animation-sync-section" />',
+})
+
 describe('IdeBottomArea tab structure', () => {
   it('renders four flat tab panes: palettes, sprite, move, buffer', async () => {
     const keyboardView = createTestKeyboardBuffer()
@@ -145,21 +172,11 @@ describe('IdeBottomArea tab structure', () => {
           GameTabPane: defineComponent({ template: '<div><slot /></div>' }),
           ActivePaletteDisplay: true,
           MovementCard: true,
-          DisplayBufferSection: defineComponent({
-            template: '<div class="display-buffer-section" />',
-          }),
-          JoystickBufferSection: defineComponent({
-            template: '<div class="joystick-buffer-section" />',
-          }),
-          KeyboardBufferSection: defineComponent({
-            template: '<div class="keyboard-buffer-section" />',
-          }),
-          SpriteSlotsSection: defineComponent({
-            template: '<div class="sprite-slots-section" />',
-          }),
-          AnimationSyncSection: defineComponent({
-            template: '<div class="animation-sync-section" />',
-          }),
+          DisplayBufferSection: displayBufferSectionStub,
+          JoystickBufferSection: joystickBufferSectionStub,
+          KeyboardBufferSection: keyboardBufferSectionStub,
+          SpriteSlotsSection: spriteSlotsSectionStub,
+          AnimationSyncSection: animationSyncSectionStub,
         },
       },
     })
@@ -171,6 +188,112 @@ describe('IdeBottomArea tab structure', () => {
     expect(wrapper.find('.sprite-slots-section').exists()).toBe(true)
     expect(wrapper.find('.animation-sync-section').exists()).toBe(true)
 
+    wrapper.unmount()
+  })
+})
+
+describe('IdeBottomArea buffer tab prop bindings', () => {
+  function mountWithBufferStubs(
+    extraProps: Record<string, unknown> = {},
+  ) {
+    const keyboardView = createTestKeyboardBuffer()
+    const wrapper = mount(IdeBottomArea, {
+      props: {
+        screenBuffer: [],
+        cursorX: 0,
+        cursorY: 0,
+        bgPalette: 1,
+        spritePalette: 1,
+        backdropColor: 0,
+        cgenMode: 2,
+        spriteStates: [],
+        spriteEnabled: false,
+        sharedDisplayBufferAccessor: MOCK_FULL_ACCESSOR,
+        keyboardView,
+        ...extraProps,
+      },
+      global: {
+        stubs: {
+          JoystickControl: true,
+          GameTabs: defineComponent({
+            props: ['modelValue', 'type'],
+            template: '<div><slot /></div>',
+          }),
+          GameTabPane: defineComponent({ template: '<div><slot /></div>' }),
+          ActivePaletteDisplay: true,
+          MovementCard: true,
+          DisplayBufferSection: displayBufferSectionStub,
+          JoystickBufferSection: joystickBufferSectionStub,
+          KeyboardBufferSection: keyboardBufferSectionStub,
+          SpriteSlotsSection: spriteSlotsSectionStub,
+          AnimationSyncSection: animationSyncSectionStub,
+        },
+      },
+    })
+    return { wrapper, keyboardView }
+  }
+
+  it('passes sharedDisplayBufferAccessor to DisplayBufferSection', () => {
+    const { wrapper } = mountWithBufferStubs()
+    const section = wrapper.findComponent(displayBufferSectionStub)
+
+    expect(section.props('sharedDisplayBufferAccessor')).toEqual(MOCK_FULL_ACCESSOR)
+    wrapper.unmount()
+  })
+
+  it('passes sharedJoystickBuffer to JoystickBufferSection', () => {
+    const joystickBuffer = new SharedArrayBuffer(16)
+    const { wrapper } = mountWithBufferStubs({ sharedJoystickBuffer: joystickBuffer })
+    const section = wrapper.findComponent(joystickBufferSectionStub)
+
+    expect(section.props('sharedJoystickBuffer')).toBe(joystickBuffer)
+    wrapper.unmount()
+  })
+
+  it('passes undefined sharedJoystickBuffer when not provided', () => {
+    const { wrapper } = mountWithBufferStubs()
+    const section = wrapper.findComponent(joystickBufferSectionStub)
+
+    expect(section.props('sharedJoystickBuffer')).toBeUndefined()
+    wrapper.unmount()
+  })
+
+  it('passes keyboardView to KeyboardBufferSection', () => {
+    const { wrapper, keyboardView } = mountWithBufferStubs()
+    const section = wrapper.findComponent(keyboardBufferSectionStub)
+
+    // Verify the keyboardView object was passed (same underlying buffer)
+    const received = section.props('keyboardView')
+    expect(received.buffer).toBe(keyboardView.buffer)
+    wrapper.unmount()
+  })
+
+  it('passes spriteStates and spriteEnabled to SpriteSlotsSection', () => {
+    const spriteStates = [
+      { spriteNumber: 0, x: 10, y: 20, visible: true, priority: 1 },
+    ]
+    const { wrapper } = mountWithBufferStubs({
+      spriteStates,
+      spriteEnabled: true,
+    })
+    const section = wrapper.findComponent(spriteSlotsSectionStub)
+
+    expect(section.props('spriteStates')).toEqual(spriteStates)
+    expect(section.props('spriteEnabled')).toBe(true)
+    wrapper.unmount()
+  })
+
+  it('passes syncCommand and ackStatus to AnimationSyncSection', () => {
+    const { wrapper } = mountWithBufferStubs()
+    const section = wrapper.findComponent(animationSyncSectionStub)
+
+    // syncCommand and ackStatus are computed from sharedDisplayBufferAccessor
+    const syncCommand = section.props('syncCommand')
+    const ackStatus = section.props('ackStatus')
+
+    // Default accessor state: no sync command, ack = 0
+    expect(syncCommand).toBeNull()
+    expect(ackStatus).toBe(0)
     wrapper.unmount()
   })
 })
