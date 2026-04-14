@@ -11,32 +11,20 @@
  * by the build step (#635) or a dedicated wiring step.
  */
 
-import { SCREEN_DIMENSIONS } from '@/core/constants'
+import { EXPORT_THEME_COLORS, SCREEN_DIMENSIONS } from '@/core/constants'
 import type { HtmlExportOptions } from '@/features/ide/composables/useHtmlExporter'
 
 /** Canvas width and height matching F-BASIC sprite screen dimensions. */
 const CANVAS_WIDTH = SCREEN_DIMENSIONS.SPRITE.WIDTH
 const CANVAS_HEIGHT = SCREEN_DIMENSIONS.SPRITE.HEIGHT
 
-/** CSS background color for dark theme. */
-const DARK_BG = '#000'
-
-/** CSS background color for light theme. */
-const LIGHT_BG = '#fff'
-
-/** CSS text color for dark theme (off-white for readability). */
-const DARK_TEXT = '#e0e0e0'
-
-/** CSS text color for light theme (near-black for readability). */
-const LIGHT_TEXT = '#1a1a1a'
-
 /**
  * Returns the CSS color values for the given theme.
  */
 function getThemeColors(theme: 'dark' | 'light'): { bg: string; text: string } {
   return theme === 'dark'
-    ? { bg: DARK_BG, text: DARK_TEXT }
-    : { bg: LIGHT_BG, text: LIGHT_TEXT }
+    ? { bg: EXPORT_THEME_COLORS.DARK_BG, text: EXPORT_THEME_COLORS.DARK_TEXT }
+    : { bg: EXPORT_THEME_COLORS.LIGHT_BG, text: EXPORT_THEME_COLORS.LIGHT_TEXT }
 }
 
 /**

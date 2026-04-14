@@ -315,3 +315,11 @@ export const SYNTAX_COLORS = {
   LINE_NUMBER: '#666666',
   VARIABLE: '#9900cc',
 } as const
+
+// Export HTML theme colors (used by buildExportHtml for standalone HTML output)
+export const EXPORT_THEME_COLORS = {
+  DARK_BG: '#000',
+  LIGHT_BG: '#fff',
+  DARK_TEXT: '#e0e0e0',
+  LIGHT_TEXT: '#1a1a1a',
+} as const
