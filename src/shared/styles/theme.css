@@ -146,6 +146,10 @@
     --game-radius-sm: 4px;
     --game-radius-md: 6px;
     --game-radius-lg: 8px;
+    /* Stacking Order */
+    --z-index-dialog-overlay: 1000;
+    --z-index-navigation: 1000;
+    --z-index-nav-dropdown: 1001;
     /* Game UI Fonts */
     /* English (default) */
     --game-font-family: 'Rajdhani', 'Orbitron', system-ui, sans-serif;
