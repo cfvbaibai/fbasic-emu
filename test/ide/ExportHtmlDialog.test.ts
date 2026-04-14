@@ -77,7 +77,7 @@ describe('ExportHtmlDialog', () => {
   // -- Visibility ------------------------------------------------------------
   it('renders nothing when visible is false', () => {
     const wrapper = mountDialog({ visible: false })
-    expect(wrapper.find('.export-html-dialog-overlay').exists()).toBe(false)
+    expect(wrapper.find('.game-dialog-overlay').exists()).toBe(false)
     wrapper.unmount()
   })
 
@@ -85,7 +85,7 @@ describe('ExportHtmlDialog', () => {
     const wrapper = mountDialog({ visible: true })
     await nextTick()
 
-    expect(wrapper.find('.export-html-dialog-overlay').exists()).toBe(true)
+    expect(wrapper.find('.game-dialog-overlay').exists()).toBe(true)
     wrapper.unmount()
   })
 
@@ -93,7 +93,7 @@ describe('ExportHtmlDialog', () => {
     const wrapper = mountDialog({ visible: true })
     await nextTick()
 
-    const overlay = wrapper.find('.export-html-dialog-overlay')
+    const overlay = wrapper.find('.game-dialog-overlay')
     expect(overlay.attributes('role')).toEqual('dialog')
     expect(overlay.attributes('aria-modal')).toEqual('true')
     expect(overlay.attributes('aria-label')).toEqual('ide.exportHtml.title')
@@ -216,7 +216,7 @@ describe('ExportHtmlDialog', () => {
     const wrapper = mountDialog({ visible: true })
     await nextTick()
 
-    const overlay = wrapper.find('.export-html-dialog-overlay')
+    const overlay = wrapper.find('.game-dialog-overlay')
     await overlay.trigger('click')
 
     expect(wrapper.emitted('close')).toHaveLength(1)
@@ -227,7 +227,7 @@ describe('ExportHtmlDialog', () => {
     const wrapper = mountDialog({ visible: true })
     await nextTick()
 
-    const dialog = wrapper.find('.export-html-dialog')
+    const dialog = wrapper.find('.game-dialog')
     await dialog.trigger('click')
 
     expect(wrapper.emitted('close')).toBeUndefined()

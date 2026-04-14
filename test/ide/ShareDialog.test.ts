@@ -100,7 +100,7 @@ describe('ShareDialog', () => {
   // -- Visibility ------------------------------------------------------------
   it('renders nothing when visible is false', () => {
     const wrapper = mountDialog({ visible: false })
-    expect(wrapper.find('.share-dialog-overlay').exists()).toBe(false)
+    expect(wrapper.find('.game-dialog-overlay').exists()).toBe(false)
     wrapper.unmount()
   })
 
@@ -109,7 +109,7 @@ describe('ShareDialog', () => {
     await openDialog(wrapper)
     await waitForEncoding()
 
-    expect(wrapper.find('.share-dialog-overlay').exists()).toBe(true)
+    expect(wrapper.find('.game-dialog-overlay').exists()).toBe(true)
     wrapper.unmount()
   })
 
@@ -118,7 +118,7 @@ describe('ShareDialog', () => {
     await openDialog(wrapper)
     await waitForEncoding()
 
-    const overlay = wrapper.find('.share-dialog-overlay')
+    const overlay = wrapper.find('.game-dialog-overlay')
     expect(overlay.attributes('role')).toEqual('dialog')
     expect(overlay.attributes('aria-modal')).toEqual('true')
     expect(overlay.attributes('aria-label')).toEqual('ide.share.title')
@@ -138,13 +138,13 @@ describe('ShareDialog', () => {
     await nextTick()
     await nextTick()
 
-    expect(wrapper.find('.share-dialog-loading').exists()).toBe(true)
-    expect(wrapper.find('.share-dialog-loading').text()).toEqual('ide.share.encoding')
+    expect(wrapper.find('.game-dialog-loading').exists()).toBe(true)
+    expect(wrapper.find('.game-dialog-loading').text()).toEqual('ide.share.encoding')
 
     resolveEncode(DEFAULT_ENCODE_RESULT)
     await waitForEncoding()
 
-    expect(wrapper.find('.share-dialog-loading').exists()).toBe(false)
+    expect(wrapper.find('.game-dialog-loading').exists()).toBe(false)
     wrapper.unmount()
   })
 
@@ -155,8 +155,8 @@ describe('ShareDialog', () => {
     await openDialog(wrapper)
     await waitForEncoding()
 
-    expect(wrapper.find('.share-dialog-error').exists()).toBe(true)
-    expect(wrapper.find('.share-dialog-error').text()).toEqual('ide.share.encodeFailed')
+    expect(wrapper.find('.game-dialog-error').exists()).toBe(true)
+    expect(wrapper.find('.game-dialog-error').text()).toEqual('ide.share.encodeFailed')
     wrapper.unmount()
   })
 
@@ -309,7 +309,7 @@ describe('ShareDialog', () => {
     await openDialog(wrapper)
     await waitForEncoding()
 
-    const overlay = wrapper.find('.share-dialog-overlay')
+    const overlay = wrapper.find('.game-dialog-overlay')
     await overlay.trigger('click')
 
     expect(wrapper.emitted('close')).toHaveLength(1)
@@ -321,7 +321,7 @@ describe('ShareDialog', () => {
     await openDialog(wrapper)
     await waitForEncoding()
 
-    const dialog = wrapper.find('.share-dialog')
+    const dialog = wrapper.find('.game-dialog')
     await dialog.trigger('click')
 
     expect(wrapper.emitted('close')).toBeUndefined()

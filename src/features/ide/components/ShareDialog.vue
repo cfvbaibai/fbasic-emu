@@ -122,27 +122,27 @@ onUnmounted(() => {
   <Teleport to="body">
     <div
       v-if="visible"
-      class="share-dialog-overlay"
+      class="game-dialog-overlay"
       role="dialog"
       aria-modal="true"
       :aria-label="t('ide.share.title')"
       @click="handleOverlayClick"
     >
-      <div class="share-dialog">
-        <h3 class="share-dialog-title">
+      <div class="game-dialog">
+        <h3 class="game-dialog-title">
           {{ t('ide.share.title') }}
         </h3>
 
-        <div v-if="isEncoding" class="share-dialog-loading">
+        <div v-if="isEncoding" class="game-dialog-loading">
           {{ t('ide.share.encoding') }}
         </div>
 
-        <div v-else-if="error" class="share-dialog-error">
+        <div v-else-if="error" class="game-dialog-error">
           {{ t('ide.share.encodeFailed') }}
         </div>
 
         <template v-else>
-          <p class="share-dialog-description">
+          <p class="game-dialog-description">
             {{ t('ide.share.description') }}
           </p>
 
@@ -161,16 +161,16 @@ onUnmounted(() => {
             {{ t('ide.share.tooLarge') }}
           </p>
 
-          <div class="share-dialog-actions">
+          <div class="game-dialog-actions">
             <button
-              class="share-dialog-btn share-dialog-btn-copy"
+              class="game-dialog-btn game-dialog-btn-primary"
               data-testid="share-copy-button"
               @click="handleCopy"
             >
               {{ copyLabel }}
             </button>
             <button
-              class="share-dialog-btn share-dialog-btn-close"
+              class="game-dialog-btn game-dialog-btn-secondary"
               data-testid="share-close-button"
               @click="handleClose"
             >
@@ -184,55 +184,9 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-.share-dialog-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--base-alpha-gray-00-60);
-}
+@import url('@/shared/styles/dialog.css');
 
-.share-dialog {
-  background: var(--game-surface-bg-gradient);
-  border: 2px solid var(--game-surface-border);
-  border-radius: 12px;
-  padding: 1.5rem;
-  min-width: 420px;
-  max-width: 90vw;
-  box-shadow: var(--game-shadow-base);
-}
-
-.share-dialog-title {
-  margin: 0 0 0.75rem;
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: var(--game-text-primary);
-}
-
-.share-dialog-description {
-  margin: 0 0 0.75rem;
-  font-size: 0.875rem;
-  color: var(--game-text-secondary);
-  line-height: 1.4;
-}
-
-.share-dialog-loading {
-  padding: 1rem 0;
-  text-align: center;
-  color: var(--game-text-secondary);
-  font-size: 0.875rem;
-}
-
-.share-dialog-error {
-  padding: 0.75rem;
-  color: var(--semantic-solid-danger);
-  font-size: 0.875rem;
-  background: var(--base-alpha-danger-10);
-  border-radius: 6px;
-}
-
+/* Share-specific: URL input container */
 .share-dialog-url-container {
   margin-bottom: 0.5rem;
 }
@@ -255,50 +209,11 @@ onUnmounted(() => {
   box-shadow: 0 0 0 2px var(--base-alpha-primary-20);
 }
 
+/* Share-specific: too-large warning */
 .share-dialog-warning {
   margin: 0.5rem 0 0.75rem;
   font-size: 0.8rem;
   color: var(--semantic-solid-warning);
   line-height: 1.4;
-}
-
-.share-dialog-actions {
-  display: flex;
-  gap: 0.75rem;
-  justify-content: flex-end;
-}
-
-.share-dialog-btn {
-  padding: 0.5rem 1rem;
-  border: 1px solid var(--game-surface-border);
-  border-radius: 6px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.share-dialog-btn:focus-visible {
-  outline: 2px solid var(--base-solid-primary);
-  outline-offset: 2px;
-}
-
-.share-dialog-btn-copy {
-  background: var(--base-solid-primary);
-  color: var(--game-text-contrast);
-  border-color: var(--base-solid-primary);
-}
-
-.share-dialog-btn-copy:hover {
-  opacity: 0.9;
-}
-
-.share-dialog-btn-close {
-  background: transparent;
-  color: var(--game-text-secondary);
-}
-
-.share-dialog-btn-close:hover {
-  background: var(--game-surface-bg-start);
 }
 </style>
