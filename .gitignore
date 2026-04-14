@@ -82,7 +82,7 @@ test_output.txt
 output/
 
 # Codex-generated skills folder (separate from .claude/skills/)
-skills/
+/skills/
 
 # Generated parser files
 src/core/parser/fbasic-parser.js

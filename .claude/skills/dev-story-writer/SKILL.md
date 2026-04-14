@@ -132,6 +132,20 @@ Once approved:
 2. Copy the approved draft to `dev-stories/YYYY-MM/{kebab-case-title}.md`
 3. Report the file path to the user
 
+## Step 6: Publish
+
+After the story is saved to `dev-stories/`, commit and push it to master:
+
+1. Commit with format: `docs: add dev story - {short title}`
+2. Push to `origin/master`
+
+The story will **automatically sync to the GitHub Wiki** via the existing workflow at `.github/workflows/sync-wiki.yml`. This workflow:
+- Triggers on any push to `dev-stories/**/*.md` on the `master` branch
+- Also supports manual trigger via `workflow_dispatch`
+- Runs `scripts/sync-wiki.sh` using the `WIKI_TOKEN` secret
+
+No manual Wiki publishing is needed — just commit and push the story file.
+
 ## Writing Guidelines
 
 These guidelines are for the writer subagent. They define what makes a good dev story.
