@@ -29,7 +29,7 @@ const LESSON_KEYWORDS: Array<RegExp> = [
   /\bPLAY\b/,
   /\bBGPLAY\b/,
   /\bGOTO\b/,
-  /\bBGPLAY\b/,
+  /\bSCORE\b/,
 ]
 
 // ---------------------------------------------------------------------------
