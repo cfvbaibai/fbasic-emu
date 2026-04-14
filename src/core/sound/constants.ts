@@ -51,3 +51,9 @@ export const CHANNEL_C_DEFAULT_ENVELOPE = 0
  * Channel C uses 50% duty cycle (Y2)
  */
 export const CHANNEL_C_DEFAULT_DUTY = 2
+
+/**
+ * Default volume for composer playback preview (0-15 scale).
+ * Used by the music composer when no explicit volume is set.
+ */
+export const COMPOSER_DEFAULT_VOLUME = 10
