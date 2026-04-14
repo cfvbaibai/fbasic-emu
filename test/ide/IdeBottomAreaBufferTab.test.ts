@@ -10,9 +10,7 @@ import IdeBottomArea from '@/features/ide/components/IdeBottomArea.vue'
 import { createI18nMock } from '../helpers/createI18nMock'
 import { createTestKeyboardBuffer } from './helpers/createTestKeyboardBuffer'
 
-const mockT = createI18nMock({
-  'ide.bufferInspector.title': 'Buffer Inspector',
-})
+const mockT = createI18nMock({})
 
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({ t: mockT }),
