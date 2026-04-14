@@ -10,7 +10,14 @@ import { reloadPage } from '@/shared/utils/reloadPage'
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
     locale: ref('en'),
-    t: (key: string) => key,
+    t: (key: string) => {
+      const messages: Record<string, string> = {
+        'coi.warning.message': 'High-performance mode is unavailable because cross-origin isolation is not enabled. Try reloading, use HTTPS, and confirm COOP/COEP headers are configured.',
+        'coi.warning.reload': 'Reload',
+        'coi.warning.dismiss': 'Dismiss',
+      }
+      return messages[key] ?? key
+    },
   }),
 }))
 
@@ -105,7 +112,7 @@ describe('App', () => {
 
     const dismissButton = wrapper
       .findAll('button')
-      .find(button => button.text().trim() === 'coi.warning.dismiss')
+      .find(button => button.text().trim() === 'Dismiss')
     expect(dismissButton).toBeTruthy()
 
     await dismissButton!.trigger('click')
@@ -127,7 +134,7 @@ describe('App', () => {
 
     const reloadButton = wrapper
       .findAll('button')
-      .find(button => button.text().trim() === 'coi.warning.reload')
+      .find(button => button.text().trim() === 'Reload')
     expect(reloadButton).toBeTruthy()
 
     await reloadButton!.trigger('click')

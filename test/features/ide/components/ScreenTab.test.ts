@@ -9,7 +9,14 @@ import ScreenTab from '@/features/ide/components/ScreenTab.vue'
 // Stub vue-i18n
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
-    t: (key: string) => key,
+    t: (key: string) => {
+      const messages: Record<string, string> = {
+        'ide.output.screen': 'Screen',
+        'ide.screenTab.grid': 'Grid',
+        'ide.screenTab.filter': 'CRT',
+      }
+      return messages[key] ?? key
+    },
   }),
 }))
 
@@ -129,7 +136,7 @@ describe('ScreenTab', () => {
     const wrapper = mountScreenTab()
 
     const filterButton = wrapper.find('[data-testid="ide-filter-toggle"]')
-    expect(filterButton.text()).toEqual('ide.screenTab.filter')
+    expect(filterButton.text()).toEqual('CRT')
     wrapper.unmount()
   })
 

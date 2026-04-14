@@ -9,7 +9,22 @@ import enIde from '@/shared/i18n/locales/en/ide.json'
 
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
-    t: (key: string) => key,
+    t: (key: string) => {
+      const messages: Record<string, string> = {
+        'ide.stateInspector.title': 'State Inspector',
+        'ide.stateInspector.tabPalette': 'PALETTE',
+        'ide.stateInspector.tabSprite': 'SPRITE',
+        'ide.stateInspector.tabMove': 'MOVE',
+        'ide.stateInspector.tabBg': 'BG',
+        'ide.stateInspector.backdrop': 'Backdrop',
+        'ide.stateInspector.cgen': 'CGEN',
+        'ide.stateInspector.spriteEnabled': 'SPRITE ON',
+        'ide.stateInspector.on': 'ON',
+        'ide.stateInspector.off': 'OFF',
+        'ide.stateInspector.empty': '(none)',
+      }
+      return messages[key] ?? key
+    },
   }),
 }))
 

@@ -7,7 +7,15 @@ import RuntimeOutput from '@/features/ide/components/RuntimeOutput.vue'
 
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
-    t: (key: string) => key,
+    t: (key: string) => {
+      const messages: Record<string, string> = {
+        'ide.output.title': 'Runtime Output',
+        'ide.output.screen': 'Screen',
+        'ide.output.variables': 'Variables',
+        'ide.output.debug': 'Debug',
+      }
+      return messages[key] ?? key
+    },
   }),
 }))
 

@@ -13,7 +13,12 @@ import { createTestKeyboardBuffer } from './helpers/createTestKeyboardBuffer'
 
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
-    t: (key: string) => key,
+    t: (key: string) => {
+      const messages: Record<string, string> = {
+        'ide.bufferInspector.title': 'Buffer Inspector',
+      }
+      return messages[key] ?? key
+    },
   }),
 }))
 
@@ -116,7 +121,7 @@ describe('BufferInspector', () => {
 
     const block = wrapper.find('.game-block-stub')
     expect(block.exists()).toBe(true)
-    expect(block.attributes('data-title')).toBe('ide.bufferInspector.title')
+    expect(block.attributes('data-title')).toBe('Buffer Inspector')
     wrapper.unmount()
   })
 

@@ -12,7 +12,19 @@ import ShareDialog from '@/features/ide/components/ShareDialog.vue'
 
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
-    t: (key: string) => key,
+    t: (key: string) => {
+      const messages: Record<string, string> = {
+        'ide.share.title': 'Share',
+        'ide.share.description': 'Copy this URL to share your program with others.',
+        'ide.share.copy': 'Copy URL',
+        'ide.share.copied': 'Copied!',
+        'ide.share.close': 'Close',
+        'ide.share.encoding': 'Generating share URL...',
+        'ide.share.encodeFailed': 'Failed to generate share URL.',
+        'ide.share.tooLarge': 'This program is too large to share via URL.',
+      }
+      return messages[key] ?? key
+    },
   }),
 }))
 
@@ -121,7 +133,7 @@ describe('ShareDialog', () => {
     const overlay = wrapper.find('.game-dialog-overlay')
     expect(overlay.attributes('role')).toEqual('dialog')
     expect(overlay.attributes('aria-modal')).toEqual('true')
-    expect(overlay.attributes('aria-label')).toEqual('ide.share.title')
+    expect(overlay.attributes('aria-label')).toEqual('Share')
     wrapper.unmount()
   })
 
@@ -139,7 +151,7 @@ describe('ShareDialog', () => {
     await nextTick()
 
     expect(wrapper.find('.game-dialog-loading').exists()).toBe(true)
-    expect(wrapper.find('.game-dialog-loading').text()).toEqual('ide.share.encoding')
+    expect(wrapper.find('.game-dialog-loading').text()).toEqual('Generating share URL...')
 
     resolveEncode(DEFAULT_ENCODE_RESULT)
     await waitForEncoding()
@@ -156,7 +168,7 @@ describe('ShareDialog', () => {
     await waitForEncoding()
 
     expect(wrapper.find('.game-dialog-error').exists()).toBe(true)
-    expect(wrapper.find('.game-dialog-error').text()).toEqual('ide.share.encodeFailed')
+    expect(wrapper.find('.game-dialog-error').text()).toEqual('Failed to generate share URL.')
     wrapper.unmount()
   })
 
@@ -193,7 +205,7 @@ describe('ShareDialog', () => {
     await waitForEncoding()
 
     expect(wrapper.find('.share-dialog-warning').exists()).toBe(true)
-    expect(wrapper.find('.share-dialog-warning').text()).toEqual('ide.share.tooLarge')
+    expect(wrapper.find('.share-dialog-warning').text()).toEqual('This program is too large to share via URL.')
     wrapper.unmount()
   })
 
@@ -216,7 +228,7 @@ describe('ShareDialog', () => {
     await nextTick()
 
     expect(navigator.clipboard.writeText).toHaveBeenCalledWith('http://localhost/#/share/abc123')
-    expect(wrapper.find('[data-testid="share-copy-button"]').text()).toEqual('ide.share.copied')
+    expect(wrapper.find('[data-testid="share-copy-button"]').text()).toEqual('Copied!')
     wrapper.unmount()
   })
 
@@ -228,12 +240,12 @@ describe('ShareDialog', () => {
     await wrapper.find('[data-testid="share-copy-button"]').trigger('click')
     await nextTick()
 
-    expect(wrapper.find('[data-testid="share-copy-button"]').text()).toEqual('ide.share.copied')
+    expect(wrapper.find('[data-testid="share-copy-button"]').text()).toEqual('Copied!')
 
     vi.advanceTimersByTime(2000)
     await nextTick()
 
-    expect(wrapper.find('[data-testid="share-copy-button"]').text()).toEqual('ide.share.copy')
+    expect(wrapper.find('[data-testid="share-copy-button"]').text()).toEqual('Copy URL')
     wrapper.unmount()
   })
 

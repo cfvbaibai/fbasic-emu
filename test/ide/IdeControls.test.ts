@@ -7,7 +7,15 @@ import IdeControls from '@/features/ide/components/IdeControls.vue'
 
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
-    t: (key: string) => key,
+    t: (key: string) => {
+      const messages: Record<string, string> = {
+        'ide.controls.run': 'Run',
+        'ide.controls.stop': 'Stop',
+        'ide.controls.clear': 'Clear',
+        'ide.controls.debug': 'Debug',
+      }
+      return messages[key] ?? key
+    },
   }),
 }))
 

@@ -12,7 +12,23 @@ import ExportHtmlDialog from '@/features/ide/components/ExportHtmlDialog.vue'
 
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
-    t: (key: string) => key,
+    t: (key: string) => {
+      const messages: Record<string, string> = {
+        'ide.exportHtml.title': 'Export as HTML',
+        'ide.exportHtml.description': 'Export your program as a standalone HTML file that runs in any browser.',
+        'ide.exportHtml.exporting': 'Exporting...',
+        'ide.exportHtml.exportFailed': 'Failed to export HTML file.',
+        'ide.exportHtml.titleLabel': 'Page Title',
+        'ide.exportHtml.themeLabel': 'Theme',
+        'ide.exportHtml.themeDark': 'Dark',
+        'ide.exportHtml.themeLight': 'Light',
+        'ide.exportHtml.includeSound': 'Include sound',
+        'ide.exportHtml.includeSprites': 'Include sprites',
+        'ide.exportHtml.exportButton': 'Export',
+        'ide.exportHtml.cancelButton': 'Cancel',
+      }
+      return messages[key] ?? key
+    },
   }),
 }))
 
@@ -96,7 +112,7 @@ describe('ExportHtmlDialog', () => {
     const overlay = wrapper.find('.game-dialog-overlay')
     expect(overlay.attributes('role')).toEqual('dialog')
     expect(overlay.attributes('aria-modal')).toEqual('true')
-    expect(overlay.attributes('aria-label')).toEqual('ide.exportHtml.title')
+    expect(overlay.attributes('aria-label')).toEqual('Export as HTML')
     wrapper.unmount()
   })
 
@@ -242,7 +258,7 @@ describe('ExportHtmlDialog', () => {
     await nextTick()
 
     expect(wrapper.find('[data-testid="export-html-exporting"]').exists()).toBe(true)
-    expect(wrapper.find('[data-testid="export-html-exporting"]').text()).toEqual('ide.exportHtml.exporting')
+    expect(wrapper.find('[data-testid="export-html-exporting"]').text()).toEqual('Exporting...')
     wrapper.unmount()
   })
 
@@ -253,7 +269,7 @@ describe('ExportHtmlDialog', () => {
     await nextTick()
 
     expect(wrapper.find('[data-testid="export-html-error"]').exists()).toBe(true)
-    expect(wrapper.find('[data-testid="export-html-error"]').text()).toEqual('ide.exportHtml.exportFailed')
+    expect(wrapper.find('[data-testid="export-html-error"]').text()).toEqual('Failed to export HTML file.')
     wrapper.unmount()
   })
 

@@ -7,7 +7,17 @@ import TutorialPanel from '@/features/ide/components/TutorialPanel.vue'
 
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
-    t: (key: string) => key,
+    t: (key: string) => {
+      const messages: Record<string, string> = {
+        'ide.tutorial.title': 'Tutorial',
+        'ide.tutorial.defaultTitle': 'F-BASIC Tutorial',
+        'ide.tutorial.closeAriaLabel': 'Close tutorial',
+        'ide.tutorial.prev': 'Previous lesson',
+        'ide.tutorial.next': 'Next lesson',
+        'ide.tutorial.noContent': 'No lesson content available.',
+      }
+      return messages[key] ?? key
+    },
   }),
 }))
 
@@ -40,7 +50,7 @@ describe('TutorialPanel', () => {
     })
 
     const panel = wrapper.find('[role="complementary"]')
-    expect(panel.attributes('aria-label')).toEqual('ide.tutorial.title')
+    expect(panel.attributes('aria-label')).toEqual('Tutorial')
     wrapper.unmount()
   })
 
@@ -64,7 +74,7 @@ describe('TutorialPanel', () => {
       },
     })
 
-    expect(wrapper.text()).toContain('ide.tutorial.defaultTitle')
+    expect(wrapper.text()).toContain('F-BASIC Tutorial')
     wrapper.unmount()
   })
 
@@ -93,7 +103,7 @@ describe('TutorialPanel', () => {
 
     const closeButton = wrapper.find('[data-testid="tutorial-close-button"]')
     expect(closeButton.exists()).toBe(true)
-    expect(closeButton.attributes('title')).toEqual('ide.tutorial.closeAriaLabel')
+    expect(closeButton.attributes('title')).toEqual('Close tutorial')
     wrapper.unmount()
   })
 

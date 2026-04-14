@@ -7,7 +7,12 @@ import DebugTab from '@/features/ide/components/DebugTab.vue'
 
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
-    t: (key: string) => key,
+    t: (key: string) => {
+      const messages: Record<string, string> = {
+        'ide.output.debug': 'Debug',
+      }
+      return messages[key] ?? key
+    },
   }),
 }))
 

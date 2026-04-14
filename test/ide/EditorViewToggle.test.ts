@@ -7,7 +7,15 @@ import EditorViewToggle from '@/features/ide/components/EditorViewToggle.vue'
 
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
-    t: (key: string) => key,
+    t: (key: string) => {
+      const messages: Record<string, string> = {
+        'ide.editorViewToggle.codeTitle': 'Code',
+        'ide.editorViewToggle.bgTitle': 'BG',
+        'ide.editorViewToggle.code': 'Code',
+        'ide.editorViewToggle.bg': 'BG',
+      }
+      return messages[key] ?? key
+    },
   }),
 }))
 
@@ -129,8 +137,8 @@ describe('EditorViewToggle', () => {
     // Compact mode uses GameIconButton (no text, just icons)
     const buttons = wrapper.findAll('button')
     // Both buttons should have title attributes (from GameIconButton)
-    expect(buttons[0]!.attributes('title')).toEqual('ide.editorViewToggle.codeTitle')
-    expect(buttons[1]!.attributes('title')).toEqual('ide.editorViewToggle.bgTitle')
+    expect(buttons[0]!.attributes('title')).toEqual('Code')
+    expect(buttons[1]!.attributes('title')).toEqual('BG')
     wrapper.unmount()
   })
 })

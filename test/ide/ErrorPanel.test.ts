@@ -7,7 +7,20 @@ import ErrorPanel from '@/features/ide/components/ErrorPanel.vue'
 
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
-    t: (key: string) => key,
+    t: (key: string, params?: Record<string, string | number>) => {
+      const messages: Record<string, string> = {
+        'ide.output.errorLine': 'Line {line}',
+        'ide.errorPanel.sourceLabel': 'At:',
+        'ide.errorPanel.stackTrace': 'Stack trace',
+      }
+      let text = messages[key] ?? key
+      if (params) {
+        for (const [k, v] of Object.entries(params)) {
+          text = text.replace(`{${k}}`, String(v))
+        }
+      }
+      return text
+    },
   }),
 }))
 
@@ -88,7 +101,7 @@ describe('ErrorPanel', () => {
 
     const lineSpan = wrapper.find('.error-line-number')
     expect(lineSpan.exists()).toBe(true)
-    expect(lineSpan.text()).toEqual('(ide.output.errorLine)')
+    expect(lineSpan.text()).toEqual('(Line 42)')
     wrapper.unmount()
   })
 
@@ -125,7 +138,7 @@ describe('ErrorPanel', () => {
     const sourceDiv = wrapper.find('.error-source-line')
     expect(sourceDiv.exists()).toBe(true)
     expect(sourceDiv.find('code').text()).toEqual('10 PRINT "Hello"')
-    expect(sourceDiv.find('.error-source-label').text()).toEqual('ide.errorPanel.sourceLabel')
+    expect(sourceDiv.find('.error-source-label').text()).toEqual('At:')
     wrapper.unmount()
   })
 
@@ -151,7 +164,7 @@ describe('ErrorPanel', () => {
 
     const details = wrapper.find('details.error-stack-details')
     expect(details.exists()).toBe(true)
-    expect(details.find('summary').text()).toEqual('ide.errorPanel.stackTrace')
+    expect(details.find('summary').text()).toEqual('Stack trace')
     expect(details.find('pre.error-stack').text()).toEqual('at line 10\nat line 5')
     wrapper.unmount()
   })

@@ -12,7 +12,17 @@ import JoystickBufferSection from '@/features/ide/components/JoystickBufferSecti
 
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
-    t: (key: string) => key,
+    t: (key: string) => {
+      const messages: Record<string, string> = {
+        'ide.bufferInspector.joystickTitle': 'Joystick Buffer',
+        'ide.bufferInspector.joystickUnavailable': 'No joystick buffer',
+        'ide.bufferInspector.joystick0': 'Joy 0',
+        'ide.bufferInspector.joystick1': 'Joy 1',
+        'ide.bufferInspector.joystickStick': 'STICK',
+        'ide.bufferInspector.joystickStrig': 'STRIG',
+      }
+      return messages[key] ?? key
+    },
   }),
 }))
 
@@ -50,7 +60,7 @@ describe('JoystickBufferSection', () => {
 
     const title = wrapper.find('.joystick-buffer-title')
     expect(title.exists()).toBe(true)
-    expect(title.text()).toBe('ide.bufferInspector.joystickTitle')
+    expect(title.text()).toBe('Joystick Buffer')
     wrapper.unmount()
   })
 
@@ -64,7 +74,7 @@ describe('JoystickBufferSection', () => {
 
     expect(wrapper.find('.joystick-buffer-unavailable').exists()).toBe(true)
     expect(wrapper.find('.joystick-buffer-unavailable').text()).toBe(
-      'ide.bufferInspector.joystickUnavailable'
+      'No joystick buffer'
     )
     wrapper.unmount()
   })
@@ -93,8 +103,8 @@ describe('JoystickBufferSection', () => {
 
     const labels = wrapper.findAll('.joystick-buffer-label')
     expect(labels.length).toBe(2)
-    expect(labels[0]!.text()).toBe('ide.bufferInspector.joystick0')
-    expect(labels[1]!.text()).toBe('ide.bufferInspector.joystick1')
+    expect(labels[0]!.text()).toBe('Joy 0')
+    expect(labels[1]!.text()).toBe('Joy 1')
     wrapper.unmount()
   })
 
@@ -151,8 +161,8 @@ describe('JoystickBufferSection', () => {
     const strigLabels = wrapper.findAll('.joystick-strig-label')
     expect(stickLabels.length).toBe(2)
     expect(strigLabels.length).toBe(2)
-    expect(stickLabels[0]!.text()).toBe('ide.bufferInspector.joystickStick')
-    expect(strigLabels[0]!.text()).toBe('ide.bufferInspector.joystickStrig')
+    expect(stickLabels[0]!.text()).toBe('STICK')
+    expect(strigLabels[0]!.text()).toBe('STRIG')
     wrapper.unmount()
   })
 

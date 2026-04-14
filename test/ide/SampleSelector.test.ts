@@ -8,7 +8,25 @@ import SampleSelector from '@/features/ide/components/SampleSelector.vue'
 // Mock vue-i18n to return the key as translation
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
-    t: (key: string) => key,
+    t: (key: string, fallbackOrParams?: string | Record<string, string | number>) => {
+      const messages: Record<string, string> = {
+        'ide.samples.title': 'Load Sample',
+        'ide.samples.closeAriaLabel': 'Close',
+        'ide.samples.emptyCategory': 'No samples in this category',
+        'ide.samples.bgIndicatorTitle': 'Includes BG data',
+        'common.buttons.cancel': 'Cancel',
+      }
+      if (typeof fallbackOrParams === 'string') {
+        return messages[key] ?? fallbackOrParams
+      }
+      let text = messages[key] ?? key
+      if (fallbackOrParams) {
+        for (const [k, v] of Object.entries(fallbackOrParams)) {
+          text = text.replace(`{${k}}`, String(v))
+        }
+      }
+      return text
+    },
   }),
 }))
 
