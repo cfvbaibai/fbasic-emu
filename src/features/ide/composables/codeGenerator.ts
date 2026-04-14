@@ -25,7 +25,6 @@ export interface ComposerState {
   envelope: string
   title: string
   channelNotes: NoteCellKey[][]
-  channelOctaves: number[]
 }
 
 // ---------------------------------------------------------------------------

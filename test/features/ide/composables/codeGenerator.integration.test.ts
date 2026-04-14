@@ -19,7 +19,6 @@ function makeState(
     envelope: 'none',
     title: '',
     channelNotes: [[], [], []],
-    channelOctaves: [4, 4, 4],
     ...overrides,
   }
 }
@@ -88,7 +87,6 @@ describe('generatePlayCode integration', () => {
       const ch1Notes: NoteCellKey[] = [createNoteCellKey(11, 0)] // C5 (octave 5)
       const state = makeState({
         channelNotes: [ch0Notes, ch1Notes, []],
-        channelOctaves: [3, 5, 4],
       })
 
       const lines = generatePlayCode(state)
