@@ -175,7 +175,7 @@ export const CHANNEL_COUNT = 3
  * Shared by the composer UI (useComposer) and the execution layer (SoundService).
  */
 export function isValidChannelIndex(index: number): boolean {
-  return !Number.isNaN(index) && index >= 0 && index < CHANNEL_COUNT
+  return Number.isInteger(index) && index >= 0 && index < CHANNEL_COUNT
 }
 
 // Screen dimensions and coordinate limits
