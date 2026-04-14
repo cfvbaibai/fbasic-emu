@@ -10,7 +10,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ref } from 'vue'
 
-import { useHtmlExporter } from '@/features/ide/composables/useHtmlExporter'
+import {
+  DEFAULT_EXPORT_FILENAME,
+  toExportFilename,
+  useHtmlExporter,
+} from '@/features/ide/composables/useHtmlExporter'
 
 // ============================================================================
 // Helpers
@@ -27,6 +31,32 @@ function mountComposable(code = '10 PRINT "HELLO"') {
 // ============================================================================
 // Tests
 // ============================================================================
+
+describe('toExportFilename', () => {
+  it('returns DEFAULT_EXPORT_FILENAME when title is empty string', () => {
+    expect(toExportFilename('')).toEqual(DEFAULT_EXPORT_FILENAME)
+  })
+
+  it('returns DEFAULT_EXPORT_FILENAME when title is whitespace only', () => {
+    expect(toExportFilename('   ')).toEqual(DEFAULT_EXPORT_FILENAME)
+  })
+
+  it('returns DEFAULT_EXPORT_FILENAME when title is tabs only', () => {
+    expect(toExportFilename('\t\t')).toEqual(DEFAULT_EXPORT_FILENAME)
+  })
+
+  it('returns filename with .html extension for a normal title', () => {
+    expect(toExportFilename('My Program')).toEqual('My Program.html')
+  })
+
+  it('preserves non-ASCII characters in title', () => {
+    expect(toExportFilename('プログラム')).toEqual('プログラム.html')
+  })
+
+  it('does not trim meaningful whitespace from title', () => {
+    expect(toExportFilename(' Hello ')).toEqual(' Hello .html')
+  })
+})
 
 describe('useHtmlExporter', () => {
   let createObjectURLSpy: ReturnType<typeof vi.spyOn>
@@ -239,7 +269,7 @@ describe('useHtmlExporter', () => {
       globalThis.Blob = savedBlob
     })
 
-    it('uses .html extension when title is empty string', async () => {
+    it('uses fallback filename when title is empty string', async () => {
       const { exportHtml } = mountComposable()
 
       await exportHtml({
@@ -250,7 +280,7 @@ describe('useHtmlExporter', () => {
       })
 
       const anchor = capturedAnchors[0]!
-      expect(anchor.getAttribute('download')).toEqual('.html')
+      expect(anchor.getAttribute('download')).toEqual(DEFAULT_EXPORT_FILENAME)
     })
   })
 })
