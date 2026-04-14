@@ -162,6 +162,69 @@ gh issue edit $NUMBER --add-label "claude-automation"
 - If an issue already has a type label that matches our analysis, don't add a duplicate
 - If an issue already has a priority label, skip it (it was already triaged by someone)
 
+## Phase 4b — Dependency Deadlock Detection (always runs)
+
+Sub-issues can declare dependencies on other sub-issues or parent steps, creating circular dependency chains that block entire epics. Detect and resolve these.
+
+### Build the dependency graph
+
+For every open issue, extract `Depends on #N` references from the issue body. Also infer parent-child blocking: a parent cannot close until all its open sub-issues are resolved.
+
+```bash
+# Collect dependency declarations from all open issues
+gh issue list --state open --json number,body --limit 50 | python3 -c "
+import json, sys, re
+data = json.load(sys.stdin)
+for issue in data:
+    body = issue.get('body') or ''
+    for line in body.split('\n'):
+        if re.search(r'depends?\s+on', line, re.IGNORECASE):
+            deps = re.findall(r'#(\d+)', line)
+            for d in deps:
+                if int(d) != issue['number']:
+                    print(f'{issue[\"number\"]} -> {d}')
+"
+```
+
+### Detect cycles
+
+Walk the graph looking for cycles. A cycle means a deadlock: no issue in the cycle can proceed.
+
+**Common deadlock pattern:** Sub-issue of parent A depends on sub-issue of parent A (or parent A's other steps). Example:
+
+```
+#631 (Step 2 of #538) → #772 (Step 2b of #631) → #632 (Step 3 of #538) → #631
+```
+
+### Resolve deadlocks
+
+For each cycle found:
+
+1. **Identify the weakest link** — the dependency that is least justified. Common cases:
+   - Sub-issue depends on a sibling step's *implementation*, but only needs its *interface/type* (can be defined independently)
+   - Sub-issue depends on a parent step that only exists to coordinate, not to provide output
+2. **Post a resolution comment** on the issue with the removable dependency:
+
+```bash
+gh issue comment $NUMBER --body "## Deadlock Resolution — Dependency on #X Removed
+
+This issue was part of a circular dependency chain: #A → #B → #X → #A
+
+The dependency on #X is unnecessary because [reason]. Updated scope: [new scope without the dependency].
+
+### Impact
+- Removes the cycle, unblocking [list of issues]
+- [Any side effects on other dependencies]"
+```
+
+3. **Do NOT edit the issue body** — the comment serves as the override. The original dependency text remains for traceability.
+4. **Note the resolution in the report** under "Dependency Deadlocks Resolved".
+
+### Rules
+- Only post resolution comments for cycles that actually block implementation (not theoretical)
+- Prefer the minimal change — remove one dependency per cycle, not multiple
+- If no clean resolution exists, note the deadlock in the report without posting a comment (escalate to user)
+
 ## Phase 5 — Report
 
 Write outputs following `.claude/commands/_shared/path-conventions.md`:
@@ -198,6 +261,9 @@ Write outputs following `.claude/commands/_shared/path-conventions.md`:
 ## Parents Closed (all sub-issues resolved)
 - #N: all M sub-issues closed — parent closed with completion comment
 
+## Dependency Deadlocks Resolved
+- #A → #B → #C → #A: removed dependency #B → #C (reason: interface-only, no implementation needed)
+
 ## Summary
 - Issues triaged: N
 - Issues skipped (already labeled): N
@@ -205,6 +271,7 @@ Write outputs following `.claude/commands/_shared/path-conventions.md`:
 - Issue dependencies found: N
 - Complex issues decomposed: N
 - Parents closed (all sub-issues resolved): N
+- Dependency deadlocks resolved: N
 ```
 
 **Update config** — increment `total_runs`, `total_issues_triaged`, update `last_triage_run`.
@@ -224,3 +291,4 @@ Focus on:
 - Were there issues we couldn't classify confidently?
 - Did we miss any duplicate relationships?
 - For decomposed "TOO COMPLEX" issues: were sub-issues well-scoped and independently implementable?
+- Were dependency deadlocks detected? Did resolution comments correctly break cycles without side effects?
