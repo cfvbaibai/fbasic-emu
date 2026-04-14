@@ -33,14 +33,24 @@ Check memory at `~/.claude/projects/C--Users-Tony-code-GitHub-fbasic-ide/memory/
 gh pr view <number> --json reviews,headRefOid --jq '{latest_sha: .headRefOid, latest_review: (.reviews | sort_by(.submittedAt) | last | .submittedAt // "none")}'
 ```
 
-**Skip PR if:**
+**Detect force-push (MANDATORY):** Even when `headRefOid` matches memory and a review exists on GitHub, a force-push may have replaced the reviewed commit with different content. The GitHub reviews API does not expose which commit a review was submitted against, so use commit timestamps as a proxy:
+```bash
+# Get HEAD commit's committer date
+gh api repos/cfvbaibai/fbasic-ide/pulls/<number>/commits --jq '.[-1].commit.committer.date'
+```
+
+If the HEAD commit date is **after** the latest review submission time, the branch was pushed after the review — the review is stale and the PR **must** be re-reviewed.
+
+**Skip PR if ALL of:**
 - Previously reviewed AND
 - Review actually exists on GitHub (not just in memory) AND
 - Latest GitHub review was submitted after (or at) the last known commit SHA AND
+- HEAD commit date is **not after** the latest review submission time (no force-push) AND
 - Verdict was APPROVE
 
-**Re-review if:**
+**Re-review if ANY of:**
 - New commits since last review (different SHA, OR SHA matches but no review posted for it)
+- HEAD commit date is after the latest review submission time (force-push detected)
 - Previous verdict was REQUEST CHANGES or NEEDS DISCUSSION
 - No previous review found
 - Review exists in memory but NOT on GitHub (review was never posted or was lost)
@@ -347,6 +357,7 @@ Focus on:
 - Did the specialist mapping match the actual PR scope?
 - Were any real issues missed during review?
 - When audit was run, what percentage of findings were already tracked? (target: >90%)
+- **Skip accuracy: Were any PRs incorrectly skipped due to force-push or SHA mismatch?** (target: 0 false skips)
 
 ## Periodic Execution
 
