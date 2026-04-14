@@ -9,12 +9,10 @@
  * This service compiles that symbolic data to audio using channel-specific state.
  */
 
+import { CHANNEL_COUNT } from '@/core/constants'
 import { compileToAudio, parseMusicToAst } from '@/core/sound/MusicDSLParser'
 import { SoundStateManager } from '@/core/sound/SoundStateManager'
 import type { CompiledAudio } from '@/core/sound/types'
-
-/** Number of independent audio channels (F-BASIC supports 3) */
-const CHANNEL_COUNT = 3
 
 /**
  * Service for managing sound state and compiling music.

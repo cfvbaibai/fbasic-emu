@@ -10,6 +10,7 @@
 
 import { computed, ref } from 'vue'
 
+import { CHANNEL_COUNT, isValidChannelIndex } from '@/core/constants'
 import {
   DEFAULT_DURATION,
   DEFAULT_ENVELOPE,
@@ -19,18 +20,6 @@ import {
 } from '@/features/ide/components/composerControlsConstants'
 import type { NoteCellKey } from '@/features/ide/components/pianoRollConstants'
 import { createNoteCellKey } from '@/features/ide/components/pianoRollConstants'
-
-// ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
-
-/** Number of sound channels in F-BASIC. */
-const CHANNEL_COUNT = 3
-
-/** Returns true if the given index is a valid channel index (0 to CHANNEL_COUNT - 1). */
-function isValidChannelIndex(index: number): boolean {
-  return !Number.isNaN(index) && index >= 0 && index < CHANNEL_COUNT
-}
 
 // ---------------------------------------------------------------------------
 // Module-level singleton state
