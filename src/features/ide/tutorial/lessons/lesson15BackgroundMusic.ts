@@ -1,8 +1,8 @@
 /**
  * Lesson 15: Background Music — Non-blocking music with BGPLAY.
  *
- * Covers BGPLAY for playing background music
- * and combining music with programs.
+ * Covers BGPLAY for playing background music,
+ * BGMSTOP for stopping it, and combining music with programs.
  */
 
 import type { Lesson } from '../types'
@@ -70,16 +70,31 @@ export const lesson15BackgroundMusic: Lesson = {
     '50 LOCATE 0,22',
     '```',
 
-    '## PLAY vs BGPLAY',
+    '## Stopping Background Music',
+
+    'Use `BGMSTOP` to stop background music',
+    'entirely. This is different from calling',
+    '`BGPLAY` again — it silences the music',
+    'without starting a new song:',
+    '```basic',
+    '10 BGPLAY "T5O4C4D4E4F4G4A4B4"',
+    '20 PAUSE 40',
+    '30 BGMSTOP',
+    '40 PRINT "MUSIC STOPPED"',
+    '```',
+
+    '## PLAY vs BGPLAY vs BGMSTOP',
 
     '- `PLAY` — Waits for music to finish',
     '  before continuing the program',
     '- `BGPLAY` — Music plays in the background',
     '  while the program continues',
     '- `BGPLAY` again — Replaces the current song',
+    '- `BGMSTOP` — Stops background music entirely',
 
     'Use `PLAY` for sound effects and short sounds.',
     'Use `BGPLAY` for background music in games.',
+    'Use `BGMSTOP` to silence the music.',
 
     '## Try It',
 
