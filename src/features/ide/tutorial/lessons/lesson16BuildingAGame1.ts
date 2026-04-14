@@ -48,6 +48,20 @@ export const lesson16BuildingAGame1: Lesson = {
 
     'Direction `1` means the enemy moves left.',
 
+    '## The GOTO Statement',
+
+    'The `GOTO` command jumps directly to',
+    'a specific line number in your program.',
+    'It is often used with `IF...THEN` to jump',
+    'to a different part of the program',
+    'when a condition is met.',
+    '```basic',
+    'IF condition THEN GOTO line_number',
+    '```',
+    'In Lesson 4, you saw `THEN 50` to jump to line 50.',
+    '`THEN GOTO 150` does the same thing —',
+    'the `GOTO` keyword just makes the jump explicit.',
+
     '## Step 3: Game Loop',
 
     'The game loop checks positions and',
