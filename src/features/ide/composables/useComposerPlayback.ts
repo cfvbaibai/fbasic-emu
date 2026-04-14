@@ -11,6 +11,7 @@
 
 import { computed, ref } from 'vue'
 
+import { calculateNoteFrequency } from '@/core/sound/noteFrequency'
 import type { Note, Rest } from '@/core/sound/types'
 import type { NoteCellKey } from '@/features/ide/components/pianoRollConstants'
 import { NOTE_NAMES } from '@/features/ide/components/pianoRollConstants'
@@ -31,34 +32,17 @@ function isValidChannelIndex(index: number): boolean {
 }
 
 /**
- * Note names to semitone offset mapping (C = 0).
- * Matches the mapping used in MusicDSLParser for frequency calculation.
+ * Calculate frequency in Hz for a full note name (e.g. "C#4") and standard musical octave.
+ * Parses the note name to extract the base letter and sharp flag,
+ * converts standard octave to F-BASIC octave, then delegates to the shared utility.
  */
-const NOTE_SEMITONES: Record<string, number> = {
-  C: 0,
-  D: 2,
-  E: 4,
-  F: 5,
-  G: 7,
-  A: 9,
-  B: 11,
-}
-
-/**
- * Calculate frequency in Hz for a given note name and octave.
- * Uses equal temperament tuning with A4 = 440Hz.
- * Matches the formula in MusicDSLParser.
- */
-function calculateNoteFrequency(noteName: string, octave: number): number {
-  // Strip '#' and trailing digits to get just the base letter (e.g. "C#4" → "C", "B5" → "B")
+function calculateNoteFrequencyFromName(noteName: string, octave: number): number {
   const baseName = noteName.replace(/[#0-9]/g, '')
   const isSharp = noteName.includes('#')
-  const semitone = (NOTE_SEMITONES[baseName] ?? 0) + (isSharp ? 1 : 0)
   // octave is a standard musical octave (3-5); convert to F-BASIC octave (octave - 2)
   // so the formula matches MusicDSLParser's convention (F-BASIC octave 2 = MIDI octave 4)
   const fbOctave = octave - 2
-  const midiNote = (fbOctave + 2) * 12 + semitone + 12
-  return 440 * Math.pow(2, (midiNote - 69) / 12)
+  return calculateNoteFrequency(baseName, fbOctave, isSharp)
 }
 
 /**
@@ -153,7 +137,7 @@ function buildStepAudioEvents(
         if (noteName) {
           const baseOctave = noteIndexToBaseOctave(noteIndex)
           const octaveOffset = octave - 4
-          const frequency = calculateNoteFrequency(
+          const frequency = calculateNoteFrequencyFromName(
             noteName,
             baseOctave + octaveOffset
           )
