@@ -193,4 +193,16 @@ describe('gamesLessons', () => {
     expect(lesson.content).toMatch(/game/i)
     expect(lesson.content).toMatch(/sound/i)
   })
+
+  it('PX/EX variable convention is consistent between lessons 16 and 17', () => {
+    // Lesson 16 (fix #781) established: PX = player (sprite 0), EX = enemy (sprite 1)
+    const lesson16 = gamesLessons[7]!
+    expect(lesson16.content).toMatch(/PX=XPOS\(0\)/)
+    expect(lesson16.content).toMatch(/EX=XPOS\(1\)/)
+
+    // Lesson 17 must follow the same convention (issue #810)
+    const lesson17 = gamesLessons[8]!
+    expect(lesson17.content).toMatch(/PX=XPOS\(0\)/)
+    expect(lesson17.content).toMatch(/EX=XPOS\(1\)/)
+  })
 })
