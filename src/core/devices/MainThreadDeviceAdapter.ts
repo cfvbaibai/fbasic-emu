@@ -12,6 +12,8 @@
  * Sound, sprites, and input dialogs are stubbed for future steps.
  */
 
+import type { CompiledAudio } from '@/core/sound/types'
+import { WebAudioPlayer } from '@/core/sound/WebAudioPlayer'
 import type { BasicDeviceAdapter } from '@/core/types/device-types'
 
 import type { CanvasSurface } from './CanvasScreenRenderer'
@@ -30,13 +32,14 @@ export interface MainThreadDeviceAdapterOptions {
  * Runs on the main thread and renders to a canvas. Used by standalone
  * exported HTML files that cannot use web workers or SharedArrayBuffer.
  *
- * Implements all required methods from BasicDeviceAdapter. Sound,
- * sprite, and input dialog methods are stubbed no-ops pending
- * future implementation steps (#633, #634).
+ * Implements all required methods from BasicDeviceAdapter. Sprite
+ * and input dialog methods are stubbed no-ops pending future
+ * implementation steps (#634).
  */
 export class MainThreadDeviceAdapter implements BasicDeviceAdapter {
   private readonly screenState: ScreenStateManager
   private readonly renderer: CanvasScreenRenderer
+  private readonly audioPlayer: WebAudioPlayer
 
   // === KEYBOARD INPUT STATE ===
 
@@ -45,6 +48,7 @@ export class MainThreadDeviceAdapter implements BasicDeviceAdapter {
   constructor(options: MainThreadDeviceAdapterOptions) {
     this.screenState = new ScreenStateManager()
     this.renderer = new CanvasScreenRenderer(options.canvas)
+    this.audioPlayer = new WebAudioPlayer()
   }
 
   // === JOYSTICK INPUT (stubbed — no joystick support in export) ===
@@ -87,6 +91,20 @@ export class MainThreadDeviceAdapter implements BasicDeviceAdapter {
 
   getSpritePosition(_actionNumber: number): { x: number; y: number } | null {
     return null
+  }
+
+  // === SOUND OUTPUT ===
+
+  playSound(audio: CompiledAudio): Promise<void> {
+    return this.audioPlayer.playSound(audio)
+  }
+
+  playSoundBackground(audio: CompiledAudio): void {
+    this.audioPlayer.playSoundBackground(audio)
+  }
+
+  beep(): void {
+    this.audioPlayer.beep()
   }
 
   // === TEXT OUTPUT ===
