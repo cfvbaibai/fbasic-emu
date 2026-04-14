@@ -23,6 +23,9 @@ import { lesson15BackgroundMusic } from './lessons/lesson15BackgroundMusic'
 import { lesson16BuildingAGame1 } from './lessons/lesson16BuildingAGame1'
 import { lesson17BuildingAGame2 } from './lessons/lesson17BuildingAGame2'
 import type { Lesson } from './types'
+export type { ResolvedLessonContent } from './resolveLessonLocale'
+export { resolveLessonLocale } from './resolveLessonLocale'
+export type { Lesson, LessonTranslations } from './types'
 
 /**
  * Ordered array of basics tutorial lessons.
