@@ -6,6 +6,7 @@ import { useProgramStore } from '@/features/ide/composables/useProgramStore'
 import { ConfirmDialog, GameButton, GameIconButton } from '@/shared/components/ui'
 import GameIcon from '@/shared/components/ui/GameIcon.vue'
 
+import ExportHtmlDialog from './ExportHtmlDialog.vue'
 import ShareDialog from './ShareDialog.vue'
 
 const props = withDefaults(defineProps<{ isCompact?: boolean }>(), {
@@ -17,6 +18,9 @@ const programStore = useProgramStore(t('common.defaultProgramName'))
 
 // Share dialog state
 const showShareDialog = ref(false)
+
+// Export HTML dialog state
+const showExportHtmlDialog = ref(false)
 
 // Renaming state
 const editingName = ref(false)
@@ -230,6 +234,15 @@ onUnmounted(() => {
           data-testid="ide-share-button"
           @click="showShareDialog = true"
         />
+        <GameIconButton
+          type="default"
+          icon="mdi:file-code"
+          size="small"
+          :disabled="isFileOperationPending"
+          :title="t('ide.toolbar.exportHtml')"
+          data-testid="ide-export-html-button"
+          @click="showExportHtmlDialog = true"
+        />
       </template>
       <template v-else>
         <GameButton
@@ -271,6 +284,16 @@ onUnmounted(() => {
           @click="showShareDialog = true"
         >
           {{ t('ide.share.title') }}
+        </GameButton>
+        <GameButton
+          type="default"
+          icon="mdi:file-code"
+          size="small"
+          :disabled="isFileOperationPending"
+          data-testid="ide-export-html-button"
+          @click="showExportHtmlDialog = true"
+        >
+          {{ t('ide.toolbar.exportHtml') }}
         </GameButton>
       </template>
     </div>
@@ -328,6 +351,12 @@ onUnmounted(() => {
       :source="programStore.code"
       :bg="programStore.currentProgram?.value?.bg"
       @close="showShareDialog = false"
+    />
+
+    <!-- Export HTML dialog -->
+    <ExportHtmlDialog
+      :visible="showExportHtmlDialog"
+      @close="showExportHtmlDialog = false"
     />
   </div>
 </template>

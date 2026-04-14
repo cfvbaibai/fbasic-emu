@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { ref } from 'vue'
+import { defineComponent, ref } from 'vue'
 
 import ProgramToolbar from '@/features/ide/components/ProgramToolbar.vue'
 
@@ -16,6 +16,7 @@ const mockT = createI18nMock({
   'ide.toolbar.new': 'New',
   'ide.toolbar.import': 'Import',
   'ide.toolbar.export': 'Export',
+  'ide.toolbar.exportHtml': 'Export as HTML',
   'ide.toolbar.discardConfirm': 'Discard unsaved changes?',
   'ide.toolbar.programNamePlaceholder': 'Program name',
   'ide.toolbar.unsavedChanges': 'Unsaved changes',
@@ -29,6 +30,7 @@ const mockT = createI18nMock({
   'ide.share.encoding': 'Generating share URL...',
   'ide.share.encodeFailed': 'Failed to generate share URL.',
   'ide.share.tooLarge': 'This program is too large to share.',
+  'ide.exportHtml.title': 'Export as HTML',
   'common.confirmDialog.confirm': 'OK',
   'common.confirmDialog.cancel': 'Cancel',
 })
@@ -61,6 +63,23 @@ vi.mock('@/shared/utils/programCodec', () => ({
     tooLarge: false,
   }),
 }))
+
+vi.mock('@/features/ide/composables/useHtmlExporter', () => ({
+  useHtmlExporter: () => ({
+    isExporting: ref(false),
+    exportError: ref(''),
+    exportHtml: vi.fn(),
+  }),
+}))
+
+// Stub Teleport so ExportHtmlDialog content renders inline
+const teleportStub = defineComponent({
+  name: 'Teleport',
+  props: ['to'],
+  render() {
+    return this.$slots.default?.()
+  },
+})
 
 describe('ProgramToolbar', () => {
   beforeEach(() => {
@@ -332,6 +351,86 @@ describe('ProgramToolbar', () => {
 
       // No error message should be displayed
       expect(wrapper.find('.error-message').exists()).toBe(false)
+
+      wrapper.unmount()
+    })
+  })
+
+  describe('Export as HTML button', () => {
+    const mountOptions = {
+      props: { isCompact: false },
+      global: { stubs: { Teleport: teleportStub } },
+    }
+
+    it('renders the Export as HTML button with correct text', () => {
+      const wrapper = mount(ProgramToolbar, mountOptions)
+
+      const button = wrapper.find('[data-testid="ide-export-html-button"]')
+      expect(button.exists()).toBe(true)
+      expect(button.text()).toEqual('Export as HTML')
+
+      wrapper.unmount()
+    })
+
+    it('disables Export as HTML button during file operation', async () => {
+      let resolveOpen!: () => void
+      mockOpen.mockReturnValue(
+        new Promise<boolean>((resolve) => {
+          resolveOpen = () => resolve(true)
+        }),
+      )
+
+      isDirtyRef.value = false
+      const wrapper = mount(ProgramToolbar, mountOptions)
+
+      const openButton = wrapper.find('[data-testid="ide-open-button"]')
+      await openButton.trigger('click')
+      await wrapper.vm.$nextTick()
+
+      const exportHtmlButton = wrapper.find('[data-testid="ide-export-html-button"]')
+      expect(exportHtmlButton.attributes('disabled')).toBeDefined()
+
+      resolveOpen()
+      await wrapper.vm.$nextTick()
+
+      wrapper.unmount()
+    })
+
+    it('opens ExportHtmlDialog when Export as HTML button is clicked', async () => {
+      const wrapper = mount(ProgramToolbar, mountOptions)
+
+      // Dialog should not be visible initially
+      expect(wrapper.find('.game-dialog-overlay').exists()).toBe(false)
+
+      // Click Export as HTML button
+      const button = wrapper.find('[data-testid="ide-export-html-button"]')
+      await button.trigger('click')
+      await wrapper.vm.$nextTick()
+
+      // ExportHtmlDialog should now be visible
+      expect(wrapper.find('.game-dialog-overlay').exists()).toBe(true)
+      expect(wrapper.find('.game-dialog-title').text()).toEqual('Export as HTML')
+
+      wrapper.unmount()
+    })
+
+    it('closes ExportHtmlDialog when close is emitted', async () => {
+      const wrapper = mount(ProgramToolbar, mountOptions)
+
+      // Open dialog
+      const button = wrapper.find('[data-testid="ide-export-html-button"]')
+      await button.trigger('click')
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.find('.game-dialog-overlay').exists()).toBe(true)
+
+      // Click cancel button inside dialog
+      const cancelBtn = wrapper.find('[data-testid="export-html-cancel-button"]')
+      await cancelBtn.trigger('click')
+      await wrapper.vm.$nextTick()
+
+      // Dialog should be dismissed
+      expect(wrapper.find('.game-dialog-overlay').exists()).toBe(false)
 
       wrapper.unmount()
     })

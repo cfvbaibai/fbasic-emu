@@ -4,6 +4,7 @@
     "new": "New",
     "import": "Import",
     "export": "Export",
+    "exportHtml": "Export as HTML",
     "discardConfirm": "Discard unsaved changes?",
     "programNamePlaceholder": "Program name",
     "unsavedChanges": "Unsaved changes",
