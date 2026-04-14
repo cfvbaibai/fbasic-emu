@@ -385,7 +385,6 @@
     "openLogLevels": "Open log levels"
   },
   "stateInspector": {
-    "title": "State Inspector",
     "tabPalette": "PALETTE",
     "tabSprite": "SPRITE",
     "tabMove": "MOVE",
@@ -404,7 +403,6 @@
     "empty": "(none)"
   },
   "bufferInspector": {
-    "title": "Buffer Inspector",
     "spriteSlotsTitle": "Sprite Slots",
     "spriteSlotsDisabled": "SPRITE OFF",
     "spriteSlotsOn": "ON",

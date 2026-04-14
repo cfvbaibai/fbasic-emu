@@ -385,7 +385,6 @@
     "openLogLevels": "開啟日誌級別"
   },
   "stateInspector": {
-    "title": "狀態檢查",
     "tabPalette": "PALETTE",
     "tabSprite": "SPRITE",
     "tabMove": "MOVE",
@@ -404,7 +403,6 @@
     "empty": "（無）"
   },
   "bufferInspector": {
-    "title": "緩衝區檢查器",
     "spriteSlotsTitle": "精靈槽位",
     "spriteSlotsDisabled": "精靈已關閉",
     "spriteSlotsOn": "開",

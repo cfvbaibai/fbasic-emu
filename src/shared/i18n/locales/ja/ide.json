@@ -385,7 +385,6 @@
     "openLogLevels": "ログレベルを開く"
   },
   "stateInspector": {
-    "title": "状態インスペクタ",
     "tabPalette": "PALETTE",
     "tabSprite": "SPRITE",
     "tabMove": "MOVE",
@@ -404,7 +403,6 @@
     "empty": "（なし）"
   },
   "bufferInspector": {
-    "title": "バッファインスペクタ",
     "spriteSlotsTitle": "スプライトスロット",
     "spriteSlotsDisabled": "SPRITE OFF",
     "spriteSlotsOn": "ON",
