@@ -2,13 +2,14 @@
  * useHtmlExporter composable
  *
  * Orchestrates exporting an F-BASIC program as a standalone HTML file.
- * Step 2a: Adds Blob creation and file download trigger mechanism.
- * Full runtime embedding will be added in later steps (#772, #773).
+ * Uses buildExportHtml to assemble the HTML template with canvas, theme CSS,
+ * embedded program source, and a runtime script placeholder.
  */
 
 import { ref } from 'vue'
 
 import type { CompactBg } from '@/core/types/program-types'
+import { buildExportHtml } from '@/features/ide/composables/buildExportHtml'
 
 /** Default filename used when the export title is empty or whitespace-only. */
 export const DEFAULT_EXPORT_FILENAME = 'program.html'
@@ -27,40 +28,6 @@ export interface HtmlExportOptions {
 
 /** MIME type for HTML content. */
 const HTML_MIME_TYPE = 'text/html;charset=utf-8'
-
-/**
- * Generates a minimal HTML wrapper containing the F-BASIC program source.
- * This is a placeholder — the full standalone HTML with embedded runtime
- * will be generated in later steps (#772, #773).
- *
- * @param source - The F-BASIC program source code
- * @param options - Export configuration options
- * @returns HTML string with the program source embedded
- */
-function buildMinimalHtml(source: string, options: HtmlExportOptions): string {
-  // TODO(#772): Use options.theme to embed the correct theme stylesheet
-  // TODO(#773): Use options.includeSound to conditionally embed sound data
-  // TODO(#773): Use options.includeSprites to conditionally embed sprite data
-  const escapedSource = source
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-
-  return [
-    '<!DOCTYPE html>',
-    '<html lang="en">',
-    '<head>',
-    '  <meta charset="UTF-8">',
-    `  <title>${options.title}</title>`,
-    '</head>',
-    '<body>',
-    '  <pre>',
-    escapedSource,
-    '  </pre>',
-    '</body>',
-    '</html>',
-  ].join('\n')
-}
 
 /**
  * Triggers a file download by creating a temporary anchor element.
@@ -112,7 +79,8 @@ export function useHtmlExporter(
 
   /**
    * Triggers the HTML export with the given options.
-   * Creates a Blob with minimal HTML content and triggers a file download.
+   * Assembles the HTML template with canvas, theme CSS, and program source,
+   * creates a Blob, and triggers a file download.
    *
    * @param options - Export configuration options
    */
@@ -121,7 +89,7 @@ export function useHtmlExporter(
     exportError.value = ''
 
     try {
-      const html = buildMinimalHtml(source.value, options)
+      const html = buildExportHtml(source.value, options)
       const blob = new Blob([html], { type: HTML_MIME_TYPE })
       const filename = toExportFilename(options.title)
       triggerDownload(blob, filename)
