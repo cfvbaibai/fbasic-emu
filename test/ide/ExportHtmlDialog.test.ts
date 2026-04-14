@@ -3,7 +3,6 @@ import { mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { defineComponent, nextTick, ref } from 'vue'
 
-import type { CompactBg } from '@/core/types/program-types'
 import ExportHtmlDialog from '@/features/ide/components/ExportHtmlDialog.vue'
 
 // ---------------------------------------------------------------------------
@@ -58,13 +57,10 @@ const teleportStub = defineComponent({
 
 function mountDialog(props: {
   visible?: boolean
-  source?: string
-  bg?: CompactBg
 } = {}) {
   return mount(ExportHtmlDialog, {
     props: {
       visible: false,
-      source: '10 PRINT "HELLO"',
       ...props,
     },
     global: {

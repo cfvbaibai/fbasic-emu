@@ -6,19 +6,14 @@
  * Uses the useHtmlExporter composable to trigger the actual export.
  */
 
-import { onMounted, onUnmounted, ref, toRef, watch } from 'vue'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import type { CompactBg } from '@/core/types/program-types'
 import { useHtmlExporter } from '@/features/ide/composables/useHtmlExporter'
 
-const props = withDefaults(defineProps<{
+const props = defineProps<{
   visible: boolean
-  source: string
-  bg?: CompactBg
-}>(), {
-  bg: undefined,
-})
+}>()
 
 const emit = defineEmits<{
   (e: 'close'): void
@@ -27,10 +22,7 @@ const emit = defineEmits<{
 const { t } = useI18n()
 
 // Composable
-const { isExporting, exportError, exportHtml } = useHtmlExporter(
-  toRef(props, 'source'),
-  toRef(props, 'bg'),
-)
+const { isExporting, exportError, exportHtml } = useHtmlExporter()
 
 // Export options state
 const title = ref('')
