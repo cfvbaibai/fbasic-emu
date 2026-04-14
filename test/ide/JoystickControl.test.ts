@@ -5,26 +5,19 @@ import { defineComponent, reactive, ref } from 'vue'
 
 import JoystickControl from '@/features/ide/components/JoystickControl.vue'
 
+import { createI18nMock } from '../helpers/createI18nMock'
+
+const mockT = createI18nMock({
+  'ide.joystick.control': 'Joystick Control',
+  'ide.joystick.joystick0': 'Joystick 0',
+  'ide.joystick.joystick1': 'Joystick 1',
+  'ide.joystick.joystick': 'Joystick {id}',
+  'ide.joystick.keyboardHint': 'Keyboard control enabled',
+  'ide.joystick.configureKeys': 'Configure Keys',
+})
+
 vi.mock('vue-i18n', () => ({
-  useI18n: () => ({
-    t: (key: string, params?: Record<string, string | number>) => {
-      const messages: Record<string, string> = {
-        'ide.joystick.control': 'Joystick Control',
-        'ide.joystick.joystick0': 'Joystick 0',
-        'ide.joystick.joystick1': 'Joystick 1',
-        'ide.joystick.joystick': 'Joystick {id}',
-        'ide.joystick.keyboardHint': 'Keyboard control enabled',
-        'ide.joystick.configureKeys': 'Configure Keys',
-      }
-      let text = messages[key] ?? key
-      if (params) {
-        for (const [k, v] of Object.entries(params)) {
-          text = text.replace(`{${k}}`, String(v))
-        }
-      }
-      return text
-    },
-  }),
+  useI18n: () => ({ t: mockT }),
 }))
 
 const mockStartDpadHold = vi.fn()
