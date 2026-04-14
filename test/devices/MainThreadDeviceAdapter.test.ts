@@ -11,6 +11,8 @@ import { describe, expect, it, vi } from 'vitest'
 import { SCREEN_DIMENSIONS } from '@/core/constants'
 import type { CanvasSurface } from '@/core/devices/CanvasScreenRenderer'
 import { MainThreadDeviceAdapter } from '@/core/devices/MainThreadDeviceAdapter'
+import type { DefSpriteDefinition, SpriteState } from '@/core/sprite/types'
+import type { Tile } from '@/shared/data/types'
 
 // ============================================================================
 // Mock Canvas Factory
@@ -21,6 +23,7 @@ function createMockContext() {
     fillRect: vi.fn<(...args: unknown[]) => void>(),
     fillText: vi.fn<(...args: unknown[]) => void>(),
     measureText: vi.fn<(...args: unknown[]) => { width: number }>(() => ({ width: 8 })),
+    putImageData: vi.fn<(...args: unknown[]) => void>(),
     fillStyle: '',
     font: '',
     textBaseline: '',
@@ -33,6 +36,47 @@ function createMockContext() {
   }
 
   return { ctx, canvas }
+}
+
+// ============================================================================
+// Sprite Test Helpers
+// ============================================================================
+
+/** Creates a minimal 8x8 tile with the given color index. */
+function createSolidTile(colorIndex: number): Tile {
+  return Array.from({ length: 8 }, () => Array.from({ length: 8 }, () => colorIndex))
+}
+
+/** Creates a minimal DefSpriteDefinition for testing. */
+function createSpriteDefinition(
+  overrides: Partial<DefSpriteDefinition> = {},
+): DefSpriteDefinition {
+  return {
+    spriteNumber: 0,
+    colorCombination: 0,
+    size: 0,
+    priority: 0,
+    invertX: 0,
+    invertY: 0,
+    characterSet: '@',
+    tiles: [createSolidTile(1)],
+    ...overrides,
+  }
+}
+
+/** Creates a SpriteState for testing. */
+function createSpriteState(
+  overrides: Partial<SpriteState> = {},
+): SpriteState {
+  return {
+    spriteNumber: 0,
+    x: 0,
+    y: 0,
+    visible: true,
+    priority: 0,
+    definition: createSpriteDefinition(),
+    ...overrides,
+  }
 }
 
 // ============================================================================
@@ -103,11 +147,114 @@ describe('MainThreadDeviceAdapter', () => {
     })
   })
 
-  describe('sprite methods (stubbed)', () => {
-    it('getSpritePosition returns null', () => {
+  describe('sprite position methods', () => {
+    it('getSpritePosition returns null when no position stored', () => {
       const { canvas } = createMockContext()
       const adapter = new MainThreadDeviceAdapter({ canvas })
       expect(adapter.getSpritePosition(0)).toBeNull()
+    })
+
+    it('setSpritePosition stores and getSpritePosition retrieves position', () => {
+      const { canvas } = createMockContext()
+      const adapter = new MainThreadDeviceAdapter({ canvas })
+
+      adapter.setSpritePosition(0, 100, 50)
+
+      expect(adapter.getSpritePosition(0)).toEqual({ x: 100, y: 50 })
+    })
+
+    it('clearSpritePosition removes stored position', () => {
+      const { canvas } = createMockContext()
+      const adapter = new MainThreadDeviceAdapter({ canvas })
+
+      adapter.setSpritePosition(0, 100, 50)
+      adapter.clearSpritePosition(0)
+
+      expect(adapter.getSpritePosition(0)).toBeNull()
+    })
+
+    it('stores positions for multiple action numbers independently', () => {
+      const { canvas } = createMockContext()
+      const adapter = new MainThreadDeviceAdapter({ canvas })
+
+      adapter.setSpritePosition(0, 10, 20)
+      adapter.setSpritePosition(3, 200, 150)
+
+      expect(adapter.getSpritePosition(0)).toEqual({ x: 10, y: 20 })
+      expect(adapter.getSpritePosition(3)).toEqual({ x: 200, y: 150 })
+      expect(adapter.getSpritePosition(1)).toBeNull()
+    })
+  })
+
+  describe('sendSpriteStates', () => {
+    it('stores sprite states and enables sprite rendering', () => {
+      const { ctx, canvas } = createMockContext()
+      const adapter = new MainThreadDeviceAdapter({ canvas })
+
+      const sprite = createSpriteState({ spriteNumber: 0, x: 10, y: 20 })
+      adapter.sendSpriteStates([sprite], true)
+
+      // Sprite should be rendered via putImageData
+      expect(ctx.putImageData).toHaveBeenCalled()
+      const callArgs = ctx.putImageData.mock.calls[0]!
+      expect(callArgs[1]).toEqual(10)
+      expect(callArgs[2]).toEqual(20)
+    })
+
+    it('does not render sprites when spriteEnabled is false', () => {
+      const { ctx, canvas } = createMockContext()
+      const adapter = new MainThreadDeviceAdapter({ canvas })
+
+      const sprite = createSpriteState({ spriteNumber: 0, x: 10, y: 20 })
+      adapter.sendSpriteStates([sprite], false)
+
+      expect(ctx.putImageData).not.toHaveBeenCalled()
+    })
+
+    it('skips invisible sprites even when enabled', () => {
+      const { ctx, canvas } = createMockContext()
+      const adapter = new MainThreadDeviceAdapter({ canvas })
+
+      const sprite = createSpriteState({ visible: false })
+      adapter.sendSpriteStates([sprite], true)
+
+      expect(ctx.putImageData).not.toHaveBeenCalled()
+    })
+
+    it('renders multiple visible sprites', () => {
+      const { ctx, canvas } = createMockContext()
+      const adapter = new MainThreadDeviceAdapter({ canvas })
+
+      const sprite0 = createSpriteState({ spriteNumber: 0, x: 10, y: 20 })
+      const sprite1 = createSpriteState({
+        spriteNumber: 1,
+        x: 50,
+        y: 60,
+        definition: createSpriteDefinition({ spriteNumber: 1 }),
+      })
+
+      adapter.sendSpriteStates([sprite0, sprite1], true)
+
+      expect(ctx.putImageData).toHaveBeenCalledTimes(2)
+    })
+
+    it('re-renders sprites on subsequent sendSpriteStates calls', () => {
+      const { ctx, canvas } = createMockContext()
+      const adapter = new MainThreadDeviceAdapter({ canvas })
+
+      const sprite = createSpriteState({ x: 10, y: 20 })
+      adapter.sendSpriteStates([sprite], true)
+
+      const callCount = ctx.putImageData.mock.calls.length
+
+      // Send updated position
+      const updatedSprite = createSpriteState({ x: 30, y: 40 })
+      adapter.sendSpriteStates([updatedSprite], true)
+
+      expect(ctx.putImageData.mock.calls.length).toEqual(callCount + 1)
+      const lastCall = ctx.putImageData.mock.calls[callCount]!
+      expect(lastCall[1]).toEqual(30)
+      expect(lastCall[2]).toEqual(40)
     })
   })
 
@@ -238,6 +385,31 @@ describe('MainThreadDeviceAdapter', () => {
       adapter.resetState()
 
       expect(adapter.getScreenCell(0, 0)).toEqual(' ')
+    })
+
+    it('resets sprite renderer state and clears sprite positions', () => {
+      const { ctx, canvas } = createMockContext()
+      const adapter = new MainThreadDeviceAdapter({ canvas })
+
+      // Set up sprite state
+      adapter.setSpritePosition(0, 100, 50)
+      const sprite = createSpriteState({ x: 10, y: 20 })
+      adapter.sendSpriteStates([sprite], true)
+
+      // Verify sprite was rendered before reset
+      expect(ctx.putImageData).toHaveBeenCalled()
+
+      // Reset
+      adapter.resetState()
+
+      // Sprite positions should be cleared
+      expect(adapter.getSpritePosition(0)).toBeNull()
+
+      // After reset, sending sprites with enabled=true should still render
+      ctx.putImageData.mockClear()
+      const newSprite = createSpriteState({ x: 5, y: 10 })
+      adapter.sendSpriteStates([newSprite], true)
+      expect(ctx.putImageData).toHaveBeenCalled()
     })
   })
 })
