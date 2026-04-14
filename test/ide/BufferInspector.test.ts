@@ -4,10 +4,8 @@ import { describe, expect, it, vi } from 'vitest'
 import { defineComponent } from 'vue'
 
 import { SHARED_DISPLAY_BUFFER_BYTES } from '@/core/animation/sharedDisplayBuffer'
-import { SyncCommandType } from '@/core/animation/sharedDisplayBuffer'
-import type { SyncCommand } from '@/core/animation/sharedDisplayBufferAccessor'
 import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
-import BufferInspector from '@/features/ide/components/BufferInspector.vue'
+import IdeBottomArea from '@/features/ide/components/IdeBottomArea.vue'
 
 import { createTestKeyboardBuffer } from './helpers/createTestKeyboardBuffer'
 
@@ -23,120 +21,150 @@ vi.mock('vue-i18n', () => ({
 }))
 
 /**
- * Test-only interface listing the accessor methods needed by BufferInspector
- * and its child sections in these tests. Provides compile-time safety: if
- * BufferInspector later calls an accessor method not listed here, TypeScript
- * will flag the mock as incomplete.
- */
-interface TestAccessor {
-  readScreenChar(x: number, y: number): number
-  readScreenPattern(x: number, y: number): number
-  readSyncCommand(): SyncCommand | null
-  readAck(): number
-}
-
-/**
  * Real accessor instance for IdeBottomArea integration tests.
- * Both BufferInspector children are stubbed in these tests, so the accessor
- * is unused at runtime. A real instance is used because SharedDisplayBufferAccessor
- * is a class type that cannot be structurally satisfied by a plain object without
- * type assertions like `as never`.
+ * Children are stubbed in these tests, so the accessor is unused at runtime.
+ * A real instance is used because SharedDisplayBufferAccessor is a class type
+ * that cannot be structurally satisfied by a plain object without type assertions.
  */
 const MOCK_FULL_ACCESSOR: SharedDisplayBufferAccessor = new SharedDisplayBufferAccessor(
   new SharedArrayBuffer(SHARED_DISPLAY_BUFFER_BYTES),
 )
 
-/** Mock accessor with methods needed by BufferInspector tests. */
-function createMockAccessor(overrides: Partial<TestAccessor> = {}): TestAccessor {
-  return {
-    readScreenChar: () => 0x20,
-    readScreenPattern: () => 0,
-    readSyncCommand: (): SyncCommand | null => null,
-    readAck: (): number => 0,
-    ...overrides,
-  }
-}
-
-describe('BufferInspector', () => {
-  const mockAccessor = createMockAccessor() as SharedDisplayBufferAccessor
-
-  it('renders without errors', () => {
+describe('IdeBottomArea tab structure', () => {
+  it('renders four flat tab panes: palettes, sprite, move, buffer', async () => {
     const keyboardView = createTestKeyboardBuffer()
-    const wrapper = mount(BufferInspector, {
+    const wrapper = mount(IdeBottomArea, {
       props: {
+        screenBuffer: [],
+        cursorX: 0,
+        cursorY: 0,
+        bgPalette: 1,
+        spritePalette: 1,
+        backdropColor: 0,
+        cgenMode: 2,
         spriteStates: [],
         spriteEnabled: false,
-        sharedDisplayBufferAccessor: mockAccessor,
+        sharedDisplayBufferAccessor: MOCK_FULL_ACCESSOR,
         keyboardView,
       },
       global: {
         stubs: {
-          GameBlock: defineComponent({ template: '<div><slot /></div>' }),
-        },
-      },
-    })
-
-    expect(wrapper.exists()).toBe(true)
-    wrapper.unmount()
-  })
-
-  it('has the correct component name', () => {
-    const keyboardView = createTestKeyboardBuffer()
-    const wrapper = mount(BufferInspector, {
-      props: {
-        spriteStates: [],
-        spriteEnabled: false,
-        sharedDisplayBufferAccessor: mockAccessor,
-        keyboardView,
-      },
-      global: {
-        stubs: {
-          GameBlock: defineComponent({ template: '<div><slot /></div>' }),
-        },
-      },
-    })
-
-    expect(wrapper.vm.$options.name).toBe('BufferInspector')
-    wrapper.unmount()
-  })
-
-  it('displays the title from i18n key', () => {
-    const keyboardView = createTestKeyboardBuffer()
-    const wrapper = mount(BufferInspector, {
-      props: {
-        spriteStates: [],
-        spriteEnabled: false,
-        sharedDisplayBufferAccessor: mockAccessor,
-        keyboardView,
-      },
-      global: {
-        stubs: {
-          GameBlock: defineComponent({
-            props: ['title'],
-            template: '<div class="game-block-stub" :data-title="title"><slot /></div>',
+          JoystickControl: true,
+          GameTabs: defineComponent({
+            props: ['modelValue', 'type'],
+            template: '<div class="game-tabs-stub"><slot /></div>',
           }),
+          GameTabPane: defineComponent({
+            props: ['name', 'label'],
+            template: '<div class="game-tab-pane-stub" :data-name="name"><slot /></div>',
+          }),
+          ActivePaletteDisplay: true,
+          MovementCard: true,
+          DisplayBufferSection: true,
+          JoystickBufferSection: true,
+          KeyboardBufferSection: true,
+          SpriteSlotsSection: true,
+          AnimationSyncSection: true,
         },
       },
     })
 
-    const block = wrapper.find('.game-block-stub')
-    expect(block.exists()).toBe(true)
-    expect(block.attributes('data-title')).toBe('Buffer Inspector')
+    const tabPanes = wrapper.findAll('.game-tab-pane-stub')
+    expect(tabPanes.length).toBe(4)
+
+    const names = tabPanes.map(p => p.attributes('data-name'))
+    expect(names).toContain('palettes')
+    expect(names).toContain('sprite')
+    expect(names).toContain('move')
+    expect(names).toContain('buffer')
     wrapper.unmount()
   })
 
-  it('renders content area with DisplayBufferSection, JoystickBufferSection, KeyboardBufferSection, SpriteSlotsSection and AnimationSyncSection', () => {
+  it('defaults to the palettes tab being active', async () => {
     const keyboardView = createTestKeyboardBuffer()
-    const wrapper = mount(BufferInspector, {
+    const wrapper = mount(IdeBottomArea, {
       props: {
+        screenBuffer: [],
+        cursorX: 0,
+        cursorY: 0,
+        bgPalette: 1,
+        spritePalette: 1,
+        backdropColor: 0,
+        cgenMode: 2,
         spriteStates: [],
         spriteEnabled: false,
-        sharedDisplayBufferAccessor: mockAccessor,
+        sharedDisplayBufferAccessor: MOCK_FULL_ACCESSOR,
         keyboardView,
       },
       global: {
         stubs: {
-          GameBlock: defineComponent({ template: '<div><slot /></div>' }),
+          JoystickControl: true,
+          GameTabs: defineComponent({
+            props: ['modelValue', 'type'],
+            template: '<div class="game-tabs-stub" :data-active="modelValue"><slot /></div>',
+          }),
+          GameTabPane: defineComponent({
+            props: ['name', 'label'],
+            template: '<div class="game-tab-pane-stub" :data-name="name"><slot /></div>',
+          }),
+          ActivePaletteDisplay: true,
+          MovementCard: true,
+          DisplayBufferSection: true,
+          JoystickBufferSection: true,
+          KeyboardBufferSection: true,
+          SpriteSlotsSection: true,
+          AnimationSyncSection: true,
+        },
+      },
+    })
+
+    const tabs = wrapper.find('.game-tabs-stub')
+    expect(tabs.attributes('data-active')).toBe('palettes')
+
+    wrapper.unmount()
+  })
+
+  it('renders BUFFER tab content with all child sections', async () => {
+    const keyboardView = createTestKeyboardBuffer()
+    const wrapper = mount(IdeBottomArea, {
+      props: {
+        screenBuffer: [],
+        cursorX: 0,
+        cursorY: 0,
+        bgPalette: 1,
+        spritePalette: 1,
+        backdropColor: 0,
+        cgenMode: 2,
+        spriteStates: [],
+        spriteEnabled: false,
+        sharedDisplayBufferAccessor: MOCK_FULL_ACCESSOR,
+        keyboardView,
+      },
+      global: {
+        stubs: {
+          JoystickControl: true,
+          GameTabs: defineComponent({
+            props: ['modelValue', 'type'],
+            template: '<div><slot /></div>',
+          }),
+          GameTabPane: defineComponent({ template: '<div><slot /></div>' }),
+          ActivePaletteDisplay: true,
+          MovementCard: true,
+          DisplayBufferSection: defineComponent({
+            template: '<div class="display-buffer-section" />',
+          }),
+          JoystickBufferSection: defineComponent({
+            template: '<div class="joystick-buffer-section" />',
+          }),
+          KeyboardBufferSection: defineComponent({
+            template: '<div class="keyboard-buffer-section" />',
+          }),
+          SpriteSlotsSection: defineComponent({
+            template: '<div class="sprite-slots-section" />',
+          }),
+          AnimationSyncSection: defineComponent({
+            template: '<div class="animation-sync-section" />',
+          }),
         },
       },
     })
@@ -147,229 +175,6 @@ describe('BufferInspector', () => {
     expect(wrapper.find('.keyboard-buffer-section').exists()).toBe(true)
     expect(wrapper.find('.sprite-slots-section').exists()).toBe(true)
     expect(wrapper.find('.animation-sync-section').exists()).toBe(true)
-    wrapper.unmount()
-  })
-
-  it('passes sharedDisplayBufferAccessor to DisplayBufferSection', () => {
-    const keyboardView = createTestKeyboardBuffer()
-    const wrapper = mount(BufferInspector, {
-      props: {
-        spriteStates: [],
-        spriteEnabled: false,
-        sharedDisplayBufferAccessor: mockAccessor,
-        keyboardView,
-      },
-      global: {
-        stubs: {
-          GameBlock: defineComponent({ template: '<div><slot /></div>' }),
-        },
-      },
-    })
-
-    const section = wrapper.findComponent({ name: 'DisplayBufferSection' })
-    expect(section.exists()).toBe(true)
-    expect(section.props('sharedDisplayBufferAccessor')).toEqual(mockAccessor)
-    wrapper.unmount()
-  })
-
-  it('passes sharedJoystickBuffer to JoystickBufferSection', () => {
-    const buffer = new SharedArrayBuffer(32)
-    const keyboardView = createTestKeyboardBuffer()
-    const wrapper = mount(BufferInspector, {
-      props: {
-        spriteStates: [],
-        spriteEnabled: false,
-        sharedDisplayBufferAccessor: mockAccessor,
-        sharedJoystickBuffer: buffer,
-        keyboardView,
-      },
-      global: {
-        stubs: {
-          GameBlock: defineComponent({ template: '<div><slot /></div>' }),
-        },
-      },
-    })
-
-    const section = wrapper.findComponent({ name: 'JoystickBufferSection' })
-    expect(section.exists()).toBe(true)
-    expect(section.props('sharedJoystickBuffer')).toBe(buffer)
-    wrapper.unmount()
-  })
-
-  it('passes keyboardView to KeyboardBufferSection', () => {
-    const keyboardView = createTestKeyboardBuffer()
-    const wrapper = mount(BufferInspector, {
-      props: {
-        spriteStates: [],
-        spriteEnabled: false,
-        sharedDisplayBufferAccessor: mockAccessor,
-        keyboardView,
-      },
-      global: {
-        stubs: {
-          GameBlock: defineComponent({ template: '<div><slot /></div>' }),
-        },
-      },
-    })
-
-    const section = wrapper.findComponent({ name: 'KeyboardBufferSection' })
-    expect(section.exists()).toBe(true)
-    expect(section.props('keyboardView')).toStrictEqual(keyboardView)
-    wrapper.unmount()
-  })
-
-  it('passes spriteStates and spriteEnabled to SpriteSlotsSection', () => {
-    const keyboardView = createTestKeyboardBuffer()
-    const wrapper = mount(BufferInspector, {
-      props: {
-        spriteStates: [
-          { spriteNumber: 0, x: 10, y: 20, visible: true, priority: 0, definition: null },
-        ],
-        spriteEnabled: true,
-        sharedDisplayBufferAccessor: mockAccessor,
-        keyboardView,
-      },
-      global: {
-        stubs: {
-          GameBlock: defineComponent({ template: '<div><slot /></div>' }),
-        },
-      },
-    })
-
-    const section = wrapper.findComponent({ name: 'SpriteSlotsSection' })
-    expect(section.exists()).toBe(true)
-    expect(section.props('spriteStates')).toEqual([
-      { spriteNumber: 0, x: 10, y: 20, visible: true, priority: 0, definition: null },
-    ])
-    expect(section.props('spriteEnabled')).toBe(true)
-    wrapper.unmount()
-  })
-
-  it('passes sync command and ack status to AnimationSyncSection', () => {
-    const syncCommand: SyncCommand = {
-      commandType: SyncCommandType.START_MOVEMENT,
-      actionNumber: 2,
-      params: { startX: 10, startY: 20, direction: 1, speed: 3, distance: 50, priority: 0 },
-    }
-    const keyboardView = createTestKeyboardBuffer()
-    const accessor = createMockAccessor({
-      readSyncCommand: () => syncCommand,
-      readAck: () => 1,
-    }) as SharedDisplayBufferAccessor
-    const wrapper = mount(BufferInspector, {
-      props: {
-        spriteStates: [],
-        spriteEnabled: false,
-        sharedDisplayBufferAccessor: accessor,
-        keyboardView,
-      },
-      global: {
-        stubs: {
-          GameBlock: defineComponent({ template: '<div><slot /></div>' }),
-        },
-      },
-    })
-
-    const section = wrapper.findComponent({ name: 'AnimationSyncSection' })
-    expect(section.exists()).toBe(true)
-    expect(section.props('syncCommand')).toEqual(syncCommand)
-    expect(section.props('ackStatus')).toBe(1)
-    wrapper.unmount()
-  })
-})
-
-describe('IdeBottomArea tab integration', () => {
-  it('renders both StateInspector and BufferInspector tab panes', async () => {
-    // Dynamic import to avoid module caching issues
-    const ideBottomArea = (await import('@/features/ide/components/IdeBottomArea.vue')).default
-
-    const keyboardView = createTestKeyboardBuffer()
-    const wrapper = mount(ideBottomArea, {
-      props: {
-        screenBuffer: [],
-        cursorX: 0,
-        cursorY: 0,
-        bgPalette: 1,
-        spritePalette: 1,
-        backdropColor: 0,
-        cgenMode: 2,
-        spriteStates: [],
-        spriteEnabled: false,
-        sharedDisplayBufferAccessor: MOCK_FULL_ACCESSOR,
-        keyboardView,
-      },
-      global: {
-        stubs: {
-          JoystickControl: true,
-          StateInspector: true,
-          BufferInspector: true,
-          GameBlock: defineComponent({
-            props: ['title', 'titleIcon', 'hideHeader'],
-            template: '<div class="game-block-stub"><slot /></div>',
-          }),
-          GameTabs: defineComponent({
-            props: ['modelValue', 'type'],
-            template: '<div class="game-tabs-stub"><slot /></div>',
-          }),
-          GameTabPane: defineComponent({
-            props: ['name', 'label'],
-            template: '<div class="game-tab-pane-stub" :data-name="name"><slot /></div>',
-          }),
-        },
-      },
-    })
-
-    const tabPanes = wrapper.findAll('.game-tab-pane-stub')
-    expect(tabPanes.length).toBe(2)
-
-    const names = tabPanes.map(p => p.attributes('data-name'))
-    expect(names).toContain('state')
-    expect(names).toContain('buffer')
-
-    wrapper.unmount()
-  })
-
-  it('defaults to the state tab being active', async () => {
-    const ideBottomAreaComponent = (await import('@/features/ide/components/IdeBottomArea.vue')).default
-
-    const keyboardView = createTestKeyboardBuffer()
-    const wrapper = mount(ideBottomAreaComponent, {
-      props: {
-        screenBuffer: [],
-        cursorX: 0,
-        cursorY: 0,
-        bgPalette: 1,
-        spritePalette: 1,
-        backdropColor: 0,
-        cgenMode: 2,
-        spriteStates: [],
-        spriteEnabled: false,
-        sharedDisplayBufferAccessor: MOCK_FULL_ACCESSOR,
-        keyboardView,
-      },
-      global: {
-        stubs: {
-          JoystickControl: true,
-          StateInspector: true,
-          BufferInspector: true,
-          GameBlock: defineComponent({
-            props: ['title', 'titleIcon', 'hideHeader'],
-            template: '<div class="game-block-stub"><slot /></div>',
-          }),
-          GameTabs: defineComponent({
-            props: ['modelValue', 'type'],
-            template: '<div class="game-tabs-stub" :data-active="modelValue"><slot /></div>',
-          }),
-          GameTabPane: defineComponent({
-            props: ['name', 'label'],
-            template: '<div class="game-tab-pane-stub" :data-name="name"><slot /></div>',
-          }),
-        },
-      },
-    })
-
-    const tabs = wrapper.find('.game-tabs-stub')
-    expect(tabs.attributes('data-active')).toBe('state')
 
     wrapper.unmount()
   })

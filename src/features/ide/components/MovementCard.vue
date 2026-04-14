@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { GameIcon } from '@/shared/components/ui'
 import { MoveCharacterCode } from '@/shared/data/types'
 
-/** Single movement slot data for display in StateInspector */
+/** Single movement slot data for display in the MOVE tab */
 export interface MovementSlotData {
   actionNumber: number
   hasData: boolean

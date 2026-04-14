@@ -175,7 +175,7 @@ const tutorialPanel = useTutorialPanel()
 const editorPanelRef = useTemplateRef<HTMLDivElement>('editorPanelRef')
 const isToolbarCompact = useContainerWidth(editorPanelRef, 900)
 
-// StateInspector ref for animation loop to call updateMoveSlotsData
+// IdeBottomArea ref for animation loop to call updateMoveSlotsData
 const bottomAreaRef = useTemplateRef<{ updateMoveSlotsData: () => void }>('bottomAreaRef')
 
 // Provide screen context so ScreenTab/Screen can inject instead of prop drilling

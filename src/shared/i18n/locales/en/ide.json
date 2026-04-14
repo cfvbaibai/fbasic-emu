@@ -389,6 +389,7 @@
     "tabPalette": "PALETTE",
     "tabSprite": "SPRITE",
     "tabMove": "MOVE",
+    "tabBuffer": "BUFFER",
     "tabBg": "BG",
     "palettes": "Palettes",
     "backdrop": "Backdrop",

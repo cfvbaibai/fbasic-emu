@@ -4,8 +4,10 @@ import { describe, expect, it, vi } from 'vitest'
 import { defineComponent } from 'vue'
 
 import type { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
-import StateInspector from '@/features/ide/components/StateInspector.vue'
+import IdeBottomArea from '@/features/ide/components/IdeBottomArea.vue'
 import enIde from '@/shared/i18n/locales/en/ide.json'
+
+import { createTestKeyboardBuffer } from './helpers/createTestKeyboardBuffer'
 
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
@@ -39,6 +41,10 @@ type InspectorAccessor = Pick<
   | 'readSpritePriority'
   | 'readSpriteCharacterType'
   | 'readSpriteColorCombination'
+  | 'readScreenChar'
+  | 'readScreenPattern'
+  | 'readSyncCommand'
+  | 'readAck'
 >
 
 function createAccessorMock(): SharedDisplayBufferAccessor {
@@ -53,20 +59,38 @@ function createAccessorMock(): SharedDisplayBufferAccessor {
     readSpritePriority: (actionNumber: number) => (actionNumber === 0 ? 1 : 0),
     readSpriteCharacterType: (actionNumber: number) => (actionNumber === 0 ? 2 : 0),
     readSpriteColorCombination: (actionNumber: number) => (actionNumber === 0 ? 1 : 0),
+    readScreenChar: () => 0x20,
+    readScreenPattern: () => 0,
+    readSyncCommand: () => null,
+    readAck: () => 0,
   }
   return accessor as SharedDisplayBufferAccessor
 }
 
-describe('StateInspector MOVE tab data', () => {
+describe('IdeBottomArea MOVE tab data', () => {
   it('builds MOVE card slot data from shared display buffer accessor only', async () => {
-    const wrapper = mount(StateInspector, {
+    const keyboardView = createTestKeyboardBuffer()
+    const wrapper = mount(IdeBottomArea, {
       props: {
+        screenBuffer: [],
+        cursorX: 0,
+        cursorY: 0,
+        bgPalette: 1,
+        spritePalette: 1,
+        backdropColor: 0,
+        cgenMode: 2,
+        spriteStates: [],
+        spriteEnabled: false,
         sharedDisplayBufferAccessor: createAccessorMock(),
+        keyboardView,
       },
       global: {
         stubs: {
-          GameBlock: defineComponent({ template: '<div><slot /></div>' }),
-          GameTabs: defineComponent({ template: '<div><slot /></div>' }),
+          JoystickControl: true,
+          GameTabs: defineComponent({
+            props: ['modelValue', 'type'],
+            template: '<div><slot /></div>',
+          }),
           GameTabPane: defineComponent({ template: '<div><slot /></div>' }),
           ActivePaletteDisplay: true,
           MovementCard: defineComponent({
@@ -79,6 +103,11 @@ describe('StateInspector MOVE tab data', () => {
             template:
               '<div class="movement-card-stub" :data-action="slot.actionNumber" :data-has-data="slot.hasData" :data-x="slot.x" :data-y="slot.y" :data-direction="slot.direction" :data-speed="slot.speed" :data-character-type="slot.characterType" />',
           }),
+          DisplayBufferSection: true,
+          JoystickBufferSection: true,
+          KeyboardBufferSection: true,
+          SpriteSlotsSection: true,
+          AnimationSyncSection: true,
         },
       },
     })
@@ -103,17 +132,18 @@ describe('StateInspector MOVE tab data', () => {
   })
 })
 
-describe('StateInspector tab header casing consistency', () => {
+describe('Inspector tab header casing consistency', () => {
   it('all inspector tab labels are uppercase in English locale', () => {
-    const { tabPalette, tabSprite, tabMove, tabBg } = enIde.stateInspector
+    const { tabPalette, tabSprite, tabMove, tabBuffer, tabBg } = enIde.stateInspector
 
     expect(tabPalette).toBe('PALETTE')
     expect(tabSprite).toBe('SPRITE')
     expect(tabMove).toBe('MOVE')
+    expect(tabBuffer).toBe('BUFFER')
     expect(tabBg).toBe('BG')
 
     // Regression: all tab labels must be fully uppercase (F-BASIC keyword style)
-    for (const label of [tabPalette, tabSprite, tabMove, tabBg]) {
+    for (const label of [tabPalette, tabSprite, tabMove, tabBuffer, tabBg]) {
       expect(label).toBe(label.toUpperCase())
     }
   })

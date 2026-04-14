@@ -389,6 +389,7 @@
     "tabPalette": "PALETTE",
     "tabSprite": "SPRITE",
     "tabMove": "MOVE",
+    "tabBuffer": "BUFFER",
     "tabBg": "BG",
     "palettes": "調色盤",
     "backdrop": "背景",
