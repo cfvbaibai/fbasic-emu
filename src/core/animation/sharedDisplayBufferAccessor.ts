@@ -11,6 +11,8 @@
  * Operation logic is delegated to focused modules:
  * - bufferScreenOperations.ts: Screen, cursor, sequence, scalar read/write
  * - bufferSpriteOperations.ts: Sprite position/state read/write
+ * - bufferSyncOperations.ts: Sync command and Atomics acknowledgment
+ * - bufferScalarOperations.ts: Individual scalar read/write
  * - sharedDisplayBufferTypes.ts: Type definitions
  *
  * @see {@link docs/reference/shared-display-buffer.md} for full buffer layout
@@ -18,6 +20,18 @@
 
 import type { ScreenCell } from '@/core/types/execution-types'
 
+import {
+  readAllScalars as readAllScalarsFromOps,
+  readBackdropColor as readBackdropColorFromOps,
+  readBgPalette as readBgPaletteFromOps,
+  readCgenMode as readCgenModeFromOps,
+  readSpritePalette as readSpritePaletteFromOps,
+  writeAllScalars as writeAllScalarsToOps,
+  writeBackdropColor as writeBackdropColorToOps,
+  writeBgPalette as writeBgPaletteToOps,
+  writeCgenMode as writeCgenModeToOps,
+  writeSpritePalette as writeSpritePaletteToOps,
+} from './bufferScalarOperations'
 import {
   incrementSequence as incrementSequenceToOps,
   readCursor as readCursorFromOps,
@@ -44,8 +58,18 @@ import {
   writeSpriteStateToView,
 } from './bufferSpriteOperations'
 import {
-  ACK_PENDING,
-  ACK_RECEIVED,
+  clearSyncCommand as clearSyncCommandToOps,
+  notifyAck as notifyAckToOps,
+  notifySync,
+  readAck as readAckFromOps,
+  readSyncCommand as readSyncCommandFromOps,
+  waitForAck as waitForAckFromOps,
+  writeAck as writeAckToOps,
+  writeSyncCommand as writeSyncCommandToOps,
+} from './bufferSyncOperations'
+import type {
+  SyncCommandType} from './sharedDisplayBuffer';
+import {
   COLS,
   OFFSET_ANIMATION_SYNC,
   OFFSET_CHARS,
@@ -55,10 +79,9 @@ import {
   OFFSET_SEQUENCE,
   ROWS,
   SHARED_DISPLAY_BUFFER_BYTES,
-  SPRITE_DATA_FLOATS,
-  SyncCommandType,
+  SPRITE_DATA_FLOATS
 } from './sharedDisplayBuffer'
-import type { SyncCommand,SyncCommandParams } from './sharedDisplayBufferTypes'
+import type { SyncCommand, SyncCommandParams } from './sharedDisplayBufferTypes'
 
 // Re-export types for convenience (preserve original public API)
 export type { SyncCommandType } from './sharedDisplayBuffer'
@@ -90,17 +113,6 @@ export class SharedDisplayBufferAccessor {
   private static readonly SEQUENCE_INTS = 1
   private static readonly SCALARS_BYTES = 4
   private static readonly SYNC_SECTION_FLOATS = 9 // command type + action number + 6 params + ack
-
-  // Offsets within sync section (relative to sync section start in combined buffer)
-  private static readonly SYNC_COMMAND_TYPE_INDEX = 0
-  private static readonly SYNC_ACTION_NUMBER_INDEX = 1
-  private static readonly SYNC_PARAM1_INDEX = 2
-  private static readonly SYNC_PARAM2_INDEX = 3
-  private static readonly SYNC_PARAM3_INDEX = 4
-  private static readonly SYNC_PARAM4_INDEX = 5
-  private static readonly SYNC_PARAM5_INDEX = 6
-  private static readonly SYNC_PARAM6_INDEX = 7
-  private static readonly SYNC_ACK_INDEX = 8
 
   // Screen helper
   private cellIndex(x: number, y: number): number {
@@ -152,118 +164,48 @@ export class SharedDisplayBufferAccessor {
     )
   }
 
-  /**
-   * Get Int32 index for acknowledgment (for Atomics operations).
-   */
-  private get ackInt32Index(): number {
-    return 8 * 2 // Ack is at Float64 index 8, so Int32 index 16
-  }
-
   // ============================================================================
-  // Sync Command Methods
+  // Sync Command Methods (delegated to bufferSyncOperations)
   // ============================================================================
 
   /** Notify waiting threads that sync state has changed. */
   notify(count = 1): void {
-    try {
-      Atomics.notify(this.syncInt32ViewInternal, 0, count)
-    } catch {
-      // Atomics.notify may throw in some contexts, ignore
-    }
+    notifySync(this.syncInt32ViewInternal, count)
   }
 
   /** Write a sync command to the shared buffer for Animation Worker to process. */
   writeSyncCommand(commandType: SyncCommandType, actionNumber: number, params: SyncCommandParams = {}): void {
-    const sync = this.syncViewInternal
-    sync[SharedDisplayBufferAccessor.SYNC_COMMAND_TYPE_INDEX] = commandType
-    sync[SharedDisplayBufferAccessor.SYNC_ACTION_NUMBER_INDEX] = actionNumber
-    sync[SharedDisplayBufferAccessor.SYNC_PARAM1_INDEX] = params.startX ?? 0
-    sync[SharedDisplayBufferAccessor.SYNC_PARAM2_INDEX] = params.startY ?? 0
-    sync[SharedDisplayBufferAccessor.SYNC_PARAM3_INDEX] = params.direction ?? 0
-    sync[SharedDisplayBufferAccessor.SYNC_PARAM4_INDEX] = params.speed ?? 0
-    sync[SharedDisplayBufferAccessor.SYNC_PARAM5_INDEX] = params.distance ?? 0
-    sync[SharedDisplayBufferAccessor.SYNC_PARAM6_INDEX] = params.priority ?? 0
-    sync[SharedDisplayBufferAccessor.SYNC_ACK_INDEX] = ACK_PENDING
+    writeSyncCommandToOps(this.syncViewInternal, commandType, actionNumber, params)
   }
 
   /** Read sync command from shared buffer. Returns null if no command is pending. */
   readSyncCommand(): SyncCommand | null {
-    const sync = this.syncViewInternal
-    const commandType = sync[SharedDisplayBufferAccessor.SYNC_COMMAND_TYPE_INDEX] as SyncCommandType
-
-    if (commandType < SyncCommandType.START_MOVEMENT || commandType > SyncCommandType.CLEAR_ALL_MOVEMENTS) {
-      return null
-    }
-
-    return {
-      commandType,
-      actionNumber: sync[SharedDisplayBufferAccessor.SYNC_ACTION_NUMBER_INDEX] as number,
-      params: {
-        startX: sync[SharedDisplayBufferAccessor.SYNC_PARAM1_INDEX] as number,
-        startY: sync[SharedDisplayBufferAccessor.SYNC_PARAM2_INDEX] as number,
-        direction: sync[SharedDisplayBufferAccessor.SYNC_PARAM3_INDEX] as number,
-        speed: sync[SharedDisplayBufferAccessor.SYNC_PARAM4_INDEX] as number,
-        distance: sync[SharedDisplayBufferAccessor.SYNC_PARAM5_INDEX] as number,
-        priority: sync[SharedDisplayBufferAccessor.SYNC_PARAM6_INDEX] as number,
-      },
-    }
+    return readSyncCommandFromOps(this.syncViewInternal)
   }
 
   /** Clear sync command from shared buffer (set to NONE). */
   clearSyncCommand(): void {
-    const sync = this.syncViewInternal
-    sync[SharedDisplayBufferAccessor.SYNC_COMMAND_TYPE_INDEX] = SyncCommandType.NONE
-    sync[SharedDisplayBufferAccessor.SYNC_ACTION_NUMBER_INDEX] = 0
-    sync[SharedDisplayBufferAccessor.SYNC_PARAM1_INDEX] = 0
-    sync[SharedDisplayBufferAccessor.SYNC_PARAM2_INDEX] = 0
-    sync[SharedDisplayBufferAccessor.SYNC_PARAM3_INDEX] = 0
-    sync[SharedDisplayBufferAccessor.SYNC_PARAM4_INDEX] = 0
-    sync[SharedDisplayBufferAccessor.SYNC_PARAM5_INDEX] = 0
-    sync[SharedDisplayBufferAccessor.SYNC_PARAM6_INDEX] = 0
+    clearSyncCommandToOps(this.syncViewInternal)
   }
 
   /** Write acknowledgment flag. */
   writeAck(ack: number): void {
-    this.syncViewInternal[SharedDisplayBufferAccessor.SYNC_ACK_INDEX] = ack
+    writeAckToOps(this.syncViewInternal, ack)
   }
 
   /** Read acknowledgment flag. */
   readAck(): number {
-    return this.syncViewInternal[SharedDisplayBufferAccessor.SYNC_ACK_INDEX] as number
+    return readAckFromOps(this.syncViewInternal)
   }
 
   /** Notify waiting thread using Atomics (sets ack to RECEIVED and notifies). */
   notifyAck(): void {
-    this.syncInt32ViewInternal[this.ackInt32Index] = ACK_RECEIVED
-    try {
-      Atomics.notify(this.syncInt32ViewInternal, this.ackInt32Index, 1)
-    } catch {
-      // Atomics.notify may throw in some contexts, ignore
-    }
+    notifyAckToOps(this.syncInt32ViewInternal)
   }
 
   /** Wait for acknowledgment using Atomics. */
   waitForAck(timeoutMs: number = 100): boolean {
-    const ackIndex = this.ackInt32Index
-    const startTime = performance.now()
-
-    while (this.syncInt32ViewInternal[ackIndex] === ACK_PENDING) {
-      const elapsed = performance.now() - startTime
-      if (elapsed >= timeoutMs) {
-        return false
-      }
-      try {
-        const remaining = Math.min(10, timeoutMs - elapsed)
-        Atomics.wait(this.syncInt32ViewInternal, ackIndex, ACK_PENDING, remaining)
-      } catch {
-        const start = performance.now()
-        while (performance.now() - start < 1) {
-          // Busy-wait for 1ms to yield CPU
-        }
-      }
-    }
-
-    return this.syncInt32ViewInternal[ackIndex] === ACK_RECEIVED
+    return waitForAckFromOps(this.syncInt32ViewInternal, timeoutMs)
   }
 
   // ============================================================================
@@ -339,51 +281,39 @@ export class SharedDisplayBufferAccessor {
   }
 
   // ============================================================================
-  // Scalars Section Methods
+  // Scalars Section Methods (delegated to bufferScalarOperations)
   // ============================================================================
 
   /** Read background palette (0-1). */
-  readBgPalette(): number { return this.scalarsViewInternal[0] ?? 1 }
+  readBgPalette(): number { return readBgPaletteFromOps(this.scalarsViewInternal) }
 
   /** Write background palette. */
-  writeBgPalette(value: number): void { this.scalarsViewInternal[0] = value & 1 }
+  writeBgPalette(value: number): void { writeBgPaletteToOps(this.scalarsViewInternal, value) }
 
   /** Read sprite palette (0-3). */
-  readSpritePalette(): number { return this.scalarsViewInternal[1] ?? 1 }
+  readSpritePalette(): number { return readSpritePaletteFromOps(this.scalarsViewInternal) }
 
   /** Write sprite palette. */
-  writeSpritePalette(value: number): void { this.scalarsViewInternal[1] = value & 3 }
+  writeSpritePalette(value: number): void { writeSpritePaletteToOps(this.scalarsViewInternal, value) }
 
   /** Read backdrop color (0-60). */
-  readBackdropColor(): number { return this.scalarsViewInternal[2] ?? 0 }
+  readBackdropColor(): number { return readBackdropColorFromOps(this.scalarsViewInternal) }
 
   /** Write backdrop color. */
-  writeBackdropColor(value: number): void {
-    this.scalarsViewInternal[2] = Math.max(0, Math.min(60, value))
-  }
+  writeBackdropColor(value: number): void { writeBackdropColorToOps(this.scalarsViewInternal, value) }
 
   /** Read character generation mode (0-3). */
-  readCgenMode(): number { return this.scalarsViewInternal[3] ?? 2 }
+  readCgenMode(): number { return readCgenModeFromOps(this.scalarsViewInternal) }
 
   /** Write character generation mode. */
-  writeCgenMode(value: number): void { this.scalarsViewInternal[3] = value & 3 }
+  writeCgenMode(value: number): void { writeCgenModeToOps(this.scalarsViewInternal, value) }
 
   /** Read all scalar values at once. */
-  readScalars() {
-    return {
-      bgPalette: this.readBgPalette(),
-      spritePalette: this.readSpritePalette(),
-      backdropColor: this.readBackdropColor(),
-      cgenMode: this.readCgenMode(),
-    }
-  }
+  readScalars() { return readAllScalarsFromOps(this.scalarsViewInternal) }
 
   /** Write all scalar values at once. */
   writeScalars(bgPalette: number, spritePalette: number, backdropColor: number, cgenMode: number): void {
-    this.writeBgPalette(bgPalette)
-    this.writeSpritePalette(spritePalette)
-    this.writeBackdropColor(backdropColor)
-    this.writeCgenMode(cgenMode)
+    writeAllScalarsToOps(this.scalarsViewInternal, bgPalette, spritePalette, backdropColor, cgenMode)
   }
 
   // ============================================================================
