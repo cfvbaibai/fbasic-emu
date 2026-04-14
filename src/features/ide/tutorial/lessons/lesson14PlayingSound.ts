@@ -73,7 +73,7 @@ export const lesson14PlayingSound: Lesson = {
     '10 PLAY "T5O4C4D4E4F4"',
     '```',
 
-    '`T5` sets a moderate tempo.',
+    '`T5` sets a slow tempo.',
 
     '## A Simple Melody',
 
