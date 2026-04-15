@@ -11,8 +11,11 @@ import { describe, expect, it, vi } from 'vitest'
 import { SCREEN_DIMENSIONS } from '@/core/constants'
 import type { CanvasSurface } from '@/core/devices/CanvasScreenRenderer'
 import { MainThreadDeviceAdapter } from '@/core/devices/MainThreadDeviceAdapter'
-import type { DefSpriteDefinition, SpriteState } from '@/core/sprite/types'
-import type { Tile } from '@/shared/data/types'
+
+import {
+  createSpriteDefinition,
+  createSpriteState,
+} from '../helpers/spriteTestFixtures'
 
 // ============================================================================
 // Mock Canvas Factory
@@ -36,47 +39,6 @@ function createMockContext() {
   }
 
   return { ctx, canvas }
-}
-
-// ============================================================================
-// Sprite Test Helpers
-// ============================================================================
-
-/** Creates a minimal 8x8 tile with the given color index. */
-function createSolidTile(colorIndex: number): Tile {
-  return Array.from({ length: 8 }, () => Array.from({ length: 8 }, () => colorIndex))
-}
-
-/** Creates a minimal DefSpriteDefinition for testing. */
-function createSpriteDefinition(
-  overrides: Partial<DefSpriteDefinition> = {},
-): DefSpriteDefinition {
-  return {
-    spriteNumber: 0,
-    colorCombination: 0,
-    size: 0,
-    priority: 0,
-    invertX: 0,
-    invertY: 0,
-    characterSet: '@',
-    tiles: [createSolidTile(1)],
-    ...overrides,
-  }
-}
-
-/** Creates a SpriteState for testing. */
-function createSpriteState(
-  overrides: Partial<SpriteState> = {},
-): SpriteState {
-  return {
-    spriteNumber: 0,
-    x: 0,
-    y: 0,
-    visible: true,
-    priority: 0,
-    definition: createSpriteDefinition(),
-    ...overrides,
-  }
 }
 
 // ============================================================================
