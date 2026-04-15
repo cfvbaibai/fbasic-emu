@@ -176,6 +176,7 @@ export class MainThreadDeviceAdapter implements BasicDeviceAdapter {
 
   setColorPalette(bgPalette: number, spritePalette: number): void {
     this.screenState.setColorPalette(bgPalette, spritePalette)
+    this.spriteRenderer.setSpritePalette(spritePalette)
   }
 
   setPaletteCombination(
