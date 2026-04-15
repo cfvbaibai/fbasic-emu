@@ -7,8 +7,9 @@
  * - The F-BASIC program source embedded in a `<script id="fbasic-program">` tag
  * - An empty `<script id="fbasic-runtime">` placeholder for the runtime bundle
  *
- * The runtime bundle (from #632) will be injected into the placeholder
- * by the build step (#635) or a dedicated wiring step.
+ * The runtime bundle can be provided via the `runtimeBundle` parameter,
+ * which gets inlined into the `<script id="fbasic-runtime">` tag.
+ * When omitted, the placeholder remains empty (for development use).
  */
 
 import { EXPORT_THEME_COLORS, SCREEN_DIMENSIONS } from '@/core/constants'
@@ -60,6 +61,21 @@ function escapeScriptContent(source: string): string {
 }
 
 /**
+ * Escapes the `</script>` sequence in a runtime bundle to prevent it
+ * from prematurely closing the `<script id="fbasic-runtime">` tag.
+ *
+ * Uses the same strategy as {@link escapeScriptContent} but returns
+ * an empty string when no bundle is provided.
+ *
+ * @param bundle - The runtime JS bundle string, or undefined
+ * @returns The escaped bundle string, or empty string
+ */
+function escapeRuntimeBundle(bundle: string | undefined): string {
+  if (!bundle) return ''
+  return bundle.replace(/<\/script/gi, '<\\/script')
+}
+
+/**
  * Builds the inline CSS for the exported HTML page.
  *
  * Centers the canvas, applies the theme background, and scales the
@@ -80,23 +96,26 @@ function buildThemeCss(theme: 'dark' | 'light'): string {
  * Generates a standalone HTML document for exporting an F-BASIC program.
  *
  * The resulting HTML contains a canvas element, inline theme CSS, the
- * program source embedded in a script tag, and a runtime placeholder.
- * The runtime bundle will be injected into `<script id="fbasic-runtime">`
- * during the build or wiring step.
+ * program source embedded in a script tag, and a runtime script.
+ * When `runtimeBundle` is provided, it gets inlined into the runtime
+ * script tag. When omitted, the placeholder remains empty.
  *
  * @param source - The F-BASIC program source code
  * @param options - Export configuration options
  * @param locale - The user's current locale for the HTML lang attribute
+ * @param runtimeBundle - Optional pre-built runtime JS to inline
  * @returns A complete HTML document string
  */
 export function buildExportHtml(
   source: string,
   options: HtmlExportOptions,
   locale: string,
+  runtimeBundle?: string,
 ): string {
   const css = buildThemeCss(options.theme)
   const escapedTitle = escapeHtml(options.title)
   const escapedSource = escapeScriptContent(source)
+  const escapedBundle = escapeRuntimeBundle(runtimeBundle)
 
   return [
     '<!DOCTYPE html>',
@@ -112,7 +131,7 @@ export function buildExportHtml(
     `<body data-include-sound="${options.includeSound}" data-include-sprites="${options.includeSprites}">`,
     `  <canvas id="fbasic-screen" width="${CANVAS_WIDTH}" height="${CANVAS_HEIGHT}"></canvas>`,
     `  <script id="fbasic-program" type="text/plain">${escapedSource}${SCRIPT_CLOSE}`,
-    `  <script id="fbasic-runtime">${SCRIPT_CLOSE}`,
+    `  <script id="fbasic-runtime">${escapedBundle}${SCRIPT_CLOSE}`,
     '</body>',
     '</html>',
   ].join('\n')
