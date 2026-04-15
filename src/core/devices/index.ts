@@ -5,6 +5,8 @@
  */
 
 // Device implementations
+export * from './CanvasScreenRenderer'
+export * from './CanvasSpriteRenderer'
 export * from './MainThreadDeviceAdapter'
 export * from './TestDeviceAdapter'
 export * from './WebWorkerDeviceAdapter'

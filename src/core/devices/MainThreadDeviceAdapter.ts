@@ -9,20 +9,25 @@
  * - {@link ScreenStateManager} for screen buffer state management
  * - {@link CanvasScreenRenderer} for drawing the buffer to the canvas
  *
- * Sound, sprites, and input dialogs are stubbed for future steps.
+ * Sprite operations are delegated to:
+ * - {@link CanvasSpriteRenderer} for drawing sprites to the canvas
+ *
+ * Sound and input dialogs are stubbed for future steps.
  */
 
 import type { CompiledAudio } from '@/core/sound/types'
+import type { SpriteState } from '@/core/sprite/types'
 import { WebAudioPlayer } from '@/core/sound/WebAudioPlayer'
 import type { BasicDeviceAdapter } from '@/core/types/device-types'
 
 import type { CanvasSurface } from './CanvasScreenRenderer'
 import { CanvasScreenRenderer } from './CanvasScreenRenderer'
+import { CanvasSpriteRenderer } from './CanvasSpriteRenderer'
 import { ScreenStateManager } from './ScreenStateManager'
 
 /** Configuration for creating a MainThreadDeviceAdapter. */
 export interface MainThreadDeviceAdapterOptions {
-  /** The canvas surface to render the screen buffer to. */
+  /** The canvas surface to render the screen buffer and sprites to. */
   canvas: CanvasSurface
 }
 
@@ -32,23 +37,28 @@ export interface MainThreadDeviceAdapterOptions {
  * Runs on the main thread and renders to a canvas. Used by standalone
  * exported HTML files that cannot use web workers or SharedArrayBuffer.
  *
- * Implements all required methods from BasicDeviceAdapter. Sprite
- * and input dialog methods are stubbed no-ops pending future
- * implementation steps (#634).
+ * Implements all required methods from BasicDeviceAdapter. Input dialog
+ * methods are stubbed no-ops pending future implementation steps.
  */
 export class MainThreadDeviceAdapter implements BasicDeviceAdapter {
   private readonly screenState: ScreenStateManager
   private readonly renderer: CanvasScreenRenderer
   private readonly audioPlayer: WebAudioPlayer
+  private readonly spriteRenderer: CanvasSpriteRenderer
 
   // === KEYBOARD INPUT STATE ===
 
   private currentKey: string = ''
 
+  // === SPRITE POSITION CACHE ===
+
+  private readonly spritePositionCache = new Map<number, { x: number; y: number }>()
+
   constructor(options: MainThreadDeviceAdapterOptions) {
     this.screenState = new ScreenStateManager()
     this.renderer = new CanvasScreenRenderer(options.canvas)
     this.audioPlayer = new WebAudioPlayer()
+    this.spriteRenderer = new CanvasSpriteRenderer(options.canvas)
   }
 
   // === JOYSTICK INPUT (stubbed — no joystick support in export) ===
@@ -87,10 +97,32 @@ export class MainThreadDeviceAdapter implements BasicDeviceAdapter {
     this.currentKey = ''
   }
 
-  // === SPRITE POSITION (stubbed — sprites in future step #634) ===
+  // === SPRITE POSITION ===
 
-  getSpritePosition(_actionNumber: number): { x: number; y: number } | null {
-    return null
+  getSpritePosition(actionNumber: number): { x: number; y: number } | null {
+    return this.spritePositionCache.get(actionNumber) ?? null
+  }
+
+  setSpritePosition(actionNumber: number, x: number, y: number): void {
+    this.spritePositionCache.set(actionNumber, { x, y })
+  }
+
+  clearSpritePosition(actionNumber: number): void {
+    this.spritePositionCache.delete(actionNumber)
+  }
+
+  // === SPRITE STATE NOTIFICATION ===
+
+  /**
+   * Receive sprite states from the executor and render them to the canvas.
+   *
+   * Called when DEF SPRITE, SPRITE, or SPRITE ON/OFF commands execute.
+   * Stores the sprite states and renders visible sprites on the canvas
+   * overlay (after the text screen layer).
+   */
+  sendSpriteStates(spriteStates: SpriteState[], spriteEnabled: boolean): void {
+    this.spriteRenderer.setSpriteEnabled(spriteEnabled)
+    this.spriteRenderer.renderSprites(spriteStates)
   }
 
   // === SOUND OUTPUT ===
@@ -172,11 +204,13 @@ export class MainThreadDeviceAdapter implements BasicDeviceAdapter {
   // === RESET ===
 
   /**
-   * Reset all screen state and re-render.
+   * Reset all screen and sprite state, then re-render the screen.
    * Called when starting a new program execution.
    */
   resetState(): void {
     this.screenState.resetState()
+    this.spriteRenderer.resetState()
+    this.spritePositionCache.clear()
     this.renderer.render(this.screenState.getScreenBuffer())
   }
 
