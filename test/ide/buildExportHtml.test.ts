@@ -252,6 +252,49 @@ describe('buildExportHtml', () => {
     })
   })
 
+  // -- Runtime bundle inlining ------------------------------------------------
+
+  describe('runtime bundle inlining', () => {
+    const mockBundle = 'var RUNTIME=(function(){console.log("runtime");})();'
+
+    it('inlines the runtime bundle into the fbasic-runtime script tag when provided', () => {
+      const html = buildExportHtml('10 PRINT "HI"', defaultOptions, 'en', mockBundle)
+      const runtimeMatch = html.match(
+        /<script[^>]*id="fbasic-runtime"[^>]*>([\s\S]*?)<\/script>/,
+      )
+      expect(runtimeMatch).not.toBeNull()
+      expect(runtimeMatch?.[1]?.trim()).toEqual(mockBundle)
+    })
+
+    it('keeps runtime placeholder empty when no bundle is provided', () => {
+      const html = buildExportHtml('10 PRINT "HI"', defaultOptions, 'en')
+      const runtimeMatch = html.match(
+        /<script[^>]*id="fbasic-runtime"[^>]*>\s*<\/script>/,
+      )
+      expect(runtimeMatch).not.toBeNull()
+    })
+
+    it('escapes </script> sequence within the runtime bundle content', () => {
+      const dangerousBundle = 'var x="</script><script>alert(1)</script>";'
+      const html = buildExportHtml('10 PRINT "HI"', defaultOptions, 'en', dangerousBundle)
+      // The inlined bundle should not prematurely close the script tag
+      const runtimeMatch = html.match(
+        /<script[^>]*id="fbasic-runtime"[^>]*>([\s\S]*?)<\/script>/,
+      )
+      expect(runtimeMatch).not.toBeNull()
+      // The content should have the closing script sequence escaped
+      expect(runtimeMatch![1]).not.toContain('</script>')
+    })
+
+    it('preserves all other HTML structure when bundle is provided', () => {
+      const html = buildExportHtml('10 PRINT "HI"', defaultOptions, 'en', mockBundle)
+      expect(html).toContain('id="fbasic-screen"')
+      expect(html).toContain('id="fbasic-program"')
+      expect(html).toContain('10 PRINT "HI"')
+      expect(html).toMatch(/<\/html>$/)
+    })
+  })
+
   // -- Valid HTML -------------------------------------------------------------
 
   describe('valid HTML output', () => {

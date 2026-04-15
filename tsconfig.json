@@ -8,6 +8,7 @@
     "src/**/*.d.ts",
     "test/**/*.ts",
     "scripts/validation/script-entrypoint-integrity.ts",
+    "vite.config.runtime.ts",
     "playwright.config.ts"
   ],
   "exclude": [

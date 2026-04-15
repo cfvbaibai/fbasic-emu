@@ -28,6 +28,7 @@
         "test:coverage": "vitest run --coverage",
         "build-web-worker": "tsx scripts/dev/build-service-worker.ts",
         "build-service-worker": "pnpm build-web-worker",
+        "build:runtime": "vite build --config vite.config.runtime.ts",
         "test-service-worker": "tsx scripts/dev/test-service-worker.ts",
         "visualize-cst": "tsx scripts/dev/visualize-cst.ts",
         "check-syntax": "tsx scripts/validation/check-syntax.ts",
