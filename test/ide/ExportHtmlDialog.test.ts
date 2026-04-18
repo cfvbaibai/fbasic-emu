@@ -15,6 +15,7 @@ const mockT = createI18nMock({
   'ide.exportHtml.description': 'Export your program as a standalone HTML file that runs in any browser.',
   'ide.exportHtml.exporting': 'Exporting...',
   'ide.exportHtml.exportFailed': 'Failed to export HTML file.',
+  'ide.exportHtml.exportSuccess': 'Export complete! Your file has been downloaded.',
   'ide.exportHtml.titleLabel': 'Page Title',
   'ide.exportHtml.themeLabel': 'Theme',
   'ide.exportHtml.themeDark': 'Dark',
@@ -32,11 +33,13 @@ vi.mock('vue-i18n', () => ({
 const mockExportHtml = vi.fn()
 const mockIsExporting = ref(false)
 const mockExportError = ref('')
+const mockExportSuccess = ref(false)
 
 vi.mock('@/features/ide/composables/useHtmlExporter', () => ({
   useHtmlExporter: () => ({
     isExporting: mockIsExporting,
     exportError: mockExportError,
+    exportSuccess: mockExportSuccess,
     exportHtml: mockExportHtml,
   }),
 }))
@@ -76,11 +79,14 @@ function mountDialog(props: {
 describe('ExportHtmlDialog', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.useFakeTimers()
     mockIsExporting.value = false
     mockExportError.value = ''
+    mockExportSuccess.value = false
   })
 
   afterEach(() => {
+    vi.useRealTimers()
     vi.restoreAllMocks()
   })
 
@@ -264,6 +270,56 @@ describe('ExportHtmlDialog', () => {
 
     expect(wrapper.find('[data-testid="export-html-error"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="export-html-error"]').text()).toEqual('Failed to export HTML file.')
+    wrapper.unmount()
+  })
+
+  // -- Success state ---------------------------------------------------------
+  it('shows success state when export succeeds', async () => {
+    mockExportSuccess.value = true
+
+    const wrapper = mountDialog({ visible: true })
+    await nextTick()
+
+    expect(wrapper.find('[data-testid="export-html-success"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="export-html-success"]').text()).toEqual('Export complete! Your file has been downloaded.')
+    wrapper.unmount()
+  })
+
+  it('auto-closes dialog after success feedback timer', async () => {
+    mockExportHtml.mockImplementation(async () => {
+      mockExportSuccess.value = true
+    })
+
+    const wrapper = mountDialog({ visible: true })
+    await nextTick()
+
+    await wrapper.find('[data-testid="export-html-export-button"]').trigger('click')
+    await nextTick()
+
+    // Success state should be visible
+    expect(wrapper.find('[data-testid="export-html-success"]').exists()).toBe(true)
+
+    // Advance past the COPIED_FEEDBACK_MS timer (2000ms)
+    vi.advanceTimersByTime(2000)
+    await nextTick()
+
+    expect(wrapper.emitted('close')).toHaveLength(1)
+    wrapper.unmount()
+  })
+
+  it('does not auto-close when export fails', async () => {
+    mockExportHtml.mockResolvedValue(undefined)
+
+    const wrapper = mountDialog({ visible: true })
+    await nextTick()
+
+    await wrapper.find('[data-testid="export-html-export-button"]').trigger('click')
+    await nextTick()
+
+    vi.advanceTimersByTime(2000)
+    await nextTick()
+
+    expect(wrapper.emitted('close')).toBeUndefined()
     wrapper.unmount()
   })
 

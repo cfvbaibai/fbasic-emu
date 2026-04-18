@@ -558,7 +558,8 @@
     "exportButton": "エクスポート",
     "cancelButton": "キャンセル",
     "exporting": "エクスポート中...",
-    "exportFailed": "HTMLファイルのエクスポートに失敗しました。"
+    "exportFailed": "HTMLファイルのエクスポートに失敗しました。",
+    "exportSuccess": "エクスポート完了！ファイルがダウンロードされました。"
   },
   "musicComposer": {
     "title": "ミュージックコンポーザー"

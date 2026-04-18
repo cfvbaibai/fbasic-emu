@@ -250,6 +250,11 @@ describe('useHtmlExporter', () => {
       expect(exportError.value).toEqual('')
     })
 
+    it('exportSuccess is false initially', () => {
+      const { exportSuccess } = mountComposable()
+      expect(exportSuccess.value).toEqual(false)
+    })
+
     it('isExporting returns to false after successful export', async () => {
       const { isExporting, exportHtml } = mountComposable()
 
@@ -263,8 +268,53 @@ describe('useHtmlExporter', () => {
       expect(isExporting.value).toEqual(false)
     })
 
+    it('sets exportSuccess to true after successful export', async () => {
+      const { exportSuccess, exportHtml } = mountComposable()
+
+      await exportHtml({
+        title: 'Test',
+        theme: 'dark',
+        includeSound: false,
+        includeSprites: false,
+      })
+
+      expect(exportSuccess.value).toEqual(true)
+    })
+
+    it('keeps exportSuccess false when a subsequent export fails', async () => {
+      const { exportSuccess, exportHtml } = mountComposable()
+
+      // First export succeeds
+      await exportHtml({
+        title: 'Test',
+        theme: 'dark',
+        includeSound: false,
+        includeSprites: false,
+      })
+      expect(exportSuccess.value).toEqual(true)
+
+      // Second export fails — success should be reset and stay false
+      const savedBlob = globalThis.Blob
+      class FailingBlob {
+        constructor() {
+          throw new Error('Second export failed')
+        }
+      }
+      globalThis.Blob = FailingBlob as typeof Blob
+
+      await exportHtml({
+        title: 'Test2',
+        theme: 'dark',
+        includeSound: false,
+        includeSprites: false,
+      })
+
+      expect(exportSuccess.value).toEqual(false)
+      globalThis.Blob = savedBlob
+    })
+
     it('sets exportError when Blob creation fails', async () => {
-      const { exportHtml, exportError } = mountComposable()
+      const { exportHtml, exportError, exportSuccess } = mountComposable()
 
       // Mock Blob constructor to throw — must use class syntax per vitest docs
       const savedBlob = globalThis.Blob
@@ -283,6 +333,7 @@ describe('useHtmlExporter', () => {
       })
 
       expect(exportError.value).toEqual('Blob creation failed')
+      expect(exportSuccess.value).toEqual(false)
       globalThis.Blob = savedBlob
     })
 

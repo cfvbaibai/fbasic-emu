@@ -558,7 +558,8 @@
     "exportButton": "Export",
     "cancelButton": "Cancel",
     "exporting": "Exporting...",
-    "exportFailed": "Failed to export HTML file."
+    "exportFailed": "Failed to export HTML file.",
+    "exportSuccess": "Export complete! Your file has been downloaded."
   },
   "musicComposer": {
     "title": "Music Composer"
