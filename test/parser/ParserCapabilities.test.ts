@@ -70,9 +70,13 @@ const FUNCTION_TOKEN_TO_CAPABILITY: Record<string, string> = {
 
 function getRouterStatementRules(): string[] {
   const routerPath = resolve(process.cwd(), 'src/core/execution/StatementRouter.ts')
-  const source = readFileSync(routerPath, 'utf8')
-  const matches = source.matchAll(/singleCommandCst\.children\.(\w+)/g)
-  return [...new Set([...matches].map(match => match[1]).filter((value): value is string => Boolean(value)))]
+  const routeMapPath = resolve(process.cwd(), 'src/core/execution/statementRouteMap.ts')
+  const routerSource = readFileSync(routerPath, 'utf8')
+  const routeMapSource = readFileSync(routeMapPath, 'utf8')
+  const routerMatches = routerSource.matchAll(/singleCommandCst\.children\.(\w+)/g)
+  const routeMapMatches = routeMapSource.matchAll(/cstKey:\s*'(\w+)'/g)
+  const all = [...routerMatches, ...routeMapMatches].map(match => match[1])
+  return [...new Set(all.filter((value): value is string => Boolean(value)))]
 }
 
 function getFunctionTokenNames(): string[] {

@@ -2,7 +2,11 @@
  * Statement Router
  *
  * Routes BASIC statements to their appropriate executors using CST.
+ * Simple statements are dispatched via the data-driven route map;
+ * complex statements with custom control flow are handled inline.
  */
+
+import type { CstNode } from 'chevrotain'
 
 import { ERROR_TYPES } from '@/core/constants'
 import type { ExpressionEvaluator } from '@/core/evaluation/ExpressionEvaluator'
@@ -19,7 +23,6 @@ import { ClearExecutor } from './executors/ClearExecutor'
 import { ClsExecutor } from './executors/ClsExecutor'
 import { ColorExecutor } from './executors/ColorExecutor'
 import { CutExecutor } from './executors/CutExecutor'
-import { DataExecutor } from './executors/DataExecutor'
 import { DefMoveExecutor } from './executors/DefMoveExecutor'
 import { DefSpriteExecutor } from './executors/DefSpriteExecutor'
 import { DimExecutor } from './executors/DimExecutor'
@@ -49,45 +52,45 @@ import { SpriteOnOffExecutor } from './executors/SpriteOnOffExecutor'
 import { SwapExecutor } from './executors/SwapExecutor'
 import { ViewExecutor } from './executors/ViewExecutor'
 import type { ExpandedStatement } from './statement-expander'
+import { tryDispatchSimpleStatement } from './statementRouteMap'
 
 export class StatementRouter {
-  private printExecutor: PrintExecutor
-  private letExecutor: LetExecutor
-  private forExecutor: ForExecutor
-  private nextExecutor: NextExecutor
-  private endExecutor: EndExecutor
-  private pauseExecutor: PauseExecutor
-  private ifThenExecutor: IfThenExecutor
-  private inputExecutor: InputExecutor
-  private linputExecutor: LinputExecutor
-  private gotoExecutor: GotoExecutor
-  private gosubExecutor: GosubExecutor
-  private returnExecutor: ReturnExecutor
-  private onExecutor: OnExecutor
-  private dimExecutor: DimExecutor
-  private dataExecutor: DataExecutor
-  private readExecutor: ReadExecutor
-  private restoreExecutor: RestoreExecutor
-  private clsExecutor: ClsExecutor
-  private swapExecutor: SwapExecutor
-  private clearExecutor: ClearExecutor
-  private locateExecutor: LocateExecutor
-  private colorExecutor: ColorExecutor
-  private cgsetExecutor: CgsetExecutor
-  private cgenExecutor: CgenExecutor
-  private paletExecutor: PaletExecutor
-  private defSpriteExecutor: DefSpriteExecutor
-  private spriteExecutor: SpriteExecutor
-  private spriteOnOffExecutor: SpriteOnOffExecutor
-  private defMoveExecutor: DefMoveExecutor
-  private moveExecutor: MoveExecutor
-  private cutExecutor: CutExecutor
-  private eraExecutor: EraExecutor
-  private positionExecutor: PositionExecutor
-  private playExecutor: PlayExecutor
-  private bgplayExecutor: BgplayExecutor
-  private viewExecutor: ViewExecutor
-  private beepExecutor: BeepExecutor
+  printExecutor: PrintExecutor
+  letExecutor: LetExecutor
+  forExecutor: ForExecutor
+  nextExecutor: NextExecutor
+  endExecutor: EndExecutor
+  pauseExecutor: PauseExecutor
+  ifThenExecutor: IfThenExecutor
+  inputExecutor: InputExecutor
+  linputExecutor: LinputExecutor
+  gotoExecutor: GotoExecutor
+  gosubExecutor: GosubExecutor
+  returnExecutor: ReturnExecutor
+  onExecutor: OnExecutor
+  dimExecutor: DimExecutor
+  readExecutor: ReadExecutor
+  restoreExecutor: RestoreExecutor
+  clsExecutor: ClsExecutor
+  swapExecutor: SwapExecutor
+  clearExecutor: ClearExecutor
+  locateExecutor: LocateExecutor
+  colorExecutor: ColorExecutor
+  cgsetExecutor: CgsetExecutor
+  cgenExecutor: CgenExecutor
+  paletExecutor: PaletExecutor
+  defSpriteExecutor: DefSpriteExecutor
+  spriteExecutor: SpriteExecutor
+  spriteOnOffExecutor: SpriteOnOffExecutor
+  defMoveExecutor: DefMoveExecutor
+  moveExecutor: MoveExecutor
+  cutExecutor: CutExecutor
+  eraExecutor: EraExecutor
+  positionExecutor: PositionExecutor
+  playExecutor: PlayExecutor
+  bgplayExecutor: BgplayExecutor
+  viewExecutor: ViewExecutor
+  beepExecutor: BeepExecutor
 
   constructor(
     private context: ExecutionContext,
@@ -109,7 +112,6 @@ export class StatementRouter {
     this.returnExecutor = new ReturnExecutor(context)
     this.onExecutor = new OnExecutor(context, evaluator, dataService)
     this.dimExecutor = new DimExecutor(context, evaluator, variableService)
-    this.dataExecutor = new DataExecutor(dataService)
     this.readExecutor = new ReadExecutor(dataService, variableService, evaluator)
     this.restoreExecutor = new RestoreExecutor(dataService)
     this.clsExecutor = new ClsExecutor(context)
@@ -148,105 +150,31 @@ export class StatementRouter {
       return
     }
 
-    // Check which command type we have
+    // Try data-driven dispatch for simple statements first
+    const dispatched = tryDispatchSimpleStatement(
+      this,
+      singleCommandCst,
+      expandedStatement.lineNumber
+    )
+    if (dispatched) {
+      await dispatched
+      return
+    }
+
+    // Handle complex control-flow statements that require custom logic
+    await this.executeComplexStatement(singleCommandCst, expandedStatement)
+  }
+
+  /**
+   * Execute statements with complex control flow that cannot be handled
+   * by the simple data-driven route map.
+   */
+  private async executeComplexStatement(
+    singleCommandCst: CstNode,
+    expandedStatement: ExpandedStatement
+  ): Promise<void> {
     if (singleCommandCst.children.ifThenStatement) {
-      const ifThenStmtCst = getFirstCstNode(singleCommandCst.children.ifThenStatement)
-      if (ifThenStmtCst) {
-        // Evaluate condition
-        const conditionIsTrue = this.ifThenExecutor.evaluateCondition(ifThenStmtCst, expandedStatement.lineNumber)
-
-        // When condition is false, skip colon-scoped statements on the same line
-        if (!conditionIsTrue && expandedStatement.ifScopeEndIndex !== undefined) {
-          this.context.jumpToStatement(expandedStatement.ifScopeEndIndex + 1)
-          return
-        }
-
-        // Execute THEN clause if condition is true
-        if (conditionIsTrue) {
-          // Check if it's a line number jump (IF ... THEN number or IF ... GOTO number)
-          if (this.ifThenExecutor.hasLineNumberJump(ifThenStmtCst)) {
-            const targetLineNumber = this.ifThenExecutor.getLineNumber(ifThenStmtCst)
-            if (targetLineNumber !== undefined) {
-              const targetStatementIndex = this.context.findStatementIndexByLine(targetLineNumber)
-              if (targetStatementIndex === -1) {
-                this.context.addError({
-                  line: expandedStatement.lineNumber,
-                  message: `IF-THEN: line number ${targetLineNumber} not found`,
-                  type: ERROR_TYPES.RUNTIME,
-                })
-              } else {
-                if (this.context.config.enableDebugMode) {
-                  this.context.addDebugOutput(
-                    `IF-THEN: jumping to line ${targetLineNumber} (statement index ${targetStatementIndex})`
-                  )
-                }
-                this.context.jumpToStatement(targetStatementIndex)
-                return // Don't advance to next statement
-              }
-            }
-          }
-
-          // Otherwise, execute statements in THEN clause
-          const thenCommandListCst = this.ifThenExecutor.getThenClause(ifThenStmtCst)
-          if (thenCommandListCst) {
-            // Get all commands from the command list (colon-separated commands)
-            const thenCommands = getCstNodes(thenCommandListCst.children.command)
-
-            // Execute each command in the THEN clause sequentially
-            // Use a local index counter to track position within THEN clause for FOR/NEXT loops
-            let thenCommandIndex = 0
-            while (thenCommandIndex < thenCommands.length) {
-              const commandCst = thenCommands[thenCommandIndex]
-              if (!commandCst) break
-
-              const thenStatement: ExpandedStatement = {
-                statementIndex: expandedStatement.statementIndex, // Keep same statement index
-                lineNumber: expandedStatement.lineNumber,
-                command: commandCst,
-              }
-
-              // Execute the command
-              await this.executeStatement(thenStatement)
-
-              // Check if NEXT caused a jump back (loop continuation)
-              // If so, we need to restart from the FOR statement in the THEN clause
-              const singleCommandCst = getFirstCstNode(commandCst.children.singleCommand)
-              if (singleCommandCst?.children.nextStatement) {
-                const nextStmtCst = getFirstCstNode(singleCommandCst.children.nextStatement)
-                if (nextStmtCst) {
-                  // Check if NEXT caused a jump - if loop stack has a loop for this line
-                  // and the current statement index matches, we need to find the FOR in THEN clause
-                  // NEXT always refers to the innermost loop (no variable name in Family BASIC)
-                  const activeLoop = this.context.loopStack.find(
-                    loop => loop.statementIndex === expandedStatement.statementIndex
-                  )
-                  if (activeLoop) {
-                    // Loop is active - find the FOR statement in THEN clause and restart from there
-                    // Find the index of the FOR statement for this variable
-                    const varName = activeLoop.variableName
-                    for (let i = 0; i < thenCommands.length; i++) {
-                      const cmd = thenCommands[i]
-                      const singleCmd = getFirstCstNode(cmd?.children.singleCommand)
-                      const forStmt = getFirstCstNode(singleCmd?.children.forStatement)
-                      if (forStmt) {
-                        const forVarToken = getFirstToken(forStmt.children.Identifier)
-                        if (forVarToken?.image.toUpperCase() === varName) {
-                          thenCommandIndex = i // Jump back to FOR statement
-                          break
-                        }
-                      }
-                    }
-                    continue // Continue loop to re-execute from FOR
-                  }
-                }
-              }
-
-              // Move to next command
-              thenCommandIndex++
-            }
-          }
-        }
-      }
+      await this.executeIfThen(singleCommandCst, expandedStatement)
     } else if (singleCommandCst.children.onStatement) {
       const onStmtCst = getFirstCstNode(singleCommandCst.children.onStatement)
       if (onStmtCst) {
@@ -275,35 +203,8 @@ export class StatementRouter {
         this.returnExecutor.execute(returnStmtCst, expandedStatement.lineNumber)
         return
       }
-    } else if (singleCommandCst.children.printStatement) {
-      const printStmtCst = getFirstCstNode(singleCommandCst.children.printStatement)
-      if (printStmtCst) {
-        this.printExecutor.execute(printStmtCst)
-      }
-    } else if (singleCommandCst.children.letStatement) {
-      const letStmtCst = getFirstCstNode(singleCommandCst.children.letStatement)
-      if (letStmtCst) {
-        this.letExecutor.execute(letStmtCst)
-      }
     } else if (singleCommandCst.children.forStatement) {
-      const forStmtCst = getFirstCstNode(singleCommandCst.children.forStatement)
-      if (forStmtCst) {
-        // Check if loop is already active (jumped back from NEXT)
-        // If so, skip FOR initialization
-        const identifierToken = getFirstToken(forStmtCst.children.Identifier)
-        if (identifierToken) {
-          const varName = identifierToken.image.toUpperCase()
-          const existingLoop = this.context.loopStack.find(
-            loop => loop.variableName === varName && loop.statementIndex === expandedStatement.statementIndex
-          )
-          if (existingLoop) {
-            // Loop already active - skip FOR initialization
-            return
-          }
-        }
-        // Pass current statement index and line number for loop tracking
-        this.forExecutor.execute(forStmtCst, expandedStatement.statementIndex, expandedStatement.lineNumber)
-      }
+      this.executeForStatement(singleCommandCst, expandedStatement)
     } else if (singleCommandCst.children.nextStatement) {
       const nextStmtCst = getFirstCstNode(singleCommandCst.children.nextStatement)
       if (nextStmtCst) {
@@ -339,11 +240,6 @@ export class StatementRouter {
         await this.linputExecutor.execute(linputStmtCst)
       }
       return
-    } else if (singleCommandCst.children.dimStatement) {
-      const dimStmtCst = getFirstCstNode(singleCommandCst.children.dimStatement)
-      if (dimStmtCst) {
-        this.dimExecutor.execute(dimStmtCst, expandedStatement.lineNumber)
-      }
     } else if (singleCommandCst.children.dataStatement) {
       // DATA statements are preprocessed, but we still need to handle them during execution
       // (they're no-ops during execution, but we process them during preprocessing)
@@ -355,116 +251,6 @@ export class StatementRouter {
           this.context.addDebugOutput('DATA: Statement already processed during preprocessing')
         }
       }
-    } else if (singleCommandCst.children.readStatement) {
-      const readStmtCst = getFirstCstNode(singleCommandCst.children.readStatement)
-      if (readStmtCst) {
-        this.readExecutor.execute(readStmtCst, expandedStatement.lineNumber)
-      }
-    } else if (singleCommandCst.children.restoreStatement) {
-      const restoreStmtCst = getFirstCstNode(singleCommandCst.children.restoreStatement)
-      if (restoreStmtCst) {
-        this.restoreExecutor.execute(restoreStmtCst)
-      }
-    } else if (singleCommandCst.children.clsStatement) {
-      const clsStmtCst = getFirstCstNode(singleCommandCst.children.clsStatement)
-      if (clsStmtCst) {
-        this.clsExecutor.execute(clsStmtCst)
-      }
-    } else if (singleCommandCst.children.swapStatement) {
-      const swapStmtCst = getFirstCstNode(singleCommandCst.children.swapStatement)
-      if (swapStmtCst) {
-        this.swapExecutor.execute(swapStmtCst, expandedStatement.lineNumber)
-      }
-    } else if (singleCommandCst.children.clearStatement) {
-      const clearStmtCst = getFirstCstNode(singleCommandCst.children.clearStatement)
-      if (clearStmtCst) {
-        this.clearExecutor.execute(clearStmtCst)
-      }
-    } else if (singleCommandCst.children.locateStatement) {
-      const locateStmtCst = getFirstCstNode(singleCommandCst.children.locateStatement)
-      if (locateStmtCst) {
-        this.locateExecutor.execute(locateStmtCst, expandedStatement.lineNumber)
-      }
-    } else if (singleCommandCst.children.colorStatement) {
-      const colorStmtCst = getFirstCstNode(singleCommandCst.children.colorStatement)
-      if (colorStmtCst) {
-        this.colorExecutor.execute(colorStmtCst, expandedStatement.lineNumber)
-      }
-    } else if (singleCommandCst.children.cgsetStatement) {
-      const cgsetStmtCst = getFirstCstNode(singleCommandCst.children.cgsetStatement)
-      if (cgsetStmtCst) {
-        this.cgsetExecutor.execute(cgsetStmtCst, expandedStatement.lineNumber)
-      }
-    } else if (singleCommandCst.children.cgenStatement) {
-      const cgenStmtCst = getFirstCstNode(singleCommandCst.children.cgenStatement)
-      if (cgenStmtCst) {
-        this.cgenExecutor.execute(cgenStmtCst, expandedStatement.lineNumber)
-      }
-    } else if (singleCommandCst.children.paletStatement) {
-      const paletStmtCst = getFirstCstNode(singleCommandCst.children.paletStatement)
-      if (paletStmtCst) {
-        this.paletExecutor.execute(paletStmtCst, expandedStatement.lineNumber)
-      }
-    } else if (singleCommandCst.children.defSpriteStatement) {
-      const defSpriteStmtCst = getFirstCstNode(singleCommandCst.children.defSpriteStatement)
-      if (defSpriteStmtCst) {
-        this.defSpriteExecutor.execute(defSpriteStmtCst, expandedStatement.lineNumber)
-      }
-    } else if (singleCommandCst.children.spriteStatement) {
-      const spriteStmtCst = getFirstCstNode(singleCommandCst.children.spriteStatement)
-      if (spriteStmtCst) {
-        this.spriteExecutor.execute(spriteStmtCst, expandedStatement.lineNumber)
-      }
-    } else if (singleCommandCst.children.spriteOnOffStatement) {
-      const spriteOnOffStmtCst = getFirstCstNode(singleCommandCst.children.spriteOnOffStatement)
-      if (spriteOnOffStmtCst) {
-        this.spriteOnOffExecutor.execute(spriteOnOffStmtCst, expandedStatement.lineNumber)
-      }
-    } else if (singleCommandCst.children.defMoveStatement) {
-      const defMoveStmtCst = getFirstCstNode(singleCommandCst.children.defMoveStatement)
-      if (defMoveStmtCst) {
-        this.defMoveExecutor.execute(defMoveStmtCst, expandedStatement.lineNumber)
-      }
-    } else if (singleCommandCst.children.moveStatement) {
-      const moveStmtCst = getFirstCstNode(singleCommandCst.children.moveStatement)
-      if (moveStmtCst) {
-        this.moveExecutor.execute(moveStmtCst, expandedStatement.lineNumber)
-      }
-    } else if (singleCommandCst.children.cutStatement) {
-      const cutStmtCst = getFirstCstNode(singleCommandCst.children.cutStatement)
-      if (cutStmtCst) {
-        this.cutExecutor.execute(cutStmtCst, expandedStatement.lineNumber)
-      }
-    } else if (singleCommandCst.children.eraStatement) {
-      const eraStmtCst = getFirstCstNode(singleCommandCst.children.eraStatement)
-      if (eraStmtCst) {
-        this.eraExecutor.execute(eraStmtCst, expandedStatement.lineNumber)
-      }
-    } else if (singleCommandCst.children.positionStatement) {
-      const positionStmtCst = getFirstCstNode(singleCommandCst.children.positionStatement)
-      if (positionStmtCst) {
-        this.positionExecutor.execute(positionStmtCst, expandedStatement.lineNumber)
-      }
-    } else if (singleCommandCst.children.playStatement) {
-      const playStmtCst = getFirstCstNode(singleCommandCst.children.playStatement)
-      if (playStmtCst) {
-        await this.playExecutor.execute(playStmtCst, expandedStatement.lineNumber)
-      }
-    } else if (singleCommandCst.children.bgplayStatement) {
-      const bgplayStmtCst = getFirstCstNode(singleCommandCst.children.bgplayStatement)
-      if (bgplayStmtCst) {
-        await this.bgplayExecutor.execute(bgplayStmtCst, expandedStatement.lineNumber)
-      }
-    } else if (singleCommandCst.children.viewStatement) {
-      const viewStmtCst = getFirstCstNode(singleCommandCst.children.viewStatement)
-      if (viewStmtCst) {
-        this.viewExecutor.execute(viewStmtCst, expandedStatement.lineNumber)
-      }
-    } else if (singleCommandCst.children.beepStatement) {
-      const beepStmtCst = getFirstCstNode(singleCommandCst.children.beepStatement)
-      if (beepStmtCst) {
-        this.beepExecutor.execute(beepStmtCst)
-      }
     } else {
       // Other statement types not yet implemented
       this.context.addError({
@@ -474,5 +260,139 @@ export class StatementRouter {
         code: 'UNSUPPORTED_FEATURE',
       })
     }
+  }
+
+  /**
+   * Execute IF-THEN statement with condition evaluation, line number jumps,
+   * and THEN clause execution including FOR/NEXT loop handling.
+   */
+  private async executeIfThen(
+    singleCommandCst: CstNode,
+    expandedStatement: ExpandedStatement
+  ): Promise<void> {
+    const ifThenStmtCst = getFirstCstNode(singleCommandCst.children.ifThenStatement)
+    if (!ifThenStmtCst) return
+
+    // Evaluate condition
+    const conditionIsTrue = this.ifThenExecutor.evaluateCondition(ifThenStmtCst, expandedStatement.lineNumber)
+
+    // When condition is false, skip colon-scoped statements on the same line
+    if (!conditionIsTrue && expandedStatement.ifScopeEndIndex !== undefined) {
+      this.context.jumpToStatement(expandedStatement.ifScopeEndIndex + 1)
+      return
+    }
+
+    // Execute THEN clause if condition is true
+    if (!conditionIsTrue) return
+
+    // Check if it's a line number jump (IF ... THEN number or IF ... GOTO number)
+    if (this.ifThenExecutor.hasLineNumberJump(ifThenStmtCst)) {
+      const targetLineNumber = this.ifThenExecutor.getLineNumber(ifThenStmtCst)
+      if (targetLineNumber !== undefined) {
+        const targetStatementIndex = this.context.findStatementIndexByLine(targetLineNumber)
+        if (targetStatementIndex === -1) {
+          this.context.addError({
+            line: expandedStatement.lineNumber,
+            message: `IF-THEN: line number ${targetLineNumber} not found`,
+            type: ERROR_TYPES.RUNTIME,
+          })
+        } else {
+          if (this.context.config.enableDebugMode) {
+            this.context.addDebugOutput(
+              `IF-THEN: jumping to line ${targetLineNumber} (statement index ${targetStatementIndex})`
+            )
+          }
+          this.context.jumpToStatement(targetStatementIndex)
+          return // Don't advance to next statement
+        }
+      }
+    }
+
+    // Otherwise, execute statements in THEN clause
+    const thenCommandListCst = this.ifThenExecutor.getThenClause(ifThenStmtCst)
+    if (!thenCommandListCst) return
+
+    // Get all commands from the command list (colon-separated commands)
+    const thenCommands = getCstNodes(thenCommandListCst.children.command)
+
+    // Execute each command in the THEN clause sequentially
+    // Use a local index counter to track position within THEN clause for FOR/NEXT loops
+    let thenCommandIndex = 0
+    while (thenCommandIndex < thenCommands.length) {
+      const commandCst = thenCommands[thenCommandIndex]
+      if (!commandCst) break
+
+      const thenStatement: ExpandedStatement = {
+        statementIndex: expandedStatement.statementIndex, // Keep same statement index
+        lineNumber: expandedStatement.lineNumber,
+        command: commandCst,
+      }
+
+      // Execute the command
+      await this.executeStatement(thenStatement)
+
+      // Check if NEXT caused a jump back (loop continuation)
+      // If so, we need to restart from the FOR statement in the THEN clause
+      const thenSingleCommandCst = getFirstCstNode(commandCst.children.singleCommand)
+      if (thenSingleCommandCst?.children.nextStatement) {
+        const nextStmtCst = getFirstCstNode(thenSingleCommandCst.children.nextStatement)
+        if (nextStmtCst) {
+          // Check if NEXT caused a jump - if loop stack has a loop for this line
+          // and the current statement index matches, we need to find the FOR in THEN clause
+          // NEXT always refers to the innermost loop (no variable name in Family BASIC)
+          const activeLoop = this.context.loopStack.find(
+            loop => loop.statementIndex === expandedStatement.statementIndex
+          )
+          if (activeLoop) {
+            // Loop is active - find the FOR statement in THEN clause and restart from there
+            // Find the index of the FOR statement for this variable
+            const varName = activeLoop.variableName
+            for (let i = 0; i < thenCommands.length; i++) {
+              const cmd = thenCommands[i]
+              const singleCmd = getFirstCstNode(cmd?.children.singleCommand)
+              const forStmt = getFirstCstNode(singleCmd?.children.forStatement)
+              if (forStmt) {
+                const forVarToken = getFirstToken(forStmt.children.Identifier)
+                if (forVarToken?.image.toUpperCase() === varName) {
+                  thenCommandIndex = i // Jump back to FOR statement
+                  break
+                }
+              }
+            }
+            continue // Continue loop to re-execute from FOR
+          }
+        }
+      }
+
+      // Move to next command
+      thenCommandIndex++
+    }
+  }
+
+  /**
+   * Execute FOR statement with loop-stack check for re-entry from NEXT.
+   */
+  private executeForStatement(
+    singleCommandCst: CstNode,
+    expandedStatement: ExpandedStatement
+  ): void {
+    const forStmtCst = getFirstCstNode(singleCommandCst.children.forStatement)
+    if (!forStmtCst) return
+
+    // Check if loop is already active (jumped back from NEXT)
+    // If so, skip FOR initialization
+    const identifierToken = getFirstToken(forStmtCst.children.Identifier)
+    if (identifierToken) {
+      const varName = identifierToken.image.toUpperCase()
+      const existingLoop = this.context.loopStack.find(
+        loop => loop.variableName === varName && loop.statementIndex === expandedStatement.statementIndex
+      )
+      if (existingLoop) {
+        // Loop already active - skip FOR initialization
+        return
+      }
+    }
+    // Pass current statement index and line number for loop tracking
+    this.forExecutor.execute(forStmtCst, expandedStatement.statementIndex, expandedStatement.lineNumber)
   }
 }
