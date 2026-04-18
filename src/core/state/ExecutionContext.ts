@@ -197,13 +197,6 @@ export class ExecutionContext {
   }
 
   /**
-   * Find statement indices by line number
-   */
-  findStatementIndicesByLine(lineNumber: number): number[] {
-    return this.labelMap.get(lineNumber) ?? []
-  }
-
-  /**
    * Find first statement index by line number (for GOTO/GOSUB)
    */
   findStatementIndexByLine(lineNumber: number): number {

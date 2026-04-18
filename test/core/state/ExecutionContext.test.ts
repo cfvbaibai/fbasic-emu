@@ -343,23 +343,6 @@ describe('ExecutionContext', () => {
     })
   })
 
-  describe('findStatementIndicesByLine', () => {
-    it('should return indices for a mapped line number', () => {
-      const ctx = new ExecutionContext(createConfig())
-      ctx.labelMap.set(10, [0, 1])
-      ctx.labelMap.set(20, [2])
-
-      expect(ctx.findStatementIndicesByLine(10)).toEqual([0, 1])
-      expect(ctx.findStatementIndicesByLine(20)).toEqual([2])
-    })
-
-    it('should return empty array for unmapped line number', () => {
-      const ctx = new ExecutionContext(createConfig())
-
-      expect(ctx.findStatementIndicesByLine(999)).toEqual([])
-    })
-  })
-
   describe('findStatementIndexByLine', () => {
     it('should return first index for a mapped line number', () => {
       const ctx = new ExecutionContext(createConfig())

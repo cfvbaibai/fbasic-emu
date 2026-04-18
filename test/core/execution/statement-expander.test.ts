@@ -1,8 +1,8 @@
 /**
  * Statement Expander Tests
  *
- * Unit tests for statement-expander.ts — expandStatements(), findStatementIndicesByLine(),
- * getFirstStatementIndexByLine(). Handles GOTO/GOSUB statement expansion and label mapping.
+ * Unit tests for statement-expander.ts — expandStatements().
+ * Handles GOTO/GOSUB statement expansion and label mapping.
  */
 
 import type { CstElement, CstNode, IToken } from 'chevrotain'
@@ -10,8 +10,6 @@ import { describe, expect, it } from 'vitest'
 
 import {
   expandStatements,
-  findStatementIndicesByLine,
-  getFirstStatementIndexByLine,
 } from '@/core/execution/statement-expander'
 
 // ---------------------------------------------------------------------------
@@ -402,80 +400,5 @@ describe('expandStatements', () => {
       // Line 30 PRINT "D": no IF scope
       expect(result.statements[3]!.ifScopeEndIndex).toBeUndefined()
     })
-  })
-})
-
-// ---------------------------------------------------------------------------
-// findStatementIndicesByLine
-// ---------------------------------------------------------------------------
-
-describe('findStatementIndicesByLine', () => {
-  it('should return indices for an existing line number', () => {
-    const labelMap = new Map<number, number[]>([
-      [10, [0]],
-      [20, [1, 2]],
-    ])
-
-    expect(findStatementIndicesByLine(labelMap, 10)).toEqual([0])
-    expect(findStatementIndicesByLine(labelMap, 20)).toEqual([1, 2])
-  })
-
-  it('should return empty array for a non-existent line number', () => {
-    const labelMap = new Map<number, number[]>([
-      [10, [0]],
-    ])
-
-    expect(findStatementIndicesByLine(labelMap, 999)).toEqual([])
-  })
-
-  it('should return empty array for an empty label map', () => {
-    const labelMap = new Map<number, number[]>()
-
-    expect(findStatementIndicesByLine(labelMap, 10)).toEqual([])
-  })
-})
-
-// ---------------------------------------------------------------------------
-// getFirstStatementIndexByLine
-// ---------------------------------------------------------------------------
-
-describe('getFirstStatementIndexByLine', () => {
-  it('should return the first index for a line with multiple commands', () => {
-    const labelMap = new Map<number, number[]>([
-      [20, [1, 2, 3]],
-    ])
-
-    expect(getFirstStatementIndexByLine(labelMap, 20)).toBe(1)
-  })
-
-  it('should return the index for a line with a single command', () => {
-    const labelMap = new Map<number, number[]>([
-      [10, [0]],
-    ])
-
-    expect(getFirstStatementIndexByLine(labelMap, 10)).toBe(0)
-  })
-
-  it('should return undefined for a non-existent line number', () => {
-    const labelMap = new Map<number, number[]>([
-      [10, [0]],
-    ])
-
-    expect(getFirstStatementIndexByLine(labelMap, 999)).toBeUndefined()
-  })
-
-  it('should return undefined for an empty label map', () => {
-    const labelMap = new Map<number, number[]>()
-
-    expect(getFirstStatementIndexByLine(labelMap, 10)).toBeUndefined()
-  })
-
-  it('should return undefined when line maps to empty array', () => {
-    // Edge case: a line number maps to an empty indices array
-    const labelMap = new Map<number, number[]>([
-      [10, []],
-    ])
-
-    expect(getFirstStatementIndexByLine(labelMap, 10)).toBeUndefined()
   })
 })

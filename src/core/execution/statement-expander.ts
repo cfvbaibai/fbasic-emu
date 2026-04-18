@@ -150,17 +150,3 @@ export function expandStatements(statementsCst: CstNode[]): {
   }
 }
 
-/**
- * Find statement indices by line number
- */
-export function findStatementIndicesByLine(labelMap: Map<number, number[]>, lineNumber: number): number[] {
-  return labelMap.get(lineNumber) ?? []
-}
-
-/**
- * Get the first statement index for a line number (for GOTO/GOSUB)
- */
-export function getFirstStatementIndexByLine(labelMap: Map<number, number[]>, lineNumber: number): number | undefined {
-  const indices = labelMap.get(lineNumber)
-  return indices && indices.length > 0 ? indices[0] : undefined
-}
