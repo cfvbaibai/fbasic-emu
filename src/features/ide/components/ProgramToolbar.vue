@@ -130,18 +130,7 @@ function startRename() {
 function finishRename() {
   const newName = tempName.value.trim()
   if (newName && newName !== programStore.programName) {
-    // Use setCode to trigger dirty state - name change is handled separately
-    // For now, we just update the name directly in localStorage
-    const program = programStore.currentProgram.value
-    if (program) {
-      // Create updated program with new name
-      const updatedProgram = {
-        ...program,
-        name: newName,
-        updatedAt: Date.now(),
-      }
-      programStore.loadProgram(updatedProgram)
-    }
+    programStore.setName(newName)
   }
   editingName.value = false
 }
