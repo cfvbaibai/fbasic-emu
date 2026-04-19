@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import { useReplContext } from '@/features/ide/composables/useReplMode'
 import { provideScreenDebug } from '@/features/ide/composables/useScreenDebug'
 import { useScreenFilter } from '@/features/ide/composables/useScreenFilter'
 import { provideScreenZoom } from '@/features/ide/composables/useScreenZoom'
@@ -14,6 +15,7 @@ import Screen from './Screen.vue'
 /**
  * ScreenTab component - Displays the screen buffer in a tab pane format with zoom controls.
  * Screen data comes from useScreenContext (provided by IdePage); Screen component injects it.
+ * REPL state comes from useReplContext (provided by useBasicIdeEnhanced).
  */
 defineOptions({
   name: 'ScreenTab',
@@ -38,6 +40,15 @@ const { showGrid, toggleGrid } = provideScreenDebug()
 const { filterEnabled, prefersReducedMotion, toggleFilter } =
   useScreenFilter()
 
+// REPL context (provided by useBasicIdeEnhanced in IdePage)
+const {
+  replActive,
+  commandHistory,
+  historyIndex,
+  navigateHistory,
+  executeReplCommand,
+} = useReplContext()
+
 // Zoom level options
 const zoomLevels: Array<{ value: 1 | 2 | 3 | 4; label: string }> = [
   { value: 1, label: '×1' },
@@ -46,11 +57,12 @@ const zoomLevels: Array<{ value: 1 | 2 | 3 | 4; label: string }> = [
   { value: 4, label: '×4' },
 ]
 
-// Computed property for template binding (Vue templates auto-unwrap refs, but this helps TypeScript)
+// Computed properties for template binding (Vue templates auto-unwrap refs, but this helps TypeScript)
 const currentZoomLevel = computed(() => zoomLevel.value)
 const isGridShown = computed(() => showGrid.value)
 const isFilterEnabled = computed(() => filterEnabled.value)
 const isReducedMotion = computed(() => prefersReducedMotion.value)
+const isReplDisabled = computed(() => !replActive.value)
 </script>
 
 <template>
@@ -101,7 +113,14 @@ const isReducedMotion = computed(() => prefersReducedMotion.value)
       <Screen />
     </div>
     <div class="repl-input-wrapper">
-      <ReplInput :active="false" :disabled="false" @execute="() => {}" />
+      <ReplInput
+        :active="replActive"
+        :disabled="isReplDisabled"
+        :command-history="commandHistory"
+        :history-index="historyIndex"
+        @execute="executeReplCommand"
+        @navigate-history="navigateHistory"
+      />
     </div>
     <div class="tab-content-footer">
       <ErrorPanel :errors="errors" />
