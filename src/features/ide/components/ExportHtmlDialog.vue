@@ -9,6 +9,7 @@
 import { onMounted, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import { TIMING } from '@/core/constants'
 import { useHtmlExporter } from '@/features/ide/composables/useHtmlExporter'
 
 const props = defineProps<{
@@ -22,13 +23,16 @@ const emit = defineEmits<{
 const { t } = useI18n()
 
 // Composable
-const { isExporting, exportError, exportHtml } = useHtmlExporter()
+const { isExporting, exportError, exportSuccess, exportHtml } = useHtmlExporter()
 
 // Export options state
 const title = ref('')
 const theme = ref<'dark' | 'light'>('dark')
 const includeSound = ref(true)
 const includeSprites = ref(true)
+
+// Auto-close timer for success state
+let successTimer: ReturnType<typeof setTimeout> | null = null
 
 // Reset state when dialog opens
 watch(
@@ -41,6 +45,11 @@ watch(
     includeSound.value = true
     includeSprites.value = true
     exportError.value = ''
+    exportSuccess.value = false
+    if (successTimer !== null) {
+      clearTimeout(successTimer)
+      successTimer = null
+    }
   },
 )
 
@@ -69,6 +78,16 @@ async function handleExport(): Promise<void> {
     includeSound: includeSound.value,
     includeSprites: includeSprites.value,
   })
+
+  if (exportSuccess.value) {
+    if (successTimer !== null) {
+      clearTimeout(successTimer)
+    }
+    successTimer = setTimeout(() => {
+      handleClose()
+      successTimer = null
+    }, TIMING.COPIED_FEEDBACK_MS)
+  }
 }
 
 onMounted(() => {
@@ -77,6 +96,9 @@ onMounted(() => {
 
 onUnmounted(() => {
   window.removeEventListener('keydown', handleKeydown)
+  if (successTimer !== null) {
+    clearTimeout(successTimer)
+  }
 })
 </script>
 
@@ -115,6 +137,15 @@ onUnmounted(() => {
           class="game-dialog-error"
         >
           {{ t('ide.exportHtml.exportFailed') }}
+        </div>
+
+        <!-- Success state -->
+        <div
+          v-else-if="exportSuccess"
+          data-testid="export-html-success"
+          class="game-dialog-success"
+        >
+          {{ t('ide.exportHtml.exportSuccess') }}
         </div>
 
         <!-- Form -->

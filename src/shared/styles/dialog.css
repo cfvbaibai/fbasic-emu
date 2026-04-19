@@ -58,6 +58,16 @@
   border-radius: 6px;
 }
 
+/* Success state message */
+.game-dialog-success {
+  padding: 0.75rem;
+  color: var(--semantic-solid-success);
+  font-size: 0.875rem;
+  background: var(--semantic-alpha-success-10);
+  border-radius: 6px;
+  text-align: center;
+}
+
 /* Action buttons row */
 .game-dialog-actions {
   display: flex;

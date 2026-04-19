@@ -558,7 +558,8 @@
     "exportButton": "导出",
     "cancelButton": "取消",
     "exporting": "正在导出...",
-    "exportFailed": "导出 HTML 文件失败。"
+    "exportFailed": "导出 HTML 文件失败。",
+    "exportSuccess": "导出完成！文件已下载。"
   },
   "musicComposer": {
     "title": "音乐作曲器"

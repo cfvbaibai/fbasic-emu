@@ -74,6 +74,7 @@ export function toExportFilename(title: string): string {
 export function useHtmlExporter() {
   const isExporting = ref(false)
   const exportError = ref('')
+  const exportSuccess = ref(false)
   const { locale } = useI18n()
   const programStore = useProgramStore()
 
@@ -87,12 +88,14 @@ export function useHtmlExporter() {
   async function exportHtml(options: HtmlExportOptions): Promise<void> {
     isExporting.value = true
     exportError.value = ''
+    exportSuccess.value = false
 
     try {
       const html = buildExportHtml(programStore.code, options, locale.value)
       const blob = new Blob([html], { type: HTML_MIME_TYPE })
       const filename = toExportFilename(options.title)
       triggerDownload(blob, filename)
+      exportSuccess.value = true
     } catch (err) {
       exportError.value = err instanceof Error ? err.message : String(err)
     } finally {
@@ -103,6 +106,7 @@ export function useHtmlExporter() {
   return {
     isExporting,
     exportError,
+    exportSuccess,
     exportHtml,
   }
 }

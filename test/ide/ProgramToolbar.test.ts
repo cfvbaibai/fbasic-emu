@@ -70,6 +70,7 @@ vi.mock('@/features/ide/composables/useHtmlExporter', () => ({
   useHtmlExporter: () => ({
     isExporting: ref(false),
     exportError: ref(''),
+    exportSuccess: ref(false),
     exportHtml: vi.fn(),
   }),
 }))
