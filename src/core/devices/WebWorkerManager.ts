@@ -7,7 +7,7 @@
 
 import { DEFAULTS } from '@/core/constants'
 import type { ExecutionResult, InterpreterConfig } from '@/core/types/execution-types'
-import type { AnyServiceWorkerMessage, ExecuteMessage, SetBgDataMessage, StopMessage } from '@/core/types/worker-messages'
+import type { AnyServiceWorkerMessage, ExecuteMessage, ReplClearMessage, ReplExecuteMessage, ReplRunMessage, SetBgDataMessage, StopMessage } from '@/core/types/worker-messages'
 import { logWorker } from '@/shared/logger'
 
 export interface WebWorkerExecutionOptions {
@@ -16,17 +16,17 @@ export interface WebWorkerExecutionOptions {
   timeout?: number
 }
 
+interface PendingMessageEntry {
+  resolve: (result: ExecutionResult) => void
+  reject: (error: Error) => void
+  timeout: NodeJS.Timeout
+}
+
 export class WebWorkerManager {
   private worker: Worker | null = null
   private messageId = 0
-  private pendingMessages = new Map<
-    string,
-    {
-      resolve: (result: ExecutionResult) => void
-      reject: (error: Error) => void
-      timeout: NodeJS.Timeout
-    }
-  >()
+  private _replReady = false
+  private pendingMessages = new Map<string, PendingMessageEntry>()
 
   /**
    * Check if web workers are supported
@@ -87,6 +87,7 @@ export class WebWorkerManager {
     // Handle worker errors
     this.worker.onerror = error => {
       logWorker.error('Web worker error:', error)
+      this._replReady = false
       this.rejectAllPending(`Web worker error: ${error.message}`)
     }
 
@@ -130,10 +131,26 @@ export class WebWorkerManager {
         reject(new Error(`Web worker execution timeout after ${timeout}ms`))
       }, timeout)
 
-      // Store pending message
+      // Store pending message with REPL-ready tracking
       this.pendingMessages.set(messageId, {
-        resolve,
-        reject,
+        resolve: (result) => {
+          this._replReady = true
+          resolve(result)
+        },
+        reject: (error) => {
+          // Execution errors from the worker preserve interpreter state,
+          // so REPL remains ready. Infrastructure failures (timeout, terminated)
+          // do not set REPL ready — those are handled by onerror/terminate.
+          const isInfrastructureError =
+            error.message.includes('timeout') ||
+            error.message.includes('terminated') ||
+            error.message.includes('not supported') ||
+            error.message.includes('not supported in this environment')
+          if (!isInfrastructureError) {
+            this._replReady = true
+          }
+          reject(error)
+        },
         timeout: timeoutHandle,
       })
 
@@ -230,12 +247,123 @@ export class WebWorkerManager {
   }
 
   /**
+   * Check if the worker has a persistent interpreter ready for REPL mode.
+   * Returns true after a program has been executed (successfully or with error),
+   * false before first execution or after terminate/error.
+   */
+  isReplReady(): boolean {
+    return this._replReady
+  }
+
+  /**
+   * Execute a single REPL statement in the web worker.
+   * Requires the worker to be initialized.
+   */
+  async replExecute(
+    statement: string,
+    options: { timeout?: number } = {}
+  ): Promise<ExecutionResult> {
+    if (!this.worker) {
+      throw new Error('Worker not initialized')
+    }
+
+    const messageId = (++this.messageId).toString()
+    const timeout = options.timeout ?? DEFAULTS.WEB_WORKER.MESSAGE_TIMEOUT
+
+    return new Promise<ExecutionResult>((resolve, reject) => {
+      const timeoutHandle = setTimeout(() => {
+        logWorker.warn('REPL_EXECUTE timeout after', timeout, 'ms')
+        this.pendingMessages.delete(messageId)
+        reject(new Error(`REPL_EXECUTE timeout after ${timeout}ms`))
+      }, timeout)
+
+      this.pendingMessages.set(messageId, {
+        resolve: (result) => { resolve(result) },
+        reject: (error) => { reject(error) },
+        timeout: timeoutHandle,
+      })
+
+      this.ensureReplMessageHandler()
+
+      const message: ReplExecuteMessage = {
+        type: 'REPL_EXECUTE',
+        id: messageId,
+        timestamp: Date.now(),
+        data: { statement },
+      }
+
+      logWorker.debug('Posting REPL_EXECUTE message:', { id: messageId, statement })
+      this.worker!.postMessage(message)
+    })
+  }
+
+  /**
+   * Re-run the stored program in the web worker (REPL RUN).
+   * Requires the worker to be initialized.
+   */
+  async replRun(options: { timeout?: number } = {}): Promise<ExecutionResult> {
+    if (!this.worker) {
+      throw new Error('Worker not initialized')
+    }
+
+    const messageId = (++this.messageId).toString()
+    const timeout = options.timeout ?? DEFAULTS.WEB_WORKER.MESSAGE_TIMEOUT
+
+    return new Promise<ExecutionResult>((resolve, reject) => {
+      const timeoutHandle = setTimeout(() => {
+        logWorker.warn('REPL_RUN timeout after', timeout, 'ms')
+        this.pendingMessages.delete(messageId)
+        reject(new Error(`REPL_RUN timeout after ${timeout}ms`))
+      }, timeout)
+
+      this.pendingMessages.set(messageId, {
+        resolve: (result) => { resolve(result) },
+        reject: (error) => { reject(error) },
+        timeout: timeoutHandle,
+      })
+
+      this.ensureReplMessageHandler()
+
+      const message: ReplRunMessage = {
+        type: 'REPL_RUN',
+        id: messageId,
+        timestamp: Date.now(),
+        data: {},
+      }
+
+      logWorker.debug('Posting REPL_RUN message:', { id: messageId })
+      this.worker!.postMessage(message)
+    })
+  }
+
+  /**
+   * Clear the screen without terminating the interpreter (REPL CLS).
+   * Requires the worker to be initialized.
+   */
+  async replClear(): Promise<void> {
+    if (!this.worker) {
+      throw new Error('Worker not initialized')
+    }
+
+    const message: ReplClearMessage = {
+      type: 'REPL_CLEAR',
+      id: `repl-clear-${Date.now()}`,
+      timestamp: Date.now(),
+      data: {},
+    }
+
+    logWorker.debug('Posting REPL_CLEAR message')
+    this.worker.postMessage(message)
+  }
+
+  /**
    * Terminate the web worker
    */
   terminate(): void {
     if (this.worker) {
       this.worker.terminate()
       this.worker = null
+      this._replReady = false
       this.rejectAllPending('Web worker terminated')
     }
   }
@@ -270,5 +398,35 @@ export class WebWorkerManager {
       pending.reject(new Error(reason))
     }
     this.pendingMessages.clear()
+  }
+
+  /**
+   * Ensure the worker has an onmessage handler that resolves pending messages
+   * from RESULT/ERROR responses. Only installs if no handler is already set
+   * (e.g., by executeInWorker's onMessage callback).
+   */
+  private ensureReplMessageHandler(): void {
+    if (!this.worker || this.worker.onmessage) return
+
+    this.worker.onmessage = (event: MessageEvent) => {
+      const message = event.data as AnyServiceWorkerMessage
+      if (message.type === 'RESULT') {
+        const resultMessage = message
+        const pending = this.pendingMessages.get(resultMessage.id)
+        if (pending) {
+          clearTimeout(pending.timeout)
+          this.pendingMessages.delete(resultMessage.id)
+          pending.resolve(resultMessage.data)
+        }
+      } else if (message.type === 'ERROR') {
+        const errorMessage = message
+        const pending = this.pendingMessages.get(errorMessage.id)
+        if (pending) {
+          clearTimeout(pending.timeout)
+          this.pendingMessages.delete(errorMessage.id)
+          pending.reject(new Error(errorMessage.data.message))
+        }
+      }
+    }
   }
 }

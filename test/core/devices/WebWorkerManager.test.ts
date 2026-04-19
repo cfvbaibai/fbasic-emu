@@ -1,5 +1,6 @@
 /**
- * Unit tests for WebWorkerManager
+ * Unit tests for WebWorkerManager — core lifecycle and message tests.
+ * REPL-specific tests live in WebWorkerManager.repl.test.ts.
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -16,37 +17,8 @@ vi.mock('@/shared/logger', () => ({
 
 // Must import after mocks are set up
 import { WebWorkerManager } from '@/core/devices/WebWorkerManager'
-
-interface MockWorkerLike {
-  onerror: ((error: ErrorEvent) => void) | null
-  onmessage: ((event: MessageEvent) => void) | null
-  onmessageerror: ((error: MessageEvent) => void) | null
-  terminated: boolean
-  postedMessages: unknown[]
-  postMessage(message: unknown): void
-  terminate(): void
-}
-
-/**
- * Create a mock worker class that satisfies both Worker and MockWorkerLike interfaces.
- */
-function createMockWorkerClass(): { new (...args: never[]): MockWorkerLike } {
-  return class {
-    onerror = null
-    onmessage = null
-    onmessageerror = null
-    terminated = false
-    postedMessages: unknown[] = []
-
-    postMessage(message: unknown): void {
-      this.postedMessages.push(message)
-    }
-
-    terminate(): void {
-      this.terminated = true
-    }
-  }
-}
+import type { MockWorkerLike } from '../../helpers/mockWorker'
+import { createMockWorkerClass } from '../../helpers/mockWorker'
 
 describe('WebWorkerManager', () => {
   let manager: WebWorkerManager
@@ -294,4 +266,5 @@ describe('WebWorkerManager', () => {
       expect(worker.postedMessages[0]).toEqual(customMessage)
     })
   })
+
 })
