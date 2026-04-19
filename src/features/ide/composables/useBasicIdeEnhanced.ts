@@ -29,6 +29,8 @@ import { useBasicIdeState } from './useBasicIdeState'
 import { useBasicIdeWorkerIntegration } from './useBasicIdeWorkerIntegration'
 import { useKeyboardInput } from './useKeyboardInput'
 import { useProgramStore } from './useProgramStore'
+import { provideReplContext, useReplMode } from './useReplMode'
+import { createReplWorkerAdapter } from './useReplWorkerAdapter'
 
 /**
  * Enhanced composable: reactive state and methods for IDE (AST-based parser, worker, screen).
@@ -41,6 +43,32 @@ export function useBasicIde() {
   const execution = useBasicIdeExecution(state, worker, editor.parseCode, {
     clearSharedDisplay: () => screen.clearDisplayToSharedBuffer(),
     clearWorkerDisplay: () => worker.sendClearDisplay(),
+  })
+
+  // REPL mode: create adapter from worker, track readiness via isRunning
+  const { adapter: replAdapter, markReplReady } =
+    createReplWorkerAdapter(worker.webWorkerManager)
+  const replMode = useReplMode(replAdapter)
+
+  // Mark REPL ready when program finishes running, not ready when it starts
+  watch(
+    state.isRunning,
+    (running, wasRunning) => {
+      if (wasRunning && !running) {
+        markReplReady()
+        replMode.activateRepl()
+      } else if (!wasRunning && running) {
+        replMode.deactivateRepl()
+      }
+    },
+  )
+
+  provideReplContext({
+    replActive: replMode.replActive,
+    commandHistory: replMode.commandHistory,
+    historyIndex: replMode.historyIndex,
+    navigateHistory: replMode.navigateHistory,
+    executeReplCommand: replMode.executeReplCommand,
   })
 
   // Keyboard input for INKEY$ function

@@ -1,8 +1,7 @@
 // @vitest-environment jsdom
 import { mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { computed, ref } from 'vue'
-import { defineComponent } from 'vue'
+import { computed, defineComponent, ref } from 'vue'
 
 import ScreenTab from '@/features/ide/components/ScreenTab.vue'
 
@@ -34,6 +33,23 @@ vi.mock('@/features/ide/composables/useScreenFilter', () => ({
     ),
     toggleFilter: mockToggleFilter,
     setFilterEnabled: mockSetFilterEnabled,
+  }),
+}))
+
+// Mock REPL context
+const mockReplActive = ref(false)
+const mockCommandHistory = ref<string[]>([])
+const mockHistoryIndex = ref(-1)
+const mockNavigateHistory = vi.fn()
+const mockExecuteReplCommand = vi.fn()
+
+vi.mock('@/features/ide/composables/useReplMode', () => ({
+  useReplContext: () => ({
+    replActive: computed(() => mockReplActive.value),
+    commandHistory: mockCommandHistory,
+    historyIndex: mockHistoryIndex,
+    navigateHistory: mockNavigateHistory,
+    executeReplCommand: mockExecuteReplCommand,
   }),
 }))
 
@@ -78,6 +94,9 @@ describe('ScreenTab', () => {
     localStorage.clear()
     mockFilterEnabled.value = false
     mockPrefersReducedMotion.value = false
+    mockReplActive.value = false
+    mockCommandHistory.value = []
+    mockHistoryIndex.value = -1
     vi.clearAllMocks()
   })
 
@@ -196,11 +215,70 @@ describe('ScreenTab', () => {
     wrapper.unmount()
   })
 
-  it('passes active=false to ReplInput by default', () => {
+  it('passes active=false to ReplInput when REPL is not active', () => {
+    mockReplActive.value = false
     const wrapper = mountScreenTab()
 
     const replInput = wrapper.findComponent({ name: 'ReplInput' })
     expect(replInput.props('active')).toBe(false)
+    wrapper.unmount()
+  })
+
+  it('passes active=true to ReplInput when REPL is active', () => {
+    mockReplActive.value = true
+    const wrapper = mountScreenTab()
+
+    const replInput = wrapper.findComponent({ name: 'ReplInput' })
+    expect(replInput.props('active')).toBe(true)
+    wrapper.unmount()
+  })
+
+  it('passes commandHistory to ReplInput', () => {
+    mockCommandHistory.value = ['PRINT "A"', 'CLS']
+    const wrapper = mountScreenTab()
+
+    const replInput = wrapper.findComponent({ name: 'ReplInput' })
+    expect(replInput.props('commandHistory')).toEqual(['PRINT "A"', 'CLS'])
+    wrapper.unmount()
+  })
+
+  it('passes historyIndex to ReplInput', () => {
+    mockHistoryIndex.value = 1
+    const wrapper = mountScreenTab()
+
+    const replInput = wrapper.findComponent({ name: 'ReplInput' })
+    expect(replInput.props('historyIndex')).toBe(1)
+    wrapper.unmount()
+  })
+
+  it('forwards execute event from ReplInput to executeReplCommand', async () => {
+    const wrapper = mountScreenTab()
+
+    const replInput = wrapper.findComponent({ name: 'ReplInput' })
+    replInput.vm.$emit('execute', 'PRINT "Hello"')
+
+    expect(mockExecuteReplCommand).toHaveBeenCalledOnce()
+    expect(mockExecuteReplCommand).toHaveBeenCalledWith('PRINT "Hello"')
+    wrapper.unmount()
+  })
+
+  it('forwards navigateHistory event from ReplInput to navigateHistory', async () => {
+    const wrapper = mountScreenTab()
+
+    const replInput = wrapper.findComponent({ name: 'ReplInput' })
+    replInput.vm.$emit('navigateHistory', 0)
+
+    expect(mockNavigateHistory).toHaveBeenCalledOnce()
+    expect(mockNavigateHistory).toHaveBeenCalledWith(0)
+    wrapper.unmount()
+  })
+
+  it('disables ReplInput when REPL is not active', () => {
+    mockReplActive.value = false
+    const wrapper = mountScreenTab()
+
+    const replInput = wrapper.findComponent({ name: 'ReplInput' })
+    expect(replInput.props('disabled')).toBe(true)
     wrapper.unmount()
   })
 })

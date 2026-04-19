@@ -9,11 +9,15 @@ describe('ReplInput', () => {
   function mountReplInput(props: {
     active?: boolean
     disabled?: boolean
+    commandHistory?: string[]
+    historyIndex?: number
   } = {}) {
     return mount(ReplInput, {
       props: {
         active: props.active ?? false,
         disabled: props.disabled ?? false,
+        commandHistory: props.commandHistory ?? [],
+        historyIndex: props.historyIndex ?? -1,
       },
       attachTo: document.body,
     })
@@ -161,5 +165,201 @@ describe('ReplInput', () => {
 
     expect(wrapper.emitted('execute')).toBeUndefined()
     wrapper.unmount()
+  })
+
+  describe('command history navigation', () => {
+    it('emits navigateHistory with last index on first ArrowUp', async () => {
+      const wrapper = mountReplInput({
+        active: true,
+        commandHistory: ['PRINT "A"', 'PRINT "B"', 'PRINT "C"'],
+        historyIndex: -1,
+      })
+
+      const input = wrapper.find('input.repl-input-field')
+      await input.trigger('keydown', { key: 'ArrowUp' })
+
+      const emitted = wrapper.emitted('navigateHistory')
+      expect(emitted).toHaveLength(1)
+      expect(emitted![0]).toEqual([2]) // Last index
+      wrapper.unmount()
+    })
+
+    it('emits navigateHistory with previous index on subsequent ArrowUp', async () => {
+      const wrapper = mountReplInput({
+        active: true,
+        commandHistory: ['PRINT "A"', 'PRINT "B"', 'PRINT "C"'],
+        historyIndex: 1,
+      })
+
+      const input = wrapper.find('input.repl-input-field')
+      // First ArrowUp enters navigation mode, goes to last entry (index 2)
+      await input.trigger('keydown', { key: 'ArrowUp' })
+      // Simulate parent updating historyIndex to 2
+      await wrapper.setProps({ historyIndex: 2 })
+      // Second ArrowUp goes back one step to index 1
+      await input.trigger('keydown', { key: 'ArrowUp' })
+
+      const emitted = wrapper.emitted('navigateHistory')
+      expect(emitted).toHaveLength(2)
+      expect(emitted![0]).toEqual([2]) // First ArrowUp: go to last
+      expect(emitted![1]).toEqual([1]) // Second ArrowUp: go back
+      wrapper.unmount()
+    })
+
+    it('does not go below index 0 on ArrowUp', async () => {
+      const wrapper = mountReplInput({
+        active: true,
+        commandHistory: ['PRINT "A"'],
+        historyIndex: -1,
+      })
+
+      const input = wrapper.find('input.repl-input-field')
+      // First ArrowUp enters navigation, goes to index 0
+      await input.trigger('keydown', { key: 'ArrowUp' })
+      await wrapper.setProps({ historyIndex: 0 })
+
+      // Second ArrowUp should stay at 0
+      await input.trigger('keydown', { key: 'ArrowUp' })
+
+      const emitted = wrapper.emitted('navigateHistory')
+      expect(emitted).toHaveLength(2)
+      expect(emitted![0]).toEqual([0]) // First: go to last (only entry)
+      expect(emitted![1]).toEqual([0]) // Second: clamped to 0
+      wrapper.unmount()
+    })
+
+    it('does nothing on ArrowUp when history is empty', async () => {
+      const wrapper = mountReplInput({
+        active: true,
+        commandHistory: [],
+        historyIndex: -1,
+      })
+
+      const input = wrapper.find('input.repl-input-field')
+      await input.trigger('keydown', { key: 'ArrowUp' })
+
+      expect(wrapper.emitted('navigateHistory')).toBeUndefined()
+      wrapper.unmount()
+    })
+
+    it('emits navigateHistory with next index on ArrowDown when navigating', async () => {
+      const wrapper = mountReplInput({
+        active: true,
+        commandHistory: ['PRINT "A"', 'PRINT "B"', 'PRINT "C"'],
+        historyIndex: -1,
+      })
+
+      const input = wrapper.find('input.repl-input-field')
+      // First ArrowUp enters navigation mode, goes to last (index 2)
+      await input.trigger('keydown', { key: 'ArrowUp' })
+      await wrapper.setProps({ historyIndex: 2 })
+
+      // Second ArrowUp goes to index 1
+      await input.trigger('keydown', { key: 'ArrowUp' })
+      await wrapper.setProps({ historyIndex: 1 })
+
+      // ArrowDown goes back to index 2
+      await input.trigger('keydown', { key: 'ArrowDown' })
+
+      const emitted = wrapper.emitted('navigateHistory')
+      expect(emitted).toHaveLength(3)
+      expect(emitted![0]).toEqual([2]) // First ArrowUp: go to last
+      expect(emitted![1]).toEqual([1]) // Second ArrowUp: go back
+      expect(emitted![2]).toEqual([2]) // ArrowDown: go forward
+      wrapper.unmount()
+    })
+
+    it('clears input on ArrowDown when at end of history', async () => {
+      const wrapper = mountReplInput({
+        active: true,
+        commandHistory: ['PRINT "A"', 'PRINT "B"'],
+        historyIndex: -1,
+      })
+
+      const input = wrapper.find('input.repl-input-field')
+      // ArrowUp to enter navigation mode, go to last entry (index 1)
+      await input.trigger('keydown', { key: 'ArrowUp' })
+      await wrapper.setProps({ historyIndex: 1 })
+
+      // ArrowDown at end of history should clear input
+      await input.trigger('keydown', { key: 'ArrowDown' })
+
+      // At end of history, should clear input (no emit)
+      expect(wrapper.emitted('navigateHistory')).toHaveLength(1) // Only the ArrowUp
+      expect((input.element as HTMLInputElement).value).toEqual('')
+      wrapper.unmount()
+    })
+
+    it('does nothing on ArrowDown when not navigating history', async () => {
+      const wrapper = mountReplInput({
+        active: true,
+        commandHistory: ['PRINT "A"', 'PRINT "B"'],
+        historyIndex: -1,
+      })
+
+      const input = wrapper.find('input.repl-input-field')
+      await input.trigger('keydown', { key: 'ArrowDown' })
+
+      expect(wrapper.emitted('navigateHistory')).toBeUndefined()
+      wrapper.unmount()
+    })
+
+    it('does nothing on ArrowUp when disabled', async () => {
+      const wrapper = mountReplInput({
+        active: true,
+        disabled: true,
+        commandHistory: ['PRINT "A"'],
+        historyIndex: -1,
+      })
+
+      const input = wrapper.find('input.repl-input-field')
+      await input.trigger('keydown', { key: 'ArrowUp' })
+
+      expect(wrapper.emitted('navigateHistory')).toBeUndefined()
+      wrapper.unmount()
+    })
+
+    it('updates input value when historyIndex prop changes', async () => {
+      const wrapper = mountReplInput({
+        active: true,
+        commandHistory: ['PRINT "A"', 'PRINT "B"'],
+        historyIndex: -1,
+      })
+
+      // First ArrowUp to enter navigation mode and emit navigateHistory(1)
+      const input = wrapper.find('input.repl-input-field')
+      await input.trigger('keydown', { key: 'ArrowUp' })
+
+      // Simulate parent updating historyIndex prop
+      await wrapper.setProps({ historyIndex: 1 })
+      await nextTick()
+
+      expect((input.element as HTMLInputElement).value).toEqual('PRINT "B"')
+      wrapper.unmount()
+    })
+
+    it('resets history navigation when Enter is pressed', async () => {
+      const wrapper = mountReplInput({
+        active: true,
+        commandHistory: ['PRINT "A"', 'PRINT "B"'],
+        historyIndex: -1,
+      })
+
+      const input = wrapper.find('input.repl-input-field')
+      // Navigate up
+      await input.trigger('keydown', { key: 'ArrowUp' })
+      // Execute (resets navigation)
+      await input.setValue('PRINT "C"')
+      await input.trigger('keydown', { key: 'Enter' })
+
+      // Now ArrowUp should start fresh from end of history
+      wrapper.emitted('navigateHistory')!.length = 0 // Clear previous emits
+      await input.trigger('keydown', { key: 'ArrowUp' })
+
+      const emitted = wrapper.emitted('navigateHistory')
+      expect(emitted).toHaveLength(1)
+      expect(emitted![0]).toEqual([1]) // Last index
+      wrapper.unmount()
+    })
   })
 })

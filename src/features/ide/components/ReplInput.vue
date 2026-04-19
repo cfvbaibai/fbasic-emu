@@ -5,6 +5,7 @@ import { nextTick, ref, useTemplateRef, watch } from 'vue'
  * ReplInput component - Single-line text input for REPL mode.
  * Hidden by default; appears when active prop is true.
  * Auto-focuses when activated, submits on Enter key.
+ * Supports command history navigation via Up/Down arrow keys.
  */
 defineOptions({
   name: 'ReplInput',
@@ -14,19 +15,28 @@ const props = withDefaults(
   defineProps<{
     active: boolean
     disabled: boolean
+    commandHistory: string[]
+    historyIndex: number
   }>(),
   {
     active: false,
     disabled: false,
+    commandHistory: () => [],
+    historyIndex: -1,
   },
 )
 
 const emit = defineEmits<{
   execute: [statement: string]
+  navigateHistory: [index: number]
 }>()
 
 const inputValue = ref('')
 const inputRef = useTemplateRef<HTMLInputElement>('inputRef')
+
+// Track whether user is actively navigating history
+// (to avoid clobbering input while they type)
+const isNavigatingHistory = ref(false)
 
 watch(
   () => props.active,
@@ -38,15 +48,77 @@ watch(
   },
 )
 
+// When history index changes externally (e.g., from composable), update input
+watch(
+  () => props.historyIndex,
+  (newIndex) => {
+    if (newIndex < 0 || !isNavigatingHistory.value) return
+    const command = props.commandHistory[newIndex]
+    if (command !== undefined) {
+      inputValue.value = command
+    }
+  },
+)
+
 function onKeyDown(event: KeyboardEvent) {
-  if (event.key !== 'Enter') return
   if (props.disabled) return
 
-  const trimmed = inputValue.value.trim()
-  if (!trimmed) return
+  if (event.key === 'Enter') {
+    isNavigatingHistory.value = false
+    const trimmed = inputValue.value.trim()
+    if (!trimmed) return
 
-  emit('execute', trimmed)
-  inputValue.value = ''
+    emit('execute', trimmed)
+    inputValue.value = ''
+    return
+  }
+
+  if (event.key === 'ArrowUp') {
+    event.preventDefault()
+    handleHistoryUp()
+    return
+  }
+
+  if (event.key === 'ArrowDown') {
+    event.preventDefault()
+    handleHistoryDown()
+    return
+  }
+
+  // Any other key resets history navigation
+  isNavigatingHistory.value = false
+}
+
+function handleHistoryUp(): void {
+  const history = props.commandHistory
+  if (history.length === 0) return
+
+  let newIndex: number
+  if (!isNavigatingHistory.value) {
+    // Starting fresh navigation: go to last entry
+    newIndex = history.length - 1
+    isNavigatingHistory.value = true
+  } else {
+    // Already navigating: go one step back
+    newIndex = Math.max(0, props.historyIndex - 1)
+  }
+
+  emit('navigateHistory', newIndex)
+}
+
+function handleHistoryDown(): void {
+  if (!isNavigatingHistory.value) return
+
+  const history = props.commandHistory
+  if (props.historyIndex >= history.length - 1) {
+    // At the end: clear input and stop navigating
+    inputValue.value = ''
+    isNavigatingHistory.value = false
+    return
+  }
+
+  const newIndex = props.historyIndex + 1
+  emit('navigateHistory', newIndex)
 }
 </script>
 
