@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 /**
  * ReplInput component - Single-line text input for REPL mode.
@@ -30,6 +31,8 @@ const emit = defineEmits<{
   execute: [statement: string]
   navigateHistory: [index: number]
 }>()
+
+const { t } = useI18n()
 
 const inputValue = ref('')
 const inputRef = useTemplateRef<HTMLInputElement>('inputRef')
@@ -130,7 +133,7 @@ function handleHistoryDown(): void {
       v-model="inputValue"
       type="text"
       class="repl-input-field"
-      :placeholder="'Enter command...'"
+      :placeholder="t('ide.repl.placeholder')"
       :disabled="disabled"
       @keydown="onKeyDown"
     />

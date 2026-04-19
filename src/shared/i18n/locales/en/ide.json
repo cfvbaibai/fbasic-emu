@@ -564,6 +564,9 @@
   "musicComposer": {
     "title": "Music Composer"
   },
+  "repl": {
+    "placeholder": "Enter command..."
+  },
   "tutorial": {
     "title": "Tutorial",
     "defaultTitle": "F-BASIC Tutorial",

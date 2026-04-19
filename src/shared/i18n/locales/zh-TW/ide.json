@@ -564,6 +564,9 @@
   "musicComposer": {
     "title": "音樂作曲器"
   },
+  "repl": {
+    "placeholder": "輸入命令..."
+  },
   "tutorial": {
     "title": "教學",
     "defaultTitle": "F-BASIC 教學",
