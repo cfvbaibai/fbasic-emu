@@ -8,7 +8,7 @@
 import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { WebWorkerDeviceAdapter } from '@/core/devices/WebWorkerDeviceAdapter'
-import type { AnyServiceWorkerMessage, ClearDisplayMessage, ErrorMessage, ExecuteMessage, InputValueMessage, OutputMessage, PlaySoundCompleteMessage, ResultMessage, SetBgDataMessage, SetSharedAnimationBufferMessage, SetSharedJoystickBufferMessage, SetSharedKeyboardBufferMessage, StopMessage, StrigEventMessage } from '@/core/types/worker-messages'
+import type { AnyServiceWorkerMessage, ClearDisplayMessage, ErrorMessage, ExecuteMessage, InputValueMessage, OutputMessage, PlaySoundCompleteMessage, ReplClearMessage, ReplExecuteMessage, ReplRunMessage, ResultMessage, SetBgDataMessage, SetSharedAnimationBufferMessage, SetSharedJoystickBufferMessage, SetSharedKeyboardBufferMessage, StopMessage, StrigEventMessage } from '@/core/types/worker-messages'
 import type { BgGridData } from '@/features/bg-editor/types'
 import { logWorker } from '@/shared/logger'
 
@@ -92,11 +92,24 @@ class WebWorkerInterpreter {
           logWorker.debug('Handling CLEAR_DISPLAY message')
           this.handleClearDisplay(message)
           break
+        case 'REPL_EXECUTE':
+          logWorker.debug('Handling REPL_EXECUTE message')
+          await this.handleReplExecute(message)
+          break
+        case 'REPL_RUN':
+          logWorker.debug('Handling REPL_RUN message')
+          await this.handleReplRun(message)
+          break
+        case 'REPL_CLEAR':
+          logWorker.debug('Handling REPL_CLEAR message')
+          this.handleReplClear(message)
+          break
 
         default:
           // Other message types (RESULT, PROGRESS, OUTPUT, ERROR,
           // SCREEN_UPDATE, INIT, READY) are sent FROM the worker, not
-          // handled BY the worker
+          // handled BY the worker.
+          // REPL_EXECUTE, REPL_RUN, REPL_CLEAR are handled above.
           logWorker.warn('Unexpected message type:', message.type)
           break
       }
@@ -236,6 +249,94 @@ class WebWorkerInterpreter {
     this.webWorkerDeviceAdapter?.resetSoundState?.()
     // Reject pending play complete promises so PLAY executor doesn't hang
     this.webWorkerDeviceAdapter?.rejectAllPendingRequests?.('CLEAR pressed during PLAY')
+  }
+
+  async handleReplExecute(message: ReplExecuteMessage) {
+    try {
+      const { statement } = message.data
+      this.currentExecutionId = message.id
+
+      if (this.webWorkerDeviceAdapter) {
+        this.webWorkerDeviceAdapter.setCurrentExecutionId(message.id)
+      }
+
+      // Create interpreter if needed (fresh REPL session)
+      if (!this.interpreter) {
+        this.interpreter = new BasicInterpreter({
+          maxIterations: Infinity,
+          maxOutputLines: Infinity,
+          enableDebugMode: false,
+          strictMode: false,
+          deviceAdapter: this.webWorkerDeviceAdapter!,
+          sharedAnimationBuffer: this.sharedAnimationBuffer ?? undefined,
+        })
+      }
+
+      // Execute the single statement
+      this.isRunning = true
+      const result = await this.interpreter.executeSingleStatement(statement)
+      this.isRunning = false
+
+      if (this.webWorkerDeviceAdapter) {
+        this.webWorkerDeviceAdapter.setCurrentExecutionId(null)
+      }
+
+      this.sendResult(message.id, {
+        ...result,
+        executionId: message.id,
+        workerId: 'web-worker-1',
+      })
+    } catch (error) {
+      this.isRunning = false
+      const err = error instanceof Error ? error : new Error(String(error))
+      logWorker.error('REPL_EXECUTE error:', err.message)
+      const location = this.interpreter?.getExecutionLocation() ?? null
+      this.sendError(message.id, err, location)
+    }
+  }
+
+  async handleReplRun(message: ReplRunMessage) {
+    try {
+      this.currentExecutionId = message.id
+
+      if (this.webWorkerDeviceAdapter) {
+        this.webWorkerDeviceAdapter.setCurrentExecutionId(message.id)
+      }
+
+      // Re-execute the stored program (creates fresh state like RUN command)
+      if (!this.interpreter) {
+        throw new Error('No program has been executed yet')
+      }
+
+      this.isRunning = true
+      const result = await this.interpreter.runStoredProgram()
+      this.isRunning = false
+
+      if (this.webWorkerDeviceAdapter) {
+        this.webWorkerDeviceAdapter.setCurrentExecutionId(null)
+      }
+
+      const spriteStates = this.interpreter.getSpriteStates()
+      const spriteEnabled = this.interpreter.isSpriteEnabled()
+
+      this.sendResult(message.id, {
+        ...result,
+        executionId: message.id,
+        workerId: 'web-worker-1',
+        spriteStates,
+        spriteEnabled,
+      })
+    } catch (error) {
+      this.isRunning = false
+      const err = error instanceof Error ? error : new Error(String(error))
+      logWorker.error('REPL_RUN error:', err.message)
+      this.sendError(message.id, err, null)
+    }
+  }
+
+  handleReplClear(_message: ReplClearMessage) {
+    // Clear screen without terminating the interpreter (REPL CLS)
+    this.interpreter?.getContext()?.clearScreen()
   }
 
   handleStrigEvent(message: StrigEventMessage) {

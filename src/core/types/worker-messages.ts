@@ -42,6 +42,9 @@ export type ServiceWorkerMessageType =
   | 'PLAY_SOUND'
   | 'PLAY_SOUND_COMPLETE'
   | 'CLEAR_DISPLAY'
+  | 'REPL_EXECUTE'
+  | 'REPL_RUN'
+  | 'REPL_CLEAR'
 
 // Execute message - sent from UI to service worker
 export interface ExecuteMessage extends ServiceWorkerMessage {
@@ -302,6 +305,26 @@ export interface PlaySoundCompleteMessage extends ServiceWorkerMessage {
   }
 }
 
+// REPL execute - sent from UI to worker to execute a single statement
+export interface ReplExecuteMessage extends ServiceWorkerMessage {
+  type: 'REPL_EXECUTE'
+  data: {
+    statement: string
+  }
+}
+
+// REPL run - sent from UI to worker to re-execute the stored program
+export interface ReplRunMessage extends ServiceWorkerMessage {
+  type: 'REPL_RUN'
+  data: Record<string, never>
+}
+
+// REPL clear - sent from UI to worker to clear screen without terminating interpreter
+export interface ReplClearMessage extends ServiceWorkerMessage {
+  type: 'REPL_CLEAR'
+  data: Record<string, never>
+}
+
 // Union type for all possible messages
 export type AnyServiceWorkerMessage =
   | ClearDisplayMessage
@@ -327,6 +350,9 @@ export type AnyServiceWorkerMessage =
   | InputValueMessage
   | PlaySoundMessage
   | PlaySoundCompleteMessage
+  | ReplExecuteMessage
+  | ReplRunMessage
+  | ReplClearMessage
 
 // Message handler interface for type-safe message handling
 export interface ServiceWorkerMessageHandler {
