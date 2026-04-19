@@ -94,6 +94,14 @@ export class ExecutionContext {
   }
 
   /**
+   * Clear the screen buffer without resetting variables or control flow.
+   * Used for REPL CLS — preserves execution state while clearing visual output.
+   */
+  clearScreen(): void {
+    this.deviceAdapter?.clearScreen()
+  }
+
+  /**
    * Clear display-related state only (DEF SPRITE state, DEF MOVE definitions and movement states).
    * Used when IDE Clear button is clicked so worker has no sprite/move definitions.
    */

@@ -486,6 +486,32 @@ describe('ExecutionContext', () => {
     })
   })
 
+  describe('clearScreen', () => {
+    it('should clear screen via device adapter without resetting variables', () => {
+      const ctx = new ExecutionContext(createConfig())
+      ctx.variables.set('X', { value: 42, type: 'number' })
+      ctx.isRunning = true
+      ctx.currentStatementIndex = 5
+      const mockAdapter = { clearScreen: vi.fn() }
+      ctx.deviceAdapter = mockAdapter as never
+
+      ctx.clearScreen()
+
+      // Variables and state preserved
+      expect(ctx.variables.size).toEqual(1)
+      expect(ctx.isRunning).toEqual(true)
+      expect(ctx.currentStatementIndex).toEqual(5)
+      // Screen was cleared
+      expect(mockAdapter.clearScreen).toHaveBeenCalledTimes(1)
+    })
+
+    it('should not throw when no device adapter is set', () => {
+      const ctx = new ExecutionContext(createConfig())
+
+      expect(() => ctx.clearScreen()).not.toThrow()
+    })
+  })
+
   describe('getSpritePosition', () => {
     it('should delegate to deviceAdapter', () => {
       const ctx = new ExecutionContext(createConfig())
