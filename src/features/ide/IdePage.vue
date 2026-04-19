@@ -1,20 +1,8 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, shallowRef, useTemplateRef } from 'vue'
+import { computed, onMounted, shallowRef, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 
-import type { SharedDisplayViews } from '@/core/animation/sharedDisplayBuffer'
-import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
-import { PALETTE_DEFAULTS } from '@/core/constants'
-import type { KeyboardBufferView } from '@/core/devices'
-import {
-  createSharedKeyboardBuffer,
-  createViewsFromKeyboardBuffer,
-} from '@/core/devices'
-import type { SpriteState } from '@/core/sprite/types'
-import type { HighlighterInfo, ParserInfo, ScreenCell } from '@/core/types/execution-types'
-import type { BasicVariable } from '@/core/types/state-types'
-import type { RequestInputMessage } from '@/core/types/worker-messages'
 import { GameLayout } from '@/shared/components/ui'
 import { useContainerWidth } from '@/shared/composables/useContainerWidth'
 
@@ -27,16 +15,9 @@ import InputModal from './components/InputModal.vue'
 import SampleSelector from './components/SampleSelector.vue'
 import TutorialPanel from './components/TutorialPanel.vue'
 import type { CommandPaletteCommand } from './composables/commandPalette'
-import {
-  isEditableTarget,
-  matchesAnyShortcut,
-} from './composables/commandPalette'
-import { useBasicIde as useBasicIdeEnhanced } from './composables/useBasicIdeEnhanced'
-import type { InputMode } from './composables/useBasicIdeState'
-import { useDevApi } from './composables/useDevApi'
 import { useIdeCommandPalette } from './composables/useIdeCommandPalette'
-import { provideScreenContext } from './composables/useScreenContext'
-import { useShareRoute } from './composables/useShareRoute'
+import { useIdeGlobalHotkeys } from './composables/useIdeGlobalHotkeys'
+import { useIdePageState } from './composables/useIdePageState'
 import { useTutorialPanel } from './composables/useTutorialPanel'
 
 /**
@@ -48,118 +29,47 @@ defineOptions({
 })
 
 const { t } = useI18n()
-
-const isE2ELite =
-  typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('e2e') === 'lite'
-
 const route = useRoute()
 
-const basicIde = isE2ELite ? null : useBasicIdeEnhanced()
-
-// Share route handling
-const code = basicIde?.code ?? ref('')
-const { shareError, handleShareRoute } = useShareRoute({ code })
-
-const isRunning = basicIde?.isRunning ?? ref(false)
-const output = basicIde?.output ?? ref<string[]>([])
-const errors =
-  basicIde?.errors ??
-  ref<Array<{ line: number; message: string; type: string; stack?: string; sourceLine?: string }>>([])
-const variables = basicIde?.variables ?? ref<Record<string, BasicVariable>>({})
-const debugOutput = basicIde?.debugOutput ?? ref('')
-const debugMode = basicIde?.debugMode ?? ref(false)
-const screenBuffer = basicIde?.screenBuffer ?? ref<ScreenCell[][]>([])
-const cursorX = basicIde?.cursorX ?? ref(0)
-const cursorY = basicIde?.cursorY ?? ref(0)
-const bgPalette = basicIde?.bgPalette ?? ref(PALETTE_DEFAULTS.BG_PALETTE)
-const backdropColor = basicIde?.backdropColor ?? ref(PALETTE_DEFAULTS.BACKDROP_COLOR)
-const spritePalette = basicIde?.spritePalette ?? ref(PALETTE_DEFAULTS.SPRITE_PALETTE)
-const cgenMode = basicIde?.cgenMode ?? ref(PALETTE_DEFAULTS.CGEN_MODE)
-const spriteStates = basicIde?.spriteStates ?? ref<SpriteState[]>([])
-const spriteEnabled = basicIde?.spriteEnabled ?? ref(true)
-const movementPositionsFromBuffer =
-  basicIde?.movementPositionsFromBuffer ?? ref<Map<number, { x: number; y: number }>>(new Map())
-const frontSpriteNodes = basicIde?.frontSpriteNodes ?? ref<Map<number, unknown>>(new Map())
-const backSpriteNodes = basicIde?.backSpriteNodes ?? ref<Map<number, unknown>>(new Map())
-const inputMode = basicIde?.inputMode ?? ref<InputMode>('joystick')
-
-const runCode =
-  basicIde?.runCode ??
-  (async () => {
-    isRunning.value = true
-  })
-const stopCode =
-  basicIde?.stopCode ??
-  (() => {
-    isRunning.value = false
-  })
-const clearOutput =
-  basicIde?.clearOutput ??
-  (() => {
-    output.value = []
-    errors.value = []
-    variables.value = {}
-    debugOutput.value = ''
-  })
-const loadSampleCode = basicIde?.loadSampleCode ?? (() => false)
-const getParserCapabilities =
-  basicIde?.getParserCapabilities ??
-  (() => ({
-    name: 'E2E Lite Parser',
-    version: '0.0.0',
-    capabilities: [],
-    features: [],
-    supportedStatements: [],
-    supportedFunctions: [],
-    supportedOperators: [],
-  }))
-const getHighlighterCapabilities =
-  basicIde?.getHighlighterCapabilities ??
-  (() => ({
-    name: 'E2E Lite Highlighter',
-    version: '0.0.0',
-    features: [],
-  }))
-const toggleDebugMode =
-  basicIde?.toggleDebugMode ??
-  (() => {
-    debugMode.value = !debugMode.value
-  })
-const sendStrigEvent = basicIde?.sendStrigEvent ?? (() => {})
-const sharedDisplayBufferAccessor =
-  basicIde?.sharedDisplayBufferAccessor ?? ({} as SharedDisplayBufferAccessor)
-const sharedAnimationBuffer = basicIde?.sharedAnimationBuffer ?? ({} as SharedArrayBuffer)
-const sharedDisplayViews: SharedDisplayViews = basicIde?.sharedDisplayViews ?? {
-  buffer: {} as SharedArrayBuffer,
-  spriteView: {} as Float64Array,
-  charView: {} as Uint8Array,
-  patternView: {} as Uint8Array,
-  cursorView: {} as Uint8Array,
-  sequenceView: {} as Int32Array,
-  scalarsView: {} as Uint8Array,
-  animationSyncView: {} as Float64Array,
-}
-const sharedJoystickBuffer = basicIde?.sharedJoystickBuffer ?? ({} as SharedArrayBuffer)
-const sharedKeyboardBufferView: KeyboardBufferView =
-  basicIde?.sharedKeyboardBufferView ?? createViewsFromKeyboardBuffer(createSharedKeyboardBuffer())
-const setDecodedScreenState = basicIde?.setDecodedScreenState ?? (() => {})
-const registerCallbacks = basicIde?.registerCallbacks ?? {
-  registerScheduleRender: () => {},
-  registerInvalidateBackgroundBuffer: () => {},
-}
-const pendingInputRequest = basicIde?.pendingInputRequest ?? ref<RequestInputMessage['data'] | null>(null)
-const respondToInputRequest =
-  basicIde?.respondToInputRequest ?? ((_requestId: string, _values: string[], _cancelled: boolean) => {})
-
-// Expose DEV-only global API for headless test code injection
-useDevApi({
+// All IDE state (with E2E Lite fallbacks) + screen context provision
+const bottomAreaRef = useTemplateRef<{ updateMoveSlotsData: () => void }>('bottomAreaRef')
+const {
   code,
+  isRunning,
+  output,
+  errors,
+  variables,
+  debugOutput,
+  debugMode,
+  screenBuffer,
+  cursorX,
+  cursorY,
+  bgPalette,
+  backdropColor,
+  spritePalette,
+  cgenMode,
+  spriteStates,
+  spriteEnabled,
+  inputMode,
   runCode,
   stopCode,
+  clearOutput,
+  loadSampleCode,
+  getParserCapabilities,
+  getHighlighterCapabilities,
+  toggleDebugMode,
+  sendStrigEvent,
   pendingInputRequest,
   respondToInputRequest,
-  screenBuffer,
-})
+  sharedDisplayBufferAccessor,
+  sharedJoystickBuffer,
+  sharedKeyboardBufferView,
+  isE2ELite,
+  parserInfo,
+  highlighterInfo,
+  shareError,
+  handleShareRoute,
+} = useIdePageState(bottomAreaRef)
 
 // UI state
 const sampleSelectorOpen = shallowRef(false)
@@ -175,34 +85,40 @@ const tutorialPanel = useTutorialPanel()
 const editorPanelRef = useTemplateRef<HTMLDivElement>('editorPanelRef')
 const isToolbarCompact = useContainerWidth(editorPanelRef, 900)
 
-// IdeBottomArea ref for animation loop to call updateMoveSlotsData
-const bottomAreaRef = useTemplateRef<{ updateMoveSlotsData: () => void }>('bottomAreaRef')
-
-// Provide screen context so ScreenTab/Screen can inject instead of prop drilling
-if (!isE2ELite && sharedDisplayViews && sharedDisplayBufferAccessor && sharedAnimationBuffer && sharedJoystickBuffer) {
-  provideScreenContext({
-    screenBuffer,
-    cursorX,
-    cursorY,
-    bgPalette,
-    backdropColor,
-    spritePalette,
-    cgenMode,
-    spriteStates,
-    spriteEnabled,
-    movementPositionsFromBuffer,
-    externalFrontSpriteNodes: frontSpriteNodes,
-    externalBackSpriteNodes: backSpriteNodes,
-    sharedDisplayViews: ref(sharedDisplayViews),
-    sharedDisplayBufferAccessor,
-    sharedAnimationBuffer: ref(sharedAnimationBuffer),
-    sharedJoystickBuffer: ref(sharedJoystickBuffer),
-    setDecodedScreenState,
-    registerCallbacks,
-    // Callback for animation loop to update inspector MOVE tab data
-    updateInspectorMoveSlots: () => bottomAreaRef.value?.updateMoveSlotsData(),
-  })
+// Toggle input mode between joystick and keyboard
+function toggleInputMode() {
+  inputMode.value = inputMode.value === 'joystick' ? 'keyboard' : 'joystick'
 }
+
+// Command palette commands
+const { commands: commandPaletteCommands } = useIdeCommandPalette({
+  isRunning,
+  runCode,
+  stopCode,
+  clearOutput,
+  toggleDebugMode,
+  toggleInputMode,
+  sampleSelectorOpen,
+  logLevelPanelOpen,
+  editorView,
+})
+
+function openCommandPalette() {
+  commandPaletteOpen.value = true
+}
+
+function closeCommandPalette() {
+  commandPaletteOpen.value = false
+}
+
+async function handleExecuteCommandFromPalette(command: CommandPaletteCommand) {
+  closeCommandPalette()
+  await command.execute()
+}
+
+// Computed properties for backward compatibility
+const canRun = computed(() => !isRunning.value)
+const canStop = isRunning
 
 // Input modal response handler
 function handleInputResponse(
@@ -224,50 +140,14 @@ function handleLoadSample(sampleType: string) {
   }
 }
 
-function openCommandPalette() {
-  commandPaletteOpen.value = true
+function dismissShareError() {
+  shareError.value = ''
 }
-
-function closeCommandPalette() {
-  commandPaletteOpen.value = false
-}
-
-async function restartCode() {
-  stopCode()
-  await runCode()
-}
-
-// Command palette commands
-const { commands: commandPaletteCommands } = useIdeCommandPalette({
-  isRunning,
-  runCode,
-  stopCode,
-  clearOutput,
-  toggleDebugMode,
-  toggleInputMode,
-  sampleSelectorOpen,
-  logLevelPanelOpen,
-  editorView,
-})
-
-async function handleExecuteCommandFromPalette(command: CommandPaletteCommand) {
-  closeCommandPalette()
-  await command.execute()
-}
-
-// Computed properties for backward compatibility
-const canRun = computed(() => !isRunning.value)
-const canStop = isRunning
-
-// Parser capabilities for display
-const parserInfo = shallowRef<ParserInfo | null>(null)
-const highlighterInfo = shallowRef<HighlighterInfo | null>(null)
 
 // Initialize parser info and handle share route
 onMounted(() => {
   parserInfo.value = getParserCapabilities()
   highlighterInfo.value = getHighlighterCapabilities()
-  window.addEventListener('keydown', handleGlobalKeydown)
 
   // If we arrived via a share link, decode and load the program
   if (route.name === 'Share') {
@@ -275,49 +155,14 @@ onMounted(() => {
   }
 })
 
-onUnmounted(() => {
-  window.removeEventListener('keydown', handleGlobalKeydown)
+// Register global keyboard shortcuts (command palette, run/stop/restart, F9)
+useIdeGlobalHotkeys({
+  commandPaletteOpen,
+  inputMode,
+  runCode,
+  stopCode,
+  openCommandPalette,
 })
-
-// Global hotkey handler
-function handleGlobalKeydown(e: KeyboardEvent) {
-  if (matchesAnyShortcut(e, ['Ctrl+Shift+P', 'Meta+Shift+P'])) {
-    e.preventDefault()
-    openCommandPalette()
-    return
-  }
-
-  if (commandPaletteOpen.value || isEditableTarget(e.target)) return
-
-  if (matchesAnyShortcut(e, ['Ctrl+Enter', 'Meta+Enter'])) {
-    e.preventDefault()
-    void runCode()
-    return
-  }
-
-  if (matchesAnyShortcut(e, ['Ctrl+Shift+Enter', 'Meta+Shift+Enter'])) {
-    e.preventDefault()
-    stopCode()
-    return
-  }
-
-  if (matchesAnyShortcut(e, ['Ctrl+Shift+R', 'Meta+Shift+R'])) {
-    e.preventDefault()
-    void restartCode()
-    return
-  }
-
-  // F9: Toggle input mode (joystick/keyboard)
-  if (e.key === 'F9') {
-    e.preventDefault()
-    toggleInputMode()
-  }
-}
-
-// Toggle input mode between joystick and keyboard
-function toggleInputMode() {
-  inputMode.value = inputMode.value === 'joystick' ? 'keyboard' : 'joystick'
-}
 </script>
 
 <template>
@@ -398,7 +243,7 @@ function toggleInputMode() {
           <span class="share-error-text">{{ t('ide.share.loadFailed') }}: {{ shareError }}</span>
           <button
             class="share-error-dismiss"
-            @click="shareError = ''"
+            @click="dismissShareError"
           >
             &times;
           </button>
