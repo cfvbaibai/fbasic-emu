@@ -10,6 +10,7 @@ import { createI18nMock } from '../helpers/createI18nMock'
 const mockNewProgram = vi.fn()
 const mockOpen = vi.fn()
 const mockSave = vi.fn()
+const mockSetName = vi.fn()
 const isDirtyRef = ref(true)
 
 const mockT = createI18nMock({
@@ -50,6 +51,7 @@ vi.mock('@/features/ide/composables/useProgramStore', () => ({
     newProgram: mockNewProgram,
     open: mockOpen,
     save: mockSave,
+    setName: mockSetName,
     currentProgram: ref(null),
     loadProgram: vi.fn(),
   }),
@@ -86,6 +88,7 @@ describe('ProgramToolbar', () => {
     mockNewProgram.mockReset()
     mockOpen.mockReset()
     mockSave.mockReset()
+    mockSetName.mockReset()
     isDirtyRef.value = true
   })
 
@@ -431,6 +434,57 @@ describe('ProgramToolbar', () => {
 
       // Dialog should be dismissed
       expect(wrapper.find('.game-dialog-overlay').exists()).toBe(false)
+
+      wrapper.unmount()
+    })
+  })
+
+  describe('rename preserves dirty state', () => {
+    it('calls setName instead of loadProgram when renaming', async () => {
+      const wrapper = mount(ProgramToolbar, {
+        props: { isCompact: false },
+      })
+
+      // Click the program name to enter rename mode
+      const nameEditable = wrapper.find('.program-name-editable')
+      await nameEditable.trigger('click')
+      await wrapper.vm.$nextTick()
+
+      // Verify rename input is shown
+      const nameInput = wrapper.find('.program-name-input')
+      expect(nameInput.exists()).toBe(true)
+
+      // Set new name and trigger finish by blurring
+      await nameInput.setValue('New Program Name')
+      await nameInput.trigger('blur')
+      await wrapper.vm.$nextTick()
+
+      // setName should be called with the new name
+      expect(mockSetName).toHaveBeenCalledWith('New Program Name')
+
+      wrapper.unmount()
+    })
+
+    it('preserves dirty state after rename when program had unsaved changes', async () => {
+      isDirtyRef.value = true
+
+      const wrapper = mount(ProgramToolbar, {
+        props: { isCompact: false },
+      })
+
+      // Click the program name to enter rename mode
+      const nameEditable = wrapper.find('.program-name-editable')
+      await nameEditable.trigger('click')
+      await wrapper.vm.$nextTick()
+
+      // Set new name and finish rename
+      const nameInput = wrapper.find('.program-name-input')
+      await nameInput.setValue('Renamed Program')
+      await nameInput.trigger('blur')
+      await wrapper.vm.$nextTick()
+
+      // Dirty indicator should still be visible after rename
+      expect(wrapper.find('.dirty-indicator').exists()).toBe(true)
 
       wrapper.unmount()
     })
