@@ -2,15 +2,18 @@
  * Web Worker Entry Point for BASIC Interpreter
  *
  * This is the main entry point for the web worker that will be bundled
- * with the interpreter code.
+ * with the interpreter code. It handles incoming messages from the main
+ * thread, dispatches them to the appropriate handlers, and manages the
+ * interpreter lifecycle for both one-shot execution and REPL sessions.
  */
 
-import { SharedDisplayBufferAccessor } from '@/core/animation/sharedDisplayBufferAccessor'
 import { BasicInterpreter } from '@/core/BasicInterpreter'
 import { WebWorkerDeviceAdapter } from '@/core/devices/WebWorkerDeviceAdapter'
-import type { AnyServiceWorkerMessage, ClearDisplayMessage, ErrorMessage, ExecuteMessage, InputValueMessage, OutputMessage, PlaySoundCompleteMessage, ReplClearMessage, ReplExecuteMessage, ReplRunMessage, ResultMessage, SetBgDataMessage, SetSharedAnimationBufferMessage, SetSharedJoystickBufferMessage, SetSharedKeyboardBufferMessage, StopMessage, StrigEventMessage } from '@/core/types/worker-messages'
-import type { BgGridData } from '@/features/bg-editor/types'
+import type { AnyServiceWorkerMessage, ClearDisplayMessage, ExecuteMessage, InputValueMessage, PlaySoundCompleteMessage, ReplClearMessage, ReplExecuteMessage, ReplRunMessage, ResultMessage, StopMessage, StrigEventMessage } from '@/core/types/worker-messages'
 import { logWorker } from '@/shared/logger'
+
+import { sendError, sendResult } from './workerMessageSenders'
+import { handleSetBgData, handleSetSharedAnimationBuffer, handleSetSharedJoystickBuffer, handleSetSharedKeyboardBuffer } from './workerSharedBufferHandlers'
 
 // Web Worker Interpreter Implementation
 class WebWorkerInterpreter {
@@ -33,25 +36,11 @@ class WebWorkerInterpreter {
     if (typeof self === 'undefined') return
 
     self.addEventListener('message', event => {
-      // Commented out to reduce log flooding
-      // logWorker.debug('Web worker received message from main thread:', {
-      //   type: event.data.type,
-      //   id: event.data.id,
-      //   timestamp: event.data.timestamp,
-      //   dataSize: JSON.stringify(event.data).length,
-      // })
       void this.handleMessage(event.data)
     })
   }
 
   async handleMessage(message: AnyServiceWorkerMessage) {
-    // Commented out to reduce log flooding
-    // logWorker.debug('Processing message:', {
-    //   type: message.type,
-    //   id: message.id,
-    //   timestamp: message.timestamp,
-    // })
-
     try {
       // -- Only handling request messages, not response messages
       // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
@@ -71,16 +60,18 @@ class WebWorkerInterpreter {
           this.handleStrigEvent(message)
           break
         case 'SET_SHARED_ANIMATION_BUFFER':
-          this.handleSetSharedAnimationBuffer(message)
+          this.sharedAnimationBuffer = handleSetSharedAnimationBuffer(
+            message, this.interpreter, this.webWorkerDeviceAdapter, this.sharedAnimationBuffer
+          )
           break
         case 'SET_SHARED_JOYSTICK_BUFFER':
-          this.handleSetSharedJoystickBuffer(message)
+          handleSetSharedJoystickBuffer(message, this.webWorkerDeviceAdapter)
           break
         case 'SET_SHARED_KEYBOARD_BUFFER':
-          this.handleSetSharedKeyboardBuffer(message)
+          handleSetSharedKeyboardBuffer(message, this.webWorkerDeviceAdapter)
           break
         case 'SET_BG_DATA':
-          this.handleSetBgData(message)
+          handleSetBgData(message, this.webWorkerDeviceAdapter)
           break
         case 'INPUT_VALUE':
           this.handleInputValue(message)
@@ -109,7 +100,6 @@ class WebWorkerInterpreter {
           // Other message types (RESULT, PROGRESS, OUTPUT, ERROR,
           // SCREEN_UPDATE, INIT, READY) are sent FROM the worker, not
           // handled BY the worker.
-          // REPL_EXECUTE, REPL_RUN, REPL_CLEAR are handled above.
           logWorker.warn('Unexpected message type:', message.type)
           break
       }
@@ -119,7 +109,7 @@ class WebWorkerInterpreter {
       logWorker.error('Stack trace:', err.stack ?? '(no stack available)')
       // Capture location from interpreter when available (e.g. error escaped from handleExecute)
       const location = this.interpreter?.getExecutionLocation?.() ?? null
-      this.sendError(message.id, err, location)
+      sendError(message.id, err, location)
     }
   }
 
@@ -182,7 +172,6 @@ class WebWorkerInterpreter {
       }
       const spriteStates = this.interpreter.getSpriteStates()
       const spriteEnabled = this.interpreter.isSpriteEnabled()
-      // movementStates no longer sent in RESULT - read from shared buffer instead
 
       // Create enhanced result with execution metadata
       const enhancedResult: ResultMessage['data'] = {
@@ -193,20 +182,20 @@ class WebWorkerInterpreter {
         spriteEnabled,
       }
 
-      this.sendResult(message.id, enhancedResult)
+      sendResult(message.id, enhancedResult)
     } catch (error) {
       this.isRunning = false
       const err = error instanceof Error ? error : new Error(String(error))
       logWorker.error('Execution error:', err.message)
       logWorker.error('Stack trace:', err.stack ?? '(no stack available)')
       const location = this.interpreter?.getExecutionLocation() ?? null
-      this.sendError(message.id, err, location)
+      sendError(message.id, err, location)
     }
   }
 
   handlePing(message: { id: string }) {
     logWorker.debug('Handling PING message')
-    this.sendResult(message.id, {
+    sendResult(message.id, {
       executionId: message.id,
       success: true,
       errors: [],
@@ -261,16 +250,14 @@ class WebWorkerInterpreter {
       }
 
       // Create interpreter if needed (fresh REPL session)
-      if (!this.interpreter) {
-        this.interpreter = new BasicInterpreter({
-          maxIterations: Infinity,
-          maxOutputLines: Infinity,
-          enableDebugMode: false,
-          strictMode: false,
-          deviceAdapter: this.webWorkerDeviceAdapter!,
-          sharedAnimationBuffer: this.sharedAnimationBuffer ?? undefined,
-        })
-      }
+      this.interpreter ??= new BasicInterpreter({
+        maxIterations: Infinity,
+        maxOutputLines: Infinity,
+        enableDebugMode: false,
+        strictMode: false,
+        deviceAdapter: this.webWorkerDeviceAdapter!,
+        sharedAnimationBuffer: this.sharedAnimationBuffer ?? undefined,
+      })
 
       // Execute the single statement
       this.isRunning = true
@@ -281,7 +268,7 @@ class WebWorkerInterpreter {
         this.webWorkerDeviceAdapter.setCurrentExecutionId(null)
       }
 
-      this.sendResult(message.id, {
+      sendResult(message.id, {
         ...result,
         executionId: message.id,
         workerId: 'web-worker-1',
@@ -291,7 +278,7 @@ class WebWorkerInterpreter {
       const err = error instanceof Error ? error : new Error(String(error))
       logWorker.error('REPL_EXECUTE error:', err.message)
       const location = this.interpreter?.getExecutionLocation() ?? null
-      this.sendError(message.id, err, location)
+      sendError(message.id, err, location)
     }
   }
 
@@ -319,7 +306,7 @@ class WebWorkerInterpreter {
       const spriteStates = this.interpreter.getSpriteStates()
       const spriteEnabled = this.interpreter.isSpriteEnabled()
 
-      this.sendResult(message.id, {
+      sendResult(message.id, {
         ...result,
         executionId: message.id,
         workerId: 'web-worker-1',
@@ -330,7 +317,7 @@ class WebWorkerInterpreter {
       this.isRunning = false
       const err = error instanceof Error ? error : new Error(String(error))
       logWorker.error('REPL_RUN error:', err.message)
-      this.sendError(message.id, err, null)
+      sendError(message.id, err, null)
     }
   }
 
@@ -346,151 +333,6 @@ class WebWorkerInterpreter {
     if (this.webWorkerDeviceAdapter) {
       this.webWorkerDeviceAdapter.pushStrigState(joystickId, state)
     }
-  }
-
-  handleSetSharedAnimationBuffer(message: SetSharedAnimationBufferMessage) {
-    const data = message.data
-    if (!data?.buffer) {
-      logWorker.warn('SET_SHARED_ANIMATION_BUFFER: message.data or buffer missing')
-      return
-    }
-    const { buffer } = data
-    this.sharedAnimationBuffer = buffer
-    logWorker.debug('[WebWorkerInterpreter] SET_SHARED_ANIMATION_BUFFER received, buffer byteLength =', buffer.byteLength)
-    const accessor = new SharedDisplayBufferAccessor(buffer)
-    const animationManager = this.interpreter?.getAnimationManager()
-    logWorker.debug('[WebWorkerInterpreter] Interpreter exists:', !!this.interpreter, 'AnimationManager exists:', !!animationManager)
-    if (this.webWorkerDeviceAdapter) {
-      this.webWorkerDeviceAdapter.setSharedDisplayBufferAccessor(accessor)
-    }
-    // Update AnimationManager's shared buffer for direct sync to AnimationWorker
-    if (animationManager) {
-      logWorker.debug('[WebWorkerInterpreter] Updating existing AnimationManager with shared buffer')
-      animationManager.setSharedAnimationBuffer(buffer)
-    } else {
-      logWorker.debug('[WebWorkerInterpreter] AnimationManager not created yet, will use buffer when interpreter is created')
-    }
-  }
-
-  handleSetSharedJoystickBuffer(message: SetSharedJoystickBufferMessage) {
-    const data = message.data
-    if (!data?.buffer) {
-      logWorker.warn('SET_SHARED_JOYSTICK_BUFFER: message.data or buffer missing')
-      return
-    }
-    const { buffer } = data
-    logWorker.debug('[WebWorkerInterpreter] SET_SHARED_JOYSTICK_BUFFER received, buffer byteLength =', buffer.byteLength)
-    if (this.webWorkerDeviceAdapter) {
-      this.webWorkerDeviceAdapter.setSharedJoystickBuffer(buffer)
-      logWorker.debug('[WebWorkerInterpreter] Shared joystick buffer set in WebWorkerDeviceAdapter')
-    } else {
-      logWorker.warn('[WebWorkerInterpreter] No WebWorkerDeviceAdapter available for SET_SHARED_JOYSTICK_BUFFER')
-    }
-  }
-
-  handleSetSharedKeyboardBuffer(message: SetSharedKeyboardBufferMessage) {
-    const data = message.data
-    if (!data?.buffer) {
-      logWorker.warn('SET_SHARED_KEYBOARD_BUFFER: message.data or buffer missing')
-      return
-    }
-    const { buffer } = data
-    logWorker.debug('[WebWorkerInterpreter] SET_SHARED_KEYBOARD_BUFFER received, buffer byteLength =', buffer.byteLength)
-    if (this.webWorkerDeviceAdapter) {
-      this.webWorkerDeviceAdapter.setSharedKeyboardBuffer(buffer)
-      logWorker.debug('[WebWorkerInterpreter] Shared keyboard buffer set in WebWorkerDeviceAdapter')
-    } else {
-      logWorker.warn('[WebWorkerInterpreter] No WebWorkerDeviceAdapter available for SET_SHARED_KEYBOARD_BUFFER')
-    }
-  }
-
-  handleSetBgData(message: SetBgDataMessage) {
-    const data = message.data
-    if (!data?.grid) {
-      logWorker.warn('SET_BG_DATA: message.data or grid missing')
-      return
-    }
-    logWorker.debug('[WebWorkerInterpreter] SET_BG_DATA received, grid size =', data.grid.length, 'x', data.grid[0]?.length ?? 0)
-    if (this.webWorkerDeviceAdapter) {
-      // Cast to BgGridData since the message type uses number for colorPattern
-      // but the actual values are always 0-3 (ColorPattern)
-      this.webWorkerDeviceAdapter.setBgGridData(data.grid as BgGridData)
-      logWorker.debug('[WebWorkerInterpreter] BG grid data set in WebWorkerDeviceAdapter')
-    } else {
-      logWorker.warn('[WebWorkerInterpreter] No WebWorkerDeviceAdapter available for SET_BG_DATA')
-    }
-  }
-
-  sendOutput(output: string, outputType: 'print' | 'debug' | 'error') {
-    if (!this.currentExecutionId) return
-
-    const message: OutputMessage = {
-      type: 'OUTPUT',
-      id: `output-${Date.now()}`,
-      timestamp: Date.now(),
-      data: {
-        executionId: this.currentExecutionId,
-        output,
-        outputType,
-        timestamp: Date.now(),
-      },
-    }
-    logWorker.debug('Sending OUTPUT message:', {
-      outputType,
-      outputLength: output.length,
-      executionId: this.currentExecutionId,
-    })
-    self.postMessage(message)
-  }
-
-  sendResult(messageId: string, result: ResultMessage['data']) {
-    const message: ResultMessage = {
-      type: 'RESULT',
-      id: messageId,
-      timestamp: Date.now(),
-      data: result,
-    }
-    logWorker.debug('Sending RESULT message:', {
-      messageId,
-      success: result.success,
-      executionTime: result.executionTime,
-    })
-    self.postMessage(message)
-  }
-
-  sendError(
-    messageId: string,
-    error: Error,
-    location?: { lineNumber: number; statementIndex: number; sourceLine?: string } | null
-  ): void {
-    // Always send a string for stack so main thread can display it (worker stack may be undefined in some envs)
-    const stackStr =
-      (error && typeof (error).stack === 'string' && (error).stack) ||
-      '(stack not available)'
-    const message: ErrorMessage = {
-      type: 'ERROR',
-      id: messageId,
-      timestamp: Date.now(),
-      data: {
-        executionId: messageId,
-        message: error.message,
-        stack: stackStr,
-        lineNumber: location?.lineNumber,
-        sourceLine: location?.sourceLine,
-        errorType: 'execution',
-        recoverable: true,
-      },
-    }
-    logWorker.error('Sending ERROR message:', {
-      messageId,
-      errorMessage: error.message,
-      lineNumber: location?.lineNumber,
-      sourceLine: location?.sourceLine ? `${location.sourceLine.slice(0, 40)}...` : undefined,
-      errorType: 'execution',
-      recoverable: true,
-    })
-    logWorker.error('Stack trace:', stackStr)
-    self.postMessage(message)
   }
 }
 
