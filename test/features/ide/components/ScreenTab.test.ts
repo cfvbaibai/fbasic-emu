@@ -163,4 +163,44 @@ describe('ScreenTab', () => {
     expect(mockToggleFilter).not.toHaveBeenCalled()
     wrapper.unmount()
   })
+
+  it('renders ReplInput between tab-content and tab-content-footer', () => {
+    const wrapper = mountScreenTab()
+
+    const tabContent = wrapper.find('.tab-content')
+    const replInput = wrapper.findComponent({ name: 'ReplInput' })
+    const footer = wrapper.find('.tab-content-footer')
+
+    expect(tabContent.exists()).toBe(true)
+    expect(replInput.exists()).toBe(true)
+    expect(footer.exists()).toBe(true)
+
+    // Verify DOM order: tab-content before ReplInput before footer
+    const children = wrapper.element.children
+    let foundTabContent = false
+    let foundReplInput = false
+    for (let i = 0; i < children.length; i++) {
+      const el = children[i] as HTMLElement
+      if (el.classList.contains('tab-content')) foundTabContent = true
+      if (foundTabContent && !foundReplInput && el.classList.contains('repl-input-wrapper')) {
+        foundReplInput = true
+      }
+      if (foundReplInput && el.classList.contains('tab-content-footer')) {
+        // Correct order found
+        expect(true).toBe(true)
+        return
+      }
+    }
+    // Should not reach here
+    expect.fail('ReplInput not found between tab-content and tab-content-footer')
+    wrapper.unmount()
+  })
+
+  it('passes active=false to ReplInput by default', () => {
+    const wrapper = mountScreenTab()
+
+    const replInput = wrapper.findComponent({ name: 'ReplInput' })
+    expect(replInput.props('active')).toBe(false)
+    wrapper.unmount()
+  })
 })
