@@ -8,6 +8,7 @@ import { provideScreenZoom } from '@/features/ide/composables/useScreenZoom'
 import { GameButton, GameButtonGroup, GameIcon, GameTabPane } from '@/shared/components/ui'
 
 import ErrorPanel from './ErrorPanel.vue'
+import ReplInput from './ReplInput.vue'
 import Screen from './Screen.vue'
 
 /**
@@ -98,6 +99,9 @@ const isReducedMotion = computed(() => prefersReducedMotion.value)
 
     <div class="tab-content">
       <Screen />
+    </div>
+    <div class="repl-input-wrapper">
+      <ReplInput :active="false" :disabled="false" @execute="() => {}" />
     </div>
     <div class="tab-content-footer">
       <ErrorPanel :errors="errors" />
