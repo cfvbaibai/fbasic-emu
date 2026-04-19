@@ -5,6 +5,16 @@ import { nextTick } from 'vue'
 
 import ReplInput from '@/features/ide/components/ReplInput.vue'
 
+import { createI18nMock } from '../../../helpers/createI18nMock'
+
+const mockT = createI18nMock({
+  'ide.repl.placeholder': 'Enter command...',
+})
+
+vi.mock('vue-i18n', () => ({
+  useI18n: () => ({ t: mockT }),
+}))
+
 describe('ReplInput', () => {
   function mountReplInput(props: {
     active?: boolean
@@ -52,7 +62,7 @@ describe('ReplInput', () => {
     wrapper.unmount()
   })
 
-  it('renders a text input with placeholder', () => {
+  it('renders a text input with i18n placeholder', () => {
     const wrapper = mountReplInput({ active: true })
 
     const input = wrapper.find('input.repl-input-field')

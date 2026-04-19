@@ -564,6 +564,9 @@
   "musicComposer": {
     "title": "ミュージックコンポーザー"
   },
+  "repl": {
+    "placeholder": "コマンドを入力..."
+  },
   "tutorial": {
     "title": "チュートリアル",
     "defaultTitle": "F-BASICチュートリアル",
